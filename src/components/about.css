@@ -1,0 +1,4 @@
+.fullpage{
+    background: rgb(255,255,255);
+    background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgb(255, 185, 34) 100%);
+}

@@ -1,5 +1,12 @@
 .App {
   text-align: center;
+  width: 85%;
+  max-width: 1900px;
+  margin: auto;
+}
+
+body {
+  font-family: 'nanumsquare';
 }
 
 .App-logo {
@@ -34,5 +41,12 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 775px) {
+  /*Mobile View */
+  .App {
+    width: 100%;
   }
 }
