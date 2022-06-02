@@ -47,6 +47,9 @@ const Header = (props) => {
                 <Link to="/announcement">교회소식</Link>
               </li>
               <li className="option" onClick={closeMobileMenu}>
+                <Link to="/announcement">온라인</Link>
+              </li>
+              <li className="option" onClick={closeMobileMenu}>
                 <Link to="/photos">사진</Link>
               </li>
               <li className="option mobile-option" onClick={closeMobileMenu}>

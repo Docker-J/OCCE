@@ -1,5 +1,5 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { firebaseInstance } from "../firebase";
+import { firebaseInstance } from "../api/firebase";
 
   const FirebaseSignUp = (email, password) => {
     const auth = firebaseInstance.getAuth();

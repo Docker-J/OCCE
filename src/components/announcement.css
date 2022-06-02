@@ -1,0 +1,31 @@
+.weeklyBulletinBoard {
+  margin: auto;
+  align-items: center;
+}
+
+.page {
+  display: flex;
+  justify-content: center;
+}
+
+#previousBulletin {
+  margin-right: 20px;
+}
+
+#previousBulletin :hover {
+  color: orange;
+}
+
+#nextBulletin {
+  margin-left: 20px;
+}
+
+#nextBulletin :hover {
+  color: orange;
+}
+
+#uploadBulletinButton {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
