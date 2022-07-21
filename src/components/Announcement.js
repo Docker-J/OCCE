@@ -20,6 +20,7 @@ import BulletinUploadModal from "./BulletinUploadModal";
 import { collection, getDocs, setDoc, doc, getDoc } from "firebase/firestore";
 import { db } from "../api/firebase";
 import PDFReader from "./PDFReader";
+import { useParams } from "react-router-dom";
 
 const Announcement = () => {
   function printLog(value) {
@@ -27,11 +28,12 @@ const Announcement = () => {
   }
 
   const [bulletin, setBulletin] = useState(null);
-
-  const minDate = new Date("2022/04/03");
-  const [maxDate, setMaxDate] = useState(null);
-
   const [isSuccessSnackBarOpen, setIsSuccessSnackBarOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [modalState, setModalState] = useState(false);
+  const [maxDate, setMaxDate] = useState(null);
+  const minDate = new Date("2022/04/03");
+
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -40,26 +42,26 @@ const Announcement = () => {
     setIsSuccessSnackBarOpen(false);
   };
 
-  const [selectedDate, setSelectedDate] = useState(null);
-
-  useEffect(() => {
-    getMaxDate();
-  }, []);
-
   async function getMaxDate() {
-    let maxDateString = "0";
-
     const querySnapshot = await getDocs(collection(db, "weeklyBulletin"));
-    querySnapshot.forEach((doc) => {
-      if (doc.id.replace(/-/g, "") > maxDateString.replace(/-/g, "")) {
-        maxDateString = doc.id.replace(/-/g, "/");
-      }
-    });
 
-    const maxDate = new Date(maxDateString);
+    const maxDate = new Date(
+      querySnapshot.docs[querySnapshot.docs.length - 1].id.replace(/-/g, "/")
+    );
 
     setMaxDate(maxDate);
-    setSelectedDate(maxDate);
+    const params = new URLSearchParams(window.location.search);
+    let queryDate = params.get("date");
+
+    if (queryDate === null) {
+      setSelectedDate(maxDate);
+    } else {
+      const year = +queryDate.substring(0, 4);
+      const month = +queryDate.substring(4, 6);
+      const day = +queryDate.substring(6, 8);
+
+      setSelectedDate(new Date(year, month - 1, day));
+    }
   }
 
   // Get Bulletin from Firestore
@@ -70,12 +72,6 @@ const Announcement = () => {
 
     setBulletin(docSnap.data().file);
   }
-
-  useEffect(() => {
-    loadFile();
-  });
-
-  const [modalState, setModalState] = useState(false);
 
   function closeModal() {
     setModalState(false);
@@ -124,6 +120,28 @@ const Announcement = () => {
       )
     );
   };
+
+  useEffect(() => {
+    getMaxDate();
+  }, []);
+
+  useEffect(() => {
+    loadFile();
+    // if (useParams.postId != null) {
+    //   selectedDate.toLocaleDateString("sv").replace(/-/g, "");
+    // }
+    if (selectedDate != null) {
+      const newUrl =
+        window.location.protocol +
+        "//" +
+        window.location.host +
+        window.location.pathname +
+        "?date=" +
+        selectedDate.toLocaleDateString("sv").replace(/-/g, "");
+
+      window.history.replaceState({}, null, newUrl);
+    }
+  });
 
   return (
     <div className="weeklyBulletinBoard">

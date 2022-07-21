@@ -1,4 +1,35 @@
-.fullpage{
-    background: rgb(255,255,255);
-    background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgb(255, 185, 34) 100%);
+.fullpage {
+  /* background: rgb(255, 255, 255);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgb(255, 185, 34) 100%
+  ); */
+}
+
+#section1 {
+  background-image: url("FirstStep2.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.section1Body {
+  margin: auto;
+  max-width: 1536px;
+  padding: 4vw;
+}
+
+#section2 {
+  background-image: url("Name.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+#section3 {
+  background-image: url("Direction.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }

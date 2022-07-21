@@ -24,8 +24,12 @@
   color: orange;
 }
 
+#nextBulletin :disabled {
+  color: white;
+}
+
 #uploadBulletinButton {
-  position: absolute;
-  right: 0;
-  bottom: 0;
+  position: fixed;
+  right: 2vw;
+  bottom: 3vh;
 }

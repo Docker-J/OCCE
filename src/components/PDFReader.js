@@ -40,6 +40,28 @@ function PDFReader(props) {
     setPageNumber(1);
   }, [props.file]);
 
+  const [windowDimenion, detectHW] = useState({
+    winWidth: window.innerWidth,
+    winHeight: window.innerHeight,
+  });
+
+  const detectSize = () => {
+    detectHW({
+      winWidth: window.innerWidth,
+      winHeight: window.innerHeight,
+    });
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", detectSize);
+
+    return () => {
+      window.removeEventListener("resize", detectSize);
+    };
+  }, [windowDimenion]);
+
+  console.log(windowDimenion.winHeight - 400);
+
   return (
     <div>
       <ButtonGroup id="scaleButton">
@@ -61,6 +83,7 @@ function PDFReader(props) {
             renderTextLayer={false}
             className="page"
             scale={scale}
+            // height={windowDimenion.winHeight}
             pageNumber={pageNumber}
           />
         </Document>

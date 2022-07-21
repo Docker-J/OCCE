@@ -1,0 +1,230 @@
+.churchName {
+  position: relative;
+  background: -webkit-linear-gradient(
+    left,
+    rgb(176, 80, 15) 0%,
+    rgb(225, 116, 42) 40%,
+    rgb(242, 164, 111) 80%,
+    rgb(246, 190, 152) 100%
+  );
+  background: -o-linear-gradient(
+    left,
+    rgb(176, 80, 15) 0%,
+    rgb(225, 116, 42) 40%,
+    rgb(242, 164, 111) 80%,
+    rgb(246, 190, 152) 100%
+  );
+  background: -ms-linear-gradient(
+    left,
+    rgb(176, 80, 15) 0%,
+    rgb(225, 116, 42) 40%,
+    rgb(242, 164, 111) 80%,
+    rgb(246, 190, 152) 100%
+  );
+  background: -moz-linear-gradient(
+    left,
+    rgb(176, 80, 15) 0%,
+    rgb(225, 116, 42) 40%,
+    rgb(242, 164, 111) 80%,
+    rgb(246, 190, 152) 100%
+  );
+  background: linear-gradient(
+    to right,
+    rgb(176, 80, 15) 0%,
+    rgb(225, 116, 42) 40%,
+    rgb(242, 164, 111) 80%,
+    rgb(246, 190, 152) 100%
+  );
+
+  padding-top: 6vh;
+  height: 35vmax;
+  max-height: 650px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+  to {
+    transform: rotate(90deg) scale(0.7);
+  }
+}
+
+@keyframes spintoHorizontal {
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+  to {
+    transform: rotate(-90deg) scale(1.4);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    height: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes goLeft {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(-30%, 0);
+  }
+}
+
+@keyframes goLeftFurther {
+  from {
+    transform: translate(-30%, 0);
+  }
+  to {
+    transform: translate(-65%, 0);
+  }
+}
+
+@keyframes goRight {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(50%, 0);
+  }
+}
+
+@keyframes goRightFurther {
+  from {
+    transform: translate(50%, 0);
+  }
+  to {
+    transform: translate(120%, 0);
+  }
+}
+
+.horizontalLogo {
+  max-width: 400px;
+  width: 21vmax;
+  height: auto;
+  margin-top: 4vh;
+  margin-bottom: 4vh;
+  animation: spin 4s ease-in-out 2s 1 forwards,
+    fadeOut 5s ease-in-out 11s 1 forwards;
+}
+
+.nameExplanationContainer {
+  position: relative;
+  height: 5.3vh;
+  margin-bottom: 3vmin;
+  margin-top: 3vmin;
+}
+
+.nameExplanation {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 100%;
+  /* margin: auto;
+  color: white;
+  font-weight: bolder;
+  font-size: 1.7vmax; */
+  justify-content: center;
+  animation-name: fadeOut;
+  animation-duration: 4s;
+  animation-delay: 2s;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: both;
+}
+
+.nameExplanation2 {
+  position: absolute;
+  width: 100%;
+  left: 50%;
+  transform: translate(-50%, 0);
+  display: flex;
+  height: 0;
+  opacity: 0;
+  justify-content: center;
+  animation: fadeIn 4s ease-in-out 6s 1 forwards,
+    fadeOut 4s ease-in-out 10s 1 forwards;
+}
+
+.nameExplanation3 {
+  position: absolute;
+  width: 100%;
+
+  left: 50%;
+  transform: translate(-50%, 0);
+  margin: auto;
+  max-width: 1500px;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  justify-content: center;
+  animation: fadeIn 4s ease-in-out 14s 1 forwards;
+}
+
+.edmonton {
+  animation: goLeft 4s ease-in-out 16s 1 forwards,
+    goLeftFurther 4s ease-in-out 22s 1 forwards;
+}
+
+.nameExplanation3 > .verticalLogo {
+  position: absolute;
+  left: 50.5%;
+  opacity: 0;
+  max-width: 5vmax;
+  animation: fadeIn 4s ease-in-out 16.5s 1 forwards,
+    spintoHorizontal 4s ease-in-out 22s 1 forwards;
+}
+
+.church {
+  animation: goRight 4s ease-in-out 16s 1 forwards,
+    goRightFurther 4s ease-in-out 22s 1 forwards;
+}
+
+.churchName > .learnMoreAbtChurch {
+  position: absolute;
+  bottom: 65px;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+
+.cards {
+  margin: auto;
+  max-width: 1500px;
+  margin-top: 3vh;
+  margin-bottom: 3vh;
+  justify-content: space-around;
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.cards > card {
+  margin: 2vh;
+}
+
+/* Responsive layout - when the screen is less than 700px wide, make the two columns stack on top of each other instead of next to each other */
+/* @media screen and (max-width: 850px) {
+  .cards {
+    flex-direction: column;
+  }
+
+  .cards > card {
+    margin: 4vh;
+  }
+} */

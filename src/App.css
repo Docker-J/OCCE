@@ -1,12 +1,14 @@
+@import url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@1.0/nanumsquare.css);
+
 .App {
   text-align: center;
-  width: 85%;
-  max-width: 1900px;
+  /* width: 85%;
+  max-width: 1900px; */
   margin: auto;
 }
 
 body {
-  font-family: 'nanumsquare';
+  font-family: "nanumsquare";
 }
 
 .App-logo {
