@@ -1,52 +1,37 @@
-import {
-  Button,
-  Card,
-  Typography,
-  Box,
-  CardContent,
-  CardActions,
-  Divider,
-  Fab,
-} from "@mui/material";
+import { Button, Typography, Fab } from "@mui/material";
 
-import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
-import ScheduleIcon from "@mui/icons-material/Schedule";
-import FeedOutlinedIcon from "@mui/icons-material/FeedOutlined";
-import YouTubeIcon from "@mui/icons-material/YouTube";
-import HowToRegOutlinedIcon from "@mui/icons-material/HowToRegOutlined";
-import VolunteerActivismOutlinedIcon from "@mui/icons-material/VolunteerActivismOutlined";
 import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
 
 import { Link as RouterLink } from "react-router-dom";
 
 import "./Main.css";
-import { minHeight, textAlign } from "@mui/system";
+import ButtonBases from "./MainButtonBanner";
 
 const Main = () => {
   return (
     <div>
       <div className="churchName">
-        <img className="horizontalLogo" src="img/ONLogo.svg" />
-
         <div className="nameExplanationContainer">
-          <div className="nameExplanation" style={{ display: "flex" }}>
+          <img className="horizontalLogo" src="img/ONLogo.svg" />
+
+          <div className="nameExplanation">
             <Typography
               className="old"
               variant="h5"
               fontWeight="530"
-              fontSize={"1.7vmax"}
+              fontSize={"min(5vw, 36px)"}
               style={{ color: "#f1cdb0" }}
             >
-              예부터 주신 말씀을 따라
+              Based ON the OLD truth
             </Typography>
             <Typography
               className="new"
               variant="h5"
               fontWeight="530"
-              fontSize={"1.7vmax"}
+              fontSize={"min(5vw, 36px)"}
               color="white"
             >
-              &nbsp;새 시대의 사명을 행하는 교회
+              Moving ON to the NEW standard
             </Typography>
           </div>
 
@@ -54,22 +39,20 @@ const Main = () => {
             <Typography
               variant="h5"
               fontWeight="530"
-              fontSize={"1.4vmax"}
+              fontSize={"min(5vw, 36px)"}
               style={{ color: "#f1cdb0" }}
             >
               온 맘 다해 하나님을 사랑하고
             </Typography>
             <Typography
-              className="new"
               variant="h5"
               fontWeight="530"
-              fontSize={"1.4vmax"}
+              fontSize={"min(5vw, 36px)"}
               color="white"
             >
-              &nbsp;온 힘 다해 이웃을 사랑하는 교회
+              온 힘 다해 이웃을 사랑하는 교회
             </Typography>
           </div>
-
           <div className="nameExplanation3">
             <Typography
               className="edmonton"
@@ -103,21 +86,34 @@ const Main = () => {
           className="learnMoreAbtChurch"
           component={RouterLink}
           to="/aboutus#churchname"
-          variant="contained"
-          sx={{ backgroundColor: "transparent" }}
+          variant="outlined"
+          size="medium"
+          sx={{
+            color: "white",
+            borderColor: "white",
+            ":hover": { borderColor: "white", bgcolor: "#964B00" },
+          }}
         >
-          더 알아보기
+          온 교회 이야기
         </Button>
       </div>
 
       <div className="cards">
-        <Card sx={{ minWidth: 275 }}>
-          <CardContent>
-            <PlaceOutlinedIcon fontSize="large" />
+        <ButtonBases />
 
-            <Typography variant="h5" component="div">
-              장소
-            </Typography>
+        {/* <Card component="Card" sx={{ minWidth: 275 }}>
+          <CardContent>
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="center"
+              gap={0.5}
+            >
+              <PlaceOutlinedIcon fontSize="large" />
+              <Typography variant="h5" component="div">
+                장소
+              </Typography>
+            </Stack>
 
             <Divider sx={{ my: 1 }} variant="middle" />
 
@@ -129,15 +125,15 @@ const Main = () => {
             <Button
               href="https://goo.gl/maps/gqpiA88gJSvbjfDD9"
               target="_blank"
-              size="small"
+              size="large"
               style={{ margin: "auto" }}
             >
-              Learn More
+              오시는 길
             </Button>
           </CardActions>
         </Card>
 
-        <Card component="card" sx={{ minWidth: 275 }}>
+        <Card component="Card" sx={{ minWidth: 275 }}>
           <CardContent>
             <ScheduleIcon fontSize="large" />
 
@@ -161,7 +157,7 @@ const Main = () => {
           </CardActions>
         </Card>
 
-        <Card sx={{ minWidth: 275 }}>
+        <Card component="Card" sx={{ minWidth: 275 }}>
           <CardContent>
             <FeedOutlinedIcon fontSize="large" />
 
@@ -184,16 +180,16 @@ const Main = () => {
           <CardActions>
             <Button
               component={RouterLink}
-              size="small"
+              size="large"
               style={{ margin: "auto" }}
               to="/announcement"
             >
-              Learn More
-            </Button>{" "}
+              바로가기
+            </Button>
           </CardActions>
         </Card>
 
-        <Card component="card" sx={{ minWidth: 275 }}>
+        <Card component="Card" sx={{ minWidth: 275 }}>
           <CardContent>
             <YouTubeIcon fontSize="large" />
 
@@ -225,7 +221,7 @@ const Main = () => {
           </CardActions>
         </Card>
 
-        <Card component="card" sx={{ minWidth: 275 }}>
+        <Card component="Card" sx={{ minWidth: 275 }}>
           <CardContent>
             <HowToRegOutlinedIcon fontSize="large" />
 
@@ -257,7 +253,7 @@ const Main = () => {
           </CardActions>
         </Card>
 
-        <Card component="card" sx={{ minWidth: 275 }}>
+        <Card component="Card" sx={{ minWidth: 275 }}>
           <CardContent>
             <VolunteerActivismOutlinedIcon fontSize="large" />
 
@@ -287,7 +283,7 @@ const Main = () => {
               Learn More
             </Button>
           </CardActions>
-        </Card>
+        </Card> */}
       </div>
 
       <Fab

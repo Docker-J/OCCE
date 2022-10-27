@@ -1,35 +1,30 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
+import "./ResponsiveAppBar.css";
+
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
+// import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
-import MenuItem from "@mui/material/MenuItem";
-import AdbIcon from "@mui/icons-material/Adb";
-import { color } from "@mui/system";
+// import Avatar from "@mui/material/Avatar";
+// import Button from "@mui/material/Button";
+// import Tooltip from "@mui/material/Tooltip";
+// import MenuItem from "@mui/material/MenuItem";
 
-const pages = ["교회소개", "교회소식", "온라인", "공동체", "사진"];
-const links = new Map([
-  ["교회소개", "aboutus#churchname"],
-  ["교회소식", "announcement"],
-  ["온라인", "online"],
-  ["공동체", "community"],
-  ["사진", "photos"],
-]);
+import Submenu from "./Submenu";
+import SubmenuMobile from "./SubmenuMobile";
 
-// const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
+  const [anchorElOnline, setAnchorElOnline] = useState(null);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -41,14 +36,105 @@ const ResponsiveAppBar = () => {
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
-
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
 
-  console.log(useLocation());
-
+  // console.log(useLocation().hash);
   const currentPage = useLocation().pathname;
+  const currnetHash = useLocation().hash;
+
+  const pages = [
+    {
+      title: "교회소개",
+      to: "aboutus",
+    },
+    {
+      title: "교회소식",
+      subpages: [
+        {
+          title: "주보",
+          to: "weeklyupdate",
+        },
+        {
+          title: "공지사항",
+          to: "announcements",
+        },
+        {
+          title: "교회사진",
+          to: "photos",
+        },
+        {
+          title: "교회영상",
+          to: "videos",
+        },
+      ],
+      state: "newsPopupState",
+    },
+    {
+      title: "ON-Line",
+      subpages: [
+        {
+          title: "주일예배",
+          to: "prayon",
+        },
+        {
+          title: "말씀",
+          to: "prayon",
+        },
+        {
+          title: "주일찬양",
+          to: "prayon",
+        },
+        {
+          title: "기도ON",
+          to: "prayon",
+        },
+        {
+          title: "묵상ON",
+          to: "meditationon",
+        },
+      ],
+      state: "onlinePopupState",
+    },
+    {
+      title: "공동체",
+      subpages: [
+        {
+          title: "소그룹",
+          to: "",
+        },
+        {
+          title: "사역",
+          to: "",
+        },
+      ],
+      state: "communityPopupState",
+    },
+    {
+      title: "다음세대",
+      to: "",
+      subpages: [
+        {
+          title: "유아유치부",
+          to: "",
+        },
+        {
+          title: "유초등부",
+          to: "",
+        },
+        {
+          title: "중고등부",
+          to: "",
+        },
+        {
+          title: "청년부",
+          to: "",
+        },
+      ],
+      state: "nextGenPopupState",
+    },
+  ];
 
   return (
     <AppBar
@@ -60,7 +146,10 @@ const ResponsiveAppBar = () => {
           : "static"
       }
       style={{ background: "transparent", boxShadow: "none" }}
-      sx={{ color: useLocation().pathname === "/" ? "white" : "black" }}
+      sx={{
+        color:
+          currentPage === "/" || currentPage === "/aboutus" ? "white" : "black",
+      }}
     >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
@@ -72,32 +161,16 @@ const ResponsiveAppBar = () => {
           >
             <Link to="/">
               <img
+                alt="Header Logo"
                 src={
-                  useLocation().pathname === "/"
-                    ? "img/HeaderLogoColor.png"
-                    : "img/HeaderLogoBW.png"
+                  currentPage === "/" || currentPage === "/aboutus"
+                    ? "/img/HeaderLogoColor.png"
+                    : "/img/HeaderLogoBW.png"
                 }
                 style={{ width: "240px" }}
               />
             </Link>
           </Box>
-
-          {/* <Typography
-            component={Link}
-            to="/"
-            variant="h6"
-            noWrap
-            sx={{
-              mr: 2,
-              display: { xs: "none", md: "flex" },
-              fontFamily: "sans-serif",
-              fontWeight: 900,
-              letterSpacing: ".4rem",
-              color: "inherit",
-            }}
-          >
-            에드먼턴 온 교회
-          </Typography> */}
 
           <Box
             sx={{
@@ -135,21 +208,10 @@ const ResponsiveAppBar = () => {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography
-                    component={Link}
-                    to={`/${links.get(page)}`}
-                    textAlign="center"
-                  >
-                    {page}
-                  </Typography>
-                </MenuItem>
+                <SubmenuMobile page={page} />
               ))}
             </Menu>
           </Box>
-          {/* <AdbIcon
-            sx={{ display: { xs: "flex", md: "none" }, mr: 1, color: "black" }}
-          /> */}
 
           <Box
             noWrap
@@ -161,12 +223,14 @@ const ResponsiveAppBar = () => {
           >
             <Link to="/">
               <img
+                alt="Header Logo"
+                className="mobileLogo"
                 src={
-                  useLocation().pathname === "/"
-                    ? "img/HeaderLogoColor.png"
-                    : "img/HeaderLogoBW.png"
+                  currentPage === "/" || currentPage === "/aboutus"
+                    ? "/img/HeaderLogoColor.png"
+                    : "/img/HeaderLogoBW.png"
                 }
-                style={{ width: "200px" }}
+                style={{ width: "180px" }}
               />
             </Link>
           </Box>
@@ -178,57 +242,13 @@ const ResponsiveAppBar = () => {
             }}
           >
             {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{
-                  my: 2,
-                  ml: 0.8,
-                  color: "inherit",
-                  display: "block",
-                  fontSize: "20px",
-                  fontWeight: "550",
-                }}
-                component={Link}
-                to={`/${links.get(page)}`}
-              >
-                {page}
-              </Button>
+              <Submenu page={page} />
             ))}
           </Box>
-          {/* 
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box> */}
         </Toolbar>
       </Container>
     </AppBar>
   );
 };
+
 export default ResponsiveAppBar;

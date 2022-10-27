@@ -8,6 +8,7 @@
 }
 
 body {
+  word-break: keep-all;
   font-family: "nanumsquare";
 }
 

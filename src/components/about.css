@@ -1,35 +1,111 @@
-.fullpage {
-  /* background: rgb(255, 255, 255);
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 1) 0%,
-    rgb(255, 185, 34) 100%
-  ); */
-}
-
 #section1 {
-  background-image: url("FirstStep2.jpg");
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)),
+    url("FirstStep.webp");
   background-repeat: no-repeat;
   background-size: cover;
-  background-position: center;
+  background-position: 83%;
 }
 
 .section1Body {
   margin: auto;
   max-width: 1536px;
-  padding: 4vw;
+}
+
+.section1Text {
+  position: absolute;
+  top: 50%;
+  left: 38%;
+  transform: translate(-50%, -50%);
 }
 
 #section2 {
-  background-image: url("Name.jpg");
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)),
+    url("calling.webp");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 35%;
+  position: relative;
+}
+
+.test {
+  position: relative;
+  width: 100%;
+  max-width: 1536px;
+  height: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.section2Title {
+  /* display: inline-flex; */
+  position: absolute;
+  left: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* .slidesNavigator {
+  position: absolute;
+  top: 65%;
+  right: 5%;
+} */
+
+/* .section2Body {
+  position: absolute;
+  width: 100%;
+  max-width: 1536px;
+  top: 25%;
+  left: 5%;
+} */
+
+#section3 {
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2)),
+    url("Direction.webp");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
 }
 
-#section3 {
-  background-image: url("Direction.jpg");
+.section3Title {
+  position: absolute;
+  left: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#section4 {
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+    url("AboutUs.webp");
   background-repeat: no-repeat;
   background-size: cover;
-  background-position: center;
+  background-position-x: center;
+  background-position-y: 85%;
 }
+
+p {
+  color: white;
+}
+
+/* .section3Body {
+  position: absolute;
+  padding-left: 75px;
+  padding-right: 75px;
+  max-width: 1536px;
+  width: 90vw;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+} */
+
+/* .section3Body {
+  height: 100%;
+  margin: auto;
+  max-width: 1536px;
+  padding-left: 6vw;
+  padding-right: 6vw;
+} */
+
+/* .fp-controlArrow {
+  margin-left: 10px;
+  margin-right: 10px;
+} */
