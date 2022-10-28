@@ -1,0 +1,19 @@
+{
+  "files": {
+    "main.css": "/static/css/main.bee1114e.css",
+    "main.js": "/static/js/main.cbdb09c6.js",
+    "static/js/787.f587e8d5.chunk.js": "/static/js/787.f587e8d5.chunk.js",
+    "static/media/AboutUs.webp": "/static/media/AboutUs.7bc5bf670a83a952297f.webp",
+    "static/media/FirstStep.webp": "/static/media/FirstStep.f3edcc561fed8718e35d.webp",
+    "static/media/calling.webp": "/static/media/calling.e7f545066145af9531f6.webp",
+    "static/media/Direction.webp": "/static/media/Direction.d63f71a70840e547bf78.webp",
+    "index.html": "/index.html",
+    "main.bee1114e.css.map": "/static/css/main.bee1114e.css.map",
+    "main.cbdb09c6.js.map": "/static/js/main.cbdb09c6.js.map",
+    "787.f587e8d5.chunk.js.map": "/static/js/787.f587e8d5.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.bee1114e.css",
+    "static/js/main.cbdb09c6.js"
+  ]
+}
