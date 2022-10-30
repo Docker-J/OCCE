@@ -286,12 +286,12 @@ const Main = () => {
         </Card> */}
       </div>
 
-      <Fab
+      {/* <Fab
         variant="primary"
         style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
       >
         <QuestionAnswerOutlinedIcon />
-      </Fab>
+      </Fab> */}
     </div>
   );
 };
