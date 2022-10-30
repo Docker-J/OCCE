@@ -4,6 +4,8 @@ import { pdfjs } from "react-pdf";
 import { Page } from "react-pdf";
 import { Document } from "react-pdf";
 
+import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.js`;
 
 function PDFReader(props) {
@@ -90,7 +92,7 @@ function PDFReader(props) {
       </p>
 
       <div>
-        <p>
+        <p style={{ color: "black" }}>
           Page {pageNumber || (numPages ? 1 : "--")} of {numPages || "--"}
         </p>
         <ButtonGroup id="pageButton">

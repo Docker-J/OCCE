@@ -28,7 +28,7 @@ const SubmenuMobile = (props) => {
     <>
       <MenuItem
         key={props.page.title}
-        onClick={handleCloseNavMenu}
+        onClick={props.page.to && props.onClose}
         component={props.page.to && Link}
         to={props.page.to}
         {...(props.page.subpages ? bindHover(popupState) : null)}
@@ -59,7 +59,10 @@ const SubmenuMobile = (props) => {
           {props.page.subpages.map((subpage) => (
             <MenuItem
               key={subpage.title}
-              onClick={popupState.close}
+              onClick={() => {
+                popupState.close();
+                props.onClose();
+              }}
               component={Link}
               to={subpage.to}
             >

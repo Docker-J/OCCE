@@ -179,7 +179,7 @@ const WeeklyUpdate = () => {
         <CircularProgress />
       )}
 
-      <div>
+      {/* <div>
         <Snackbar
           open={isSuccessSnackBarOpen}
           autoHideDuration={7000}
@@ -200,13 +200,12 @@ const WeeklyUpdate = () => {
           <UploadIcon sx={{ mr: 1 }} />
           Upload
         </Fab>
-        {/* <input type="file" name="theFiles" onChange={handleChangeFile} accept="application/pdf" /> */}
         <BulletinUploadModal
           open={modalState}
           onModalUpload={uploadBulletin}
           onModalClose={() => closeModal()}
         />
-      </div>
+      </div> */}
     </div>
   );
 };

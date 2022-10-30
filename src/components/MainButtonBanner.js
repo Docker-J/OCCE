@@ -29,7 +29,7 @@ const images = [
     url: "youtube.webp",
     title: "교회 유튜브 바로가기",
     width: "31%",
-    link: "https://www.youtube.com/channel/UCkr5XutOkqIxYJaJgYlQshQ/featured",
+    link: "https://www.youtube.com/c/oncce",
     target: "_blank",
   },
   {
@@ -42,7 +42,7 @@ const images = [
     url: "offering.webp",
     title: "헌금 안내",
     width: "31%",
-    link: "http://localhost:3000/aboutus#aboutus",
+    link: "http://localhost:3000/aboutus#aboutus/offering",
   },
 ];
 

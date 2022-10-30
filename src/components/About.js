@@ -13,13 +13,13 @@ const About = () => (
     //fullpage options
     licenseKey={"YOUR_KEY_HERE"}
     scrollingSpeed={1000} /* Options here */
-    anchors={["begninning", "name", "direction", "aboutus"]}
+    anchors={["beginning", "name", "direction", "aboutus"]}
     // slidesNavigation={true}
     // slidesNavPosition="bottom"
     scrollHorizontally={true}
     interlockedSlides={true}
     verticalCentered={true}
-    navigation={true}
+    // navigation={true}
     navigationPosition="right"
     controlArrows={false}
     render={({ state, fullpageApi }) => {
@@ -97,8 +97,8 @@ const About = () => (
                     >
                       의미) 우리의 삶의 자리
                       <br />
-                      사명) 우리를 심으신 이 땅에 대한 사랑과 기도와 복음 전파를
-                      잊지 말라는 하나님의 부르심
+                      사명) 우리를 심으신 이땅에 대한 사랑과 섬김, 기도와 복음
+                      전파를 잊지 말라는 하나님의 부르심
                     </Typography>
                   </div>
 
@@ -140,8 +140,8 @@ const About = () => (
                       sx={{ color: "white" }}
                     >
                       의미) Old & New 의 약자 <br />
-                      사명) 예부터 주신 진리의 말씀인 성경 말씀을 중심으로,
-                      주어진 삶의 자리에서 삶과 입술로 복음따라 살아내고
+                      사명) 예부터 주신 진리의 말씀인 성경을 따라, 새로운 시대에
+                      주어진 사명을 삶의 자리에서 살아내고 그리스도의 복음을
                       증언하라는 부르심
                     </Typography>
                   </div>
@@ -212,13 +212,17 @@ const About = () => (
                     <Typography
                       style={{ textAlign: "left" }}
                       variant="h6"
-                      fontWeight="550"
+                      fontWeight="500"
                       sx={{ color: "white", ml: "15px" }}
                     >
-                      가족 예배 <br />
-                      -주일 -찬양
-                      <br />
-                      -특별 -가정별
+                      내가 주인된 시대 속에서, 예배와 말씀을 통해 우리 삶의
+                      창조자이며 참 주인되시며 인도자이신 성부 성자 성령
+                      하나님의 사랑을 맛보고 나누며, 하나님을 향한 우리의 사랑을
+                      온전히 올려드립니다. 온교회는 교회 성전 중심으로 모이는
+                      것만 중요시하는 공동체가 아니라, 모일 때 힘써 모여
+                      예배드리고 기도하지만 일상의 자리에서 하나님을 높이며 그의
+                      나라와 의를 구하며 말씀대로 살아가는 삶의 예배를
+                      중요시하는 공동체입니다.
                     </Typography>
                   </div>
 
@@ -235,17 +239,15 @@ const About = () => (
                     <Typography
                       style={{ textAlign: "left" }}
                       variant="h6"
-                      fontWeight="550"
+                      fontWeight="500"
                       sx={{ color: "white", ml: "15px" }}
                     >
-                      정원을 통한 실천과 나눔 <br />
-                      -교회 내 -교회 밖
-                      <br />
-                      공동체의 실천과 나눔
+                      정내가 중심된 세상에서 하나님께 받은 은혜와 부르신 사명에
+                      따라 공동체와 이웃을 말씀대로 사랑하고 섬기며 살아갑니다.
                     </Typography>
                   </div>
 
-                  <div class="slide" data-anchor="wordscentered">
+                  {/* <div class="slide" data-anchor="wordscentered">
                     <Typography
                       style={{ textAlign: "left" }}
                       variant="h4"
@@ -294,7 +296,7 @@ const About = () => (
                       <br />
                       주일 예배 후 교제(다과, 말씀과 삶 나눔)
                     </Typography>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -303,11 +305,67 @@ const About = () => (
           </div>
 
           <div className="section" id="section4">
-            <p>About Us</p>
-            <p>예배시간</p>
-            <p>장소</p>
-            <p>Contact | Email</p>
-            <p>Facebook Instagram</p>
+            <div className="section4Title">
+              <Button
+                size="large"
+                sx={{ color: "white" }}
+                onClick={() => fullpageApi.moveSlideLeft()}
+              >
+                <NavigateBeforeIcon sx={{ height: "45px", width: "45px" }} />
+              </Button>
+              <Button
+                size="large"
+                sx={{ color: "white" }}
+                onClick={() => fullpageApi.moveSlideRight()}
+              >
+                <NavigateNextIcon sx={{ height: "45px", width: "45px" }} />
+              </Button>
+              <div class="slide" data-anchor="time">
+                <Typography
+                  style={{ textAlign: "center" }}
+                  variant="subtitle1"
+                  fontWeight="500"
+                  sx={{ color: "white", ml: "15px" }}
+                >
+                  주일예배 | 오후 2시 30분 | 본당
+                  <br />
+                  새벽 QT | 월-금요일 오전 6시 | 교회 Youtube 채널
+                  <br />
+                  신년 특별 새벽기도회 | 1월 첫주 월-토요일 | 본당
+                  <br />
+                  하반기 특별 새벽기도회 | 8월 마지막주 월-토요일 | 본당
+                  <br />
+                  유아유치부 주일 활동| 오후 4시 | Preschool Room
+                  <br />
+                  유초등부 주일 활동 | 오후 4시 | Sunday School Room
+                  <br />
+                  중고등부 주일 활동 | 오후 4시 | Fireside Room
+                  <br />
+                  청년부 주일 Brunch Club | 오전 11시 30분 | 문의: 안주영 목사
+                  <br />
+                  중보기도 모임 | 월 오전 10시, 금 저녁 7시 | 문의: 주미옥 장로
+                </Typography>
+              </div>
+
+              <div class="slide" data-anchor="offering">
+                <Typography
+                  style={{ textAlign: "center" }}
+                  variant="subtitle1"
+                  fontWeight="500"
+                  sx={{ color: "white", ml: "15px" }}
+                >
+                  온라인 E-Transfer 헌금 안내 ▪ 이메일 : occeoffer@gmail.com |
+                  비밀번호 설정 : occe0403
+                  <br />
+                  Cheque 헌금 Pay To : OCCE 또는 ON Community Church of Edmonton
+                  <br />
+                  현장에서는 준비된 봉투를 사용하여 입구에서 헌금함에 헌금해
+                  주시기 바랍니다. 헌금봉투 10개를 한 묶음으로 따로 준비해
+                  놓았으니, 필요하신 분들은 한 묶음 씩 가져 가셔서 헌금 준비를
+                  해주시기 바랍니다.
+                </Typography>
+              </div>
+            </div>
           </div>
         </ReactFullpage.Wrapper>
       );

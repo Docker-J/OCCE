@@ -47,7 +47,7 @@ const ResponsiveAppBar = () => {
   const pages = [
     {
       title: "교회소개",
-      to: "aboutus",
+      to: "aboutus#beginning",
     },
     {
       title: "교회소식",
@@ -56,18 +56,18 @@ const ResponsiveAppBar = () => {
           title: "주보",
           to: "weeklyupdate",
         },
-        {
-          title: "공지사항",
-          to: "announcements",
-        },
-        {
-          title: "교회사진",
-          to: "photos",
-        },
-        {
-          title: "교회영상",
-          to: "videos",
-        },
+        // {
+        //   title: "공지사항",
+        //   to: "announcements",
+        // },
+        // {
+        //   title: "교회사진",
+        //   to: "photos",
+        // },
+        // {
+        //   title: "교회영상",
+        //   to: "videos",
+        // },
       ],
       state: "newsPopupState",
     },
@@ -76,64 +76,64 @@ const ResponsiveAppBar = () => {
       subpages: [
         {
           title: "주일예배",
-          to: "prayon",
+          to: "online/sundayservice",
         },
         {
           title: "말씀",
-          to: "prayon",
+          to: "online/sermon",
         },
         {
-          title: "주일찬양",
-          to: "prayon",
+          title: "찬양",
+          to: "online/worship",
         },
         {
           title: "기도ON",
-          to: "prayon",
+          to: "online/prayON",
         },
-        {
-          title: "묵상ON",
-          to: "meditationon",
-        },
+        // {
+        //   title: "묵상ON",
+        //   to: "meditationon",
+        // },
       ],
       state: "onlinePopupState",
     },
-    {
-      title: "공동체",
-      subpages: [
-        {
-          title: "소그룹",
-          to: "",
-        },
-        {
-          title: "사역",
-          to: "",
-        },
-      ],
-      state: "communityPopupState",
-    },
-    {
-      title: "다음세대",
-      to: "",
-      subpages: [
-        {
-          title: "유아유치부",
-          to: "",
-        },
-        {
-          title: "유초등부",
-          to: "",
-        },
-        {
-          title: "중고등부",
-          to: "",
-        },
-        {
-          title: "청년부",
-          to: "",
-        },
-      ],
-      state: "nextGenPopupState",
-    },
+    // {
+    //   title: "공동체",
+    //   subpages: [
+    //     {
+    //       title: "소그룹",
+    //       to: "",
+    //     },
+    //     {
+    //       title: "사역",
+    //       to: "",
+    //     },
+    //   ],
+    //   state: "communityPopupState",
+    // },
+    // {
+    //   title: "다음세대",
+    //   to: "",
+    //   subpages: [
+    //     {
+    //       title: "유아유치부",
+    //       to: "",
+    //     },
+    //     {
+    //       title: "유초등부",
+    //       to: "",
+    //     },
+    //     {
+    //       title: "중고등부",
+    //       to: "",
+    //     },
+    //     {
+    //       title: "청년부",
+    //       to: "",
+    //     },
+    //   ],
+    //   state: "nextGenPopupState",
+    // },
   ];
 
   return (
@@ -208,7 +208,7 @@ const ResponsiveAppBar = () => {
               }}
             >
               {pages.map((page) => (
-                <SubmenuMobile page={page} />
+                <SubmenuMobile page={page} onClose={handleCloseNavMenu} />
               ))}
             </Menu>
           </Box>
