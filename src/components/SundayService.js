@@ -4,7 +4,7 @@ import "./online.css";
 const SundayService = () => {
   return (
     <div>
-      <h1>기도 ON</h1>
+      <h1>주일예배</h1>
       {/* <Typography textAlign={"center"} sx={{ mt: "5px" }}>
         일상의 자리에서 매일 말씀을 묵상하고 그 말씀에 따라 살아갑니다. 정해진
         해설과 적용 대신 하나님과의 일 대일로 대면하며 말씀을 듣고 하나님과

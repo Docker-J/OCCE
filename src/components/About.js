@@ -325,7 +325,7 @@ const About = () => (
                   style={{ textAlign: "center" }}
                   variant="subtitle1"
                   fontWeight="500"
-                  sx={{ color: "white", ml: "15px" }}
+                  sx={{ color: "white" }}
                 >
                   주일예배 | 오후 2시 30분 | 본당
                   <br />
@@ -352,7 +352,7 @@ const About = () => (
                   style={{ textAlign: "center" }}
                   variant="subtitle1"
                   fontWeight="500"
-                  sx={{ color: "white", ml: "15px" }}
+                  sx={{ color: "white" }}
                 >
                   온라인 E-Transfer 헌금 안내 ▪ 이메일 : occeoffer@gmail.com |
                   비밀번호 설정 : occe0403
