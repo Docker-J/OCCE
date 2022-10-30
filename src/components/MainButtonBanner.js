@@ -42,7 +42,7 @@ const images = [
     url: "offering.webp",
     title: "헌금 안내",
     width: "31%",
-    link: "http://localhost:3000/aboutus#aboutus/offering",
+    link: "aboutus#aboutus/offering",
   },
 ];
 
