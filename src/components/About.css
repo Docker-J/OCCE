@@ -88,9 +88,17 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 1536px;
 }
+
 p {
   color: white;
+}
+
+.section4Body {
+  margin: auto;
+  width: 90%;
 }
 
 /* .section3Body {

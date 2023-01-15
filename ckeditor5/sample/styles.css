@@ -32,10 +32,6 @@ main .ck-editor[role='application'] .ck.ck-content,
 	padding: 1.5em 2em;
 }
 
-main .ck-editor[role='application'] {
-	overflow: auto;
-}
-
 .ck.ck-editor__editable {
 	background: #fff;
 	border: 1px solid hsl(0, 0%, 70%);

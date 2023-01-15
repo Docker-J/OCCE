@@ -7,12 +7,10 @@ import Autoformat from '@ckeditor/ckeditor5-autoformat/src/autoformat.js';
 import Base64UploadAdapter from '@ckeditor/ckeditor5-upload/src/adapters/base64uploadadapter.js';
 import BlockQuote from '@ckeditor/ckeditor5-block-quote/src/blockquote.js';
 import Bold from '@ckeditor/ckeditor5-basic-styles/src/bold.js';
-import CloudServices from '@ckeditor/ckeditor5-cloud-services/src/cloudservices.js';
 import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials.js';
 import Heading from '@ckeditor/ckeditor5-heading/src/heading.js';
 import Image from '@ckeditor/ckeditor5-image/src/image.js';
 import ImageCaption from '@ckeditor/ckeditor5-image/src/imagecaption.js';
-import ImageResize from '@ckeditor/ckeditor5-image/src/imageresize.js';
 import ImageStyle from '@ckeditor/ckeditor5-image/src/imagestyle.js';
 import ImageToolbar from '@ckeditor/ckeditor5-image/src/imagetoolbar.js';
 import ImageUpload from '@ckeditor/ckeditor5-image/src/imageupload.js';
@@ -35,12 +33,10 @@ Editor.builtinPlugins = [
 	Base64UploadAdapter,
 	BlockQuote,
 	Bold,
-	CloudServices,
 	Essentials,
 	Heading,
 	Image,
 	ImageCaption,
-	ImageResize,
 	ImageStyle,
 	ImageToolbar,
 	ImageUpload,
@@ -79,10 +75,11 @@ Editor.defaultConfig = {
 			'redo'
 		]
 	},
-	language: 'en-gb',
+	language: 'en',
 	image: {
 		toolbar: [
 			'imageTextAlternative',
+			'toggleImageCaption',
 			'imageStyle:inline',
 			'imageStyle:block',
 			'imageStyle:side'

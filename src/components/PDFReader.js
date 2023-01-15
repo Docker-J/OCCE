@@ -1,8 +1,6 @@
 import { Button, ButtonGroup, CircularProgress } from "@mui/material";
 import { useState, useEffect } from "react";
-import { pdfjs } from "react-pdf";
-import { Page } from "react-pdf";
-import { Document } from "react-pdf";
+import { pdfjs, Page, Document } from "react-pdf";
 
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 

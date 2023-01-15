@@ -11,12 +11,12 @@ import { createTheme, ThemeProvider } from "@mui/material";
 import Community from "./components/Community";
 import Announcements from "./components/Announcements";
 import Announcement from "./components/Announcement";
-import MeditationON from "./components/MeditationON";
-import MeditationONPost from "./components/MeditationONPost";
-import PrayON from "./components/PrayON";
-import Worship from "./components/Worship";
-import SundayService from "./components/SundayService";
-import Sermon from "./components/Sermon";
+import MeditationON from "./components/Online/MeditationON";
+import MeditationONPost from "./components/Online/MeditationONPost";
+import PrayON from "./components/Online/PrayON";
+import Worship from "./components/Online/Worship";
+import SundayService from "./components/Online/SundayService";
+import Sermon from "./components/Online/Sermon";
 
 const theme = createTheme({
   palette: {

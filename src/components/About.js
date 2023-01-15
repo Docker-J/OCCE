@@ -2,11 +2,68 @@ import React from "react";
 import ReactFullpage from "@fullpage/react-fullpage";
 
 import "./About.css";
-import { Button, Typography } from "@mui/material";
+import {
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
 import Arrow from "./Arrow";
 
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+
+const serviceInfo = [
+  {
+    title: "주일예배",
+    time: "오후 2시 30분",
+    place: "본당",
+  },
+  {
+    title: "새벽 QT",
+    time: "월 - 토요일 오전 6시",
+    place: "교회 Youtube 채널",
+  },
+  {
+    title: "신년 특별 새벽기도회",
+    time: "1월 첫주 월-토요일",
+    place: "본당",
+  },
+  {
+    title: "하반기 특별 새벽기도회",
+    time: "8월 마지막주 월-토요일",
+    place: "본당",
+  },
+  {
+    title: "유아유치부 주일활동",
+    time: "오후 4시",
+    place: "Preschool Room",
+  },
+  {
+    title: "유초등부 주일활동",
+    time: "오후 4시",
+    place: "Sunday School Room",
+  },
+  {
+    title: "중고등부 주일활동",
+    time: "오후 4시",
+    place: "Sunday School Room",
+  },
+  {
+    title: "청년부 주일 Brunch Club",
+    time: "오전 11시 30분",
+    place: "문의 : 안주영 목사",
+  },
+  {
+    title: "중보기도 모임",
+    time: "월 오전 10시, 금 저녁 7시",
+    place: "문의 : 주미옥 장로",
+  },
+];
 
 const About = () => (
   <ReactFullpage
@@ -320,50 +377,63 @@ const About = () => (
               >
                 <NavigateNextIcon sx={{ height: "45px", width: "45px" }} />
               </Button>
-              <div class="slide" data-anchor="time">
-                <Typography
-                  style={{ textAlign: "center" }}
-                  variant="subtitle1"
-                  fontWeight="500"
-                  sx={{ color: "white" }}
-                >
-                  주일예배 | 오후 2시 30분 | 본당
-                  <br />
-                  새벽 QT | 월-금요일 오전 6시 | 교회 Youtube 채널
-                  <br />
-                  신년 특별 새벽기도회 | 1월 첫주 월-토요일 | 본당
-                  <br />
-                  하반기 특별 새벽기도회 | 8월 마지막주 월-토요일 | 본당
-                  <br />
-                  유아유치부 주일 활동| 오후 4시 | Preschool Room
-                  <br />
-                  유초등부 주일 활동 | 오후 4시 | Sunday School Room
-                  <br />
-                  중고등부 주일 활동 | 오후 4시 | Fireside Room
-                  <br />
-                  청년부 주일 Brunch Club | 오전 11시 30분 | 문의: 안주영 목사
-                  <br />
-                  중보기도 모임 | 월 오전 10시, 금 저녁 7시 | 문의: 주미옥 장로
-                </Typography>
-              </div>
+              <div className="section4Body">
+                <div class="slide" data-anchor="time">
+                  <TableContainer
+                    className="table"
+                    // component={Paper}
+                    sx={{ color: "white" }}
+                  >
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell
+                            colspan="3"
+                            align="center"
+                            sx={{ color: "white" }}
+                          >
+                            예배 및 모임 안내
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {serviceInfo.map((service) => (
+                          <TableRow>
+                            <TableCell align="center" sx={{ color: "white" }}>
+                              {service.title}
+                            </TableCell>
+                            <TableCell align="center" sx={{ color: "white" }}>
+                              {service.time}
+                            </TableCell>
+                            <TableCell align="center" sx={{ color: "white" }}>
+                              {service.place}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </div>
 
-              <div class="slide" data-anchor="offering">
-                <Typography
-                  style={{ textAlign: "center" }}
-                  variant="subtitle1"
-                  fontWeight="500"
-                  sx={{ color: "white" }}
-                >
-                  온라인 E-Transfer 헌금 안내 ▪ 이메일 : occeoffer@gmail.com |
-                  비밀번호 설정 : occe0403
-                  <br />
-                  Cheque 헌금 Pay To : OCCE 또는 ON Community Church of Edmonton
-                  <br />
-                  현장에서는 준비된 봉투를 사용하여 입구에서 헌금함에 헌금해
-                  주시기 바랍니다. 헌금봉투 10개를 한 묶음으로 따로 준비해
-                  놓았으니, 필요하신 분들은 한 묶음 씩 가져 가셔서 헌금 준비를
-                  해주시기 바랍니다.
-                </Typography>
+                <div class="slide" data-anchor="offering">
+                  <Typography
+                    style={{ textAlign: "center" }}
+                    variant="subtitle1"
+                    fontWeight="500"
+                    sx={{ color: "white" }}
+                  >
+                    온라인 E-Transfer 헌금 안내 ▪ 이메일 : occeoffer@gmail.com |
+                    비밀번호 설정 : occe0403
+                    <br />
+                    Cheque 헌금 Pay To : OCCE 또는 ON Community Church of
+                    Edmonton
+                    <br />
+                    현장에서는 준비된 봉투를 사용하여 입구에서 헌금함에 헌금해
+                    주시기 바랍니다. 헌금봉투 10개를 한 묶음으로 따로 준비해
+                    놓았으니, 필요하신 분들은 한 묶음 씩 가져 가셔서 헌금 준비를
+                    해주시기 바랍니다.
+                  </Typography>
+                </div>
               </div>
             </div>
           </div>
