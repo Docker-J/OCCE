@@ -179,7 +179,7 @@ const WeeklyUpdate = () => {
         <CircularProgress />
       )}
 
-      {/* <div>
+      <div>
         <Snackbar
           open={isSuccessSnackBarOpen}
           autoHideDuration={7000}
@@ -191,7 +191,7 @@ const WeeklyUpdate = () => {
         </Snackbar>
       </div>
 
-      <div>
+      {/* <div>
         <Fab
           id="uploadBulletinButton"
           variant="extended"

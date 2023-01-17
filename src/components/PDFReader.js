@@ -1,10 +1,10 @@
 import { Button, ButtonGroup, CircularProgress } from "@mui/material";
 import { useState, useEffect } from "react";
-import { pdfjs, Page, Document } from "react-pdf";
+import { pdfjs, Page, Document } from "react-pdf/dist/esm/entry.webpack5";
 
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.js`;
+// pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 function PDFReader(props) {
   const [numPages, setNumPages] = useState(null);
