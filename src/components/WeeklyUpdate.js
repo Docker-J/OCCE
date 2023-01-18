@@ -78,13 +78,17 @@ const WeeklyUpdate = () => {
 
   const uploadBulletin = (file, date) => {
     fileToBase64(file, (err, result) => {
-      setDoc(doc(db, "weeklyBulletin", date), {
+      setDoc(doc(db, "weeklyBulletin", date.toLocaleDateString("sv")), {
         file: result,
       });
       closeModal();
 
-      getMaxDate();
       setSelectedDate(new Date(date));
+
+      if (date > maxDate) {
+        setMaxDate(date);
+      }
+
       setIsSuccessSnackBarOpen(true);
     });
   };
@@ -179,7 +183,7 @@ const WeeklyUpdate = () => {
         <CircularProgress />
       )}
 
-      <div>
+      {/* <div>
         <Snackbar
           open={isSuccessSnackBarOpen}
           autoHideDuration={7000}
@@ -191,7 +195,7 @@ const WeeklyUpdate = () => {
         </Snackbar>
       </div>
 
-      {/* <div>
+      <div>
         <Fab
           id="uploadBulletinButton"
           variant="extended"

@@ -3,7 +3,7 @@ import "./online.css";
 
 const PrayON = () => {
   return (
-    <div>
+    <div class="main">
       <h1>기도 ON</h1>
       {/* <Typography textAlign={"center"} sx={{ mt: "5px" }}>
         일상의 자리에서 매일 말씀을 묵상하고 그 말씀에 따라 살아갑니다. 정해진

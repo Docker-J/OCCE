@@ -75,14 +75,7 @@ const BulletinUploadModal = (props) => {
       />
 
       <p>
-        <Button
-          onClick={() =>
-            props.onModalUpload(
-              fileToUpload,
-              selectedDate.toLocaleDateString("sv")
-            )
-          }
-        >
+        <Button onClick={() => props.onModalUpload(fileToUpload, selectedDate)}>
           Upload
         </Button>
         <Button onClick={props.onModalClose}>Close</Button>
