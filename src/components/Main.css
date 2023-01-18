@@ -1,6 +1,6 @@
 .churchName {
   position: relative;
-  background: -webkit-linear-gradient(
+  /* background: -webkit-linear-gradient(
     left,
     rgb(176, 80, 15) 0%,
     rgb(225, 116, 42) 40%,
@@ -27,9 +27,9 @@
     rgb(225, 116, 42) 40%,
     rgb(242, 164, 111) 80%,
     rgb(246, 190, 152) 100%
-  );
-  /* background-image: url("Picture1.png"); */
-
+  ); */
+  background-image: url("Picture1.webp");
+  background-size: cover;
   padding-top: min(6vmax, 85px);
   height: 35vmax;
   max-height: 650px;
