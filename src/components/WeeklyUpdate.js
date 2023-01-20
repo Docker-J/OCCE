@@ -43,14 +43,14 @@ const WeeklyUpdate = () => {
 
   async function getMaxDate() {
     const docSnap = await getDoc(doc(db, "Misc", "RecentWeeklyBulletin"));
-    const maxDate = new Date(docSnap.data().date.replace(/-/g, "/"));
+    const recentDate = new Date(docSnap.data().date.replace(/-/g, "/"));
 
-    setMaxDate(maxDate);
+    setMaxDate(recentDate);
     const params = new URLSearchParams(window.location.search);
     let queryDate = params.get("date");
 
     if (queryDate === null) {
-      setSelectedDate(maxDate);
+      setSelectedDate(recentDate);
     } else {
       const year = +queryDate.substring(0, 4);
       const month = +queryDate.substring(4, 6);
@@ -80,11 +80,13 @@ const WeeklyUpdate = () => {
       });
       closeModal();
 
-      setSelectedDate(new Date(date));
+      setSelectedDate(date);
 
       if (date > maxDate) {
         setMaxDate(date);
-        setDoc(doc(db, "weeklyBulletin", date.toLocaleDateString("sv")));
+        setDoc(doc(db, "Misc", "RecentWeeklyBulletin"), {
+          date: date.toLocaleDateString("sv"),
+        });
       }
 
       setIsSuccessSnackBarOpen(true);
