@@ -15,11 +15,11 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import UploadIcon from "@mui/icons-material/Upload";
 
+import PDFReader from "./PDFReader";
 import BulletinUploadModal from "./BulletinUploadModal";
 
-import { collection, getDocs, setDoc, doc, getDoc } from "firebase/firestore";
+import { setDoc, doc, getDoc } from "firebase/firestore";
 import { db } from "../api/firebase";
-import PDFReader from "./PDFReader";
 
 const WeeklyUpdate = () => {
   function printLog(value) {
@@ -42,11 +42,8 @@ const WeeklyUpdate = () => {
   };
 
   async function getMaxDate() {
-    const querySnapshot = await getDocs(collection(db, "weeklyBulletin"));
-
-    const maxDate = new Date(
-      querySnapshot.docs[querySnapshot.docs.length - 1].id.replace(/-/g, "/")
-    );
+    const docSnap = await getDoc(doc(db, "Misc", "RecentWeeklyBulletin"));
+    const maxDate = new Date(docSnap.data().date.replace(/-/g, "/"));
 
     setMaxDate(maxDate);
     const params = new URLSearchParams(window.location.search);
@@ -87,6 +84,7 @@ const WeeklyUpdate = () => {
 
       if (date > maxDate) {
         setMaxDate(date);
+        setDoc(doc(db, "weeklyBulletin", date.toLocaleDateString("sv")));
       }
 
       setIsSuccessSnackBarOpen(true);
@@ -186,7 +184,7 @@ const WeeklyUpdate = () => {
       {/* <div>
         <Snackbar
           open={isSuccessSnackBarOpen}
-          autoHideDuration={7000}
+          autoHideDuration={8000}
           onClose={handleClose}
         >
           <Alert severity="success" onClose={handleClose}>
