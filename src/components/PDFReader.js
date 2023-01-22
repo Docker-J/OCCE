@@ -1,4 +1,5 @@
 import { Button, ButtonGroup, CircularProgress } from "@mui/material";
+import { isMobile } from "react-device-detect";
 import { useState, useEffect } from "react";
 import { pdfjs, Page, Document } from "react-pdf";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
@@ -42,26 +43,20 @@ function PDFReader(props) {
   }, [props.file]);
 
   const [windowDimension, detectHW] = useState({
-    width:
-      window.innerHeight * 10 > window.innerWidth * 16
-        ? window.innerWidth - 30
-        : null,
-    height:
-      window.innerHeight * 10 < window.innerWidth * 16
-        ? window.innerHeight - 400
-        : null,
+    width: null,
+    height: null,
   });
 
   const detectSize = () => {
+    const width = isMobile
+      ? document.documentElement.clientWidth
+      : window.innerWidth;
+    const height = isMobile
+      ? document.documentElement.clientHeight
+      : window.innerHeight;
     detectHW({
-      width:
-        window.innerHeight * 10 > window.innerWidth * 16
-          ? window.innerWidth - 30
-          : null,
-      height:
-        window.innerHeight * 10 < window.innerWidth * 16
-          ? window.innerHeight - 400
-          : null,
+      width: height * 10 > width * 16 ? width - 30 : null,
+      height: height * 10 < width * 16 ? height - 400 : null,
     });
   };
 
