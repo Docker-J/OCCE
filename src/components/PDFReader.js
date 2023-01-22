@@ -41,15 +41,27 @@ function PDFReader(props) {
     setPageNumber(1);
   }, [props.file]);
 
-  const [windowDimenion, detectHW] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
+  const [windowDimension, detectHW] = useState({
+    width:
+      window.innerHeight * 10 > window.innerWidth * 16
+        ? window.innerWidth - 30
+        : null,
+    height:
+      window.innerHeight * 10 < window.innerWidth * 16
+        ? window.innerHeight - 400
+        : null,
   });
 
   const detectSize = () => {
     detectHW({
-      width: window.innerWidth,
-      height: window.innerHeight,
+      width:
+        window.innerHeight * 10 > window.innerWidth * 16
+          ? window.innerWidth - 30
+          : null,
+      height:
+        window.innerHeight * 10 < window.innerWidth * 16
+          ? window.innerHeight - 400
+          : null,
     });
   };
 
@@ -59,9 +71,7 @@ function PDFReader(props) {
     return () => {
       window.removeEventListener("resize", detectSize);
     };
-  }, [windowDimenion]);
-
-  console.log(windowDimenion.height - 400);
+  }, [windowDimension]);
 
   return (
     <div>
@@ -84,16 +94,8 @@ function PDFReader(props) {
             renderTextLayer={false}
             className="page"
             scale={scale}
-            height={
-              windowDimenion.height * 10 < windowDimenion.width * 16
-                ? windowDimenion.height - 400
-                : null
-            }
-            width={
-              windowDimenion.height * 10 > windowDimenion.width * 16
-                ? windowDimenion.width - 30
-                : null
-            }
+            height={windowDimension.height}
+            width={windowDimension.width}
             pageNumber={pageNumber}
           />
         </Document>
