@@ -47,7 +47,7 @@ const WeeklyUpdate = () => {
 
     setMaxDate(recentDate);
     const params = new URLSearchParams(window.location.search);
-    let queryDate = params.get("date");
+    const queryDate = params.get("date");
 
     if (queryDate === null) {
       setSelectedDate(recentDate);
@@ -78,7 +78,6 @@ const WeeklyUpdate = () => {
       setDoc(doc(db, "weeklyBulletin", date.toLocaleDateString("sv")), {
         file: result,
       });
-      closeModal();
 
       setSelectedDate(date);
 
@@ -89,6 +88,7 @@ const WeeklyUpdate = () => {
         });
       }
 
+      closeModal();
       setIsSuccessSnackBarOpen(true);
     });
   };

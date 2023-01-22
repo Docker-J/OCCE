@@ -42,14 +42,14 @@ function PDFReader(props) {
   }, [props.file]);
 
   const [windowDimenion, detectHW] = useState({
-    winWidth: window.innerWidth,
-    winHeight: window.innerHeight,
+    width: window.innerWidth,
+    height: window.innerHeight,
   });
 
   const detectSize = () => {
     detectHW({
-      winWidth: window.innerWidth,
-      winHeight: window.innerHeight,
+      width: window.innerWidth,
+      height: window.innerHeight,
     });
   };
 
@@ -61,7 +61,7 @@ function PDFReader(props) {
     };
   }, [windowDimenion]);
 
-  console.log(windowDimenion.winHeight - 400);
+  console.log(windowDimenion.height - 400);
 
   return (
     <div>
@@ -84,7 +84,16 @@ function PDFReader(props) {
             renderTextLayer={false}
             className="page"
             scale={scale}
-            // height={windowDimenion.winHeight}
+            height={
+              windowDimenion.height * 10 < windowDimenion.width * 16
+                ? windowDimenion.height - 400
+                : null
+            }
+            width={
+              windowDimenion.height * 10 > windowDimenion.width * 16
+                ? windowDimenion.width - 30
+                : null
+            }
             pageNumber={pageNumber}
           />
         </Document>
