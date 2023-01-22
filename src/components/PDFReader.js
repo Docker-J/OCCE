@@ -42,9 +42,16 @@ function PDFReader(props) {
     setPageNumber(1);
   }, [props.file]);
 
+  const width = isMobile
+    ? document.documentElement.clientWidth
+    : window.innerWidth;
+  const height = isMobile
+    ? document.documentElement.clientHeight
+    : window.innerHeight;
+
   const [windowDimension, detectHW] = useState({
-    width: null,
-    height: null,
+    width: height * 10 > width * 16 ? width - 30 : null,
+    height: height * 10 < width * 16 ? height - 400 : null,
   });
 
   const detectSize = () => {
@@ -54,6 +61,7 @@ function PDFReader(props) {
     const height = isMobile
       ? document.documentElement.clientHeight
       : window.innerHeight;
+
     detectHW({
       width: height * 10 > width * 16 ? width - 30 : null,
       height: height * 10 < width * 16 ? height - 400 : null,
