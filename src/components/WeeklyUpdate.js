@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./WeeklyUpdate.css";
 
+import axios from "axios";
+
 import ButtonDatePicker from "./ButtonDatePicker";
 
 import {
@@ -18,7 +20,7 @@ import UploadIcon from "@mui/icons-material/Upload";
 import PDFReader from "./PDFReader";
 import BulletinUploadModal from "./BulletinUploadModal";
 
-import { setDoc, doc, getDoc } from "firebase/firestore";
+import { setDoc, doc } from "firebase/firestore";
 import { db } from "../api/firebase";
 
 const WeeklyUpdate = () => {
@@ -41,32 +43,38 @@ const WeeklyUpdate = () => {
     setIsSuccessSnackBarOpen(false);
   };
 
-  async function getMaxDate() {
-    const docSnap = await getDoc(doc(db, "Misc", "RecentWeeklyBulletin"));
-    const recentDate = new Date(docSnap.data().date.replace(/-/g, "/"));
+  function getMaxDate() {
+    axios
+      .get("http://localhost:3001/api/WeeklyUpdate/RecentDate")
+      .then((res) => {
+        const recentDate = new Date(res.data.replace(/-/g, "/"));
+        setMaxDate(recentDate);
 
-    setMaxDate(recentDate);
-    const params = new URLSearchParams(window.location.search);
-    const queryDate = params.get("date");
+        const params = new URLSearchParams(window.location.search);
+        const queryDate = params.get("date");
 
-    if (queryDate === null) {
-      setSelectedDate(recentDate);
-    } else {
-      const year = +queryDate.substring(0, 4);
-      const month = +queryDate.substring(4, 6);
-      const day = +queryDate.substring(6, 8);
+        if (queryDate === null) {
+          setSelectedDate(recentDate);
+        } else {
+          const year = +queryDate.substring(0, 4);
+          const month = +queryDate.substring(4, 6);
+          const day = +queryDate.substring(6, 8);
 
-      setSelectedDate(new Date(year, month - 1, day));
-    }
+          setSelectedDate(new Date(year, month - 1, day));
+        }
+      });
   }
 
   // Get Bulletin from Firestore
   async function loadFile() {
-    const docSnap = await getDoc(
-      doc(db, "weeklyBulletin", selectedDate.toLocaleDateString("sv"))
-    );
-
-    setBulletin(docSnap.data().file);
+    axios
+      .get("http://localhost:3001/api/WeeklyUpdate/GetBulletin", {
+        params: { date: selectedDate.toLocaleDateString("sv") },
+      })
+      .then((res) => {
+        // console.log(res);
+        setBulletin(res.data);
+      });
   }
 
   function closeModal() {
