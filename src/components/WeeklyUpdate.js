@@ -69,15 +69,6 @@ const WeeklyUpdate = () => {
       params: { date: selectedDate.toLocaleDateString("sv") },
     });
     setBulletin(result.data);
-
-    // axios
-    //   .get("/api/WeeklyUpdate/GetBulletin", {
-    //     params: { date: selectedDate.toLocaleDateString("sv") },
-    //   })
-    //   .then((res) => {
-    //     // console.log(res);
-    //     setBulletin(res.data);
-    //   });
   };
 
   function closeModal() {
