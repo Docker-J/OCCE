@@ -45,7 +45,7 @@ const WeeklyUpdate = () => {
 
   function getMaxDate() {
     axios
-      .get("http://localhost:3001/api/WeeklyUpdate/RecentDate")
+      .get("https://onncce.ca:3001/api/WeeklyUpdate/RecentDate")
       .then((res) => {
         const recentDate = new Date(res.data.replace(/-/g, "/"));
         setMaxDate(recentDate);
@@ -68,7 +68,7 @@ const WeeklyUpdate = () => {
   // Get Bulletin from Firestore
   async function loadFile() {
     axios
-      .get("http://localhost:3001/api/WeeklyUpdate/GetBulletin", {
+      .get("https://oncce.ca:3001/api/WeeklyUpdate/GetBulletin", {
         params: { date: selectedDate.toLocaleDateString("sv") },
       })
       .then((res) => {
