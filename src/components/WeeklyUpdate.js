@@ -43,39 +43,42 @@ const WeeklyUpdate = () => {
     setIsSuccessSnackBarOpen(false);
   };
 
-  function getMaxDate() {
-    axios
-      .get("https://onncce.ca:3001/api/WeeklyUpdate/RecentDate")
-      .then((res) => {
-        const recentDate = new Date(res.data.replace(/-/g, "/"));
-        setMaxDate(recentDate);
+  const getMaxDate = async () => {
+    const result = await axios.get("/api/WeeklyUpdate/RecentDate");
 
-        const params = new URLSearchParams(window.location.search);
-        const queryDate = params.get("date");
+    const recentDate = new Date(result.data.replace(/-/g, "/"));
+    setMaxDate(recentDate);
 
-        if (queryDate === null) {
-          setSelectedDate(recentDate);
-        } else {
-          const year = +queryDate.substring(0, 4);
-          const month = +queryDate.substring(4, 6);
-          const day = +queryDate.substring(6, 8);
+    const params = new URLSearchParams(window.location.search);
+    const queryDate = params.get("date");
 
-          setSelectedDate(new Date(year, month - 1, day));
-        }
-      });
-  }
+    if (queryDate === null) {
+      setSelectedDate(recentDate);
+    } else {
+      const year = +queryDate.substring(0, 4);
+      const month = +queryDate.substring(4, 6);
+      const day = +queryDate.substring(6, 8);
+
+      setSelectedDate(new Date(year, month - 1, day));
+    }
+  };
 
   // Get Bulletin from Firestore
-  async function loadFile() {
-    axios
-      .get("https://oncce.ca:3001/api/WeeklyUpdate/GetBulletin", {
-        params: { date: selectedDate.toLocaleDateString("sv") },
-      })
-      .then((res) => {
-        // console.log(res);
-        setBulletin(res.data);
-      });
-  }
+  const loadFile = async () => {
+    const result = await axios.get("/api/WeeklyUpdate/GetBulletin", {
+      params: { date: selectedDate.toLocaleDateString("sv") },
+    });
+    setBulletin(result.data);
+
+    // axios
+    //   .get("/api/WeeklyUpdate/GetBulletin", {
+    //     params: { date: selectedDate.toLocaleDateString("sv") },
+    //   })
+    //   .then((res) => {
+    //     // console.log(res);
+    //     setBulletin(res.data);
+    //   });
+  };
 
   function closeModal() {
     setModalState(false);

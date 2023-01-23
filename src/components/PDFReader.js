@@ -63,8 +63,8 @@ function PDFReader(props) {
       : window.innerHeight;
 
     detectHW({
-      width: height * 10 > width * 16 ? width - 30 : null,
-      height: height * 10 < width * 16 ? height - 400 : null,
+      width: height * 10 >= width * 16 ? width - 30 : null,
+      height: height * 10 <= width * 16 ? height - 400 : null,
     });
   };
 
