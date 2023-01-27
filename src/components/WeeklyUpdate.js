@@ -45,9 +45,7 @@ const WeeklyUpdate = () => {
 
   const getMaxDate = async () => {
     try {
-      const result = await axios.get(
-        `${process.env.REACT_APP_SERVER}/api/WeeklyUpdate/RecentDate`
-      );
+      const result = await axios.get("/api/WeeklyUpdate/RecentDate");
       console.log(result.data);
 
       const recentDate = new Date(result.data.replace(/-/g, "/"));
@@ -71,12 +69,9 @@ const WeeklyUpdate = () => {
   // Get Bulletin from Firestore
   const loadFile = async () => {
     try {
-      const result = await axios.get(
-        `${process.env.REACT_APP_SERVER}/api/WeeklyUpdate/GetBulletin`,
-        {
-          params: { date: selectedDate.toLocaleDateString("sv") },
-        }
-      );
+      const result = await axios.get("/api/WeeklyUpdate/GetBulletin", {
+        params: { date: selectedDate.toLocaleDateString("sv") },
+      });
       setBulletin(result.data);
     } catch (err) {}
   };
