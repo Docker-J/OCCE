@@ -44,31 +44,41 @@ const WeeklyUpdate = () => {
   };
 
   const getMaxDate = async () => {
-    const result = await axios.get("/api/WeeklyUpdate/RecentDate");
+    try {
+      const result = await axios.get(
+        `${process.env.REACT_APP_SERVER}/api/WeeklyUpdate/RecentDate`
+      );
+      console.log(result.data);
 
-    const recentDate = new Date(result.data.replace(/-/g, "/"));
-    setMaxDate(recentDate);
+      const recentDate = new Date(result.data.replace(/-/g, "/"));
+      setMaxDate(recentDate);
 
-    const params = new URLSearchParams(window.location.search);
-    const queryDate = params.get("date");
+      const params = new URLSearchParams(window.location.search);
+      const queryDate = params.get("date");
 
-    if (queryDate === null) {
-      setSelectedDate(recentDate);
-    } else {
-      const year = +queryDate.substring(0, 4);
-      const month = +queryDate.substring(4, 6);
-      const day = +queryDate.substring(6, 8);
+      if (queryDate === null) {
+        setSelectedDate(recentDate);
+      } else {
+        const year = +queryDate.substring(0, 4);
+        const month = +queryDate.substring(4, 6);
+        const day = +queryDate.substring(6, 8);
 
-      setSelectedDate(new Date(year, month - 1, day));
-    }
+        setSelectedDate(new Date(year, month - 1, day));
+      }
+    } catch (err) {}
   };
 
   // Get Bulletin from Firestore
   const loadFile = async () => {
-    const result = await axios.get("/api/WeeklyUpdate/GetBulletin", {
-      params: { date: selectedDate.toLocaleDateString("sv") },
-    });
-    setBulletin(result.data);
+    try {
+      const result = await axios.get(
+        `${process.env.REACT_APP_SERVER}/api/WeeklyUpdate/GetBulletin`,
+        {
+          params: { date: selectedDate.toLocaleDateString("sv") },
+        }
+      );
+      setBulletin(result.data);
+    } catch (err) {}
   };
 
   function closeModal() {
@@ -131,11 +141,11 @@ const WeeklyUpdate = () => {
   }, []);
 
   useEffect(() => {
-    loadFile();
     // if (useParams.postId != null) {
     //   selectedDate.toLocaleDateString("sv").replace(/-/g, "");
     // }
     if (selectedDate != null) {
+      loadFile();
       const newUrl =
         window.location.protocol +
         "//" +
