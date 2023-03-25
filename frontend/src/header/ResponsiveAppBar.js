@@ -175,7 +175,6 @@ const ResponsiveAppBar = () => {
 
           <Box
             sx={{
-              color: "inherit",
               flexGrow: 1,
               display: { xs: "flex", md: "none" },
             }}
@@ -250,7 +249,7 @@ const ResponsiveAppBar = () => {
             ))}
           </Box>
 
-          <Box sx={{ flexGrow: 0 }}>
+          <Box sx={{ ml: "15pt", flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" />
