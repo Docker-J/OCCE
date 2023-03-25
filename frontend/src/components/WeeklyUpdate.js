@@ -157,7 +157,7 @@ const WeeklyUpdate = () => {
     <div className="weeklyBulletinBoard">
       <h1>주보</h1>
 
-      {selectedDate ? (
+      {selectedDate && bulletin ? (
         <div>
           <IconButton
             id="previousBulletin"
@@ -182,9 +182,7 @@ const WeeklyUpdate = () => {
             <ArrowForwardIosIcon />
           </IconButton>
 
-          <p>
-            <PDFReader file={bulletin} />
-          </p>
+          <PDFReader file={bulletin} />
         </div>
       ) : (
         <CircularProgress />

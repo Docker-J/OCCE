@@ -4,7 +4,7 @@ const db = require("./api/firebase.js");
 
 let RECENTDATE;
 
-const getRecentdate = (async () => {
+const getRecentdate = async () => {
   try {
     const snapshot = await db
       .collection("Misc")
@@ -12,15 +12,19 @@ const getRecentdate = (async () => {
       .get();
 
     RECENTDATE = snapshot.data().date;
-    console.log(RECENTDATE);
   } catch {}
-})();
+};
 
-router.get("/api/WeeklyUpdate/RecentDate", async (req, res) => {
-  res.send(RECENTDATE);
+router.get("/RecentDate", async (req, res) => {
+  if (RECENTDATE) {
+    res.send(RECENTDATE);
+  } else {
+    await getRecentdate();
+    res.send(RECENTDATE);
+  }
 });
 
-router.get("/api/WeeklyUpdate/GetBulletin", async (req, res) => {
+router.get("/GetBulletin", async (req, res) => {
   try {
     const snapshot = await db
       .collection("weeklyBulletin")
@@ -30,7 +34,7 @@ router.get("/api/WeeklyUpdate/GetBulletin", async (req, res) => {
   } catch {}
 });
 
-router.put("/api/WeeklyUpdate/PostBulletin", async (req, res) => {
+router.put("/PostBulletin", async (req, res) => {
   const data = {
     file: req.query.file,
   };

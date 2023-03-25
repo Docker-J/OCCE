@@ -87,22 +87,20 @@ function PDFReader(props) {
         </Button>
       </ButtonGroup>
 
-      <p>
-        <Document
-          file={props.file}
-          onLoadSuccess={onDocumentLoadSuccess}
-          loading={<CircularProgress />}
-        >
-          <Page
-            renderTextLayer={false}
-            className="page"
-            scale={scale}
-            height={windowDimension.height}
-            width={windowDimension.width}
-            pageNumber={pageNumber}
-          />
-        </Document>
-      </p>
+      <Document
+        file={props.file}
+        onLoadSuccess={onDocumentLoadSuccess}
+        loading={<CircularProgress />}
+      >
+        <Page
+          renderTextLayer={false}
+          className="page"
+          scale={scale}
+          height={windowDimension.height}
+          width={windowDimension.width}
+          pageNumber={pageNumber}
+        />
+      </Document>
 
       <div>
         <p style={{ color: "black" }}>
