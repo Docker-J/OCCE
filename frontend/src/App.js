@@ -1,22 +1,23 @@
 import { Route, Routes } from "react-router-dom";
 
-import Main from "./components/Main";
-import About from "./components/About";
-import WeeklyUpdate from "./components/WeeklyUpdate";
+import Main from "./pages/Main/Main";
+import About from "./pages/About/About";
+import WeeklyUpdate from "./pages/WeeklyUpdate/WeeklyUpdate";
 import SignUp from "./components/SignUp";
 
 import "./App.css";
-import ResponsiveAppBar from "./components/ResponsiveAppBar";
+import ResponsiveAppBar from "./header/ResponsiveAppBar";
 import { createTheme, ThemeProvider } from "@mui/material";
 import Community from "./components/Community";
-import Announcements from "./components/Announcements";
-import Announcement from "./components/Announcement";
-import MeditationON from "./components/Online/MeditationON";
-import MeditationONPost from "./components/Online/MeditationONPost";
-import PrayON from "./components/Online/PrayON";
-import Worship from "./components/Online/Worship";
-import SundayService from "./components/Online/SundayService";
-import Sermon from "./components/Online/Sermon";
+import Announcements from "./pages/Announcements/Announcements";
+import Announcement from "./components/Announcement/Announcement";
+import MeditationON from "./pages/Online/MeditationON";
+import MeditationONPost from "./pages/Online/MeditationONPost";
+import PrayON from "./pages/Online/PrayON";
+import Worship from "./pages/Online/Worship";
+import SundayService from "./pages/Online/SundayService";
+import Sermon from "./pages/Online/Sermon";
+import { Page } from "react-pdf";
 
 const theme = createTheme({
   palette: {

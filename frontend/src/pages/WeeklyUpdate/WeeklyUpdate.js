@@ -3,7 +3,7 @@ import "./WeeklyUpdate.css";
 
 import axios from "axios";
 
-import ButtonDatePicker from "./ButtonDatePicker";
+import ButtonDatePicker from "../../components/WeeklyUpdate/ButtonDatePicker";
 
 import {
   Alert,
@@ -17,11 +17,11 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import UploadIcon from "@mui/icons-material/Upload";
 
-import PDFReader from "./PDFReader";
-import BulletinUploadModal from "./BulletinUploadModal";
+import PDFReader from "../../components/WeeklyUpdate/PDFReader";
+import BulletinUploadModal from "../../components/WeeklyUpdate/BulletinUploadModal";
 
 import { setDoc, doc } from "firebase/firestore";
-import { db } from "../api/firebase";
+import { db } from "../../api/firebase";
 
 const WeeklyUpdate = () => {
   function printLog(value) {

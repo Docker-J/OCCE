@@ -32,10 +32,10 @@ import {
   startAfter,
 } from "firebase/firestore";
 
-import { db } from "../api/firebase";
+import { db } from "../../api/firebase";
 
 import "./Announcements.css";
-import BoardPost from "./BoardPost";
+import BoardPost from "../../components/Announcement/BoardPost";
 
 const Announcements = () => {
   const [body, setBody] = useState("");

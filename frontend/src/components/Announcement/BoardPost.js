@@ -3,7 +3,7 @@ import TextEditor from "./TextEditor";
 import { useState } from "react";
 
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "../api/firebase";
+import { db } from "../../api/firebase";
 
 import { useEffect } from "react";
 

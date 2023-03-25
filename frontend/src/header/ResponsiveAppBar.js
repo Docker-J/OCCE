@@ -17,8 +17,8 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 
-import Submenu from "./Submenu";
-import SubmenuMobile from "./SubmenuMobile";
+import Submenu from "../components/Submenu";
+import SubmenuMobile from "../components/SubmenuMobile";
 
 const settings = ["Sign in"];
 

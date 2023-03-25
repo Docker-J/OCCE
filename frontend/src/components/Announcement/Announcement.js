@@ -1,5 +1,5 @@
 import { collection, getDocs, addDoc, doc, getDoc } from "firebase/firestore";
-import { db } from "../api/firebase";
+import { db } from "../../api/firebase";
 import { useState, useEffect } from "react";
 import { CircularProgress } from "@mui/material";
 import { useParams } from "react-router-dom";
