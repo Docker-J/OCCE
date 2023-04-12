@@ -17,7 +17,7 @@ const Worship = () => {
           <iframe
             width="560"
             height="315"
-            src="https://www.youtube.com/embed/videoseries?list=PL-MVshquUXWGUNkyG44lg765Vf90rkOTA"
+            src="https://www.youtube.com/embed/videoseries?list=PL-MVshquUXWHGJNBM8QtFDNqMpCwOKs6e"
             title="YouTube video player"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
