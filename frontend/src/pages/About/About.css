@@ -1,6 +1,6 @@
 #section1 {
   background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)),
-    url("../../components/FirstStep.webp");
+    url("../../components/About/FirstStep.webp");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 83%;
@@ -20,7 +20,7 @@
 
 #section2 {
   background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)),
-    url("../../components/calling.webp");
+    url("../../components/About/calling.webp");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 35%;
@@ -60,7 +60,7 @@
 
 #section3 {
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2)),
-    url("../../components/Direction.webp");
+    url("../../components/About/Direction.webp");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -75,7 +75,7 @@
 
 #section4 {
   background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-    url("../../components/AboutUs.webp");
+    url("../../components/About/AboutUs.webp");
   background-repeat: no-repeat;
   background-size: cover;
   background-position-x: center;
