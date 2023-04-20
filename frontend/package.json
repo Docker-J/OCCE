@@ -6,7 +6,7 @@
     "@ckeditor/ckeditor5-react": "^5.0.6",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
-    "@fullpage/react-fullpage": "^0.1.31",
+    "@fullpage/react-fullpage": "^0.1.39",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.10.16",
     "@mui/x-date-pickers": "^6.2.0",
