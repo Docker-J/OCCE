@@ -89,7 +89,6 @@ const NewComers = () => {
           zoomOnScroll={false}
           edgesUpdatable={false}
           nodesConnectable={false}
-          nodesDeletable={false}
         >
           <Controls showInteractive={false} />
         </ReactFlow>
