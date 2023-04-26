@@ -1,9 +1,5 @@
 import React, { useRef, useState } from "react";
-
-import { Box, Button } from "@mui/material";
-
-import Modal from "@mui/material/Modal";
-
+import { Box, Button, Modal } from "@mui/material";
 import ButtonDatePicker from "./ButtonDatePicker";
 
 const modalStyle = {
@@ -36,16 +32,14 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: "80vw",
+  width: "50vw",
   maxWidth: "1500px",
-  height: "80vh",
+  height: "50vh",
   bgcolor: "#ffffff",
   border: "0.1px solid #f57c00",
   boxShadow: 24,
   p: 2,
 };
-
-// Modal.setAppElement("#root");
 
 const BulletinUploadModal = (props) => {
   function nextSunday() {

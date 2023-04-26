@@ -56,7 +56,10 @@ function ButtonDatePicker(props) {
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <DatePicker
         slots={{ field: ButtonField, ...props.slots }}
-        slotProps={{ field: { setIsDatePickerOpen } }}
+        slotProps={{
+          field: { setIsDatePickerOpen },
+          popper: { placement: "bottom" },
+        }}
         {...props}
         open={isDatePickerOpen}
         onClose={() => setIsDatePickerOpen(false)}
