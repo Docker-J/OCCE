@@ -9,7 +9,7 @@ import SignUp from "./components/SignUp";
 import "./App.css";
 import ResponsiveAppBar from "./header/ResponsiveAppBar";
 import { createTheme, ThemeProvider } from "@mui/material";
-import Community from "./components/Community";
+import Community from "./pages/Community";
 import Announcements from "./pages/Announcements/Announcements";
 import Announcement from "./components/Announcement/Announcement";
 import MeditationON from "./pages/Online/MeditationON";
