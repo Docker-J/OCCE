@@ -1,7 +1,8 @@
 import React, { useRef, useState } from "react";
-import Modal from "react-modal";
 
-import { Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
+
+import Modal from "@mui/material/Modal";
 
 import ButtonDatePicker from "./ButtonDatePicker";
 
@@ -30,7 +31,21 @@ const modalStyle = {
   },
 };
 
-Modal.setAppElement("#root");
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "80vw",
+  maxWidth: "1500px",
+  height: "80vh",
+  bgcolor: "#ffffff",
+  border: "0.1px solid #f57c00",
+  boxShadow: 24,
+  p: 2,
+};
+
+// Modal.setAppElement("#root");
 
 const BulletinUploadModal = (props) => {
   function nextSunday() {
@@ -50,36 +65,35 @@ const BulletinUploadModal = (props) => {
   };
 
   return (
-    <Modal
-      isOpen={props.open}
-      contentLabel="Selected Todo"
-      style={modalStyle}
-      onRequestClose={props.onModalClose}
-    >
-      <h2>Choose Date</h2>
+    <Modal open={props.open} onClose={props.onClose}>
+      <Box sx={style} bgcolor="white">
+        <h2>Choose Date</h2>
 
-      <ButtonDatePicker
-        value={selectedDate}
-        minDate={new Date("2022/04/03")}
-        onChange={setSelectedDate}
-      />
+        <ButtonDatePicker
+          value={selectedDate}
+          minDate={new Date("2022/04/03")}
+          onChange={setSelectedDate}
+        />
 
-      <h2>Choose File</h2>
-      <input
-        type="file"
-        ref={inputRef}
-        id="bulletin"
-        name="theFile"
-        onChange={handleChangeFile}
-        accept="application/pdf"
-      />
+        <h2>Choose File</h2>
+        <input
+          type="file"
+          ref={inputRef}
+          id="bulletin"
+          name="theFile"
+          onChange={handleChangeFile}
+          accept="application/pdf"
+        />
 
-      <p>
-        <Button onClick={() => props.onModalUpload(fileToUpload, selectedDate)}>
-          Upload
-        </Button>
-        <Button onClick={props.onModalClose}>Close</Button>
-      </p>
+        <p>
+          <Button
+            onClick={() => props.onModalUpload(fileToUpload, selectedDate)}
+          >
+            Upload
+          </Button>
+          <Button onClick={props.onClose}>Close</Button>
+        </p>
+      </Box>
     </Modal>
   );
 };

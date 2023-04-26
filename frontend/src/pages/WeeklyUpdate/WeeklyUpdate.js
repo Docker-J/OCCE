@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { format } from "date-fns";
 import "./WeeklyUpdate.css";
 
 import axios from "axios";
@@ -169,7 +168,6 @@ const WeeklyUpdate = () => {
           </IconButton>
 
           <ButtonDatePicker
-            label={format(selectedDate, "MM/dd/yyyy")}
             value={selectedDate}
             minDate={minDate}
             maxDate={maxDate}
@@ -190,33 +188,30 @@ const WeeklyUpdate = () => {
         <CircularProgress />
       )}
 
-      {/* <div>
-        <Snackbar
-          open={isSuccessSnackBarOpen}
-          autoHideDuration={8000}
-          onClose={handleClose}
-        >
-          <Alert severity="success" onClose={handleClose}>
-            Uploaded Succesfully!
-          </Alert>
-        </Snackbar>
-      </div>
+      <Fab
+        id="uploadBulletinButton"
+        variant="extended"
+        onClick={() => setModalState(true)}
+      >
+        <UploadIcon sx={{ mr: 1 }} />
+        Upload
+      </Fab>
 
-      <div>
-        <Fab
-          id="uploadBulletinButton"
-          variant="extended"
-          onClick={() => setModalState(true)}
-        >
-          <UploadIcon sx={{ mr: 1 }} />
-          Upload
-        </Fab>
-        <BulletinUploadModal
-          open={modalState}
-          onModalUpload={uploadBulletin}
-          onModalClose={() => closeModal()}
-        />
-      </div> */}
+      <BulletinUploadModal
+        open={modalState}
+        onModalUpload={uploadBulletin}
+        onClose={() => closeModal()}
+      />
+
+      <Snackbar
+        open={isSuccessSnackBarOpen}
+        autoHideDuration={8000}
+        onClose={handleClose}
+      >
+        <Alert severity="success" onClose={handleClose}>
+          Uploaded Succesfully!
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

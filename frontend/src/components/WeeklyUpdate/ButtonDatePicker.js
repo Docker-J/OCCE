@@ -3,14 +3,14 @@ import { useState } from "react";
 import { Button } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { color } from "@mui/system";
+import { format } from "date-fns";
 
 function ButtonField(props) {
   const {
     setIsDatePickerOpen,
     id,
     disabled,
-    label,
+    value,
     InputProps: { ref } = {},
     inputProps: { "aria-label": ariaLabel } = {},
   } = props;
@@ -25,7 +25,7 @@ function ButtonField(props) {
       aria-label={ariaLabel}
       onClick={() => setIsDatePickerOpen?.((prev) => !prev)}
     >
-      {label}
+      {format(value, "MM/dd/yyyy")}
     </Button>
   );
 }
