@@ -162,6 +162,7 @@ const Announcements = () => {
                       to={
                         "/announcements/announcement?docID=" + announcement.id
                       }
+                      key={announcement.id}
                       sx={{ textDecoration: "none" }}
                     >
                       <TableCell>{announcement.data().title}</TableCell>

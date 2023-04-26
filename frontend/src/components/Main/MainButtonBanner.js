@@ -136,7 +136,6 @@ export default function ButtonBases() {
         <ImageButton
           component={image.to && Link}
           sx={{ margin: 1 }}
-          focusRipple
           key={image.title}
           style={{
             width: image.width,

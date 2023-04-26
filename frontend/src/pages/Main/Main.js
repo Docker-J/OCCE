@@ -1,18 +1,22 @@
-import { Button, Typography, Fab } from "@mui/material";
+import { lazy } from "react";
+import { Link } from "react-router-dom";
 
+import { Button, Typography, Fab } from "@mui/material";
 import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
 
-import { Link as RouterLink } from "react-router-dom";
-
-import "./Main.css";
 import ButtonBases from "../../components/Main/MainButtonBanner";
+import "./Main.css";
 
 const Main = () => {
   return (
-    <div>
+    <>
       <div className="churchName">
         <div className="nameExplanationContainer">
-          <img className="horizontalLogo" src="img/ONLogo.svg" />
+          <img
+            className="horizontalLogo"
+            src="img/ONLogo.svg"
+            alt="logo of ON Community Church of Edmonton"
+          />
 
           <div className="nameExplanation">
             <Typography
@@ -84,7 +88,7 @@ const Main = () => {
 
         <Button
           className="learnMoreAbtChurch"
-          component={RouterLink}
+          component={Link}
           to="/aboutus#churchname"
           variant="outlined"
           size="medium"
@@ -98,9 +102,7 @@ const Main = () => {
         </Button>
       </div>
 
-      <div className="cards">
-        <ButtonBases />
-      </div>
+      <ButtonBases className="cards" />
 
       {/* <Fab
         variant="primary"
@@ -108,7 +110,7 @@ const Main = () => {
       >
         <QuestionAnswerOutlinedIcon />
       </Fab> */}
-    </div>
+    </>
   );
 };
 
