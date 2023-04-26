@@ -54,13 +54,17 @@ const ResponsiveAppBar = () => {
       title: "교회소식",
       subpages: [
         {
+          title: "공지사항",
+          to: "announcements",
+        },
+        {
           title: "주보",
           to: "weeklyupdate",
         },
-        // {
-        //   title: "공지사항",
-        //   to: "announcements",
-        // },
+        {
+          title: "새가족",
+          to: "newcomers",
+        },
         // {
         //   title: "교회사진",
         //   to: "photos",
@@ -91,10 +95,10 @@ const ResponsiveAppBar = () => {
           title: "기도ON",
           to: "online/prayON",
         },
-        // {
-        //   title: "묵상ON",
-        //   to: "meditationon",
-        // },
+        {
+          title: "묵상ON",
+          to: "online/meditationon",
+        },
       ],
       state: "onlinePopupState",
     },

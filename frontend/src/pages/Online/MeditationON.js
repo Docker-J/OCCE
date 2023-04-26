@@ -34,6 +34,8 @@ const MeditationON = () => {
   };
 
   const handleClose = () => {
+    setFilesToUpload([]);
+    setImagesPreview([]);
     setOpenModal(false);
   };
 
@@ -42,21 +44,28 @@ const MeditationON = () => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "1000px",
-    height: "1000px",
+    width: "800px",
+    height: "800px",
     bgcolor: "#ffffff",
     border: "0.1px solid #f57c00",
     boxShadow: 24,
     p: 2,
   };
 
-  const [filesToUpload, setFilesToUpload] = useState(null);
+  const [filesToUpload, setFilesToUpload] = useState([]);
+  const [imagesPreview, setImagesPreview] = useState([]);
 
-  const handleChangeFile = ({ target }) => {
-    setFilesToUpload(target.files);
+  const handleChangeFile = (e) => {
+    setFilesToUpload(e.target.files);
   };
 
-  async function getImages() {
+  useEffect(() => {
+    Array.from(filesToUpload).forEach((image) => {
+      setImagesPreview([...imagesPreview, URL.createObjectURL(image)]);
+    });
+  }, [filesToUpload]);
+
+  async function imgToBase64() {
     return new Promise((resolve) => {
       let images = [];
       for (let i = 0; i < filesToUpload.length; i++) {
@@ -71,7 +80,7 @@ const MeditationON = () => {
   }
 
   const uploadFiles = () => {
-    getImages().then((result) => {
+    imgToBase64().then((result) => {
       post(result);
     });
   };
@@ -106,16 +115,6 @@ const MeditationON = () => {
     };
   };
 
-  // function fileToBase64(file) {
-  //   return new Promise((resolve) => {
-  //     const reader = new FileReader();
-  //     reader.readAsDataURL(file);
-  //     reader.onload = function () {
-  //       resolve(reader.result);
-  //     };
-  //   });
-  // }
-
   return (
     <>
       <div
@@ -129,7 +128,11 @@ const MeditationON = () => {
       >
         <h1>묵상 ON</h1>
         {images ? (
-          <ImageList sx={{ width: 900, height: 900 }} cols={3} rowHeight={300}>
+          <ImageList
+            sx={{ display: "flex", width: "100%" }}
+            cols={3}
+            rowHeight={300}
+          >
             {images.docs.map((item) => (
               <ImageListItem
                 component={Link}
@@ -148,7 +151,7 @@ const MeditationON = () => {
                   //   item.data().images[0]
                   // }?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
                   // // alt={item.title}
-                  // loading="lazy"
+                  loading="lazy"
                 />
               </ImageListItem>
             ))}
@@ -179,13 +182,17 @@ const MeditationON = () => {
               accept="image/*"
               multiple
               type="file"
-              onChange={handleChangeFile}
+              onChange={(e) => handleChangeFile(e)}
             />
           </Button>
 
           <Button onClick={uploadFiles} variant="contained" component="label">
             Submit
           </Button>
+
+          {imagesPreview.map((image) => (
+            <img src={image} />
+          ))}
         </Box>
       </Modal>
     </>

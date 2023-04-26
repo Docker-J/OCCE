@@ -1,6 +1,6 @@
 import { Button, ButtonGroup, CircularProgress } from "@mui/material";
 import { isMobile } from "react-device-detect";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { pdfjs, Page, Document } from "react-pdf";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
 
@@ -16,6 +16,7 @@ function PDFReader(props) {
   const add = () => {
     setScale(scale + 0.2);
   };
+
   const minus = () => {
     if (scale !== 1) {
       setScale(scale - 0.2);
@@ -77,15 +78,17 @@ function PDFReader(props) {
   }, [windowDimension]);
 
   return (
-    <div>
-      <ButtonGroup id="scaleButton">
-        <Button onClick={add} variant={"outlined"}>
-          +
-        </Button>
-        <Button onClick={minus} variant={"outlined"} disabled={scale <= 1}>
-          -
-        </Button>
-      </ButtonGroup>
+    <>
+      <div>
+        <ButtonGroup id="scaleButton">
+          <Button onClick={add} variant={"outlined"}>
+            +
+          </Button>
+          <Button onClick={minus} variant={"outlined"} disabled={scale <= 1}>
+            -
+          </Button>
+        </ButtonGroup>
+      </div>
 
       <Document
         file={props.file}
@@ -125,7 +128,7 @@ function PDFReader(props) {
           </Button>
         </ButtonGroup>
       </div>
-    </div>
+    </>
   );
 }
 

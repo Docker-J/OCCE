@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import Main from "./pages/Main/Main";
 import About from "./pages/About/About";
 import WeeklyUpdate from "./pages/WeeklyUpdate/WeeklyUpdate";
+import NewComers from "./pages/NewComers";
 import SignUp from "./components/SignUp";
 
 import "./App.css";
@@ -17,7 +18,6 @@ import PrayON from "./pages/Online/PrayON";
 import Worship from "./pages/Online/Worship";
 import SundayService from "./pages/Online/SundayService";
 import Sermon from "./pages/Online/Sermon";
-import { Page } from "react-pdf";
 
 const theme = createTheme({
   palette: {
@@ -50,6 +50,7 @@ function App() {
             element={<Announcement />}
           />
           <Route path="/weeklyupdate" element={<WeeklyUpdate />} />
+          <Route path="/newcomers" element={<NewComers />} />
           <Route path="/online/sundayservice" element={<SundayService />} />
           <Route path="/online/sermon" element={<Sermon />} />
           <Route path="/online/worship" element={<Worship />} />

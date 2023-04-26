@@ -158,7 +158,7 @@ const WeeklyUpdate = () => {
       <h1>주보</h1>
 
       {selectedDate && bulletin ? (
-        <div>
+        <>
           <IconButton
             id="previousBulletin"
             onClick={previousBulletin}
@@ -183,7 +183,7 @@ const WeeklyUpdate = () => {
           </IconButton>
 
           <PDFReader file={bulletin} />
-        </div>
+        </>
       ) : (
         <CircularProgress />
       )}
