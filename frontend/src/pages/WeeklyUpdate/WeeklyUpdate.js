@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { format } from "date-fns";
 import "./WeeklyUpdate.css";
 
 import axios from "axios";
@@ -168,6 +169,7 @@ const WeeklyUpdate = () => {
           </IconButton>
 
           <ButtonDatePicker
+            label={format(selectedDate, "MM/dd/yyyy")}
             value={selectedDate}
             minDate={minDate}
             maxDate={maxDate}

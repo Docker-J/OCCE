@@ -10,6 +10,7 @@ function ButtonField(props) {
     setIsDatePickerOpen,
     id,
     disabled,
+    label,
     InputProps: { ref } = {},
     inputProps: { "aria-label": ariaLabel } = {},
   } = props;
@@ -17,13 +18,14 @@ function ButtonField(props) {
   return (
     <Button
       variant="outlined"
+      size="large"
       id={id}
       disabled={disabled}
       ref={ref}
       aria-label={ariaLabel}
       onClick={() => setIsDatePickerOpen?.((prev) => !prev)}
     >
-      {props.inputProps.value}
+      {label}
     </Button>
   );
 }
@@ -39,6 +41,7 @@ ButtonField.propTypes = {
     startAdornment: PropTypes.node,
   }),
   setIsDatePickerOpen: PropTypes.func,
+  label: PropTypes.node,
 };
 
 function ButtonDatePicker(props) {
