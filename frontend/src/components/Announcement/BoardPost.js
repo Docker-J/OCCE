@@ -10,7 +10,7 @@ import { useEffect } from "react";
 const BoardPost = (props) => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [postButton, setPostButton] = useState("false");
+  const [postButton, setPostButton] = useState(false);
 
   const getBody = (body) => {
     setBody(body);
