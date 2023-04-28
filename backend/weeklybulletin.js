@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("./api/firebase.js");
 
-let RECENTDATE;
+var RECENTDATE;
 
 const getRecentdate = async () => {
   try {
@@ -36,20 +36,20 @@ router.get("/GetBulletin", async (req, res) => {
 
 router.put("/PostBulletin", async (req, res) => {
   const data = {
-    file: req.query.file,
+    file: req.body.file,
   };
   try {
-    await db.collection.doc(req.query.date).set(data);
-    res.send("Success");
-    if (req.query.date > RECENTDATE) {
-      RECENTDATE = req.query.date;
+    await db.collection("weeklyBulletin").doc(req.body.date).set(data);
+    if (req.body.date > RECENTDATE) {
+      RECENTDATE = req.body.date;
       try {
         const data = {
-          date: req.query.date,
+          date: req.body.date,
         };
         await db.collection("Misc").doc("RecentWeeklyBulletin").set(data);
       } catch {}
     }
+    res.send("Success");
   } catch {
     res.send("Error");
   }

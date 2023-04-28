@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./WeeklyUpdate.css";
-
 import axios from "axios";
-
-import ButtonDatePicker from "../../components/WeeklyUpdate/ButtonDatePicker";
 
 import {
   Alert,
@@ -17,11 +13,14 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import UploadIcon from "@mui/icons-material/Upload";
 
+import ButtonDatePicker from "../../components/WeeklyUpdate/ButtonDatePicker";
 import PDFReader from "../../components/WeeklyUpdate/PDFReader";
 import BulletinUploadModal from "../../components/WeeklyUpdate/BulletinUploadModal";
 
 import { setDoc, doc } from "firebase/firestore";
 import { db } from "../../api/firebase";
+
+import "./WeeklyUpdate.css";
 
 const WeeklyUpdate = () => {
   function printLog(value) {
@@ -80,20 +79,14 @@ const WeeklyUpdate = () => {
     setModalState(false);
   }
 
-  const uploadBulletin = (file, date) => {
+  const uploadBulletin = async (file, date) => {
     fileToBase64(file, (err, result) => {
-      setDoc(doc(db, "weeklyBulletin", date.toLocaleDateString("sv")), {
+      axios.put("/api/WeeklyUpdate/PostBulletin/", {
         file: result,
+        date: date.toLocaleDateString("sv"),
       });
 
       setSelectedDate(date);
-
-      if (date > maxDate) {
-        setMaxDate(date);
-        setDoc(doc(db, "Misc", "RecentWeeklyBulletin"), {
-          date: date.toLocaleDateString("sv"),
-        });
-      }
 
       closeModal();
       setIsSuccessSnackBarOpen(true);
