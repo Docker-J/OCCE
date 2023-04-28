@@ -8,7 +8,6 @@ import {
   IconButton,
   Snackbar,
 } from "@mui/material";
-
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import UploadIcon from "@mui/icons-material/Upload";
@@ -17,16 +16,9 @@ import ButtonDatePicker from "../../components/WeeklyUpdate/ButtonDatePicker";
 import PDFReader from "../../components/WeeklyUpdate/PDFReader";
 import BulletinUploadModal from "../../components/WeeklyUpdate/BulletinUploadModal";
 
-import { setDoc, doc } from "firebase/firestore";
-import { db } from "../../api/firebase";
-
 import "./WeeklyUpdate.css";
 
 const WeeklyUpdate = () => {
-  function printLog(value) {
-    console.log(value);
-  }
-
   const [bulletin, setBulletin] = useState(null);
   const [isSuccessSnackBarOpen, setIsSuccessSnackBarOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -75,9 +67,9 @@ const WeeklyUpdate = () => {
     } catch (err) {}
   };
 
-  function closeModal() {
+  const closeModal = () => {
     setModalState(false);
-  }
+  };
 
   const uploadBulletin = async (file, date) => {
     fileToBase64(file, (err, result) => {
@@ -129,9 +121,6 @@ const WeeklyUpdate = () => {
   }, []);
 
   useEffect(() => {
-    // if (useParams.postId != null) {
-    //   selectedDate.toLocaleDateString("sv").replace(/-/g, "");
-    // }
     if (selectedDate != null) {
       loadFile();
       const newUrl =
@@ -144,7 +133,7 @@ const WeeklyUpdate = () => {
 
       window.history.replaceState({}, null, newUrl);
     }
-  });
+  }, [selectedDate]);
 
   return (
     <div className="weeklyBulletinBoard">
@@ -193,7 +182,7 @@ const WeeklyUpdate = () => {
       <BulletinUploadModal
         open={modalState}
         onModalUpload={uploadBulletin}
-        onClose={() => closeModal()}
+        onClose={closeModal}
       />
 
       <Snackbar
