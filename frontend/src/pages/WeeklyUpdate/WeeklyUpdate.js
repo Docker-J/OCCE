@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 import {
@@ -25,6 +25,8 @@ const WeeklyUpdate = () => {
   const [modalState, setModalState] = useState(false);
   const [maxDate, setMaxDate] = useState(null);
   const minDate = new Date("2022/04/03");
+
+  console.log(maxDate);
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -58,14 +60,14 @@ const WeeklyUpdate = () => {
   };
 
   // Get Bulletin from Firestore
-  const loadFile = async () => {
+  const loadFile = useCallback(async () => {
     try {
       const result = await axios.get("/api/WeeklyUpdate/GetBulletin", {
         params: { date: selectedDate.toLocaleDateString("sv") },
       });
       setBulletin(result.data);
     } catch (err) {}
-  };
+  }, [selectedDate]);
 
   const closeModal = () => {
     setModalState(false);
@@ -73,15 +75,18 @@ const WeeklyUpdate = () => {
 
   const uploadBulletin = async (file, date) => {
     fileToBase64(file, (err, result) => {
-      axios.put("/api/WeeklyUpdate/PostBulletin/", {
-        file: result,
-        date: date.toLocaleDateString("sv"),
-      });
-
-      setSelectedDate(date);
-
-      closeModal();
-      setIsSuccessSnackBarOpen(true);
+      axios
+        .put("/api/WeeklyUpdate/PostBulletin/", {
+          file: result,
+          date: date.toLocaleDateString("sv"),
+        })
+        .then((res) => {
+          console.log(res.data);
+          setMaxDate(new Date(res.data.replace(/-/g, "/")));
+          setSelectedDate(date);
+          closeModal();
+          setIsSuccessSnackBarOpen(true);
+        });
     });
   };
 
@@ -133,7 +138,7 @@ const WeeklyUpdate = () => {
 
       window.history.replaceState({}, null, newUrl);
     }
-  }, [selectedDate]);
+  }, [selectedDate, loadFile]);
 
   return (
     <div className="weeklyBulletinBoard">

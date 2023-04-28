@@ -49,7 +49,7 @@ router.put("/PostBulletin", async (req, res) => {
         await db.collection("Misc").doc("RecentWeeklyBulletin").set(data);
       } catch {}
     }
-    res.send("Success");
+    res.send(RECENTDATE);
   } catch {
     res.send("Error");
   }
