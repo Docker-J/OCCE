@@ -8,6 +8,7 @@ const {
 } = require("firebase-admin/auth");
 const AmazonCognitoIdentity = require("amazon-cognito-identity-js");
 const CognitoUserPool = AmazonCognitoIdentity.CognitoUserPool;
+const AWS = require("aws-sdk");
 
 const auth = getAuth();
 
@@ -19,10 +20,10 @@ const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
 
 router.post("/signIn", async (req, res) => {
   console.log("requested!");
-  var authenticationDetails = {
+  var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
     Username: req.body.email,
     Password: req.body.password,
-  };
+  });
   var userData = { Username: req.body.email, Pool: userPool };
   var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
   cognitoUser.authenticateUser(authenticationDetails, {
