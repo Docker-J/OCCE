@@ -26,8 +26,6 @@ const WeeklyUpdate = () => {
   const [maxDate, setMaxDate] = useState(null);
   const minDate = new Date("2022/04/03");
 
-  console.log(maxDate);
-
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -140,6 +138,14 @@ const WeeklyUpdate = () => {
     }
   }, [selectedDate, loadFile]);
 
+  function compareDate(date1, date2) {
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+    );
+  }
+
   return (
     <div className="weeklyBulletinBoard">
       <h1>주보</h1>
@@ -149,7 +155,7 @@ const WeeklyUpdate = () => {
           <IconButton
             id="previousBulletin"
             onClick={previousBulletin}
-            disabled={selectedDate.getTime() === minDate.getTime()}
+            disabled={compareDate(selectedDate, minDate)}
           >
             <ArrowBackIosIcon />
           </IconButton>
@@ -164,7 +170,7 @@ const WeeklyUpdate = () => {
           <IconButton
             id="nextBulletin"
             onClick={nextBulletin}
-            disabled={selectedDate.getTime() === maxDate.getTime()}
+            disabled={compareDate(selectedDate, maxDate)}
           >
             <ArrowForwardIosIcon />
           </IconButton>

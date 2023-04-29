@@ -128,11 +128,7 @@ const MeditationON = () => {
       >
         <h1>묵상 ON</h1>
         {images ? (
-          <ImageList
-            sx={{ display: "flex", width: "100%" }}
-            cols={3}
-            rowHeight={300}
-          >
+          <ImageList sx={{ width: "100%" }} cols={3}>
             {images.docs.map((item) => (
               <ImageListItem
                 component={Link}
@@ -150,7 +146,7 @@ const MeditationON = () => {
                   // srcSet={`${
                   //   item.data().images[0]
                   // }?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                  // // alt={item.title}
+                  // alt={item.title}
                   loading="lazy"
                 />
               </ImageListItem>
