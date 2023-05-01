@@ -5,7 +5,7 @@ const AmazonCognitoIdentity = require("amazon-cognito-identity-js");
 const CognitoUserPool = AmazonCognitoIdentity.CognitoUserPool;
 const AWS = require("aws-sdk");
 
-const auth = getAuth();
+// const auth = getAuth();
 
 const poolData = {
   UserPoolId: "us-west-2_v1MWWI1Vn",
@@ -31,6 +31,30 @@ router.post("/signIn", async (req, res) => {
       console.log(err);
     },
   });
+});
+
+router.post("/signUp", async (req, res) => {
+  var attributeList = [];
+  var dataName = {
+    Name: "name",
+    Value: req.body.email,
+  };
+  var attributeName = new AmazonCognitoIdentity.CognitoUserAttribute(dataName);
+  attributeList.push(attributeName);
+
+  userPool.signUp(
+    req.body.email,
+    req.body.password,
+    attributeList,
+    null,
+    function (err, result) {
+      if (err) {
+        alert(err.message || JSON.stringify(err));
+      }
+      var cognitoUser = result.user;
+      console.log("user name is" + cognitoUser.getUsername());
+    }
+  );
 });
 
 router.get("/signOut", async (req, res) => {});
