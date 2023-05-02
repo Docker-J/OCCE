@@ -274,9 +274,8 @@
 }
 
 .cards {
-  margin: auto;
   max-width: 1536px;
-  margin-top: 3vh;
+  margin-top: 5vh;
   margin-bottom: 3vh;
   justify-content: space-around;
   align-items: center;

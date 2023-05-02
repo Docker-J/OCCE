@@ -124,12 +124,18 @@ export default function ButtonBases() {
   return (
     <Box
       sx={{
+        position: "absolute",
+        left: "50%",
+        transform: "translateX(-50%)",
+        maxWidth: "1536px",
         display: "flex",
         flexWrap: "wrap",
         alignItems: "center",
         justifyContent: "space-evenly",
         width: "100%",
-        minWidth: 350,
+        minWidth: "200",
+        mt: "1vmin",
+        mb: "1vmin",
       }}
     >
       {images.map((image) => (
