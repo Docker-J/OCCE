@@ -26,7 +26,6 @@ const About = lazy(() => import("./pages/About/About"));
 const WeeklyUpdate = lazy(() => import("./pages/WeeklyUpdate/WeeklyUpdate"));
 const NewComers = lazy(() => import("./pages/NewComers"));
 const SignUp = lazy(() => import("./components/SignUp"));
-const Community = lazy(() => import("./pages/Community"));
 const Announcements = lazy(() => import("./pages/Announcements/Announcements"));
 const Announcement = lazy(() =>
   import("./components/Announcement/Announcement")
@@ -37,6 +36,13 @@ const PrayON = lazy(() => import("./pages/Online/PrayON"));
 const Worship = lazy(() => import("./pages/Online/Worship"));
 const SundayService = lazy(() => import("./pages/Online/SundayService"));
 const Sermon = lazy(() => import("./pages/Online/Sermon"));
+const SmallGroup = lazy(() => import("./pages/Community/SmallGroup"));
+const Ministry = lazy(() => import("./pages/Community/Ministry"));
+
+const Preschool = lazy(() => import("./pages/NextGen/Preschool"));
+const Elementary = lazy(() => import("./pages/NextGen/Elementary"));
+const Youth = lazy(() => import("./pages/NextGen/Youth"));
+const YoungAdult = lazy(() => import("./pages/NextGen/YoungAdult"));
 
 const theme = createTheme({
   palette: {
@@ -71,6 +77,10 @@ function App() {
             />
             <Route path="/weeklyupdate" element={<WeeklyUpdate />} />
             <Route path="/newcomers" element={<NewComers />} />
+
+            <Route path="/community/smallgroup" element={<SmallGroup />} />
+            <Route path="/community/ministry" element={<Ministry />} />
+
             <Route path="/online/sundayservice" element={<SundayService />} />
             <Route path="/online/sermon" element={<Sermon />} />
             <Route path="/online/worship" element={<Worship />} />
@@ -81,7 +91,12 @@ function App() {
               path="/meditationON/post/"
               element={<MeditationONPost />}
             />
-            <Route path="/community" element={<Community />} />
+
+            <Route path="/nextgen/preschool" element={<Preschool />} />
+            <Route path="/nextgen/elementary" element={<Elementary />} />
+            <Route path="/nextgen/youth" element={<Youth />} />
+            <Route path="/nextgen/youngadult" element={<YoungAdult />} />
+
             <Route path="/signup" element={<SignUp />} />
           </Routes>
         </Suspense>

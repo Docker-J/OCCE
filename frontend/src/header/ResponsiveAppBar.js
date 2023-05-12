@@ -112,43 +112,42 @@ const ResponsiveAppBar = () => {
       ],
       state: "onlinePopupState",
     },
-    // {
-    //   title: "공동체",
-    //   subpages: [
-    //     {
-    //       title: "소그룹",
-    //       to: "",
-    //     },
-    //     {
-    //       title: "사역",
-    //       to: "",
-    //     },
-    //   ],
-    //   state: "communityPopupState",
-    // },
-    // {
-    //   title: "다음세대",
-    //   to: "",
-    //   subpages: [
-    //     {
-    //       title: "유아유치부",
-    //       to: "",
-    //     },
-    //     {
-    //       title: "유초등부",
-    //       to: "",
-    //     },
-    //     {
-    //       title: "중고등부",
-    //       to: "",
-    //     },
-    //     {
-    //       title: "청년부",
-    //       to: "",
-    //     },
-    //   ],
-    //   state: "nextGenPopupState",
-    // },
+    {
+      title: "공동체",
+      subpages: [
+        {
+          title: "소그룹",
+          to: "community/smallgroup",
+        },
+        {
+          title: "사역",
+          to: "community/ministry",
+        },
+      ],
+      state: "communityPopupState",
+    },
+    {
+      title: "다음세대",
+      subpages: [
+        {
+          title: "유아유치부",
+          to: "nextgen/preschool",
+        },
+        {
+          title: "유초등부",
+          to: "nextgen/elementary",
+        },
+        {
+          title: "중고등부",
+          to: "nextgen/youth",
+        },
+        {
+          title: "청년부",
+          to: "nextgen/youngadult",
+        },
+      ],
+      state: "nextGenPopupState",
+    },
   ];
 
   // const settings = [
