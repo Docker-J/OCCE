@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "amazon-cognito-identity-js": "^6.2.0",
-    "aws-sdk": "^2.1368.0",
+    "aws-sdk": "^2.1379.0",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "express": "^4.18.1",
