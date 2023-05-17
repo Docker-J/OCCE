@@ -24,7 +24,7 @@ import ResponsiveAppBar from "./header/ResponsiveAppBar";
 const Main = lazy(() => import("./pages/Main/Main"));
 const About = lazy(() => import("./pages/About/About"));
 const WeeklyUpdate = lazy(() => import("./pages/WeeklyUpdate/WeeklyUpdate"));
-const NewComers = lazy(() => import("./pages/NewComers"));
+const NewComers = lazy(() => import("./pages/NewComers/NewComers"));
 const SignUp = lazy(() => import("./components/SignUp"));
 const Announcements = lazy(() => import("./pages/Announcements/Announcements"));
 const Announcement = lazy(() =>

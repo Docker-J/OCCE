@@ -1,12 +1,4 @@
-import { useCallback } from "react";
-import ReactFlow, {
-  MiniMap,
-  Controls,
-  Background,
-  useNodesState,
-  useEdgesState,
-  addEdge,
-} from "reactflow";
+import ReactFlow, { useNodesState, useEdgesState } from "reactflow";
 
 import "reactflow/dist/style.css";
 
@@ -21,21 +13,25 @@ const initialNodes = [
   },
   {
     id: "2",
-    position: { x: 0, y: 100 },
+    position: { x: 0, y: 75 },
     draggable: false,
     deletable: false,
-    data: { label: "등록" },
+    data: {
+      label: "등록 | QR코드 온라인 등록 또는 오프라인 등록 양식 작성",
+    },
   },
   {
     id: "3",
-    position: { x: 0, y: 200 },
+    position: { x: 0, y: 150 },
     draggable: false,
     deletable: false,
-    data: { label: "새가족 교육" },
+    data: {
+      label: "새가족 교육 | 4주 과정, 주일 오후 4시 15분 새가족실(1층 미팅룸)",
+    },
   },
   {
     id: "4",
-    position: { x: 0, y: 300 },
+    position: { x: 0, y: 225 },
     draggable: false,
     deletable: false,
     data: { label: "소그룹(정원) 배치" },
@@ -43,7 +39,7 @@ const initialNodes = [
   {
     id: "5",
     type: "output",
-    position: { x: 0, y: 400 },
+    position: { x: 0, y: 300 },
     draggable: false,
     deletable: false,
     data: { label: "새가족 환영회" },
@@ -58,13 +54,8 @@ const initialEdges = [
 ];
 
 const NewComers = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-
-  const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
-  );
+  const [nodes] = useNodesState(initialNodes);
+  const [edges] = useEdgesState(initialEdges);
 
   return (
     <>
@@ -79,20 +70,17 @@ const NewComers = () => {
         가족이 되심을 기쁨으로 환영합니다. 아래와 같은 과정을 통해 온 공동체의
         가족으로 함께 하게 됩니다.
       </p>
-      <div style={{ height: 800 }}>
+      <div style={{ height: "800" }}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
           fitView
           zoomOnScroll={false}
+          preventScrolling={false}
+          panOnDrag={false}
           edgesUpdatable={false}
           nodesConnectable={false}
-        >
-          <Controls showInteractive={false} />
-        </ReactFlow>
+        ></ReactFlow>
       </div>
     </>
   );
