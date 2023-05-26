@@ -17,7 +17,7 @@
     "browser-image-compression": "^2.0.0",
     "ckeditor5-custom-build": "file:ckeditor5",
     "file": "^0.2.2",
-    "firebase": "^9.14.0",
+    "firebase": "^9.22.1",
     "material-ui-popup-state": "^5.0.8",
     "pdf-to-base64": "^1.0.3",
     "prop-types": "^15.8.1",
