@@ -70,7 +70,7 @@ const About = () => (
     //fullpage options
     licenseKey={"YOUR_KEY_HERE"}
     scrollingSpeed={1000} /* Options here */
-    anchors={["beginning", "name", "direction", "aboutus"]}
+    anchors={["beginning", "name", "direction", "servers", "aboutus"]}
     // slidesNavigation={true}
     // slidesNavPosition="bottom"
     scrollHorizontally={true}
@@ -359,6 +359,10 @@ const About = () => (
             </div>
 
             <Arrow onClick={() => fullpageApi.moveSectionDown()} />
+          </div>
+
+          <div className="section" id="section5">
+            섬기는 사람들
           </div>
 
           <div className="section" id="section4">
