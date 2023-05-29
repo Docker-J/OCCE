@@ -1,4 +1,4 @@
-@import url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@1.0/nanumsquare.css);
+@import url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/nanumsquare.css);
 
 .App {
   text-align: center;
@@ -9,7 +9,7 @@
 
 body {
   word-break: keep-all;
-  font-family: "nanumsquare";
+  font-family: "NanumSquare", sans-serif;
 }
 
 .App-logo {
