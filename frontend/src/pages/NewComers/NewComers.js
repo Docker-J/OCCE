@@ -2,6 +2,8 @@ import ReactFlow, { useNodesState, useEdgesState } from "reactflow";
 
 import "reactflow/dist/style.css";
 import { Typography } from "@mui/material";
+import { useCallback, useEffect, useState } from "react";
+import { useWindowSize } from "@uidotdev/usehooks";
 
 const initialNodes = [
   {
@@ -58,6 +60,19 @@ const NewComers = () => {
   const [nodes] = useNodesState(initialNodes);
   const [edges] = useEdgesState(initialEdges);
 
+  const size = useWindowSize();
+  const [reactFlowInstance, setReactFlowInstance] = useState(null);
+
+  const onInit = useCallback((reactFlowInstance) => {
+    setReactFlowInstance(reactFlowInstance);
+  }, []);
+
+  useEffect(() => {
+    if (reactFlowInstance) {
+      reactFlowInstance.fitView();
+    }
+  }, [size, reactFlowInstance]);
+
   return (
     <>
       <h1>새가족</h1>
@@ -71,8 +86,9 @@ const NewComers = () => {
         가족이 되심을 기쁨으로 환영합니다. 아래와 같은 과정을 통해 온 공동체의
         가족으로 함께 하게 됩니다.
       </Typography>
-      <div style={{ width: "100%", height: "800px" }}>
+      <div style={{ width: "100vw", height: "800px" }}>
         <ReactFlow
+          onInit={onInit}
           nodes={nodes}
           edges={edges}
           fitView
