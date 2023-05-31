@@ -3,7 +3,7 @@ import "./online.css";
 
 const Worship = () => {
   return (
-    <div class="main">
+    <div className="main">
       <h1>찬양</h1>
       {/* <Typography textAlign={"center"} sx={{ mt: "5px" }}>
         일상의 자리에서 매일 말씀을 묵상하고 그 말씀에 따라 살아갑니다. 정해진
@@ -12,8 +12,8 @@ const Worship = () => {
         중심의 삶을 살도록 합니다
       </Typography> */}
 
-      <div class="video">
-        <div class="video-container">
+      <div className="video">
+        <div className="video-container">
           <iframe
             width="560"
             height="315"
@@ -21,7 +21,7 @@ const Worship = () => {
             title="YouTube video player"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen="allowfullscreen"
+            allowFullScreen
           ></iframe>
         </div>
       </div>

@@ -28,8 +28,8 @@ const ResponsiveAppBar = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [anchorElOnline, setAnchorElOnline] = useState(null);
 
-  const [signInModalOpen, setSignInModalOpen] = useState(null);
-  const [signUpModalOpen, setSignUpModalOpen] = useState(null);
+  const [signInModalOpen, setSignInModalOpen] = useState(false);
+  const [signUpModalOpen, setSignUpModalOpen] = useState(false);
 
   const onSignInModalClose = () => {
     setSignInModalOpen(false);
