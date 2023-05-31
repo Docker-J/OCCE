@@ -21,6 +21,7 @@ import Submenu from "../components/Header/Submenu";
 import SubmenuMobile from "../components/Header/SubmenuMobile";
 import SignInModal from "../components/User/SignInModal";
 import SignUpModal from "../components/User/SignUpModal";
+import { signOut } from "../api/user";
 
 const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
@@ -34,7 +35,7 @@ const ResponsiveAppBar = () => {
     setSignInModalOpen(false);
   };
   const onSignUpModalClose = () => {
-    setSignInModalOpen(false);
+    setSignUpModalOpen(false);
   };
 
   const handleOpenNavMenu = (event) => {
@@ -150,12 +151,13 @@ const ResponsiveAppBar = () => {
     },
   ];
 
-  // const settings = [
-  //   { title: "Sign In", onClick: setSignInModalOpen(true) },
-  //   { title: "Sign Up", onClick: setSignUpModalOpen(true) },
-  // ];
+  const settings = [
+    { title: "Sign In", onClick: () => setSignInModalOpen(true) },
+    { title: "Sign Up", onClick: () => setSignUpModalOpen(true) },
+    { title: "Sign Out", onClick: () => signOut() },
+  ];
 
-  const settings = [{ title: "Sign In" }, { title: "Sign Up" }];
+  // const settings = [{ title: "Sign In" }, { title: "Sign Up" }];
 
   return (
     <>
@@ -299,7 +301,7 @@ const ResponsiveAppBar = () => {
                     <Typography
                       sx={{ color: "black" }}
                       textAlign="center"
-                      onClick={handleCloseUserMenu}
+                      onClick={setting.onClick}
                     >
                       {setting.title}
                     </Typography>

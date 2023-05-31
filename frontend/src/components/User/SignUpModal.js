@@ -23,6 +23,10 @@ const SignUpModal = (props) => {
   const [lastName, setLastName] = useState("");
   const [firstName, setFirstName] = useState("");
 
+  const handleSignUp = () => {
+    handleClose();
+  };
+
   const handleClose = () => {
     setEmail("");
     setPassword("");
@@ -32,7 +36,7 @@ const SignUpModal = (props) => {
   return (
     <Modal open={props.open} onClose={handleClose}>
       <Box sx={style} bgcolor="white">
-        <h1>Sign In</h1>
+        <h1>Sign Up</h1>
         <TextField
           sx={{ width: "35%" }}
           label="Last Name"
@@ -70,7 +74,7 @@ const SignUpModal = (props) => {
         />
 
         <p>
-          <Button onClick={handleClose}>Sign In</Button>
+          <Button onClick={handleSignUp}>Sign Up</Button>
           <Button onClick={handleClose}>Close</Button>
         </p>
       </Box>

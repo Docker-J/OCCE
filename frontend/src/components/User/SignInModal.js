@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { Box, Button, Modal, TextField } from "@mui/material";
+import { signIn } from "../../api/user";
 
 const style = {
   position: "absolute",
@@ -19,6 +20,11 @@ const style = {
 const SignInModal = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const handleSignIn = () => {
+    signIn(email, password);
+    handleClose();
+  };
 
   const handleClose = () => {
     setEmail("");
@@ -46,7 +52,7 @@ const SignInModal = (props) => {
         />
 
         <p>
-          <Button onClick={handleClose}>Sign In</Button>
+          <Button onClick={handleSignIn}>Sign In</Button>
           <Button onClick={handleClose}>Close</Button>
         </p>
       </Box>
