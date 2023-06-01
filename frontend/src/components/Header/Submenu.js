@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-import { Box, Button, Typography, MenuItem } from "@mui/material";
+import { Button, Typography, MenuItem } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
@@ -18,7 +18,7 @@ const Submenu = (props) => {
   });
 
   return (
-    <Box>
+    <>
       <Button
         component={props.page.to && Link}
         to={props.page.to}
@@ -67,7 +67,7 @@ const Submenu = (props) => {
           ))}
         </HoverMenu>
       )}
-    </Box>
+    </>
   );
 };
 
