@@ -19,6 +19,7 @@ const Sermon = () => {
             height="315"
             src="https://www.youtube.com/embed/videoseries?list=PL-MVshquUXWFkxA1rry9X2d4WAvR-kesH"
             title="YouTube video player"
+            frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           ></iframe>
