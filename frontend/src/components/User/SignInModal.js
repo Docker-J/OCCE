@@ -55,6 +55,7 @@ const SignInModal = (props) => {
           sx={{ width: "70%" }}
           label="Email"
           value={email}
+          type="email"
           onChange={(e) => setEmail(e.target.value)}
           required
         />
@@ -62,6 +63,7 @@ const SignInModal = (props) => {
           sx={{ width: "70%" }}
           label="Password"
           value={password}
+          type="password"
           onChange={(e) => setPassword(e.target.value)}
           required
         />
