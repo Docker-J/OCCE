@@ -17,8 +17,11 @@ import PDFReader from "../../components/WeeklyUpdate/PDFReader";
 import BulletinUploadModal from "../../components/WeeklyUpdate/BulletinUploadModal";
 
 import "./WeeklyUpdate.css";
+import { useSelector } from "react-redux";
 
 const WeeklyUpdate = () => {
+  const user = useSelector((state) => state.authToken.admin);
+
   const [bulletin, setBulletin] = useState(null);
   const [isSuccessSnackBarOpen, setIsSuccessSnackBarOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -181,30 +184,34 @@ const WeeklyUpdate = () => {
         <CircularProgress />
       )}
 
-      <Fab
-        id="uploadBulletinButton"
-        variant="extended"
-        onClick={() => setModalState(true)}
-      >
-        <UploadIcon sx={{ mr: 1 }} />
-        Upload
-      </Fab>
+      {user && (
+        <>
+          <Fab
+            id="uploadBulletinButton"
+            variant="extended"
+            onClick={() => setModalState(true)}
+          >
+            <UploadIcon sx={{ mr: 1 }} />
+            Upload
+          </Fab>
 
-      <BulletinUploadModal
-        open={modalState}
-        onModalUpload={uploadBulletin}
-        onClose={closeModal}
-      />
+          <BulletinUploadModal
+            open={modalState}
+            onModalUpload={uploadBulletin}
+            onClose={closeModal}
+          />
 
-      <Snackbar
-        open={isSuccessSnackBarOpen}
-        autoHideDuration={8000}
-        onClose={handleClose}
-      >
-        <Alert severity="success" onClose={handleClose}>
-          Uploaded Succesfully!
-        </Alert>
-      </Snackbar>
+          <Snackbar
+            open={isSuccessSnackBarOpen}
+            autoHideDuration={8000}
+            onClose={handleClose}
+          >
+            <Alert severity="success" onClose={handleClose}>
+              Uploaded Succesfully!
+            </Alert>
+          </Snackbar>
+        </>
+      )}
     </div>
   );
 };

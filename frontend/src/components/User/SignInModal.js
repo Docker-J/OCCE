@@ -27,7 +27,12 @@ const SignInModal = (props) => {
   const [password, setPassword] = useState("");
 
   const signInSuccess = (result) => {
-    dispatch(SET_TOKEN(result.getAccessToken().getJwtToken()));
+    const data = {
+      accessToken: result.getAccessToken().getJwtToken(),
+      groups: result.getIdToken().payload["cognito:groups"],
+    };
+
+    dispatch(SET_TOKEN(data));
     setRefreshToken(result.getRefreshToken().getToken());
   };
 

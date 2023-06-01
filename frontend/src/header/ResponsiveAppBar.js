@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import "./ResponsiveAppBar.css";
@@ -29,6 +29,9 @@ import { DELETE_TOKEN } from "../store/Auth";
 const ResponsiveAppBar = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.authToken.authenticated);
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
 
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
