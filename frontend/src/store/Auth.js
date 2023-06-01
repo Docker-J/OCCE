@@ -6,6 +6,7 @@ export const tokenSlice = createSlice({
   name: "authToken",
   initialState: {
     authenticated: false,
+    admin: false,
     accessToken: null,
     expireTime: null,
   },
