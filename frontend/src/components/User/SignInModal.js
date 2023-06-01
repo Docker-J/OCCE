@@ -1,6 +1,9 @@
 import React, { useRef, useState } from "react";
 import { Box, Button, Modal, TextField } from "@mui/material";
 import { signIn } from "../../api/user";
+import { useDispatch } from "react-redux";
+import { SET_TOKEN } from "../../store/Auth";
+import { setRefreshToken } from "../../storage/Cookie";
 
 const style = {
   position: "absolute",
@@ -18,11 +21,18 @@ const style = {
 };
 
 const SignInModal = (props) => {
+  const dispatch = useDispatch();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const signInSuccess = (result) => {
+    dispatch(SET_TOKEN(result.getAccessToken().getJwtToken()));
+    setRefreshToken(result.getRefreshToken().getToken());
+  };
+
   const handleSignIn = () => {
-    signIn(email, password);
+    signIn(email, password, signInSuccess);
     handleClose();
   };
 

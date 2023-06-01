@@ -22,8 +22,14 @@ import SubmenuMobile from "../components/Header/SubmenuMobile";
 import SignInModal from "../components/User/SignInModal";
 import SignUpModal from "../components/User/SignUpModal";
 import { signOut } from "../api/user";
+import { useDispatch, useSelector } from "react-redux";
+import { removeCookieToken } from "../storage/Cookie";
+import { DELETE_TOKEN } from "../store/Auth";
 
 const ResponsiveAppBar = () => {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.authToken.authenticated);
+
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [anchorElOnline, setAnchorElOnline] = useState(null);
@@ -52,7 +58,6 @@ const ResponsiveAppBar = () => {
     setAnchorElUser(null);
   };
 
-  // console.log(useLocation().hash);
   const currentPage = useLocation().pathname;
   const currnetHash = useLocation().hash;
 
@@ -151,13 +156,19 @@ const ResponsiveAppBar = () => {
     },
   ];
 
-  const settings = [
-    { title: "Sign In", onClick: () => setSignInModalOpen(true) },
-    { title: "Sign Up", onClick: () => setSignUpModalOpen(true) },
-    { title: "Sign Out", onClick: () => signOut() },
+  const settings_signed = [
+    { title: "Sign Out", onClick: () => signOut(signOutSuccess) },
   ];
 
-  // const settings = [{ title: "Sign In" }, { title: "Sign Up" }];
+  const settings_not_signed = [
+    { title: "Sign In", onClick: () => setSignInModalOpen(true) },
+    { title: "Sign Up", onClick: () => setSignUpModalOpen(true) },
+  ];
+
+  const signOutSuccess = () => {
+    dispatch(DELETE_TOKEN());
+    removeCookieToken();
+  };
 
   return (
     <>
@@ -296,17 +307,19 @@ const ResponsiveAppBar = () => {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                {settings.map((setting) => (
-                  <MenuItem key={setting.title} onClick={handleCloseUserMenu}>
-                    <Typography
-                      sx={{ color: "black" }}
-                      textAlign="center"
-                      onClick={setting.onClick}
-                    >
-                      {setting.title}
-                    </Typography>
-                  </MenuItem>
-                ))}
+                {(user ? settings_signed : settings_not_signed).map(
+                  (setting) => (
+                    <MenuItem key={setting.title} onClick={handleCloseUserMenu}>
+                      <Typography
+                        sx={{ color: "black" }}
+                        textAlign="center"
+                        onClick={setting.onClick}
+                      >
+                        {setting.title}
+                      </Typography>
+                    </MenuItem>
+                  )
+                )}
               </Menu>
             </Box>
           </Toolbar>

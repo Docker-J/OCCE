@@ -1,3 +1,7 @@
+import { useDispatch } from "react-redux";
+import { removeCookieToken, setRefreshToken } from "../storage/Cookie";
+import { DELETE_TOKEN, SET_TOKEN } from "../store/Auth";
+
 const AmazonCognitoIdentity = require("amazon-cognito-identity-js");
 
 const poolData = {
@@ -6,7 +10,7 @@ const poolData = {
 };
 const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
 
-export const signIn = (email, password) => {
+export const signIn = (email, password, success) => {
   console.log("requested!");
   var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
     Username: email,
@@ -19,6 +23,7 @@ export const signIn = (email, password) => {
       // console.log("access token + " + result.getAccessToken().getJwtToken());
       // console.log("id token + " + result.getIdToken().getJwtToken());
       // console.log("refresh token + " + result.getRefreshToken().getToken());
+      success(result);
       console.log(result.getIdToken().payload["cognito:groups"]);
     },
     onFailure: function (err) {
@@ -27,10 +32,11 @@ export const signIn = (email, password) => {
   });
 };
 
-export const signOut = () => {
+export const signOut = (success) => {
   var user = userPool.getCurrentUser();
   if (user) {
     user.signOut();
+    success();
     console.log("Success");
   }
 };
