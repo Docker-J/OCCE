@@ -6,7 +6,7 @@ import "./App.css";
 import ResponsiveAppBar from "./header/ResponsiveAppBar";
 
 // import Main from "./pages/Main/Main";
-// import About from "./pages/About/About";
+import About from "./pages/About/About";
 // import WeeklyUpdate from "./pages/WeeklyUpdate/WeeklyUpdate";
 // import NewComers from "./pages/NewComers";
 // import SignUp from "./components/SignUp";
@@ -22,7 +22,7 @@ import ResponsiveAppBar from "./header/ResponsiveAppBar";
 // import Sermon from "./pages/Online/Sermon";
 
 const Main = lazy(() => import("./pages/Main/Main"));
-const About = lazy(() => import("./pages/About/About"));
+// const About = lazy(() => import("./pages/About/About"));
 const WeeklyUpdate = lazy(() => import("./pages/WeeklyUpdate/WeeklyUpdate"));
 const NewComers = lazy(() => import("./pages/NewComers/NewComers"));
 const SignUp = lazy(() => import("./components/SignUp"));
