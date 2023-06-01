@@ -79,7 +79,7 @@ function PDFReader(props) {
 
   return (
     <>
-      <div>
+      <div style={{ marginTop: "1em", marginBottom: "1em" }}>
         <ButtonGroup id="scaleButton">
           <Button onClick={add} variant={"outlined"}>
             +
