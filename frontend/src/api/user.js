@@ -1,7 +1,3 @@
-import { useDispatch } from "react-redux";
-import { removeCookieToken, setRefreshToken } from "../storage/Cookie";
-import { DELETE_TOKEN, SET_TOKEN } from "../store/Auth";
-
 const AmazonCognitoIdentity = require("amazon-cognito-identity-js");
 
 const poolData = {
