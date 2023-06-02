@@ -7,39 +7,40 @@ import Typography from "@mui/material/Typography";
 
 const images = [
   {
-    url: "./location.webp",
+    url: "img/Main/location.webp",
     title: "주일예배 장소",
     width: "31%",
     link: "https://goo.gl/maps/gqpiA88gJSvbjfDD9",
     target: "_blank",
   },
   {
-    url: "time.webp",
+    url: "img/Main/time.webp",
     title: "예배 시간",
     width: "31%",
     to: "/aboutus#aboutus",
   },
   {
-    url: "news.webp",
+    url: "img/Main/news.webp",
     title: "최신 주보 보기",
     width: "31%",
     to: "/weeklyupdate",
   },
   {
-    url: "youtube.webp",
+    url: "img/Main/youtube.webp",
     title: "교회 유튜브 바로가기",
     width: "31%",
     link: "https://www.youtube.com/c/oncce",
     target: "_blank",
   },
   {
-    url: "join.webp",
+    url: "img/Main/join.webp",
     title: "교인 등록하기",
     width: "31%",
     link: "https://docs.google.com/forms/d/e/1FAIpQLSfYN9EECPuQ0e4TrPfok4UhMH3zKnvjUckKwGfe3SkQM-0O-A/viewform",
+    target: "_blank",
   },
   {
-    url: "offering.webp",
+    url: "img/Main/offering.webp",
     title: "헌금 안내",
     width: "31%",
     link: "aboutus#aboutus/offering",
