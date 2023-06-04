@@ -51,8 +51,8 @@ function PDFReader(props) {
     : window.innerHeight;
 
   const [windowDimension, detectHW] = useState({
-    width: height * 10 > width * 16 ? width - 30 : null,
-    height: height * 10 < width * 16 ? height - 400 : null,
+    width: height / width >= 16 / 10 ? width - 30 : null,
+    height: height / width < 16 / 10 ? height : null,
   });
 
   const detectSize = () => {
@@ -64,8 +64,8 @@ function PDFReader(props) {
       : window.innerHeight;
 
     detectHW({
-      width: height * 10 >= width * 16 ? width - 30 : null,
-      height: height * 10 <= width * 16 ? height - 400 : null,
+      width: height / width >= 16 / 10 ? width - 30 : null,
+      height: height / width < 16 / 10 ? height : null,
     });
   };
 
