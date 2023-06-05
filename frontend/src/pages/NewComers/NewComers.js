@@ -16,6 +16,7 @@ const initialNodes = [
     draggable: false,
     deletable: false,
     data: { label: "방문카드 작성" },
+    style: { width: 300 },
   },
   {
     id: "2",
@@ -23,32 +24,36 @@ const initialNodes = [
     draggable: false,
     deletable: false,
     data: {
-      label: "등록 | QR코드 온라인 등록 또는 오프라인 등록 양식 작성",
+      label: "등록 \n QR코드 온라인 등록 또는 오프라인 등록 양식 작성",
     },
+    style: { width: 300 },
   },
   {
     id: "3",
-    position: { x: 0, y: 175 },
+    position: { x: 0, y: 160 },
     draggable: false,
     deletable: false,
     data: {
-      label: "새가족 교육 | 4주 과정, 주일 오후 4시 15분 새가족실(1층 미팅룸)",
+      label: "새가족 교육 \n 4주 과정, 주일 오후 4시 15분 새가족실(1층 미팅룸)",
     },
+    style: { width: 300 },
   },
   {
     id: "4",
-    position: { x: 0, y: 275 },
+    position: { x: 0, y: 250 },
     draggable: false,
     deletable: false,
     data: { label: "소그룹(정원) 배치" },
+    style: { width: 300 },
   },
   {
     id: "5",
     type: "output",
-    position: { x: 0, y: 350 },
+    position: { x: 0, y: 325 },
     draggable: false,
     deletable: false,
     data: { label: "새가족 환영회" },
+    style: { width: 300 },
   },
 ];
 
@@ -111,7 +116,7 @@ const NewComers = () => {
   return (
     <>
       <h1>새가족</h1>
-      <Typography sx={{ color: "black" }}>
+      <Typography sx={{ fontSize: "1.1em", color: "black" }}>
         에드먼턴 온 교회에 오신 여러분을 환영합니다.<br></br> 교회에 처음 오신
         분들과 개인 사정으로 이주해 오신 분들, 신앙의 회복을 위해 새로이 나아
         오신 분들 모두를 환영합니다.<br></br>새 공동체의 울타리 안에서 새로운
@@ -121,7 +126,7 @@ const NewComers = () => {
         가족이 되심을 기쁨으로 환영합니다. 아래와 같은 과정을 통해 온 공동체의
         가족으로 함께 하게 됩니다.
       </Typography>
-      <div id="flowContainer" style={{ width: "100vw", height: "800px" }}>
+      <div id="flowContainer" style={{ width: "100vw", height: "60vh" }}>
         <ReactFlow
           onInit={onInit}
           nodes={nodes}
