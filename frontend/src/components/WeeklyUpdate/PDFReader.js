@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { pdfjs, Page, Document } from "react-pdf";
 
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+import "./PDFReader.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
