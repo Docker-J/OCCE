@@ -1,9 +1,12 @@
+import { useCallback, useEffect, useState } from "react";
+
 import ReactFlow, { useNodesState, useEdgesState } from "reactflow";
 
 import "reactflow/dist/style.css";
 import { Typography } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
 import { useWindowSize } from "@uidotdev/usehooks";
+
+import "./NewComers.css";
 
 const initialNodes = [
   {
@@ -25,7 +28,7 @@ const initialNodes = [
   },
   {
     id: "3",
-    position: { x: 0, y: 150 },
+    position: { x: 0, y: 175 },
     draggable: false,
     deletable: false,
     data: {
@@ -34,7 +37,7 @@ const initialNodes = [
   },
   {
     id: "4",
-    position: { x: 0, y: 225 },
+    position: { x: 0, y: 275 },
     draggable: false,
     deletable: false,
     data: { label: "소그룹(정원) 배치" },
@@ -42,7 +45,7 @@ const initialNodes = [
   {
     id: "5",
     type: "output",
-    position: { x: 0, y: 300 },
+    position: { x: 0, y: 350 },
     draggable: false,
     deletable: false,
     data: { label: "새가족 환영회" },
@@ -50,10 +53,42 @@ const initialNodes = [
 ];
 
 const initialEdges = [
-  { id: "e1-2", deletable: false, source: "1", target: "2" },
-  { id: "e2-3", deletable: false, source: "2", target: "3" },
-  { id: "e3-4", deletable: false, source: "3", target: "4" },
-  { id: "e4-5", deletable: false, source: "4", target: "5" },
+  {
+    id: "e1-2",
+    deletable: false,
+    animated: true,
+    focusable: false,
+    markerEnd: { type: "arrow" },
+    source: "1",
+    target: "2",
+  },
+  {
+    id: "e2-3",
+    deletable: false,
+    animated: true,
+    focusable: false,
+    markerEnd: { type: "arrow" },
+    source: "2",
+    target: "3",
+  },
+  {
+    id: "e3-4",
+    deletable: false,
+    animated: true,
+    focusable: false,
+    markerEnd: { type: "arrow" },
+    source: "3",
+    target: "4",
+  },
+  {
+    id: "e4-5",
+    deletable: false,
+    animated: true,
+    focusable: false,
+    markerEnd: { type: "arrow" },
+    source: "4",
+    target: "5",
+  },
 ];
 
 const NewComers = () => {
@@ -76,7 +111,7 @@ const NewComers = () => {
   return (
     <>
       <h1>새가족</h1>
-      <Typography style={{ color: "black" }}>
+      <Typography sx={{ color: "black" }}>
         에드먼턴 온 교회에 오신 여러분을 환영합니다.<br></br> 교회에 처음 오신
         분들과 개인 사정으로 이주해 오신 분들, 신앙의 회복을 위해 새로이 나아
         오신 분들 모두를 환영합니다.<br></br>새 공동체의 울타리 안에서 새로운
@@ -86,7 +121,7 @@ const NewComers = () => {
         가족이 되심을 기쁨으로 환영합니다. 아래와 같은 과정을 통해 온 공동체의
         가족으로 함께 하게 됩니다.
       </Typography>
-      <div style={{ width: "100vw", height: "800px" }}>
+      <div id="flowContainer" style={{ width: "100vw", height: "800px" }}>
         <ReactFlow
           onInit={onInit}
           nodes={nodes}
