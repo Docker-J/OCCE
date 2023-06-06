@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 import { Button, Typography, Fab } from "@mui/material";
 import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
 
-import ChatBot from "react-simple-chatbot";
-
 import ButtonBases from "../../components/Main/MainButtonBanner";
 import "./Main.css";
+import { useState } from "react";
+import CustomChatBot from "../../components/Main/CustomChatBot";
 
 const Main = () => {
   return (
@@ -105,23 +105,14 @@ const Main = () => {
 
       <ButtonBases className="cards" />
 
-      <Fab
+      {/* <Fab
         variant="primary"
         style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
       >
         <QuestionAnswerOutlinedIcon />
-      </Fab>
+      </Fab> */}
 
-      <ChatBot
-        style={{ display: "none" }}
-        steps={[
-          {
-            id: "hello-world",
-            message: "Hello World!",
-            end: true,
-          },
-        ]}
-      />
+      <CustomChatBot />
     </>
   );
 };
