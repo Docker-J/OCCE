@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import ChatBot from "react-simple-chatbot";
 import { ThemeProvider } from "styled-components";
 
@@ -23,8 +24,8 @@ const steps = [
   {
     id: "options-questions",
     options: [
-      { value: 1, label: "예배장소", trigger: "place" },
-      { value: 2, label: "예배시간", trigger: "time" },
+      { value: 1, label: "예배 장소", trigger: "place" },
+      { value: 2, label: "예배 시간", trigger: "time" },
       { value: 3, label: "문의하기", trigger: "ask-name" },
     ],
     hideInput: true,
@@ -32,12 +33,38 @@ const steps = [
   {
     id: "place",
     message: "주일 예배 장소는 9419 95 St, Edmonton, AB 입니다",
+    trigger: "placelink",
+    hideInput: true,
+  },
+  {
+    id: "placelink",
+    component: (
+      <a
+        style={{ color: "#fff" }}
+        href="https://goo.gl/maps/T6qS2MfTkb1miSyUA"
+        target="__blank"
+      >
+        Google Map에서 위치 보기
+      </a>
+    ),
+    asMessage: true,
     trigger: "welcome",
     hideInput: true,
   },
   {
     id: "time",
     message: "주일 예배 시간은 2시 30분 입니다.",
+    trigger: "timelink",
+    hideInput: true,
+  },
+  {
+    id: "timelink",
+    component: (
+      <Link style={{ color: "#fff" }} to="/aboutus#aboutus">
+        예배 및 모임 시간 확인하기
+      </Link>
+    ),
+    asMessage: true,
     trigger: "welcome",
     hideInput: true,
   },
@@ -97,9 +124,10 @@ const steps = [
   {
     id: "answer-content",
     user: true,
+    trigger: "ask-submitted",
   },
   {
-    id: "ask-content",
+    id: "ask-submitted",
     message: "문의사항이 접수되었습니다.",
     trigger: "welcome",
     hideInput: true,
@@ -114,8 +142,9 @@ const CustomChatBot = () => {
         botAvatar="apple-icon.png"
         floating={true}
         hideUserAvatar={true}
-        botDealy={250}
+        botDealy={0}
         userDelay={500}
+        style={{ textAlign: "left" }}
         //   floatingIcon={<QuestionAnswerOutlinedIcon />}
         steps={steps}
       />
