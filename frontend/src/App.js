@@ -9,7 +9,6 @@ import Main from "./pages/Main/Main";
 import About from "./pages/About/About";
 // import WeeklyUpdate from "./pages/WeeklyUpdate/WeeklyUpdate";
 // import NewComers from "./pages/NewComers";
-// import SignUp from "./components/SignUp";
 
 // import Community from "./pages/Community";
 // import Announcements from "./pages/Announcements/Announcements";
@@ -23,22 +22,28 @@ import About from "./pages/About/About";
 
 // const Main = lazy(() => import("./pages/Main/Main"));
 // const About = lazy(() => import("./pages/About/About"));
-const WeeklyUpdate = lazy(() => import("./pages/WeeklyUpdate/WeeklyUpdate"));
-const NewComers = lazy(() => import("./pages/NewComers/NewComers"));
-const SignUp = lazy(() => import("./components/SignUp"));
+
+//Announcements
 const Announcements = lazy(() => import("./pages/Announcements/Announcements"));
 const Announcement = lazy(() =>
   import("./components/Announcement/Announcement")
 );
+const WeeklyUpdate = lazy(() => import("./pages/WeeklyUpdate/WeeklyUpdate"));
+const NewComers = lazy(() => import("./pages/NewComers/NewComers"));
+
+// Online
 const MeditationON = lazy(() => import("./pages/Online/MeditationON"));
 const MeditationONPost = lazy(() => import("./pages/Online/MeditationONPost"));
 const PrayON = lazy(() => import("./pages/Online/PrayON"));
 const Worship = lazy(() => import("./pages/Online/Worship"));
 const SundayService = lazy(() => import("./pages/Online/SundayService"));
 const Sermon = lazy(() => import("./pages/Online/Sermon"));
+
+// Community
 const SmallGroup = lazy(() => import("./pages/Community/SmallGroup"));
 const Ministry = lazy(() => import("./pages/Community/Ministry"));
 
+// NextGen
 const Preschool = lazy(() => import("./pages/NextGen/Preschool"));
 const Elementary = lazy(() => import("./pages/NextGen/Elementary"));
 const Youth = lazy(() => import("./pages/NextGen/Youth"));
@@ -96,8 +101,6 @@ function App() {
             <Route path="/nextgen/elementary" element={<Elementary />} />
             <Route path="/nextgen/youth" element={<Youth />} />
             <Route path="/nextgen/youngadult" element={<YoungAdult />} />
-
-            <Route path="/signup" element={<SignUp />} />
           </Routes>
         </Suspense>
       </div>
