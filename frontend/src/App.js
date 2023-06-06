@@ -5,7 +5,7 @@ import "./App.css";
 
 import ResponsiveAppBar from "./header/ResponsiveAppBar";
 
-// import Main from "./pages/Main/Main";
+import Main from "./pages/Main/Main";
 import About from "./pages/About/About";
 // import WeeklyUpdate from "./pages/WeeklyUpdate/WeeklyUpdate";
 // import NewComers from "./pages/NewComers";
@@ -21,7 +21,7 @@ import About from "./pages/About/About";
 // import SundayService from "./pages/Online/SundayService";
 // import Sermon from "./pages/Online/Sermon";
 
-const Main = lazy(() => import("./pages/Main/Main"));
+// const Main = lazy(() => import("./pages/Main/Main"));
 // const About = lazy(() => import("./pages/About/About"));
 const WeeklyUpdate = lazy(() => import("./pages/WeeklyUpdate/WeeklyUpdate"));
 const NewComers = lazy(() => import("./pages/NewComers/NewComers"));
