@@ -8,7 +8,7 @@
     "@emotion/styled": "^11.10.5",
     "@fullpage/react-fullpage": "^0.1.39",
     "@mui/icons-material": "^5.11.16",
-    "@mui/material": "^5.13.2",
+    "@mui/material": "^5.13.4",
     "@mui/x-date-pickers": "^6.6.0",
     "@reduxjs/toolkit": "^1.9.5",
     "@testing-library/jest-dom": "^5.16.5",
