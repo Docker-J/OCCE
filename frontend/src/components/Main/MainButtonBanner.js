@@ -36,7 +36,8 @@ const images = [
     url: "img/Main/join.webp",
     title: "교인 등록하기",
     width: "31%",
-    link: "https://docs.google.com/forms/d/e/1FAIpQLSfYN9EECPuQ0e4TrPfok4UhMH3zKnvjUckKwGfe3SkQM-0O-A/viewform",
+    link:
+      "https://docs.google.com/forms/d/e/1FAIpQLSfYN9EECPuQ0e4TrPfok4UhMH3zKnvjUckKwGfe3SkQM-0O-A/viewform",
     target: "_blank",
   },
   {

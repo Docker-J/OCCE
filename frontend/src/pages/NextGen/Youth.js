@@ -9,7 +9,6 @@ const Youth = () => {
         sx={{ fontSize: "1.1em", color: "black" }}
         // style={{ textAlign: "center", maxWidth: "1536px" }}
       >
-        {" "}
         시간: 주일 오후 4시
         <br />
         장소: Fireside Room
