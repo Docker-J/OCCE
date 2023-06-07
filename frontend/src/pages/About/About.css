@@ -101,6 +101,23 @@ p {
   width: 90%;
 }
 
+#slider {
+  /* display: inline-flex; */
+  position: absolute;
+  left: 50%;
+  top: 15%;
+  transform: translateY(-50%);
+}
+
+#section5 {
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+    url("../../components/About/servers.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  /* background-position-x: center;
+  background-position-y: 85%; */
+}
+
 /* .section3Body {
   position: absolute;
   padding-left: 75px;

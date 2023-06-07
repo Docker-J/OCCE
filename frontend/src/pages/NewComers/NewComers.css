@@ -5,6 +5,8 @@
 .react-flow__node {
   white-space: pre-wrap;
   border-color: #f57c00;
+  font-size: 0.8em;
+  font-weight: 500;
 }
 
 .react-flow__node.selected {
