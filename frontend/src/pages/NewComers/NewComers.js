@@ -133,6 +133,7 @@ const NewComers = () => {
           edges={edges}
           fitView
           zoomOnScroll={false}
+          zoomOnDoubleClick={false}
           preventScrolling={false}
           panOnDrag={false}
           edgesUpdatable={false}
