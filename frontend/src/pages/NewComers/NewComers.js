@@ -114,7 +114,7 @@ const NewComers = () => {
   }, [size, reactFlowInstance]);
 
   return (
-    <>
+    <div style={{ margin: "1em" }}>
       <h1>새가족</h1>
       <Typography sx={{ fontSize: "1.1em", color: "black" }}>
         에드먼턴 온 교회에 오신 여러분을 환영합니다.<br></br> 교회에 처음 오신
@@ -126,7 +126,7 @@ const NewComers = () => {
         가족이 되심을 기쁨으로 환영합니다. 아래와 같은 과정을 통해 온 공동체의
         가족으로 함께 하게 됩니다.
       </Typography>
-      <div id="flowContainer" style={{ width: "100vw", height: "60vh" }}>
+      <div id="flowContainer" style={{ width: "100%", height: "60vh" }}>
         <ReactFlow
           onInit={onInit}
           nodes={nodes}
@@ -139,7 +139,7 @@ const NewComers = () => {
           nodesConnectable={false}
         ></ReactFlow>
       </div>
-    </>
+    </div>
   );
 };
 
