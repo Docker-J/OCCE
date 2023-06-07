@@ -15,6 +15,7 @@ const theme = {
 };
 
 const steps = [
+  // Welcome
   {
     id: "welcome",
     message: "에드먼튼 온교회에 오신 것을 환영합니다! 무엇을 도와드릴까요?",
@@ -24,20 +25,22 @@ const steps = [
   {
     id: "options-questions",
     options: [
-      { value: 1, label: "예배 장소", trigger: "place" },
+      { value: 1, label: "예배 장소", trigger: "location" },
       { value: 2, label: "예배 시간", trigger: "time" },
       { value: 3, label: "문의하기", trigger: "ask-name" },
     ],
     hideInput: true,
   },
+
+  // Church Location
   {
-    id: "place",
+    id: "location",
     message: "주일 예배 장소는 9419 95 St, Edmonton, AB 입니다",
-    trigger: "placelink",
+    trigger: "locationlink",
     hideInput: true,
   },
   {
-    id: "placelink",
+    id: "locationlink",
     component: (
       <a
         style={{ color: "#fff" }}
@@ -51,6 +54,8 @@ const steps = [
     trigger: "welcome",
     hideInput: true,
   },
+
+  // Service time
   {
     id: "time",
     message: "주일 예배 시간은 2시 30분 입니다.",
@@ -68,6 +73,8 @@ const steps = [
     trigger: "welcome",
     hideInput: true,
   },
+
+  // Inquiry
   {
     id: "ask-name",
     message: "성함을 입력해주세요",
@@ -102,6 +109,11 @@ const steps = [
   {
     id: "answer-email",
     user: true,
+    trigger: "confirm-email",
+  },
+  {
+    id: "confirm-email",
+    user: true,
     trigger: "ask-content",
   },
   {
@@ -112,6 +124,11 @@ const steps = [
   },
   {
     id: "answer-phone",
+    user: true,
+    trigger: "confirm-phone",
+  },
+  {
+    id: "confirm-phone",
     user: true,
     trigger: "ask-content",
   },
