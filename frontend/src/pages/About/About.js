@@ -123,8 +123,11 @@ const About = () => (
                   fontWeight="550"
                   sx={{ color: "white" }}
                 >
-                  에드먼턴 온 교회는 2022년 4월 3일,<br></br>교회의 세속화에
-                  따른 위기와 포스트 코로나라는 시대의 도전 가운데<br></br>
+                  에드먼턴 온 교회는 2022년 4월 3일,
+                  <br />
+                  교회의 세속화에 따른 위기와 포스트 코로나라는 시대의 도전
+                  가운데
+                  <br />
                   하나님이 디자인하고 부르신 뜻대로 새롭게 태어난 교회
                   공동체입니다
                 </Typography>
@@ -142,14 +145,16 @@ const About = () => (
                   fontWeight="750"
                   sx={{ color: "white", letterSpacing: "5px" }}
                 >
-                  이름,<br></br>부르심과 사명
+                  이름,
+                  <br />
+                  부르심과 사명
                 </Typography>
 
                 <LeftButton fullpageApi={fullpageApi} />
                 <RightButton fullpageApi={fullpageApi} />
 
                 <div className="section2Body">
-                  <div class="slide" data-anchor="edmonton">
+                  <div className="slide" data-anchor="edmonton">
                     <Typography
                       style={{ textAlign: "left" }}
                       variant="h4"
@@ -171,7 +176,7 @@ const About = () => (
                     </Typography>
                   </div>
 
-                  <div class="slide" data-anchor="all">
+                  <div className="slide" data-anchor="all">
                     <Typography
                       style={{ textAlign: "left" }}
                       variant="h3"
@@ -193,7 +198,7 @@ const About = () => (
                     </Typography>
                   </div>
 
-                  <div class="slide" data-anchor="on">
+                  <div className="slide" data-anchor="on">
                     <Typography
                       style={{ textAlign: "left" }}
                       variant="h2"
@@ -215,7 +220,7 @@ const About = () => (
                     </Typography>
                   </div>
 
-                  <div class="slide" data-anchor="building">
+                  <div className="slide" data-anchor="building">
                     <Typography
                       style={{ textAlign: "left" }}
                       variant="h2"
@@ -250,14 +255,16 @@ const About = () => (
                   fontWeight="700"
                   sx={{ color: "white", letterSpacing: "5px" }}
                 >
-                  부르심에 따른<br></br>공동체의 발걸음
+                  부르심에 따른
+                  <br />
+                  공동체의 발걸음
                 </Typography>
 
                 <LeftButton fullpageApi={fullpageApi} />
                 <RightButton fullpageApi={fullpageApi} />
 
                 <div className="section3Body">
-                  <div class="slide" data-anchor="lovegod">
+                  <div className="slide" data-anchor="lovegod">
                     <Typography
                       style={{ textAlign: "left" }}
                       variant="h4"
@@ -283,7 +290,7 @@ const About = () => (
                     </Typography>
                   </div>
 
-                  <div class="slide" data-anchor="loveneighbor">
+                  <div className="slide" data-anchor="loveneighbor">
                     <Typography
                       style={{ textAlign: "left" }}
                       variant="h4"
@@ -304,7 +311,7 @@ const About = () => (
                     </Typography>
                   </div>
 
-                  {/* <div class="slide" data-anchor="wordscentered">
+                  {/* <div className="slide" data-anchor="wordscentered">
                     <Typography
                       style={{ textAlign: "left" }}
                       variant="h4"
@@ -327,7 +334,7 @@ const About = () => (
                     </Typography>
                   </div>
 
-                  <div class="slide" data-anchor="community">
+                  <div className="slide" data-anchor="community">
                     <Typography
                       style={{ textAlign: "left" }}
                       variant="h4"
@@ -365,7 +372,7 @@ const About = () => (
             <div className="section4Title">
               <LeftButton fullpageApi={fullpageApi} />
               <RightButton fullpageApi={fullpageApi} />
-              <div class="slide" data-anchor="chin">
+              <div className="slide" data-anchor="chin">
                 <div
                   style={{
                     // objectFit: "cover",
@@ -402,7 +409,7 @@ const About = () => (
                   <p style={{ color: "black" }}>담임 목사</p>
                 </div>
               </div>
-              <div class="slide" data-anchor="kim">
+              <div className="slide" data-anchor="kim">
                 <img
                   src="img/About/KimHwikyung.jpg"
                   style={{
@@ -425,7 +432,7 @@ const About = () => (
               <LeftButton fullpageApi={fullpageApi} />
               <RightButton fullpageApi={fullpageApi} />
               <div className="section4Body">
-                <div class="slide" data-anchor="time">
+                <div className="slide" data-anchor="time">
                   <TableContainer
                     className="table"
                     // component={Paper}
@@ -435,7 +442,7 @@ const About = () => (
                       <TableHead>
                         <TableRow>
                           <TableCell
-                            colspan="3"
+                            colSpan="3"
                             align="center"
                             sx={{ color: "white" }}
                           >
@@ -445,7 +452,7 @@ const About = () => (
                       </TableHead>
                       <TableBody>
                         {serviceInfo.map((service) => (
-                          <TableRow>
+                          <TableRow key={service.title}>
                             <TableCell align="center" sx={{ color: "white" }}>
                               {service.title}
                             </TableCell>
@@ -462,7 +469,7 @@ const About = () => (
                   </TableContainer>
                 </div>
 
-                <div class="slide" data-anchor="offering">
+                <div className="slide" data-anchor="offering">
                   <Typography
                     style={{ textAlign: "center" }}
                     variant="subtitle1"
