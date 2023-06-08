@@ -3,7 +3,6 @@ import ReactFullpage from "@fullpage/react-fullpage";
 
 import "./About.css";
 import {
-  Box,
   Button,
   Table,
   TableBody,
@@ -66,6 +65,30 @@ const serviceInfo = [
   },
 ];
 
+const LeftButton = ({ fullpageApi }) => {
+  return (
+    <Button
+      size="large"
+      sx={{ color: "white" }}
+      onClick={() => fullpageApi.moveSlideLeft()}
+    >
+      <NavigateBeforeIcon sx={{ height: "45px", width: "45px" }} />
+    </Button>
+  );
+};
+
+const RightButton = ({ fullpageApi }) => {
+  return (
+    <Button
+      size="large"
+      sx={{ color: "white" }}
+      onClick={() => fullpageApi.moveSlideRight()}
+    >
+      <NavigateNextIcon sx={{ height: "45px", width: "45px" }} />
+    </Button>
+  );
+};
+
 const About = () => (
   <ReactFullpage
     //fullpage options
@@ -122,20 +145,8 @@ const About = () => (
                   이름,<br></br>부르심과 사명
                 </Typography>
 
-                <Button
-                  size="large"
-                  sx={{ color: "white" }}
-                  onClick={() => fullpageApi.moveSlideLeft()}
-                >
-                  <NavigateBeforeIcon sx={{ height: "45px", width: "45px" }} />
-                </Button>
-                <Button
-                  size="large"
-                  sx={{ color: "white" }}
-                  onClick={() => fullpageApi.moveSlideRight()}
-                >
-                  <NavigateNextIcon sx={{ height: "45px", width: "45px" }} />
-                </Button>
+                <LeftButton fullpageApi={fullpageApi} />
+                <RightButton fullpageApi={fullpageApi} />
 
                 <div className="section2Body">
                   <div class="slide" data-anchor="edmonton">
@@ -242,20 +253,8 @@ const About = () => (
                   부르심에 따른<br></br>공동체의 발걸음
                 </Typography>
 
-                <Button
-                  size="large"
-                  sx={{ color: "white" }}
-                  onClick={() => fullpageApi.moveSlideLeft()}
-                >
-                  <NavigateBeforeIcon sx={{ height: "45px", width: "45px" }} />
-                </Button>
-                <Button
-                  size="large"
-                  sx={{ color: "white" }}
-                  onClick={() => fullpageApi.moveSlideRight()}
-                >
-                  <NavigateNextIcon sx={{ height: "45px", width: "45px" }} />
-                </Button>
+                <LeftButton fullpageApi={fullpageApi} />
+                <RightButton fullpageApi={fullpageApi} />
 
                 <div className="section3Body">
                   <div class="slide" data-anchor="lovegod">
@@ -363,92 +362,68 @@ const About = () => (
           </div>
 
           <div className="section" id="section5">
-            <div id="slider">
-              <Button
-                size="large"
-                sx={{ color: "white" }}
-                onClick={() => fullpageApi.moveSlideLeft()}
-              >
-                <NavigateBeforeIcon sx={{ height: "45px", width: "45px" }} />
-              </Button>
-              <Button
-                size="large"
-                sx={{ color: "white" }}
-                onClick={() => fullpageApi.moveSlideRight()}
-              >
-                <NavigateNextIcon sx={{ height: "45px", width: "45px" }} />
-              </Button>
-            </div>
-            <div class="slide" data-anchor="chin">
-              <div
-                style={{
-                  // objectFit: "cover",
-                  // width: 350,
-                  // height: 550,
-                  // position: "absolute",
-                  height: "max-content",
-                  width: "max-content",
-                  borderRadius: "0.7rem",
-                  borderStyle: "solid",
-                  borderColor: "#ffffff",
-                  borderWidth: "1.5rem",
-                  backgroundColor: "white",
-                  // left: "50%",
-                  // top: "50%",
-                  // translate: "translate(-50%, -50%)",
-                }}
-              >
+            <div className="section4Title">
+              <LeftButton fullpageApi={fullpageApi} />
+              <RightButton fullpageApi={fullpageApi} />
+              <div class="slide" data-anchor="chin">
+                <div
+                  style={{
+                    // objectFit: "cover",
+                    // width: 350,
+                    // height: 550,
+                    // position: "absolute",
+                    height: "max-content",
+                    width: "max-content",
+                    borderRadius: "0.7rem",
+                    borderStyle: "solid",
+                    borderColor: "#ffffff",
+                    borderWidth: "1.5rem",
+                    backgroundColor: "white",
+                    // left: "50%",
+                    // top: "50%",
+                    // translate: "translate(-50%, -50%)",
+                  }}
+                >
+                  <img
+                    src="img/About/ChinSeongIn.jpg"
+                    style={{
+                      objectFit: "cover",
+                      width: 350,
+                      height: 550,
+                      borderRadius: "0.7rem",
+                      // borderStyle: "solid",
+                      // borderColor: "#ffffff",
+                      // borderWidth: "1rem",
+                    }}
+                  />
+                  <p style={{ color: "black", fontWeight: "bold" }}>
+                    진성인 목사
+                  </p>
+                  <p style={{ color: "black" }}>담임 목사</p>
+                </div>
+              </div>
+              <div class="slide" data-anchor="kim">
                 <img
-                  src="img/About/ChinSeongIn.jpg"
+                  src="img/About/KimHwikyung.jpg"
                   style={{
                     objectFit: "cover",
                     width: 350,
                     height: 550,
-                    borderRadius: "0.7rem",
-                    // borderStyle: "solid",
-                    // borderColor: "#ffffff",
-                    // borderWidth: "1rem",
+                    borderRadius: "1rem",
+                    borderStyle: "solid",
+                    borderColor: "#ffffff",
+                    borderWidth: "1rem",
                   }}
                 />
-                <p style={{ color: "black", fontWeight: "bold" }}>
-                  진성인 목사
-                </p>
-                <p style={{ color: "black" }}>담임 목사</p>
+                <p>김휘경 전도사 (중고등부/찬양/행정)</p>
               </div>
-            </div>
-            <div class="slide" data-anchor="kim">
-              <img
-                src="img/About/KimHwikyung.jpg"
-                style={{
-                  objectFit: "cover",
-                  width: 350,
-                  height: 550,
-                  borderRadius: "1rem",
-                  borderStyle: "solid",
-                  borderColor: "#ffffff",
-                  borderWidth: "1rem",
-                }}
-              />
-              <p>김휘경 전도사 (중고등부/찬양/행정)</p>
             </div>
           </div>
 
           <div className="section" id="section4">
             <div className="section4Title">
-              <Button
-                size="large"
-                sx={{ color: "white" }}
-                onClick={() => fullpageApi.moveSlideLeft()}
-              >
-                <NavigateBeforeIcon sx={{ height: "45px", width: "45px" }} />
-              </Button>
-              <Button
-                size="large"
-                sx={{ color: "white" }}
-                onClick={() => fullpageApi.moveSlideRight()}
-              >
-                <NavigateNextIcon sx={{ height: "45px", width: "45px" }} />
-              </Button>
+              <LeftButton fullpageApi={fullpageApi} />
+              <RightButton fullpageApi={fullpageApi} />
               <div className="section4Body">
                 <div class="slide" data-anchor="time">
                   <TableContainer
