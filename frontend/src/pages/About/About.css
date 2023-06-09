@@ -1,3 +1,9 @@
+.fp-section {
+  display: flex;
+  /* align-items: center; */
+  justify-content: center;
+}
+
 #section1 {
   background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)),
     url("../../components/About/FirstStep.webp");
@@ -7,15 +13,13 @@
 }
 
 .section1Body {
-  margin: auto;
-  max-width: 1536px;
-}
-
-.section1Text {
-  position: absolute;
-  top: 50%;
-  left: 38%;
-  transform: translate(-50%, -50%);
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  /* position: absolute; */
+  /* top: 50%;
+  left: 5%;
+  transform: translateY(-50%); */
 }
 
 #section2 {
@@ -24,24 +28,13 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 35%;
-  position: relative;
 }
 
-.test {
-  position: relative;
-  width: 100%;
-  max-width: 1536px;
-  height: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.section2Title {
-  /* display: inline-flex; */
-  position: absolute;
-  left: 5%;
-  top: 50%;
-  transform: translateY(-50%);
+.section2Body {
+  max-width: 1500px;
+  height: fit-content;
+  margin: auto;
+  padding: 0 1.5rem;
 }
 
 /* .slidesNavigator {
@@ -66,11 +59,11 @@
   background-position: center;
 }
 
-.section3Title {
-  position: absolute;
-  left: 5%;
-  top: 50%;
-  transform: translateY(-50%);
+.section3Body {
+  max-width: 1500px;
+  height: fit-content;
+  margin: auto;
+  padding: 0 1.5rem;
 }
 
 #section4 {
@@ -114,30 +107,23 @@ p {
     url("../../components/About/servers.jpg");
   background-repeat: no-repeat;
   background-size: cover;
-  /* background-position-x: center;
-  background-position-y: 85%; */
 }
 
-/* .section3Body {
-  position: absolute;
-  padding-left: 75px;
-  padding-right: 75px;
-  max-width: 1536px;
-  width: 90vw;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-} */
-
-/* .section3Body {
-  height: 100%;
+.section5Body {
+  max-width: 1500px;
+  height: fit-content;
   margin: auto;
-  max-width: 1536px;
-  padding-left: 6vw;
-  padding-right: 6vw;
-} */
+  padding: 0 1.5rem;
+  height: 100%;
+}
 
-/* .fp-controlArrow {
-  margin-left: 10px;
-  margin-right: 10px;
-} */
+.serversPicture {
+  height: max-content;
+  width: max-content;
+  border-radius: 0.7rem;
+  border-style: solid;
+  border-color: white;
+  border-width: 1.5rem;
+  background-color: white;
+  margin: auto;
+}

@@ -1,7 +1,6 @@
 import React from "react";
 import ReactFullpage from "@fullpage/react-fullpage";
 
-import "./About.css";
 import {
   Button,
   Table,
@@ -12,10 +11,12 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import Arrow from "../../components/About/Arrow";
-
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+
+import Arrow from "../../components/About/Arrow";
+
+import "./About.css";
 
 const serviceInfo = [
   {
@@ -65,11 +66,12 @@ const serviceInfo = [
   },
 ];
 
-const LeftButton = ({ fullpageApi }) => {
+const LeftButton = ({ fullpageApi, style }) => {
   return (
     <Button
       size="large"
       sx={{ color: "white" }}
+      style={style}
       onClick={() => fullpageApi.moveSlideLeft()}
     >
       <NavigateBeforeIcon sx={{ height: "45px", width: "45px" }} />
@@ -77,11 +79,12 @@ const LeftButton = ({ fullpageApi }) => {
   );
 };
 
-const RightButton = ({ fullpageApi }) => {
+const RightButton = ({ fullpageApi, style }) => {
   return (
     <Button
       size="large"
       sx={{ color: "white" }}
+      style={style}
       onClick={() => fullpageApi.moveSlideRight()}
     >
       <NavigateNextIcon sx={{ height: "45px", width: "45px" }} />
@@ -108,210 +111,193 @@ const About = () => (
         <ReactFullpage.Wrapper>
           <div className="section" id="section1">
             <div className="section1Body">
-              <div className="section1Text">
-                <Typography
-                  style={{ textAlign: "left" }}
-                  variant="h1"
-                  fontWeight="800"
-                  sx={{ color: "white", mb: "30px", letterSpacing: "5px" }}
-                >
-                  첫걸음
-                </Typography>
-                <Typography
-                  style={{ textAlign: "left" }}
-                  variant="h5"
-                  fontWeight="550"
-                  sx={{ color: "white" }}
-                >
-                  에드먼턴 온 교회는 2022년 4월 3일,
-                  <br />
-                  교회의 세속화에 따른 위기와 포스트 코로나라는 시대의 도전
-                  가운데
-                  <br />
-                  하나님이 디자인하고 부르신 뜻대로 새롭게 태어난 교회
-                  공동체입니다
-                </Typography>
-              </div>
-              <Arrow onClick={() => fullpageApi.moveSectionDown()} />
+              <Typography
+                style={{ textAlign: "left" }}
+                variant="h1"
+                fontWeight="800"
+                sx={{ color: "white", mb: "30px", letterSpacing: "5px" }}
+              >
+                첫걸음
+              </Typography>
+              <Typography
+                variant="h5"
+                fontWeight="550"
+                fontSize={"1.3rem"}
+                sx={{ textAlign: "left", color: "white" }}
+              >
+                에드먼턴 온 교회는 2022년 4월 3일,
+                <br />
+                교회의 세속화에 따른 위기와 포스트 코로나라는 시대의 도전 가운데
+                <br />
+                하나님이 디자인하고 부르신 뜻대로 새롭게 태어난 교회
+                공동체입니다
+              </Typography>
             </div>
+            <Arrow onClick={() => fullpageApi.moveSectionDown()} />
           </div>
 
           <div className="section" id="section2">
-            <div className="test">
-              <div className="section2Title">
+            <div className="section2Body">
+              <Typography
+                variant="h2"
+                fontWeight="750"
+                sx={{
+                  textAlign: "left",
+                  color: "white",
+                  letterSpacing: "3px",
+                }}
+              >
+                이름,
+                <br />
+                부르심과 사명
+              </Typography>
+
+              <LeftButton fullpageApi={fullpageApi} />
+              <RightButton fullpageApi={fullpageApi} />
+
+              <div className="slide" data-anchor="edmonton">
                 <Typography
-                  style={{ textAlign: "left" }}
-                  variant="h2"
-                  fontWeight="750"
-                  sx={{ color: "white", letterSpacing: "5px" }}
+                  variant="h4"
+                  fontWeight="800"
+                  sx={{ textAlign: "left", color: "white" }}
                 >
-                  이름,
-                  <br />
-                  부르심과 사명
+                  에드먼턴 Edmonton, Community
                 </Typography>
+                <Typography
+                  variant="h6"
+                  fontWeight="550"
+                  sx={{ textAlign: "left", color: "white" }}
+                >
+                  의미) 우리의 삶의 자리
+                  <br />
+                  사명) 우리를 심으신 이땅에 대한 사랑과 섬김, 기도와 복음
+                  전파를 잊지 말라는 하나님의 부르심
+                </Typography>
+              </div>
 
-                <LeftButton fullpageApi={fullpageApi} />
-                <RightButton fullpageApi={fullpageApi} />
+              <div className="slide" data-anchor="all">
+                <Typography
+                  variant="h3"
+                  fontWeight="700"
+                  sx={{ textAlign: "left", color: "white" }}
+                >
+                  온
+                </Typography>
+                <Typography
+                  variant="h6"
+                  fontWeight="550"
+                  sx={{ textAlign: "left", color: "white" }}
+                >
+                  의미) 온 우리말의 ‘모든(All)’ 이라는 의미를 담고 있다. <br />
+                  사명) 온 마음을 다해 하나님을 사랑하고 온 힘을 다해 이웃을
+                  사랑하라는 부르심
+                </Typography>
+              </div>
 
-                <div className="section2Body">
-                  <div className="slide" data-anchor="edmonton">
-                    <Typography
-                      style={{ textAlign: "left" }}
-                      variant="h4"
-                      fontWeight="800"
-                      sx={{ color: "white" }}
-                    >
-                      에드먼턴 Edmonton, Community
-                    </Typography>
-                    <Typography
-                      style={{ textAlign: "left" }}
-                      variant="h6"
-                      fontWeight="550"
-                      sx={{ color: "white" }}
-                    >
-                      의미) 우리의 삶의 자리
-                      <br />
-                      사명) 우리를 심으신 이땅에 대한 사랑과 섬김, 기도와 복음
-                      전파를 잊지 말라는 하나님의 부르심
-                    </Typography>
-                  </div>
+              <div className="slide" data-anchor="on">
+                <Typography
+                  variant="h2"
+                  fontWeight="600"
+                  sx={{ textAlign: "left", color: "white" }}
+                >
+                  ON
+                </Typography>
+                <Typography
+                  variant="h6"
+                  fontWeight="550"
+                  sx={{ textAlign: "left", color: "white" }}
+                >
+                  의미) Old & New 의 약자 <br />
+                  사명) 예부터 주신 진리의 말씀인 성경을 따라, 새로운 시대에
+                  주어진 사명을 삶의 자리에서 살아내고 그리스도의 복음을
+                  증언하라는 부르심
+                </Typography>
+              </div>
 
-                  <div className="slide" data-anchor="all">
-                    <Typography
-                      style={{ textAlign: "left" }}
-                      variant="h3"
-                      fontWeight="700"
-                      sx={{ color: "white" }}
-                    >
-                      온
-                    </Typography>
-                    <Typography
-                      style={{ textAlign: "left" }}
-                      variant="h6"
-                      fontWeight="550"
-                      sx={{ color: "white" }}
-                    >
-                      의미) 온 우리말의 ‘모든(All)’ 이라는 의미를 담고 있다.{" "}
-                      <br />
-                      사명) 온 마음을 다해 하나님을 사랑하고 온 힘을 다해 이웃을
-                      사랑하라는 부르심
-                    </Typography>
-                  </div>
-
-                  <div className="slide" data-anchor="on">
-                    <Typography
-                      style={{ textAlign: "left" }}
-                      variant="h2"
-                      fontWeight="600"
-                      sx={{ color: "white" }}
-                    >
-                      ON
-                    </Typography>
-                    <Typography
-                      style={{ textAlign: "left" }}
-                      variant="h6"
-                      fontWeight="550"
-                      sx={{ color: "white" }}
-                    >
-                      의미) Old & New 의 약자 <br />
-                      사명) 예부터 주신 진리의 말씀인 성경을 따라, 새로운 시대에
-                      주어진 사명을 삶의 자리에서 살아내고 그리스도의 복음을
-                      증언하라는 부르심
-                    </Typography>
-                  </div>
-
-                  <div className="slide" data-anchor="building">
-                    <Typography
-                      style={{ textAlign: "left" }}
-                      variant="h2"
-                      fontWeight="600"
-                      sx={{ color: "white" }}
-                    >
-                      교회
-                    </Typography>
-                    <Typography
-                      style={{ textAlign: "left" }}
-                      variant="h6"
-                      fontWeight="550"
-                      sx={{ color: "white" }}
-                    >
-                      의미) 건물이 아니라 사람, 회중 <br />
-                      사명) 하나님이 택하고 부르신 사람들이 하나의 신앙 고백과
-                      사명 가운데 응답하며 합력하라는 부르심
-                    </Typography>
-                  </div>
-                </div>
+              <div className="slide" data-anchor="building">
+                <Typography
+                  variant="h2"
+                  fontWeight="600"
+                  sx={{ textAlign: "left", color: "white" }}
+                >
+                  교회
+                </Typography>
+                <Typography
+                  variant="h6"
+                  fontWeight="550"
+                  sx={{ textAlign: "left", color: "white" }}
+                >
+                  의미) 건물이 아니라 사람, 회중 <br />
+                  사명) 하나님이 택하고 부르신 사람들이 하나의 신앙 고백과 사명
+                  가운데 응답하며 합력하라는 부르심
+                </Typography>
               </div>
             </div>
             <Arrow onClick={() => fullpageApi.moveSectionDown()} />
           </div>
 
           <div className="section" id="section3">
-            <div className="test">
-              <div className="section3Title">
+            <div className="section3Body">
+              <Typography
+                variant="h2"
+                fontWeight="700"
+                sx={{ textAlign: "left", color: "white", letterSpacing: "5px" }}
+              >
+                부르심에 따른
+                <br />
+                공동체의 발걸음
+              </Typography>
+
+              <LeftButton fullpageApi={fullpageApi} />
+              <RightButton fullpageApi={fullpageApi} />
+
+              <div className="slide" data-anchor="lovegod">
                 <Typography
                   style={{ textAlign: "left" }}
-                  variant="h2"
-                  fontWeight="700"
-                  sx={{ color: "white", letterSpacing: "5px" }}
+                  variant="h4"
+                  fontWeight="800"
+                  sx={{ color: "white" }}
                 >
-                  부르심에 따른
-                  <br />
-                  공동체의 발걸음
+                  온 맘 다해 하나님 사랑
+                </Typography>
+                <Typography
+                  style={{ textAlign: "left" }}
+                  variant="h6"
+                  fontWeight="500"
+                  sx={{ color: "white", ml: "15px" }}
+                >
+                  내가 주인된 시대 속에서, 예배와 말씀을 통해 우리 삶의
+                  창조자이며 참 주인되시며 인도자이신 성부 성자 성령 하나님의
+                  사랑을 맛보고 나누며, 하나님을 향한 우리의 사랑을 온전히
+                  올려드립니다. 온교회는 교회 성전 중심으로 모이는 것만
+                  중요시하는 공동체가 아니라, 모일 때 힘써 모여 예배드리고
+                  기도하지만 일상의 자리에서 하나님을 높이며 그의 나라와 의를
+                  구하며 말씀대로 살아가는 삶의 예배를 중요시하는 공동체입니다.
+                </Typography>
+              </div>
+
+              <div className="slide" data-anchor="loveneighbor">
+                <Typography
+                  style={{ textAlign: "left" }}
+                  variant="h4"
+                  fontWeight="800"
+                  sx={{ color: "white" }}
+                >
+                  온 힘 다해 이웃 사랑
                 </Typography>
 
-                <LeftButton fullpageApi={fullpageApi} />
-                <RightButton fullpageApi={fullpageApi} />
+                <Typography
+                  style={{ textAlign: "left" }}
+                  variant="h6"
+                  fontWeight="500"
+                  sx={{ color: "white", ml: "15px" }}
+                >
+                  내가 중심된 세상에서 하나님께 받은 은혜와 부르신 사명에 따라
+                  공동체와 이웃을 말씀대로 사랑하고 섬기며 살아갑니다.
+                </Typography>
+              </div>
 
-                <div className="section3Body">
-                  <div className="slide" data-anchor="lovegod">
-                    <Typography
-                      style={{ textAlign: "left" }}
-                      variant="h4"
-                      fontWeight="800"
-                      sx={{ color: "white" }}
-                    >
-                      온 맘 다해 하나님 사랑
-                    </Typography>
-                    <Typography
-                      style={{ textAlign: "left" }}
-                      variant="h6"
-                      fontWeight="500"
-                      sx={{ color: "white", ml: "15px" }}
-                    >
-                      내가 주인된 시대 속에서, 예배와 말씀을 통해 우리 삶의
-                      창조자이며 참 주인되시며 인도자이신 성부 성자 성령
-                      하나님의 사랑을 맛보고 나누며, 하나님을 향한 우리의 사랑을
-                      온전히 올려드립니다. 온교회는 교회 성전 중심으로 모이는
-                      것만 중요시하는 공동체가 아니라, 모일 때 힘써 모여
-                      예배드리고 기도하지만 일상의 자리에서 하나님을 높이며 그의
-                      나라와 의를 구하며 말씀대로 살아가는 삶의 예배를
-                      중요시하는 공동체입니다.
-                    </Typography>
-                  </div>
-
-                  <div className="slide" data-anchor="loveneighbor">
-                    <Typography
-                      style={{ textAlign: "left" }}
-                      variant="h4"
-                      fontWeight="800"
-                      sx={{ color: "white" }}
-                    >
-                      온 힘 다해 이웃 사랑
-                    </Typography>
-
-                    <Typography
-                      style={{ textAlign: "left" }}
-                      variant="h6"
-                      fontWeight="500"
-                      sx={{ color: "white", ml: "15px" }}
-                    >
-                      내가 중심된 세상에서 하나님께 받은 은혜와 부르신 사명에
-                      따라 공동체와 이웃을 말씀대로 사랑하고 섬기며 살아갑니다.
-                    </Typography>
-                  </div>
-
-                  {/* <div className="slide" data-anchor="wordscentered">
+              {/* <div className="slide" data-anchor="wordscentered">
                     <Typography
                       style={{ textAlign: "left" }}
                       variant="h4"
@@ -361,133 +347,147 @@ const About = () => (
                       주일 예배 후 교제(다과, 말씀과 삶 나눔)
                     </Typography>
                   </div> */}
-                </div>
-              </div>
             </div>
 
             <Arrow onClick={() => fullpageApi.moveSectionDown()} />
           </div>
 
           <div className="section" id="section5">
-            <div className="section4Title">
-              <LeftButton fullpageApi={fullpageApi} />
-              <RightButton fullpageApi={fullpageApi} />
+            <div className="section5Body">
+              <LeftButton
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "2%",
+                  zIndex: 2,
+                }}
+                fullpageApi={fullpageApi}
+              />
+              <RightButton
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  right: "2%",
+                  zIndex: 2,
+                }}
+                fullpageApi={fullpageApi}
+              />
               <div className="slide" data-anchor="chin">
-                <div
-                  style={{
-                    // objectFit: "cover",
-                    // width: 350,
-                    // height: 550,
-                    // position: "absolute",
-                    height: "max-content",
-                    width: "max-content",
-                    borderRadius: "0.7rem",
-                    borderStyle: "solid",
-                    borderColor: "#ffffff",
-                    borderWidth: "1.5rem",
-                    backgroundColor: "white",
-                    // left: "50%",
-                    // top: "50%",
-                    // translate: "translate(-50%, -50%)",
-                  }}
-                >
+                <div className="serversPicture">
                   <img
                     src="img/About/ChinSeongIn.jpg"
                     style={{
                       objectFit: "cover",
-                      width: 350,
-                      height: 550,
+                      width: "max(35vw, 155px)",
+                      height: "max(50vmin, 205px)",
+                      maxWidth: "400px",
+                      maxHeight: "550px",
                       borderRadius: "0.7rem",
-                      // borderStyle: "solid",
-                      // borderColor: "#ffffff",
-                      // borderWidth: "1rem",
                     }}
                   />
-                  <p style={{ color: "black", fontWeight: "bold" }}>
+                  <p
+                    style={{
+                      fontSize: "1.25rem",
+                      color: "black",
+                      fontWeight: "bold",
+                    }}
+                  >
                     진성인 목사
                   </p>
                   <p style={{ color: "black" }}>담임 목사</p>
                 </div>
               </div>
               <div className="slide" data-anchor="kim">
-                <img
-                  src="img/About/KimHwikyung.jpg"
-                  style={{
-                    objectFit: "cover",
-                    width: 350,
-                    height: 550,
-                    borderRadius: "1rem",
-                    borderStyle: "solid",
-                    borderColor: "#ffffff",
-                    borderWidth: "1rem",
-                  }}
-                />
-                <p>김휘경 전도사 (중고등부/찬양/행정)</p>
+                <div className="serversPicture">
+                  <img
+                    src="img/About/KimHwikyung.jpg"
+                    style={{
+                      objectFit: "cover",
+                      width: 350,
+                      height: 550,
+                      borderRadius: "0.7rem",
+                    }}
+                  />
+                  <p
+                    style={{
+                      fontSize: "1.25rem",
+                      color: "black",
+                      fontWeight: "bolder",
+                    }}
+                  >
+                    김휘경 전도사
+                  </p>
+                  <p style={{ color: "black" }}>중고등부/찬양/행정</p>
+                </div>
               </div>
             </div>
+            <Arrow onClick={() => fullpageApi.moveSectionDown()} />
           </div>
 
           <div className="section" id="section4">
-            <div className="section4Title">
-              <LeftButton fullpageApi={fullpageApi} />
-              <RightButton fullpageApi={fullpageApi} />
-              <div className="section4Body">
-                <div className="slide" data-anchor="time">
-                  <TableContainer
-                    className="table"
-                    // component={Paper}
-                    sx={{ color: "white" }}
-                  >
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell
-                            colSpan="3"
-                            align="center"
-                            sx={{ color: "white" }}
-                          >
-                            예배 및 모임 안내
+            <div className="section4Body">
+              {/* <LeftButton fullpageApi={fullpageApi} />
+              <RightButton fullpageApi={fullpageApi} /> */}
+              <div className="slide" data-anchor="time">
+                <TableContainer
+                  className="table"
+                  // component={Paper}
+                  sx={{ color: "white" }}
+                >
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell
+                          colSpan="3"
+                          align="center"
+                          sx={{ fontWeight: "bold", color: "inherit" }}
+                        >
+                          <LeftButton
+                            style={{ display: "none" }}
+                            fullpageApi={fullpageApi}
+                          />
+                          예배 및 모임 안내
+                          <RightButton fullpageApi={fullpageApi} />
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {serviceInfo.map((service) => (
+                        <TableRow key={service.title}>
+                          <TableCell align="center" sx={{ color: "white" }}>
+                            {service.title}
+                          </TableCell>
+                          <TableCell align="center" sx={{ color: "white" }}>
+                            {service.time}
+                          </TableCell>
+                          <TableCell align="center" sx={{ color: "white" }}>
+                            {service.place}
                           </TableCell>
                         </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {serviceInfo.map((service) => (
-                          <TableRow key={service.title}>
-                            <TableCell align="center" sx={{ color: "white" }}>
-                              {service.title}
-                            </TableCell>
-                            <TableCell align="center" sx={{ color: "white" }}>
-                              {service.time}
-                            </TableCell>
-                            <TableCell align="center" sx={{ color: "white" }}>
-                              {service.place}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </div>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </div>
 
-                <div className="slide" data-anchor="offering">
-                  <Typography
-                    style={{ textAlign: "center" }}
-                    variant="subtitle1"
-                    fontWeight="500"
-                    sx={{ color: "white" }}
-                  >
-                    온라인 E-Transfer 헌금 안내 ▪ 이메일 : occeoffer@gmail.com |
-                    비밀번호 설정 : occe0403
-                    <br />
-                    Cheque 헌금 Pay To : OCCE 또는 ON Community Church of
-                    Edmonton
-                    <br />
-                    현장에서는 준비된 봉투를 사용하여 입구에서 헌금함에 헌금해
-                    주시기 바랍니다. 헌금봉투 10개를 한 묶음으로 따로 준비해
-                    놓았으니, 필요하신 분들은 한 묶음 씩 가져 가셔서 헌금 준비를
-                    해주시기 바랍니다.
-                  </Typography>
-                </div>
+              <div className="slide" data-anchor="offering">
+                <LeftButton fullpageApi={fullpageApi} />
+                <Typography
+                  style={{ textAlign: "center" }}
+                  variant="subtitle1"
+                  fontWeight="500"
+                  sx={{ color: "white" }}
+                >
+                  온라인 E-Transfer 헌금 안내 ▪ 이메일 : occeoffer@gmail.com |
+                  비밀번호 설정 : occe0403
+                  <br />
+                  Cheque 헌금 Pay To : OCCE 또는 ON Community Church of Edmonton
+                  <br />
+                  현장에서는 준비된 봉투를 사용하여 입구에서 헌금함에 헌금해
+                  주시기 바랍니다. 헌금봉투 10개를 한 묶음으로 따로 준비해
+                  놓았으니, 필요하신 분들은 한 묶음 씩 가져 가셔서 헌금 준비를
+                  해주시기 바랍니다.
+                </Typography>
               </div>
             </div>
           </div>
