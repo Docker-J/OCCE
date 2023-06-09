@@ -15,20 +15,29 @@ export const signIn = (email, password, success) => {
   var userData = { Username: email, Pool: userPool };
   var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
   cognitoUser.authenticateUser(authenticationDetails, {
-    onSuccess: function (result) {
+    onSuccess: function(result) {
       // console.log("access token + " + result.getAccessToken().getJwtToken());
       // console.log("id token + " + result.getIdToken().getJwtToken());
       // console.log("refresh token + " + result.getRefreshToken().getToken());
       success(result);
-      console.log(result.getIdToken().payload["cognito:groups"]);
+      console.log(result.getAccessToken());
     },
-    onFailure: function (err) {
+    onFailure: function(err) {
       console.log(err);
     },
   });
 };
 
 export const signOut = (success) => {
+  var user = userPool.getCurrentUser();
+  if (user) {
+    user.signOut();
+    success();
+    console.log("Success");
+  }
+};
+
+export const renewAccessToken = (refreshToken, success) => {
   var user = userPool.getCurrentUser();
   if (user) {
     user.signOut();

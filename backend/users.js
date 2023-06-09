@@ -3,7 +3,7 @@ const router = express.Router();
 
 const AmazonCognitoIdentity = require("amazon-cognito-identity-js");
 // const CognitoUserPool = AmazonCognitoIdentity.CognitoUserPool;
-// const AWS = require("aws-sdk");
+const AWS = require("aws-sdk");
 
 // const auth = getAuth();
 
@@ -12,6 +12,28 @@ const poolData = {
   ClientId: "78vu8v6fh72mhjetdmsh2vvaad",
 };
 const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+const cognito = new AWS.CognitoIdentityServiceProvider({ region: "us-west-2" });
+
+router.get("/refreshAccessToken", async (req, res) => {
+  const params = {
+    AuthFlow: "REFRESH_TOKEN_AUTH",
+    ClientId: "78vu8v6fh72mhjetdmsh2vvaad",
+    AuthParameters: {
+      REFRESH_TOKEN: req.query.refreshToken,
+    },
+  };
+
+  try {
+    const response = await cognito.initiateAuth(params).promise();
+    console.log(response);
+    const accessToken = response.AuthenticationResult.AccessToken;
+    const newRefreshToken = response.AuthenticationResult.RefreshToken;
+
+    console.log("Access Token", accessToken);
+    console.log("Refresh Token", newRefreshToken);
+    res.send(accessToken);
+  } catch {}
+});
 
 router.post("/signIn", async (req, res) => {
   console.log("requested!");
