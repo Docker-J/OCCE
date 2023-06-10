@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 
-const AmazonCognitoIdentity = require("amazon-cognito-identity-js");
 const {
   CognitoIdentityProviderClient,
   InitiateAuthCommand,
