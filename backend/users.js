@@ -2,17 +2,45 @@ const express = require("express");
 const router = express.Router();
 
 const AmazonCognitoIdentity = require("amazon-cognito-identity-js");
-// const CognitoUserPool = AmazonCognitoIdentity.CognitoUserPool;
-const AWS = require("aws-sdk");
-
-// const auth = getAuth();
+// const AWS = require("aws-sdk");
+const {
+  CognitoIdentityProviderClient,
+  InitiateAuthCommand,
+  SignUpCommand,
+  GlobalSignOutCommand,
+} = require("@aws-sdk/client-cognito-identity-provider");
 
 const poolData = {
   UserPoolId: "us-west-2_v1MWWI1Vn",
   ClientId: "78vu8v6fh72mhjetdmsh2vvaad",
 };
 const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
-const cognito = new AWS.CognitoIdentityServiceProvider({ region: "us-west-2" });
+const cognitoClient = new CognitoIdentityProviderClient({
+  region: "us-west-2",
+});
+
+router.post("/signIn", async (req, res) => {
+  const params = {
+    AuthFlow: "USER_PASSWORD_AUTH",
+    ClientId: "78vu8v6fh72mhjetdmsh2vvaad",
+    AuthParameters: {
+      USERNAME: req.body.email,
+      PASSWORD: req.body.password,
+    },
+  };
+
+  const command = new InitiateAuthCommand(params);
+
+  try {
+    const response = await cognitoClient.send(command);
+    const accessToken = response.AuthenticationResult.AccessToken;
+    const refreshToken = response.AuthenticationResult.RefreshToken;
+
+    res.send({ accessToken: accessToken, refreshToken: refreshToken });
+  } catch (error) {
+    res.send(error);
+  }
+});
 
 router.get("/refreshAccessToken", async (req, res) => {
   const params = {
@@ -23,64 +51,51 @@ router.get("/refreshAccessToken", async (req, res) => {
     },
   };
 
+  const command = new InitiateAuthCommand(params);
+
   try {
-    const response = await cognito.initiateAuth(params).promise();
+    const response = await cognitoClient.send(command);
     console.log(response);
     const accessToken = response.AuthenticationResult.AccessToken;
     const newRefreshToken = response.AuthenticationResult.RefreshToken;
 
     console.log("Access Token", accessToken);
-    console.log("Refresh Token", newRefreshToken);
     res.send(accessToken);
-  } catch {}
-});
-
-router.post("/signIn", async (req, res) => {
-  console.log("requested!");
-  var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
-    Username: req.body.email,
-    Password: req.body.password,
-  });
-  var userData = { Username: req.body.email, Pool: userPool };
-  var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
-  cognitoUser.authenticateUser(authenticationDetails, {
-    onSuccess: function (result) {
-      console.log("access token + " + result.getAccessToken().getJwtToken());
-      console.log("id token + " + result.getIdToken().getJwtToken());
-      console.log("refresh token + " + result.getRefreshToken().getToken());
-      res.sendStatus(200);
-    },
-    onFailure: function (err) {
-      console.log(err);
-      res.sendStatus(401);
-    },
-  });
+  } catch (error) {
+    res.send(error);
+  }
 });
 
 router.post("/signUp", async (req, res) => {
-  var attributeList = [];
-  var dataName = {
-    Name: "name",
-    Value: req.body.name,
+  const params = {
+    ClientId: "78vu8v6fh72mhjetdmsh2vvaad",
+    Username: req.body.email, // required
+    Password: req.body.password, // required
+    UserAttributes: [
+      // AttributeListType
+      {
+        // AttributeType
+        Name: "name",
+        Value: req.body.name,
+      },
+    ],
+    ValidationData: [
+      {
+        Name: "name", // required
+        Value: req.body.name,
+      },
+    ],
   };
-  var attributeName = new AmazonCognitoIdentity.CognitoUserAttribute(dataName);
-  attributeList.push(attributeName);
 
-  userPool.signUp(
-    req.body.email,
-    req.body.password,
-    attributeList,
-    null,
-    function (err, result) {
-      if (err) {
-        console.log(err.message || JSON.stringify(err));
-        res.sendStatus(400);
-      }
-      var cognitoUser = result.user;
-      console.log("user name is" + cognitoUser.getUsername());
-      res.sendStatus(200);
-    }
-  );
+  const command = new SignUpCommand(params);
+  try {
+    const response = await cognitoClient.send(command);
+    console.log(response);
+    res.send(response);
+  } catch (error) {
+    console.log(error);
+    res.send(error);
+  }
 });
 
 router.post("/confirm", async (req, res) => {
@@ -114,6 +129,20 @@ router.get("/resendConfirm", async (req, res) => {
   });
 });
 
-router.get("/signOut", async (req, res) => {});
+router.post("/signOut", async (req, res) => {
+  const command = new GlobalSignOutCommand({
+    AccessToken: req.body.accessToken,
+  });
+  console.log(req.body.accessToken);
+  try {
+    const response = await cognitoClient.send(command);
+    res.sendStatus(202);
+    res.send(response);
+  } catch (error) {
+    // res.sendStatus(401);
+    console.log(error);
+    res.send(error);
+  }
+});
 
 module.exports = router;
