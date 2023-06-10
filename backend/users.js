@@ -2,19 +2,15 @@ const express = require("express");
 const router = express.Router();
 
 const AmazonCognitoIdentity = require("amazon-cognito-identity-js");
-// const AWS = require("aws-sdk");
 const {
   CognitoIdentityProviderClient,
   InitiateAuthCommand,
   SignUpCommand,
+  ConfirmSignUpCommand,
+  ResendConfirmationCodeCommand,
   GlobalSignOutCommand,
 } = require("@aws-sdk/client-cognito-identity-provider");
 
-const poolData = {
-  UserPoolId: "us-west-2_v1MWWI1Vn",
-  ClientId: "78vu8v6fh72mhjetdmsh2vvaad",
-};
-const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
 const cognitoClient = new CognitoIdentityProviderClient({
   region: "us-west-2",
 });
@@ -79,12 +75,6 @@ router.post("/signUp", async (req, res) => {
         Value: req.body.name,
       },
     ],
-    ValidationData: [
-      {
-        Name: "name", // required
-        Value: req.body.name,
-      },
-    ],
   };
 
   const command = new SignUpCommand(params);
@@ -99,44 +89,46 @@ router.post("/signUp", async (req, res) => {
 });
 
 router.post("/confirm", async (req, res) => {
-  var userData = { Username: req.body.email, Pool: userPool };
-  var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
-  cognitoUser.confirmRegistration(
-    req.body.confirm_code,
-    true,
-    function (err, result) {
-      if (err) {
-        console.log(err.message || JSON.stringify(err));
-        res.sendStatus(400);
-        return;
-      }
-      console.log("call result: " + result);
-      res.sendStatus(200);
-    }
-  );
+  const input = {
+    // ConfirmSignUpRequest
+    ClientId: "78vu8v6fh72mhjetdmsh2vvaad",
+    Username: req.body.email, // required
+    ConfirmationCode: req.body.confirm_code, // required
+  };
+  const command = new ConfirmSignUpCommand(input);
+
+  try {
+    const response = await cognitoClient.send(command);
+    res.send(response);
+  } catch (error) {
+    console.log(error);
+    res.send(error);
+  }
 });
 
 router.get("/resendConfirm", async (req, res) => {
-  var userData = { Username: req.query.email, Pool: userPool };
-  var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
-  cognitoUser.resendConfirmationCode((err, result) => {
-    if (err) {
-      alert(err.message || JSON.stringify(err));
-      return;
-    }
-    console.log("call result: " + result);
-    res.sendStatus(200);
-  });
+  const input = {
+    // ResendConfirmationCodeRequest
+    ClientId: "78vu8v6fh72mhjetdmsh2vvaad",
+    Username: req.query.email, // required
+  };
+  const command = new ResendConfirmationCodeCommand(input);
+
+  try {
+    const response = await cognitoClient.send(command);
+    res.send(response);
+  } catch (error) {
+    console.log(error);
+    res.send(error);
+  }
 });
 
 router.post("/signOut", async (req, res) => {
   const command = new GlobalSignOutCommand({
     AccessToken: req.body.accessToken,
   });
-  console.log(req.body.accessToken);
   try {
     const response = await cognitoClient.send(command);
-    res.sendStatus(202);
     res.send(response);
   } catch (error) {
     // res.sendStatus(401);
