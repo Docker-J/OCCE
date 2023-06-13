@@ -66,6 +66,39 @@ const serviceInfo = [
   },
 ];
 
+const servers = [
+  {
+    name: "진성인 목사",
+    title: "담임 목사",
+    img: "img/About/ChinSeongIn.jpg",
+    alt: "",
+  },
+  {
+    name: "이수연 전도사",
+    title: "유초등부",
+    img: "img/About/LeeSooyeon.jpg",
+    alt: "",
+  },
+  {
+    name: "김유정 전도사",
+    title: "유치부",
+    img: "img/About/KimYoojeong.jpg",
+    alt: "",
+  },
+  {
+    name: "김휘경 전도사",
+    title: "중고등부/찬양/행정",
+    img: "img/About/KimHwikyung.jpg",
+    alt: "",
+  },
+  {
+    name: "안주영 목사",
+    title: "협동 목사",
+    img: "img/About/Ahnjooyoung.jpg",
+    alt: "",
+  },
+];
+
 const LeftButton = ({ fullpageApi, style }) => {
   return (
     <Button
@@ -372,54 +405,34 @@ const About = () => (
                 }}
                 fullpageApi={fullpageApi}
               />
-              <div className="slide" data-anchor="chin">
-                <div className="serversPicture">
-                  <img
-                    src="img/About/ChinSeongIn.jpg"
-                    style={{
-                      objectFit: "cover",
-                      width: "max(35vw, 155px)",
-                      height: "max(50vmin, 205px)",
-                      maxWidth: "400px",
-                      maxHeight: "550px",
-                      borderRadius: "0.7rem",
-                    }}
-                  />
-                  <p
-                    style={{
-                      fontSize: "1.25rem",
-                      color: "black",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    진성인 목사
-                  </p>
-                  <p style={{ color: "black" }}>담임 목사</p>
+              {servers.map((server) => (
+                <div className="slide" data-anchor="chin">
+                  <div className="serversPicture">
+                    <img
+                      alt={server.alt}
+                      src={server.img}
+                      style={{
+                        objectFit: "cover",
+                        width: "max(35vw, 155px)",
+                        height: "max(50vmin, 205px)",
+                        maxWidth: "400px",
+                        maxHeight: "550px",
+                        borderRadius: "0.7rem",
+                      }}
+                    />
+                    <p
+                      style={{
+                        fontSize: "1.25rem",
+                        color: "black",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {server.name}
+                    </p>
+                    <p style={{ color: "black" }}>{server.title}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="slide" data-anchor="kim">
-                <div className="serversPicture">
-                  <img
-                    src="img/About/KimHwikyung.jpg"
-                    style={{
-                      objectFit: "cover",
-                      width: 350,
-                      height: 550,
-                      borderRadius: "0.7rem",
-                    }}
-                  />
-                  <p
-                    style={{
-                      fontSize: "1.25rem",
-                      color: "black",
-                      fontWeight: "bolder",
-                    }}
-                  >
-                    김휘경 전도사
-                  </p>
-                  <p style={{ color: "black" }}>중고등부/찬양/행정</p>
-                </div>
-              </div>
+              ))}
             </div>
             <Arrow onClick={() => fullpageApi.moveSectionDown()} />
           </div>
