@@ -28,10 +28,7 @@ import { DELETE_TOKEN } from "../store/Auth";
 
 const ResponsiveAppBar = () => {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.authToken.authenticated);
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
+  const user = useSelector((state) => state.authToken);
 
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -160,7 +157,10 @@ const ResponsiveAppBar = () => {
   ];
 
   const settings_signed = [
-    { title: "Sign Out", onClick: () => signOut(signOutSuccess) },
+    {
+      title: "Sign Out",
+      onClick: () => signOut(user.accessToken, signOutSuccess),
+    },
   ];
 
   const settings_not_signed = [
@@ -310,19 +310,20 @@ const ResponsiveAppBar = () => {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                {(user ? settings_signed : settings_not_signed).map(
-                  (setting) => (
-                    <MenuItem key={setting.title} onClick={handleCloseUserMenu}>
-                      <Typography
-                        sx={{ color: "black" }}
-                        textAlign="center"
-                        onClick={setting.onClick}
-                      >
-                        {setting.title}
-                      </Typography>
-                    </MenuItem>
-                  )
-                )}
+                {(user.authenticated
+                  ? settings_signed
+                  : settings_not_signed
+                ).map((setting) => (
+                  <MenuItem key={setting.title} onClick={handleCloseUserMenu}>
+                    <Typography
+                      sx={{ color: "black" }}
+                      textAlign="center"
+                      onClick={setting.onClick}
+                    >
+                      {setting.title}
+                    </Typography>
+                  </MenuItem>
+                ))}
               </Menu>
             </Box>
           </Toolbar>

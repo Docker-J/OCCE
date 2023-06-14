@@ -36,7 +36,8 @@ const SignInModal = (props) => {
   const signInSuccess = (result) => {
     const data = {
       accessToken: result.accessToken,
-      groups: result.getIdToken().payload["cognito:groups"],
+      groups: [result.group],
+      // groups: result.getIdToken().payload["cognito:groups"],
     };
 
     dispatch(SET_TOKEN(data));

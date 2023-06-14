@@ -1,14 +1,16 @@
-import { axios } from "axios";
+import axios from "axios";
 
 export const signIn = async (email, password, success) => {
   try {
-    const res = await axios.post("/api/user/siginin", {
+    const res = await axios.post("/api/User/signIn", {
       email: email,
       password: password,
     });
 
-    success(res);
-  } catch (error) {}
+    success(res.data);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export const signOut = async (accessToken, success) => {
