@@ -1,3 +1,7 @@
+body {
+  color: white;
+}
+
 .fp-section {
   display: flex;
   /* align-items: center; */
@@ -60,25 +64,6 @@
   background-position-y: 85%;
 }
 
-.section4Title {
-  /* display: inline-flex; */
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  max-width: 1536px;
-}
-
-p {
-  color: white;
-}
-
-.section4Body {
-  margin: auto;
-  width: 90%;
-}
-
 #slider {
   /* display: inline-flex; */
   position: absolute;
@@ -98,7 +83,7 @@ p {
   max-width: 1500px;
   height: fit-content;
   margin: auto;
-  padding: 0 1.5rem;
+  padding: 0 5vw;
   height: 100%;
 }
 
@@ -111,4 +96,9 @@ p {
   border-width: 1.5rem;
   background-color: white;
   margin: auto;
+}
+
+.section4Body {
+  margin: 0 4vw;
+  padding: 10vh 0;
 }
