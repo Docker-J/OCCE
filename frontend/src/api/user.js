@@ -1,47 +1,32 @@
-const AmazonCognitoIdentity = require("amazon-cognito-identity-js");
+import { axios } from "axios";
 
-const poolData = {
-  UserPoolId: "us-west-2_v1MWWI1Vn",
-  ClientId: "78vu8v6fh72mhjetdmsh2vvaad",
-};
-const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+export const signIn = async (email, password, success) => {
+  try {
+    const res = await axios.post("/api/user/siginin", {
+      email: email,
+      password: password,
+    });
 
-export const signIn = (email, password, success) => {
-  console.log("requested!");
-  var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
-    Username: email,
-    Password: password,
-  });
-  var userData = { Username: email, Pool: userPool };
-  var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
-  cognitoUser.authenticateUser(authenticationDetails, {
-    onSuccess: function(result) {
-      // console.log("access token + " + result.getAccessToken().getJwtToken());
-      // console.log("id token + " + result.getIdToken().getJwtToken());
-      // console.log("refresh token + " + result.getRefreshToken().getToken());
-      success(result);
-      console.log(result.getAccessToken());
-    },
-    onFailure: function(err) {
-      console.log(err);
-    },
-  });
+    success(res);
+  } catch (error) {}
 };
 
-export const signOut = (success) => {
-  var user = userPool.getCurrentUser();
-  if (user) {
-    user.signOut();
+export const signOut = async (accessToken, success) => {
+  try {
+    await axios.post("/api/user/signout", {
+      accessToken: accessToken,
+    });
+
     success();
-    console.log("Success");
-  }
+  } catch (error) {}
 };
 
-export const renewAccessToken = (refreshToken, success) => {
-  var user = userPool.getCurrentUser();
-  if (user) {
-    user.signOut();
+export const renewAccessToken = async (refreshToken, success) => {
+  try {
+    await axios.get("/api/user/signout", {
+      refreshToken: refreshToken,
+    });
+
     success();
-    console.log("Success");
-  }
+  } catch (error) {}
 };
