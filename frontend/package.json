@@ -15,7 +15,6 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.4.3",
     "@uidotdev/usehooks": "^2.0.1",
-    "amazon-cognito-identity-js": "^6.2.0",
     "axios": "^1.4.0",
     "browser-image-compression": "^2.0.0",
     "ckeditor5-custom-build": "file:ckeditor5",
@@ -46,7 +45,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "proxy": "http://oncce.ca:3001",
+  "proxy": "http://localhost:3001",
   "eslintConfig": {
     "extends": [
       "react-app",

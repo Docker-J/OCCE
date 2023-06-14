@@ -1,9 +1,11 @@
 const express = require("express");
+const axios = require("axios");
 const router = express.Router();
 
 const {
   CognitoIdentityProviderClient,
   InitiateAuthCommand,
+  AdminListGroupsForUserCommand,
   SignUpCommand,
   ConfirmSignUpCommand,
   ResendConfirmationCodeCommand,
@@ -15,6 +17,7 @@ const cognitoClient = new CognitoIdentityProviderClient({
 });
 
 router.post("/signIn", async (req, res) => {
+  console.log("Sign In requested");
   const params = {
     AuthFlow: "USER_PASSWORD_AUTH",
     ClientId: "78vu8v6fh72mhjetdmsh2vvaad",
@@ -31,7 +34,33 @@ router.post("/signIn", async (req, res) => {
     const accessToken = response.AuthenticationResult.AccessToken;
     const refreshToken = response.AuthenticationResult.RefreshToken;
 
-    res.send({ accessToken: accessToken, refreshToken: refreshToken });
+    const group = await axios.get("http://localhost:3001/api/User/getGroup", {
+      params: { email: req.body.email },
+    });
+
+    res.send({
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+      group: group.data,
+    });
+  } catch (error) {
+    res.send(error);
+  }
+});
+
+router.get("/getGroup", async (req, res) => {
+  const input = {
+    // AdminListGroupsForUserRequest
+    Username: req.query.email, // required
+    UserPoolId: "us-west-2_v1MWWI1Vn", // required
+  };
+
+  const command = new AdminListGroupsForUserCommand(input);
+
+  try {
+    const response = await cognitoClient.send(command);
+
+    res.send(response.Groups[0].GroupName);
   } catch (error) {
     res.send(error);
   }

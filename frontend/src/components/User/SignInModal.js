@@ -35,12 +35,13 @@ const SignInModal = (props) => {
 
   const signInSuccess = (result) => {
     const data = {
-      accessToken: result.getAccessToken().getJwtToken(),
-      groups: result.getIdToken().payload["cognito:groups"],
+      accessToken: result.accessToken,
+      groups: [result.group],
+      // groups: result.getIdToken().payload["cognito:groups"],
     };
 
     dispatch(SET_TOKEN(data));
-    setRefreshToken(result.getRefreshToken().getToken());
+    setRefreshToken(result.refreshToken);
     setIsSuccessSnackBarOpen(true);
     handleClose();
   };
