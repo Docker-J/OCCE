@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 
-import { Button, Typography, Fab } from "@mui/material";
-import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
+import { Button, Typography } from "@mui/material";
+// import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
 
 import ButtonBases from "../../components/Main/MainButtonBanner";
 import "./Main.css";
-import { useState } from "react";
+// import { useState } from "react";
 import CustomChatBot from "../../components/Main/CustomChatBot";
 
 const Main = () => {
@@ -72,6 +72,7 @@ const Main = () => {
             <img
               className="verticalLogo"
               src="img/ONLogoVertical.svg"
+              alt="Vertical Logo"
               // style={{ maxWidth: "5vh" }}
             />
 

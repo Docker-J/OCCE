@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import "./ResponsiveAppBar.css";
@@ -12,7 +12,7 @@ import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+// import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 // import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
@@ -32,7 +32,7 @@ const ResponsiveAppBar = () => {
 
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [anchorElOnline, setAnchorElOnline] = useState(null);
+  // const [anchorElOnline, setAnchorElOnline] = useState(null);
 
   const [signInModalOpen, setSignInModalOpen] = useState(false);
   const [signUpModalOpen, setSignUpModalOpen] = useState(false);
@@ -59,7 +59,7 @@ const ResponsiveAppBar = () => {
   };
 
   const currentPage = useLocation().pathname;
-  const currnetHash = useLocation().hash;
+  // const currnetHash = useLocation().hash;
 
   const pages = [
     {
