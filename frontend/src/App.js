@@ -1,4 +1,10 @@
-import { Route, Routes } from "react-router-dom";
+import {
+  Outlet,
+  Route,
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
+} from "react-router-dom";
 import React, { lazy, Suspense } from "react";
 import { createTheme, ThemeProvider } from "@mui/material";
 import "./App.css";
@@ -65,45 +71,53 @@ const theme = createTheme({
   },
 });
 
+const AppBarWrapper = () => {
+  return (
+    <>
+      <ResponsiveAppBar />
+      <Outlet />
+    </>
+  );
+};
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route element={<AppBarWrapper />}>
+      <Route path="/" element={<Main />} />
+      <Route path="/aboutus" element={<About />} />
+      <Route path="/announcements" element={<Announcements />} />
+      <Route
+        exact
+        path="/announcements/announcement/"
+        element={<Announcement />}
+      />
+      <Route path="/weeklyupdate" element={<WeeklyUpdate />} />
+      <Route path="/newcomers" element={<NewComers />} />
+
+      <Route path="/community/smallgroup" element={<SmallGroup />} />
+      <Route path="/community/ministry" element={<Ministry />} />
+
+      <Route path="/online/sundayservice" element={<SundayService />} />
+      <Route path="/online/sermon" element={<Sermon />} />
+      <Route path="/online/worship" element={<Worship />} />
+      <Route path="/online/prayON" element={<PrayON />} />
+      <Route path="/online/meditationON" element={<MeditationON />} />
+      <Route exact path="/meditationON/post/" element={<MeditationONPost />} />
+
+      <Route path="/nextgen/preschool" element={<Preschool />} />
+      <Route path="/nextgen/elementary" element={<Elementary />} />
+      <Route path="/nextgen/youth" element={<Youth />} />
+      <Route path="/nextgen/youngadult" element={<YoungAdult />} />
+    </Route>
+  )
+);
+
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <div className="App">
-        <ResponsiveAppBar />
-        <Suspense>
-          <Routes>
-            <Route exact path="/" element={<Main />} />
-            <Route path="/aboutus" element={<About />} />
-            <Route path="/announcements" element={<Announcements />} />
-            <Route
-              exact
-              path="/announcements/announcement/"
-              element={<Announcement />}
-            />
-            <Route path="/weeklyupdate" element={<WeeklyUpdate />} />
-            <Route path="/newcomers" element={<NewComers />} />
-
-            <Route path="/community/smallgroup" element={<SmallGroup />} />
-            <Route path="/community/ministry" element={<Ministry />} />
-
-            <Route path="/online/sundayservice" element={<SundayService />} />
-            <Route path="/online/sermon" element={<Sermon />} />
-            <Route path="/online/worship" element={<Worship />} />
-            <Route path="/online/prayON" element={<PrayON />} />
-            <Route path="/online/meditationON" element={<MeditationON />} />
-            <Route
-              exact
-              path="/meditationON/post/"
-              element={<MeditationONPost />}
-            />
-
-            <Route path="/nextgen/preschool" element={<Preschool />} />
-            <Route path="/nextgen/elementary" element={<Elementary />} />
-            <Route path="/nextgen/youth" element={<Youth />} />
-            <Route path="/nextgen/youngadult" element={<YoungAdult />} />
-          </Routes>
-        </Suspense>
-      </div>
+      <Suspense>
+        <RouterProvider router={router} />
+      </Suspense>
     </ThemeProvider>
   );
 }
