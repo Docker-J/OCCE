@@ -94,10 +94,10 @@ const WeeklyUpdate = () => {
   const fileToBase64 = (file, cb) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = function () {
+    reader.onload = function() {
       cb(null, reader.result);
     };
-    reader.onerror = function (error) {
+    reader.onerror = function(error) {
       cb(error, null);
     };
   };
@@ -150,7 +150,7 @@ const WeeklyUpdate = () => {
   }
 
   return (
-    <div className="weeklyBulletinBoard">
+    <>
       <h1>주보</h1>
 
       {selectedDate && bulletin ? (
@@ -212,7 +212,7 @@ const WeeklyUpdate = () => {
           </Snackbar>
         </>
       )}
-    </div>
+    </>
   );
 };
 
