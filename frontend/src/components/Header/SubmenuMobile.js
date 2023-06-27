@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { Typography, MenuItem, ListItemIcon } from "@mui/material";
@@ -18,10 +17,9 @@ const SubmenuMobile = (props) => {
     popupId: props.page.state,
   });
 
-  const [anchorElNav, setAnchorElNav] = useState(null);
-
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
+  const handleClose = () => {
+    props.onClose();
+    popupState.close();
   };
 
   return (
@@ -60,8 +58,7 @@ const SubmenuMobile = (props) => {
             <MenuItem
               key={subpage.title}
               onClick={() => {
-                popupState.close();
-                props.onClose();
+                handleClose();
               }}
               component={Link}
               to={subpage.to}

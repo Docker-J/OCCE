@@ -19,12 +19,16 @@ function PDFReader(props) {
   const [scale, setScale] = useState(1);
 
   const add = () => {
-    setScale(scale + 0.2);
+    setScale((prev) => {
+      return prev + 0.2;
+    });
   };
 
   const minus = () => {
     if (scale !== 1) {
-      setScale(scale - 0.2);
+      setScale((prev) => {
+        return prev - 0.2;
+      });
     }
   };
 
@@ -110,29 +114,27 @@ function PDFReader(props) {
         />
       </Document>
 
-      <div>
-        <p style={{ color: "black" }}>
-          Page {pageNumber || (numPages ? 1 : "--")} of {numPages || "--"}
-        </p>
-        <ButtonGroup id="pageButton">
-          <Button
-            type="button"
-            variant={"outlined"}
-            disabled={pageNumber <= 1}
-            onClick={previousPage}
-          >
-            Previous
-          </Button>
-          <Button
-            type="button"
-            variant={"outlined"}
-            disabled={pageNumber >= numPages}
-            onClick={nextPage}
-          >
-            Next
-          </Button>
-        </ButtonGroup>
-      </div>
+      <p style={{ color: "black" }}>
+        Page {pageNumber || (numPages ? 1 : "--")} of {numPages || "--"}
+      </p>
+      <ButtonGroup id="pageButton">
+        <Button
+          type="button"
+          variant={"outlined"}
+          disabled={pageNumber <= 1}
+          onClick={previousPage}
+        >
+          Previous
+        </Button>
+        <Button
+          type="button"
+          variant={"outlined"}
+          disabled={pageNumber >= numPages}
+          onClick={nextPage}
+        >
+          Next
+        </Button>
+      </ButtonGroup>
     </>
   );
 }
