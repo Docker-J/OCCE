@@ -14,7 +14,7 @@ import {
 const Submenu = (props) => {
   const popupState = usePopupState({
     variant: "popover",
-    popupId: props.page.state,
+    popupId: "menupopup",
   });
 
   return (
@@ -27,7 +27,6 @@ const Submenu = (props) => {
           my: 2,
           ml: 0.8,
           color: "inherit",
-          display: "flex",
           fontSize: "20px",
           fontWeight: "550",
         }}
@@ -39,7 +38,7 @@ const Submenu = (props) => {
             <ExpandMoreIcon sx={{ ml: "-8px" }} />
           ))
         }
-        {...(props.page.subpages ? bindHover(popupState) : null)}
+        {...(props.page.subpages && bindHover(popupState))}
       >
         {props.page.title}
       </Button>

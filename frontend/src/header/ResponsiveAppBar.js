@@ -68,6 +68,7 @@ const ResponsiveAppBar = () => {
     },
     {
       title: "교회소식",
+      state: "newsPopupState",
       subpages: [
         {
           title: "공지사항",
@@ -90,10 +91,10 @@ const ResponsiveAppBar = () => {
         //   to: "videos",
         // },
       ],
-      state: "newsPopupState",
     },
     {
       title: "ON-Line",
+      state: "onlinePopupState",
       subpages: [
         {
           title: "주일예배",
@@ -116,10 +117,10 @@ const ResponsiveAppBar = () => {
           to: "online/meditationon",
         },
       ],
-      state: "onlinePopupState",
     },
     {
       title: "공동체",
+      state: "communityPopupState",
       subpages: [
         {
           title: "소그룹",
@@ -130,10 +131,10 @@ const ResponsiveAppBar = () => {
           to: "community/ministry",
         },
       ],
-      state: "communityPopupState",
     },
     {
       title: "다음세대",
+      state: "nextGenPopupState",
       subpages: [
         {
           title: "유아유치부",
@@ -152,7 +153,6 @@ const ResponsiveAppBar = () => {
           to: "nextgen/youngadult",
         },
       ],
-      state: "nextGenPopupState",
     },
   ];
 

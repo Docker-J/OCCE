@@ -1,26 +1,25 @@
 import { Link } from "react-router-dom";
 
-import { Typography, MenuItem, ListItemIcon, Menu } from "@mui/material";
+import { Typography, MenuItem, ListItemIcon } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
-import HoverMenu from "material-ui-popup-state/HoverMenu";
 import {
   usePopupState,
   bindMenu,
   bindHover,
-  bindTrigger,
 } from "material-ui-popup-state/hooks";
+import HoverMenu from "material-ui-popup-state/HoverMenu";
 
 const SubmenuMobile = (props) => {
   const popupState = usePopupState({
     variant: "popover",
-    popupId: props.page.state,
+    popupId: "menupopup",
   });
 
   const handleClose = () => {
-    popupState.close();
     props.onClose();
+    popupState.close();
   };
 
   return (
@@ -30,7 +29,7 @@ const SubmenuMobile = (props) => {
         onClick={props.page.to && props.onClose}
         component={props.page.to && Link}
         to={props.page.to}
-        {...(props.page.subpages ? bindTrigger(popupState) : null)}
+        {...(props.page.subpages && bindHover(popupState))}
       >
         <Typography
           textAlign="center"
@@ -50,10 +49,11 @@ const SubmenuMobile = (props) => {
       </MenuItem>
 
       {props.page.subpages && (
-        <Menu
+        <HoverMenu
           {...bindMenu(popupState)}
           anchorOrigin={{ vertical: "center", horizontal: "right" }}
           transformOrigin={{ vertical: "center", horizontal: "left" }}
+          onClick={handleClose}
         >
           {props.page.subpages.map((subpage) => (
             <MenuItem
@@ -71,7 +71,7 @@ const SubmenuMobile = (props) => {
               </Typography>
             </MenuItem>
           ))}
-        </Menu>
+        </HoverMenu>
       )}
     </>
   );
