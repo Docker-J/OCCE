@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 import { Button, Typography, MenuItem } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -9,18 +9,19 @@ import {
   usePopupState,
   bindMenu,
   bindHover,
+  bindFocus,
 } from "material-ui-popup-state/hooks";
 
 const Submenu = ({ page }) => {
   const popupState = usePopupState({
-    variant: "popover",
     popupId: page.state,
+    variant: "popover",
   });
 
   return (
     <>
       <Button
-        component={page.to && Link}
+        component={page.to && NavLink}
         to={page.to}
         key={page.title}
         sx={{
@@ -38,23 +39,24 @@ const Submenu = ({ page }) => {
             <ExpandMoreIcon sx={{ ml: "-8px" }} />
           ))
         }
-        {...(page.subpages && bindHover(popupState))}
+        {...bindHover(popupState)}
+        {...bindFocus(popupState)}
       >
         {page.title}
       </Button>
 
       {page.subpages && (
         <HoverMenu
-          {...bindMenu(popupState)}
           anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
           transformOrigin={{ vertical: "top", horizontal: "left" }}
           disableScrollLock
+          {...bindMenu(popupState)}
         >
           {page.subpages.map((subpage) => (
             <MenuItem
               key={subpage.title}
               onClick={popupState.close}
-              component={Link}
+              component={NavLink}
               to={subpage.to}
             >
               <Typography

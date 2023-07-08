@@ -8,13 +8,14 @@ import {
   usePopupState,
   bindMenu,
   bindHover,
+  bindFocus,
 } from "material-ui-popup-state/hooks";
 import HoverMenu from "material-ui-popup-state/HoverMenu";
 
 const SubmenuMobile = (props) => {
   const popupState = usePopupState({
-    variant: "popover",
     popupId: props.page.state,
+    variant: "popover",
   });
 
   const handleClose = () => {
@@ -29,7 +30,8 @@ const SubmenuMobile = (props) => {
         onClick={props.page.to && props.onClose}
         component={props.page.to && Link}
         to={props.page.to}
-        {...(props.page.subpages && bindHover(popupState))}
+        {...bindHover(popupState)}
+        {...bindFocus(popupState)}
       >
         <Typography
           textAlign="center"
@@ -50,9 +52,9 @@ const SubmenuMobile = (props) => {
 
       {props.page.subpages && (
         <HoverMenu
-          {...bindMenu(popupState)}
           anchorOrigin={{ vertical: "center", horizontal: "right" }}
           transformOrigin={{ vertical: "center", horizontal: "left" }}
+          {...bindMenu(popupState)}
         >
           {props.page.subpages.map((subpage) => (
             <MenuItem
