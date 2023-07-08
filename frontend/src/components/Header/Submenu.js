@@ -11,18 +11,18 @@ import {
   bindHover,
 } from "material-ui-popup-state/hooks";
 
-const Submenu = (props) => {
+const Submenu = ({ page }) => {
   const popupState = usePopupState({
     variant: "popover",
-    popupId: "menupopup",
+    popupId: page.state,
   });
 
   return (
     <>
       <Button
-        component={props.page.to && Link}
-        to={props.page.to}
-        key={props.page.title}
+        component={page.to && Link}
+        to={page.to}
+        key={page.title}
         sx={{
           my: 2,
           ml: 0.8,
@@ -31,24 +31,26 @@ const Submenu = (props) => {
           fontWeight: "550",
         }}
         endIcon={
-          props.page.subpages &&
+          page.subpages &&
           (popupState.isOpen ? (
             <ExpandLessIcon sx={{ ml: "-8px" }} />
           ) : (
             <ExpandMoreIcon sx={{ ml: "-8px" }} />
           ))
         }
-        {...(props.page.subpages && bindHover(popupState))}
+        {...(page.subpages && bindHover(popupState))}
       >
-        {props.page.title}
+        {page.title}
       </Button>
-      {props.page.subpages && (
+
+      {page.subpages && (
         <HoverMenu
           {...bindMenu(popupState)}
           anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
           transformOrigin={{ vertical: "top", horizontal: "left" }}
+          disableScrollLock
         >
-          {props.page.subpages.map((subpage) => (
+          {page.subpages.map((subpage) => (
             <MenuItem
               key={subpage.title}
               onClick={popupState.close}

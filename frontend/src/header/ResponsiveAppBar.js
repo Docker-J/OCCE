@@ -174,146 +174,141 @@ const ResponsiveAppBar = () => {
   };
 
   return (
-    <>
-      <AppBar
-        position={
-          currentPage === "/"
-            ? "absolute"
-            : currentPage === "/aboutus"
-            ? "absolute"
-            : "static"
-        }
-        style={{ background: "transparent", boxShadow: "none" }}
-        sx={{
-          color:
-            currentPage === "/" || currentPage === "/aboutus"
-              ? "white"
-              : "black",
-        }}
-      >
-        <Container maxWidth="xl">
-          <Toolbar disableGutters>
-            <Box
-              sx={{
-                color: "inherit",
-                display: { xs: "none", md: "flex" },
-              }}
-            >
-              <Link to="/">
-                <img
-                  alt="Header Logo"
-                  src={
-                    currentPage === "/" || currentPage === "/aboutus"
-                      ? "/img/HeaderLogoColor.png"
-                      : "/img/HeaderLogoBW.png"
-                  }
-                  style={{ width: "240px" }}
-                />
-              </Link>
-            </Box>
+    <AppBar
+      position={
+        currentPage === "/"
+          ? "absolute"
+          : currentPage === "/aboutus"
+          ? "absolute"
+          : "static"
+      }
+      style={{ background: "transparent", boxShadow: "none" }}
+      sx={{
+        color:
+          currentPage === "/" || currentPage === "/aboutus" ? "white" : "black",
+      }}
+    >
+      <Container maxWidth="xl">
+        <Toolbar disableGutters>
+          <Box
+            sx={{
+              color: "inherit",
+              display: { xs: "none", md: "flex" },
+            }}
+          >
+            <Link to="/">
+              <img
+                alt="Header Logo"
+                src={
+                  currentPage === "/" || currentPage === "/aboutus"
+                    ? "/img/HeaderLogoColor.png"
+                    : "/img/HeaderLogoBW.png"
+                }
+                style={{ width: "240px" }}
+              />
+            </Link>
+          </Box>
 
-            <Box
-              sx={{
-                flexGrow: 1,
-                display: { xs: "flex", md: "none" },
-              }}
+          <Box
+            sx={{
+              flexGrow: 1,
+              display: { xs: "flex", md: "none" },
+            }}
+          >
+            <IconButton
+              size="large"
+              aria-label="menus"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleOpenNavMenu}
+              color="inherit"
             >
-              <IconButton
-                size="large"
-                aria-label="menus"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleOpenNavMenu}
-                color="inherit"
-              >
-                <MenuIcon />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorElNav}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "left",
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "left",
-                }}
-                open={Boolean(anchorElNav)}
-                onClose={handleCloseNavMenu}
-                sx={{
-                  display: { xs: "block", md: "none" },
-                }}
-              >
-                {pages.map((page) => (
-                  <SubmenuMobile
-                    key={page.title}
-                    page={page}
-                    onClose={handleCloseNavMenu}
-                  />
-                ))}
-              </Menu>
-            </Box>
-
-            <Box
-              sx={{
-                flexGrow: 1,
-                color: "inherit",
-                display: { xs: "flex", md: "none" },
+              <MenuIcon />
+            </IconButton>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorElNav}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "left",
               }}
-            >
-              <Link to="/">
-                <img
-                  alt="Header Logo"
-                  className="mobileLogo"
-                  src={
-                    currentPage === "/" || currentPage === "/aboutus"
-                      ? "/img/HeaderLogoColor.png"
-                      : "/img/HeaderLogoBW.png"
-                  }
-                  style={{ width: "180px" }}
-                />
-              </Link>
-            </Box>
-
-            <Box
+              keepMounted
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+              open={Boolean(anchorElNav)}
+              onClose={handleCloseNavMenu}
               sx={{
-                ml: "auto",
-                display: { xs: "none", md: "flex" },
+                display: { xs: "block", md: "none" },
               }}
             >
               {pages.map((page) => (
-                <Submenu key={page.title} page={page} />
+                <SubmenuMobile
+                  key={page.title}
+                  page={page}
+                  onClose={handleCloseNavMenu}
+                />
               ))}
-            </Box>
+            </Menu>
+          </Box>
 
-            <Box sx={{ ml: "15pt", flexGrow: 0 }}>
-              <Tooltip title="Open settings">
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Remy Sharp" />
-                </IconButton>
-              </Tooltip>
-              <Menu
-                sx={{ mt: "45px" }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-              >
-                {(user.authenticated
-                  ? settings_signed
-                  : settings_not_signed
-                ).map((setting) => (
+          <Box
+            sx={{
+              flexGrow: 1,
+              color: "inherit",
+              display: { xs: "flex", md: "none" },
+            }}
+          >
+            <Link to="/">
+              <img
+                alt="Header Logo"
+                className="mobileLogo"
+                src={
+                  currentPage === "/" || currentPage === "/aboutus"
+                    ? "/img/HeaderLogoColor.png"
+                    : "/img/HeaderLogoBW.png"
+                }
+                style={{ width: "180px" }}
+              />
+            </Link>
+          </Box>
+
+          <Box
+            sx={{
+              ml: "auto",
+              display: { xs: "none", md: "flex" },
+            }}
+          >
+            {pages.map((page) => (
+              <Submenu key={page.title} page={page} />
+            ))}
+          </Box>
+
+          <Box sx={{ ml: "15pt", flexGrow: 0 }}>
+            <Tooltip title="Open settings">
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                <Avatar alt="Remy Sharp" />
+              </IconButton>
+            </Tooltip>
+            <Menu
+              sx={{ mt: "45px" }}
+              id="menu-appbar"
+              anchorEl={anchorElUser}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              open={Boolean(anchorElUser)}
+              onClose={handleCloseUserMenu}
+            >
+              {(user.authenticated ? settings_signed : settings_not_signed).map(
+                (setting) => (
                   <MenuItem key={setting.title} onClick={handleCloseUserMenu}>
                     <Typography
                       sx={{ color: "black" }}
@@ -323,16 +318,16 @@ const ResponsiveAppBar = () => {
                       {setting.title}
                     </Typography>
                   </MenuItem>
-                ))}
-              </Menu>
-            </Box>
-          </Toolbar>
-        </Container>
-      </AppBar>
+                )
+              )}
+            </Menu>
+          </Box>
+        </Toolbar>
+      </Container>
 
       <SignInModal open={signInModalOpen} onClose={onSignInModalClose} />
       <SignUpModal open={signUpModalOpen} onClose={onSignUpModalClose} />
-    </>
+    </AppBar>
   );
 };
 

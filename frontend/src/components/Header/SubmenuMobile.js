@@ -14,7 +14,7 @@ import HoverMenu from "material-ui-popup-state/HoverMenu";
 const SubmenuMobile = (props) => {
   const popupState = usePopupState({
     variant: "popover",
-    popupId: "menupopup",
+    popupId: props.page.state,
   });
 
   const handleClose = () => {
@@ -53,7 +53,6 @@ const SubmenuMobile = (props) => {
           {...bindMenu(popupState)}
           anchorOrigin={{ vertical: "center", horizontal: "right" }}
           transformOrigin={{ vertical: "center", horizontal: "left" }}
-          onClick={handleClose}
         >
           {props.page.subpages.map((subpage) => (
             <MenuItem
