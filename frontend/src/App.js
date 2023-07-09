@@ -1,11 +1,5 @@
-import {
-  Outlet,
-  Route,
-  RouterProvider,
-  createBrowserRouter,
-  createRoutesFromElements,
-} from "react-router-dom";
-import React, { Children, lazy, Suspense } from "react";
+import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
+import React, { lazy, Suspense } from "react";
 import { createTheme, ThemeProvider } from "@mui/material";
 import "./App.css";
 

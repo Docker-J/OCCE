@@ -192,7 +192,6 @@ const ResponsiveAppBar = () => {
         <Toolbar disableGutters>
           <Box
             sx={{
-              color: "inherit",
               display: { xs: "none", md: "flex" },
             }}
           >
@@ -256,7 +255,6 @@ const ResponsiveAppBar = () => {
           <Box
             sx={{
               flexGrow: 1,
-              color: "inherit",
               display: { xs: "flex", md: "none" },
             }}
           >
