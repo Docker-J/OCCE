@@ -5,7 +5,7 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
 } from "react-router-dom";
-import React, { lazy, Suspense } from "react";
+import React, { Children, lazy, Suspense } from "react";
 import { createTheme, ThemeProvider } from "@mui/material";
 import "./App.css";
 
@@ -80,37 +80,112 @@ const AppBarWrapper = () => {
   );
 };
 
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route element={<AppBarWrapper />}>
-      <Route path="/" element={<Main />} />
-      <Route path="/aboutus" element={<About />} />
-      <Route path="/announcements" element={<Announcements />} />
-      <Route
-        exact
-        path="/announcements/announcement/"
-        element={<Announcement />}
-      />
-      <Route path="/weeklyupdate" element={<WeeklyUpdate />} />
-      <Route path="/newcomers" element={<NewComers />} />
+// const router = createBrowserRouter(
+//   <Route element={<AppBarWrapper />}>
+//     <Route path="/" element={<Main />} />
+//     <Route path="/aboutus" element={<About />} />
+//     <Route exact path="/announcements" element={<Announcements />} />
+//     <Route path="/announcements/announcement/" element={<Announcement />} />
+//     <Route path="/weeklyupdate" element={<WeeklyUpdate />} />
+//     <Route path="/newcomers" element={<NewComers />} />
 
-      <Route path="/community/smallgroup" element={<SmallGroup />} />
-      <Route path="/community/ministry" element={<Ministry />} />
+//     <Route path="/community/smallgroup" element={<SmallGroup />} />
+//     <Route path="/community/ministry" element={<Ministry />} />
 
-      <Route path="/online/sundayservice" element={<SundayService />} />
-      <Route path="/online/sermon" element={<Sermon />} />
-      <Route path="/online/worship" element={<Worship />} />
-      <Route path="/online/prayON" element={<PrayON />} />
-      <Route path="/online/meditationON" element={<MeditationON />} />
-      <Route exact path="/meditationON/post/" element={<MeditationONPost />} />
+//     <Route path="/online/sundayservice" element={<SundayService />} />
+//     <Route path="/online/sermon" element={<Sermon />} />
+//     <Route path="/online/worship" element={<Worship />} />
+//     <Route path="/online/prayON" element={<PrayON />} />
+//     <Route exact path="/online/meditationON" element={<MeditationON />} />
+//     <Route path="/online/meditationON/post/" element={<MeditationONPost />} />
 
-      <Route path="/nextgen/preschool" element={<Preschool />} />
-      <Route path="/nextgen/elementary" element={<Elementary />} />
-      <Route path="/nextgen/youth" element={<Youth />} />
-      <Route path="/nextgen/youngadult" element={<YoungAdult />} />
-    </Route>
-  )
-);
+//     <Route path="/nextgen/preschool" element={<Preschool />} />
+//     <Route path="/nextgen/elementary" element={<Elementary />} />
+//     <Route path="/nextgen/youth" element={<Youth />} />
+//     <Route path="/nextgen/youngadult" element={<YoungAdult />} />
+//   </Route>
+// );
+
+const router = createBrowserRouter([
+  {
+    element: <AppBarWrapper />,
+    children: [
+      {
+        path: "/",
+        element: <Main />,
+      },
+
+      {
+        path: "/aboutus",
+        element: <About />,
+      },
+
+      {
+        path: "/announcements",
+        element: <Announcements />,
+      },
+      {
+        path: "/weeklyupdate",
+        element: <WeeklyUpdate />,
+      },
+      {
+        path: "/newcomers",
+        element: <NewComers />,
+      },
+
+      {
+        path: "/community/smallgroup",
+        element: <SmallGroup />,
+      },
+      {
+        path: "/community/ministry",
+        element: <Ministry />,
+      },
+
+      {
+        path: "/online/sundayservice",
+        element: <SundayService />,
+      },
+      {
+        path: "/online/sermon",
+        element: <Sermon />,
+      },
+      {
+        path: "/online/worship",
+        element: <Worship />,
+      },
+      {
+        path: "/online/prayON",
+        element: <PrayON />,
+      },
+      {
+        path: "/online/meditationON",
+        element: <MeditationON />,
+      },
+      {
+        path: "/online/meditationON/post/",
+        element: <MeditationONPost />,
+      },
+
+      {
+        path: "/nextgen/preschool",
+        element: <Preschool />,
+      },
+      {
+        path: "/nextgen/elementary",
+        element: <Elementary />,
+      },
+      {
+        path: "/nextgen/youth",
+        element: <Youth />,
+      },
+      {
+        path: "/nextgen/youngadult",
+        element: <YoungAdult />,
+      },
+    ],
+  },
+]);
 
 function App() {
   return (
