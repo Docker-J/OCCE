@@ -18,9 +18,11 @@ import BulletinUploadModal from "../../components/WeeklyUpdate/BulletinUploadMod
 
 import "./WeeklyUpdate.css";
 import { useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 
 const WeeklyUpdate = () => {
   const user = useSelector((state) => state.authToken.admin);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [bulletin, setBulletin] = useState(null);
   const [isSuccessSnackBarOpen, setIsSuccessSnackBarOpen] = useState(false);
@@ -45,8 +47,7 @@ const WeeklyUpdate = () => {
       const recentDate = new Date(result.data.replace(/-/g, "/"));
       setMaxDate(recentDate);
 
-      const params = new URLSearchParams(window.location.search);
-      const queryDate = params.get("date");
+      const queryDate = searchParams.get("date");
 
       if (queryDate === null) {
         setSelectedDate(recentDate);
@@ -129,17 +130,11 @@ const WeeklyUpdate = () => {
   useEffect(() => {
     if (selectedDate != null) {
       loadFile();
-      const newUrl =
-        window.location.protocol +
-        "//" +
-        window.location.host +
-        window.location.pathname +
-        "?date=" +
-        selectedDate.toLocaleDateString("sv").replace(/-/g, "");
-
-      window.history.replaceState({}, null, newUrl);
+      setSearchParams({
+        date: selectedDate.toLocaleDateString("sv").replace(/-/g, ""),
+      });
     }
-  }, [selectedDate, loadFile]);
+  }, [selectedDate, loadFile, setSearchParams]);
 
   function compareDate(date1, date2) {
     return (
