@@ -9,12 +9,13 @@ import {
   bindMenu,
   bindHover,
   bindFocus,
+  anchorRef,
 } from "material-ui-popup-state/hooks";
 import HoverMenu from "material-ui-popup-state/HoverMenu";
 
 const SubmenuMobile = (props) => {
   const popupState = usePopupState({
-    popupId: props.page.state,
+    popupId: "submenu",
     variant: "popover",
   });
 
@@ -26,6 +27,7 @@ const SubmenuMobile = (props) => {
   return (
     <>
       <MenuItem
+        ref={anchorRef(popupState)}
         key={props.page.title}
         onClick={props.page.to && props.onClose}
         component={props.page.to && Link}

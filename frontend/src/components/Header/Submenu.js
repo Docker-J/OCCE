@@ -10,17 +10,19 @@ import {
   bindMenu,
   bindHover,
   bindFocus,
+  anchorRef,
 } from "material-ui-popup-state/hooks";
 
 const Submenu = ({ page }) => {
   const popupState = usePopupState({
-    popupId: page.state,
+    popupId: "submenu",
     variant: "popover",
   });
 
   return (
     <>
       <Button
+        ref={anchorRef(popupState)}
         component={page.to && NavLink}
         to={page.to}
         key={page.title}
