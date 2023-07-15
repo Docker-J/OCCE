@@ -7,7 +7,7 @@ import ResponsiveAppBar from "./header/ResponsiveAppBar";
 
 import Main from "./pages/Main/Main";
 import About from "./pages/About/About";
-// import WeeklyUpdate from "./pages/WeeklyUpdate/WeeklyUpdate";
+import { loader as weeklyUpdateLoader } from "./pages/WeeklyUpdate/WeeklyUpdate";
 // import NewComers from "./pages/NewComers";
 
 // import Community from "./pages/Community";
@@ -121,6 +121,7 @@ const router = createBrowserRouter([
       {
         path: "/weeklyupdate",
         element: <WeeklyUpdate />,
+        loader: weeklyUpdateLoader,
       },
       {
         path: "/newcomers",

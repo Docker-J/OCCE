@@ -18,18 +18,31 @@ import BulletinUploadModal from "../../components/WeeklyUpdate/BulletinUploadMod
 
 import "./WeeklyUpdate.css";
 import { useSelector } from "react-redux";
-import { useSearchParams } from "react-router-dom";
+import {
+  useLoaderData,
+  useRevalidator,
+  useSearchParams,
+} from "react-router-dom";
+
+export async function loader() {
+  const result = await axios.get("/api/WeeklyUpdate/RecentDate");
+
+  return new Date(result.data.replace(/-/g, "/"));
+}
 
 const WeeklyUpdate = () => {
   const user = useSelector((state) => state.authToken.admin);
+  const maxDate = useLoaderData();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [bulletin, setBulletin] = useState(null);
   const [isSuccessSnackBarOpen, setIsSuccessSnackBarOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [modalState, setModalState] = useState(false);
-  const [maxDate, setMaxDate] = useState(null);
+  // const [maxDate, setMaxDate] = useState(null);
   const minDate = new Date("2022/04/03");
+
+  let revalidator = useRevalidator();
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -41,16 +54,16 @@ const WeeklyUpdate = () => {
 
   const getMaxDate = async () => {
     try {
-      const result = await axios.get("/api/WeeklyUpdate/RecentDate");
-      console.log(result.data);
+      // const result = await axios.get("/api/WeeklyUpdate/RecentDate");
+      // console.log(result.data);
 
-      const recentDate = new Date(result.data.replace(/-/g, "/"));
-      setMaxDate(recentDate);
+      // const recentDate = new Date(result.data.replace(/-/g, "/"));
+      // setMaxDate(recentDate);
 
       const queryDate = searchParams.get("date");
 
       if (queryDate === null) {
-        setSelectedDate(recentDate);
+        setSelectedDate(maxDate);
       } else {
         const year = +queryDate.substring(0, 4);
         const month = +queryDate.substring(4, 6);
@@ -84,7 +97,8 @@ const WeeklyUpdate = () => {
         })
         .then((res) => {
           console.log(res.data);
-          setMaxDate(new Date(res.data.replace(/-/g, "/")));
+          // setMaxDate(new Date(res.data.replace(/-/g, "/")));
+          revalidator.revalidate(); //get new maxdate
           setSelectedDate(date);
           closeModal();
           setIsSuccessSnackBarOpen(true);
