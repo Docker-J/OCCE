@@ -2,12 +2,6 @@
   color: white;
 } */
 
-.fp-section {
-  display: flex;
-  /* align-items: center; */
-  justify-content: center;
-}
-
 #section1 {
   background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)),
     url("../../components/About/FirstStep.webp");
@@ -26,6 +20,8 @@
 }
 
 #section2 {
+  display: flex;
+  justify-content: center;
   background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)),
     url("../../components/About/calling.webp");
   background-repeat: no-repeat;
@@ -35,12 +31,13 @@
 
 .section2Body {
   max-width: 1500px;
-  height: fit-content;
   margin: auto;
   padding: 0 5vw;
 }
 
 #section3 {
+  display: flex;
+  justify-content: center;
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2)),
     url("../../components/About/Direction.webp");
   background-repeat: no-repeat;
@@ -50,12 +47,14 @@
 
 .section3Body {
   max-width: 1500px;
-  height: fit-content;
+  /* height: fit-content; */
   margin: auto;
   padding: 0 5vw;
 }
 
 #section4 {
+  display: flex;
+  justify-content: center;
   background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
     url("../../components/About/AboutUs.webp");
   background-repeat: no-repeat;
@@ -73,6 +72,8 @@
 }
 
 #section5 {
+  display: flex;
+  justify-content: center;
   background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
     url("../../components/About/servers.jpg");
   background-repeat: no-repeat;
@@ -81,7 +82,6 @@
 
 .section5Body {
   max-width: 1500px;
-  height: fit-content;
   margin: auto;
   padding: 0 5vw;
   height: 100%;

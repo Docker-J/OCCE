@@ -1,4 +1,5 @@
 import React from "react";
+import "./About.css";
 import ReactFullpage from "@fullpage/react-fullpage";
 
 import {
@@ -15,8 +16,6 @@ import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
 import Arrow from "../../components/About/Arrow";
-
-import "./About.css";
 
 const serviceInfo = [
   {
