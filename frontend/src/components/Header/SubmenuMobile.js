@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-import { MenuItem, ListItemIcon } from "@mui/material";
+import { MenuItem, ListItemIcon, Typography } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
@@ -24,21 +24,18 @@ const SubmenuMobile = (props) => {
     props.menuPopupState.close();
   };
 
-  const toggleMenu = (event) => {
-    popupState.toggle(event.target);
-  };
-
   return (
     <>
       <MenuItem
         key={props.page.title}
-        onClick={props.page.to ? handleClose : toggleMenu}
+        onClick={props.page.to && handleClose}
         component={props.page.to && Link}
         to={props.page.to}
+        sx={{ py: 1.5 }}
         {...(props.page.subpages && bindHover(popupState))}
         {...(props.page.subpages && bindToggle(popupState))}
       >
-        {props.page.title}
+        <Typography sx={{ fontSize: "13pt" }}>{props.page.title}</Typography>
         <ListItemIcon>
           {props.page.subpages &&
             (popupState.isOpen ? (
@@ -52,8 +49,8 @@ const SubmenuMobile = (props) => {
       {props.page.subpages && (
         <HoverMenu
           {...bindMenu(popupState)}
-          anchorOrigin={{ vertical: "center", horizontal: "right" }}
-          transformOrigin={{ vertical: "center", horizontal: "left" }}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          transformOrigin={{ vertical: "top", horizontal: "left" }}
           onClose={popupState.close}
           onBlur={popupState.close}
         >
@@ -64,7 +61,7 @@ const SubmenuMobile = (props) => {
               component={Link}
               to={subpage.to}
             >
-              {subpage.title}
+              <Typography sx={{ fontSize: "13pt" }}>{subpage.title}</Typography>
             </MenuItem>
           ))}
         </HoverMenu>
