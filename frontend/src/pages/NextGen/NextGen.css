@@ -3,4 +3,9 @@
   left: 50%;
   transform: translateX(-50%);
   text-align: left;
+  width: 100%;
+  max-width: 1500px;
+  box-sizing: border-box;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
