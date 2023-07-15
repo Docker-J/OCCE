@@ -7,8 +7,8 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import {
   usePopupState,
   bindMenu,
-  bindFocus,
   bindToggle,
+  bindHover,
 } from "material-ui-popup-state/hooks";
 import HoverMenu from "material-ui-popup-state/HoverMenu";
 
@@ -16,7 +16,7 @@ const SubmenuMobile = (props) => {
   const popupState = usePopupState({
     popupId: props.page.state,
     variant: "popover",
-    disableAutoFocus: true,
+    parentPopupState: props.menuPopupState,
   });
 
   const handleClose = () => {
@@ -24,15 +24,19 @@ const SubmenuMobile = (props) => {
     props.menuPopupState.close();
   };
 
+  const toggleMenu = (event) => {
+    popupState.toggle(event.target);
+  };
+
   return (
     <>
       <MenuItem
         key={props.page.title}
-        onClick={props.page.to && handleClose}
+        onClick={props.page.to ? handleClose : toggleMenu}
         component={props.page.to && Link}
         to={props.page.to}
+        {...(props.page.subpages && bindHover(popupState))}
         {...(props.page.subpages && bindToggle(popupState))}
-        {...(props.page.subpages && bindFocus(popupState))}
       >
         {props.page.title}
         <ListItemIcon>
@@ -47,11 +51,11 @@ const SubmenuMobile = (props) => {
 
       {props.page.subpages && (
         <HoverMenu
+          {...bindMenu(popupState)}
           anchorOrigin={{ vertical: "center", horizontal: "right" }}
           transformOrigin={{ vertical: "center", horizontal: "left" }}
           onClose={popupState.close}
           onBlur={popupState.close}
-          {...bindMenu(popupState)}
         >
           {props.page.subpages.map((subpage) => (
             <MenuItem
