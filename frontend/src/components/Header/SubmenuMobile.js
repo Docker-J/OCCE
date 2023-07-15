@@ -7,9 +7,8 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import {
   usePopupState,
   bindMenu,
-  bindHover,
   bindFocus,
-  anchorRef,
+  bindToggle,
 } from "material-ui-popup-state/hooks";
 import HoverMenu from "material-ui-popup-state/HoverMenu";
 
@@ -17,6 +16,7 @@ const SubmenuMobile = (props) => {
   const popupState = usePopupState({
     popupId: props.page.state,
     variant: "popover",
+    disableAutoFocus: true,
   });
 
   const handleClose = () => {
@@ -27,12 +27,11 @@ const SubmenuMobile = (props) => {
   return (
     <>
       <MenuItem
-        ref={anchorRef(popupState)}
         key={props.page.title}
         onClick={props.page.to && handleClose}
         component={props.page.to && Link}
         to={props.page.to}
-        {...(props.page.subpages && bindHover(popupState))}
+        {...(props.page.subpages && bindToggle(popupState))}
         {...(props.page.subpages && bindFocus(popupState))}
       >
         {props.page.title}
@@ -50,7 +49,8 @@ const SubmenuMobile = (props) => {
         <HoverMenu
           anchorOrigin={{ vertical: "center", horizontal: "right" }}
           transformOrigin={{ vertical: "center", horizontal: "left" }}
-          onClick={popupState.close}
+          onClose={popupState.close}
+          onBlur={popupState.close}
           {...bindMenu(popupState)}
         >
           {props.page.subpages.map((subpage) => (
