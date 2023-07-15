@@ -68,10 +68,10 @@ const ResponsiveAppBar = () => {
       title: "교회소식",
       state: "newsPopupState",
       subpages: [
-        {
-          title: "공지사항",
-          to: "announcements",
-        },
+        // {
+        //   title: "공지사항",
+        //   to: "announcements",
+        // },
         {
           title: "주보",
           to: "weeklyupdate",
@@ -110,10 +110,10 @@ const ResponsiveAppBar = () => {
           title: "기도ON",
           to: "online/prayON",
         },
-        {
-          title: "묵상ON",
-          to: "online/meditationon",
-        },
+        // {
+        //   title: "묵상ON",
+        //   to: "online/meditationon",
+        // },
       ],
     },
     {
@@ -130,28 +130,28 @@ const ResponsiveAppBar = () => {
         },
       ],
     },
-    {
-      title: "다음세대",
-      state: "nextGenPopupState",
-      subpages: [
-        {
-          title: "유아유치부",
-          to: "nextgen/preschool",
-        },
-        {
-          title: "유초등부",
-          to: "nextgen/elementary",
-        },
-        {
-          title: "중고등부",
-          to: "nextgen/youth",
-        },
-        {
-          title: "청년부",
-          to: "nextgen/youngadult",
-        },
-      ],
-    },
+    // {
+    //   title: "다음세대",
+    //   state: "nextGenPopupState",
+    //   subpages: [
+    //     {
+    //       title: "유아유치부",
+    //       to: "nextgen/preschool",
+    //     },
+    //     {
+    //       title: "유초등부",
+    //       to: "nextgen/elementary",
+    //     },
+    //     {
+    //       title: "중고등부",
+    //       to: "nextgen/youth",
+    //     },
+    //     {
+    //       title: "청년부",
+    //       to: "nextgen/youngadult",
+    //     },
+    //   ],
+    // },
   ];
 
   const settings_signed = [
