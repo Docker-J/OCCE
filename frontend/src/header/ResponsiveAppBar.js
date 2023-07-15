@@ -36,13 +36,20 @@ const ResponsiveAppBar = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.authToken);
 
-  const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
 
   const [signInModalOpen, setSignInModalOpen] = useState(false);
   const [signUpModalOpen, setSignUpModalOpen] = useState(false);
 
-  const popupState = usePopupState({ variant: "popover", popupId: "demoMenu" });
+  const popupState = usePopupState({
+    variant: "popover",
+    popupId: "menu",
+  });
+
+  const userPopupState = usePopupState({
+    variant: "popover",
+    popupId: "user",
+  });
 
   const onSignInModalClose = () => {
     setSignInModalOpen(false);
@@ -51,17 +58,10 @@ const ResponsiveAppBar = () => {
     setSignUpModalOpen(false);
   };
 
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
 
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-    console.log("closed");
-  };
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
@@ -226,7 +226,6 @@ const ResponsiveAppBar = () => {
               aria-label="menus"
               aria-controls="menu-appbar"
               aria-haspopup="true"
-              onClick={handleOpenNavMenu}
               color="inherit"
               {...bindTrigger(popupState)}
             >
@@ -246,13 +245,13 @@ const ResponsiveAppBar = () => {
               sx={{
                 display: { xs: "block", md: "none" },
               }}
+              disableScrollLock
               keepMounted
             >
               {pages.map((page) => (
                 <SubmenuMobile
                   key={page.title}
                   page={page}
-                  onClose={handleCloseNavMenu}
                   menuPopupState={popupState}
                 />
               ))}
@@ -292,14 +291,13 @@ const ResponsiveAppBar = () => {
 
           <Box sx={{ ml: "15pt", flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+              <IconButton {...bindTrigger(userPopupState)} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" />
               </IconButton>
             </Tooltip>
             <Menu
               sx={{ mt: "45px" }}
               id="menu-appbar"
-              anchorEl={anchorElUser}
               anchorOrigin={{
                 vertical: "top",
                 horizontal: "right",
@@ -309,12 +307,11 @@ const ResponsiveAppBar = () => {
                 vertical: "top",
                 horizontal: "right",
               }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
+              {...bindMenu(userPopupState)}
             >
               {(user.authenticated ? settings_signed : settings_not_signed).map(
                 (setting) => (
-                  <MenuItem key={setting.title} onClick={handleCloseUserMenu}>
+                  <MenuItem key={setting.title} onClick={userPopupState.close}>
                     <Typography
                       sx={{ color: "black" }}
                       textAlign="center"
