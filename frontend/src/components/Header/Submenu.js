@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 
-import { Button, Typography, MenuItem } from "@mui/material";
+import { Button, MenuItem } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
@@ -15,7 +15,7 @@ import {
 
 const Submenu = ({ page }) => {
   const popupState = usePopupState({
-    popupId: "submenu",
+    popupId: page.state,
     variant: "popover",
   });
 
@@ -41,8 +41,8 @@ const Submenu = ({ page }) => {
             <ExpandMoreIcon sx={{ ml: "-8px" }} />
           ))
         }
-        {...bindHover(popupState)}
-        {...bindFocus(popupState)}
+        {...(page.subpages && bindHover(popupState))}
+        {...(page.subpages && bindFocus(popupState))}
       >
         {page.title}
       </Button>
@@ -61,13 +61,7 @@ const Submenu = ({ page }) => {
               component={NavLink}
               to={subpage.to}
             >
-              <Typography
-                style={{ textDecoration: "none" }}
-                color="black"
-                textAlign="center"
-              >
-                {subpage.title}
-              </Typography>
+              {subpage.title}
             </MenuItem>
           ))}
         </HoverMenu>

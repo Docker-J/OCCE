@@ -10,6 +10,7 @@ import {
   bindHover,
   bindFocus,
   anchorRef,
+  bindTrigger,
 } from "material-ui-popup-state/hooks";
 import HoverMenu from "material-ui-popup-state/HoverMenu";
 
@@ -20,7 +21,8 @@ const SubmenuMobile = (props) => {
   });
 
   const handleClose = () => {
-    props.onClose();
+    props.menuPopupState.close();
+    console.log("called");
     popupState.close();
   };
 
@@ -29,19 +31,13 @@ const SubmenuMobile = (props) => {
       <MenuItem
         ref={anchorRef(popupState)}
         key={props.page.title}
-        onClick={props.page.to && props.onClose}
+        onClick={handleClose}
         component={props.page.to && Link}
         to={props.page.to}
-        {...bindHover(popupState)}
-        {...bindFocus(popupState)}
+        {...(props.page.subpages && bindTrigger(popupState))}
+        {...(props.page.subpages && bindFocus(popupState))}
       >
-        <Typography
-          textAlign="center"
-          color="black"
-          style={{ textDecoration: "none" }}
-        >
-          {props.page.title}
-        </Typography>
+        {props.page.title}
         <ListItemIcon>
           {props.page.subpages &&
             (popupState.isOpen ? (
@@ -65,13 +61,7 @@ const SubmenuMobile = (props) => {
               component={Link}
               to={subpage.to}
             >
-              <Typography
-                style={{ textDecoration: "none" }}
-                color="black"
-                textAlign="center"
-              >
-                {subpage.title}
-              </Typography>
+              {subpage.title}
             </MenuItem>
           ))}
         </HoverMenu>

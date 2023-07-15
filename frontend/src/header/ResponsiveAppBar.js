@@ -25,6 +25,12 @@ import { signOut } from "../api/user";
 import { useDispatch, useSelector } from "react-redux";
 import { removeCookieToken } from "../storage/Cookie";
 import { DELETE_TOKEN } from "../store/Auth";
+import {
+  anchorRef,
+  bindMenu,
+  bindTrigger,
+  usePopupState,
+} from "material-ui-popup-state/hooks";
 
 const ResponsiveAppBar = () => {
   const dispatch = useDispatch();
@@ -32,10 +38,11 @@ const ResponsiveAppBar = () => {
 
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  // const [anchorElOnline, setAnchorElOnline] = useState(null);
 
   const [signInModalOpen, setSignInModalOpen] = useState(false);
   const [signUpModalOpen, setSignUpModalOpen] = useState(false);
+
+  const popupState = usePopupState({ variant: "popover", popupId: "demoMenu" });
 
   const onSignInModalClose = () => {
     setSignInModalOpen(false);
@@ -53,6 +60,7 @@ const ResponsiveAppBar = () => {
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
+    console.log("closed");
   };
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
@@ -176,9 +184,7 @@ const ResponsiveAppBar = () => {
   return (
     <AppBar
       position={
-        currentPage === "/"
-          ? "absolute"
-          : currentPage === "/aboutus"
+        currentPage === "/" || currentPage === "/aboutus"
           ? "absolute"
           : "static"
       }
@@ -215,38 +221,39 @@ const ResponsiveAppBar = () => {
             }}
           >
             <IconButton
+              ref={anchorRef(popupState)}
               size="large"
               aria-label="menus"
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={handleOpenNavMenu}
               color="inherit"
+              {...bindTrigger(popupState)}
             >
               <MenuIcon />
             </IconButton>
             <Menu
               id="menu-appbar"
-              anchorEl={anchorElNav}
+              {...bindMenu(popupState)}
               anchorOrigin={{
                 vertical: "bottom",
                 horizontal: "left",
               }}
-              keepMounted
               transformOrigin={{
                 vertical: "top",
                 horizontal: "left",
               }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
               sx={{
                 display: { xs: "block", md: "none" },
               }}
+              keepMounted
             >
               {pages.map((page) => (
                 <SubmenuMobile
                   key={page.title}
                   page={page}
                   onClose={handleCloseNavMenu}
+                  menuPopupState={popupState}
                 />
               ))}
             </Menu>
