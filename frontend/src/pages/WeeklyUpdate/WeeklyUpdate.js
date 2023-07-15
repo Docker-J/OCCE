@@ -24,25 +24,18 @@ import {
   useSearchParams,
 } from "react-router-dom";
 
-export async function loader() {
-  const result = await axios.get("/api/WeeklyUpdate/RecentDate");
-
-  return new Date(result.data.replace(/-/g, "/"));
-}
-
 const WeeklyUpdate = () => {
   const user = useSelector((state) => state.authToken.admin);
   const maxDate = useLoaderData();
+  const minDate = new Date("2022/04/03");
+  let revalidator = useRevalidator();
+
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [bulletin, setBulletin] = useState(null);
   const [isSuccessSnackBarOpen, setIsSuccessSnackBarOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [modalState, setModalState] = useState(false);
-  // const [maxDate, setMaxDate] = useState(null);
-  const minDate = new Date("2022/04/03");
-
-  let revalidator = useRevalidator();
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
