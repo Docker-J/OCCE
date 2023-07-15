@@ -36,8 +36,6 @@ const ResponsiveAppBar = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.authToken);
 
-  const [anchorElUser, setAnchorElUser] = useState(null);
-
   const [signInModalOpen, setSignInModalOpen] = useState(false);
   const [signUpModalOpen, setSignUpModalOpen] = useState(false);
 
@@ -56,14 +54,6 @@ const ResponsiveAppBar = () => {
   };
   const onSignUpModalClose = () => {
     setSignUpModalOpen(false);
-  };
-
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
   };
 
   const currentPage = useLocation().pathname;
