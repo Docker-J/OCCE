@@ -4,7 +4,7 @@ import "./NextGen.css";
 const Elementary = () => {
   return (
     <>
-      <h1>초등부</h1>
+      <h1>유초등부</h1>
 
       <div className="container">
         <Typography variant="h5" fontWeight={800}>
