@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const db = require("./api/firebase.js");
+const { db, fcm } = require("./api/firebase.js");
 
 var RECENTDATE;
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import "./ResponsiveAppBar.css";
@@ -31,10 +31,33 @@ import {
   bindTrigger,
   usePopupState,
 } from "material-ui-popup-state/hooks";
+import { messaging } from "../api/firebase";
+import { getToken } from "firebase/messaging";
 
 const ResponsiveAppBar = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.authToken);
+
+  const requestWebPushPermission = async () => {
+    console.log("권한 요청 중...");
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        getToken(messaging, {
+          vapidKey:
+            "BOLDzFLzljc4HkyVktgjo4-_QoXFxx__XZS6xBmGouvsisXHHe--2dSUUJtQ2cerl3v7ONBhrAPM661xRbpQcqo",
+        }).then((token) => {
+          console.log(token);
+        });
+      }
+    } catch {}
+  };
+
+  useEffect(() => {
+    requestWebPushPermission();
+  }, []);
+
+  // console.log(token);
 
   const [signInModalOpen, setSignInModalOpen] = useState(false);
   const [signUpModalOpen, setSignUpModalOpen] = useState(false);
