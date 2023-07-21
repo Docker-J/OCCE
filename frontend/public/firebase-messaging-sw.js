@@ -22,18 +22,35 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging(app);
+
+// messaging.addEventListener("notificationclick", (event) => {
+//   // event.notification.close();
+//   // const urlToOpen = event.data.url;
+//   // // event.waitUntil(clients.openWindow(urlToOpen));
+// });
+
 messaging.onBackgroundMessage((payload) => {
   console.log("you received a message when you haven't the app active");
   console.log(payload);
 
-  const notificationTitle = payload.notification.title;
+  const notificationTitle = payload.data.title;
   const notificationOptions = {
-    body: payload.notification.body,
+    body: payload.data.body,
     icon: "/apple-icon.png",
+    data: {
+      click_action: payload.data.click_action,
+    },
   };
 
   return self.registration.showNotification(
     notificationTitle,
     notificationOptions
   );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  const url = event.notification.data.click_action;
+  event.notification.close();
+
+  event.waitUntil(clients.openWindow(url));
 });

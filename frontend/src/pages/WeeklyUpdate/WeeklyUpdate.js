@@ -22,16 +22,16 @@ import { useLoaderData, useNavigate, useRevalidator } from "react-router-dom";
 
 const WeeklyUpdate = () => {
   const user = useSelector((state) => state.authToken.admin);
-  const { maxDate, queryDate } = useLoaderData();
-  const minDate = new Date("2022/04/03");
-
   const navigate = useNavigate();
   let revalidator = useRevalidator();
 
+  const { maxDate, queryDate } = useLoaderData();
+  const minDate = new Date("2022/04/03");
+
   const [bulletin, setBulletin] = useState(null);
-  const [isSuccessSnackBarOpen, setIsSuccessSnackBarOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(queryDate);
   const [modalState, setModalState] = useState(false);
+  const [isSuccessSnackBarOpen, setIsSuccessSnackBarOpen] = useState(false);
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -65,8 +65,8 @@ const WeeklyUpdate = () => {
         .then((res) => {
           console.log(res.data);
           // setMaxDate(new Date(res.data.replace(/-/g, "/")));
-          revalidator.revalidate(); //get new maxdate
           setSelectedDate(date);
+          revalidator.revalidate(); //get new maxdate
           closeModal();
           setIsSuccessSnackBarOpen(true);
         });
@@ -126,7 +126,7 @@ const WeeklyUpdate = () => {
     <>
       <h1>주보</h1>
 
-      {selectedDate && bulletin ? (
+      {bulletin ? (
         <>
           <IconButton
             id="previousBulletin"

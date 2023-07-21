@@ -14,14 +14,22 @@ app.use(bodyParser.json({ limit: "5mb" }));
 app.use("/api/User", users);
 app.use("/api/WeeklyUpdate", weeklybulletin);
 
-app.get("/api/test", async (req, res) => {
+app.post("/api/test", async (req, res) => {
   const message = {
+    notification: {},
     data: {
-      title: "$FooCorp up 1.43% on the day",
-      body: "$FooCorp gained 11.80 points to close at 835.67, up 1.43% on the day.",
+      title: "새로운 주보가 업로드 되었습니다",
+      body: "2023-07-23",
+      click_action: "https://oncce.ca/weeklyupdate",
+    },
+    webpush: {
+      fcm_options: {
+        link: "https://oncce.ca",
+      },
+      notification: {},
     },
     token:
-      "c9I3zDFcSyYMFOWT7sv2VP:APA91bHSOnlHYMF_7W2IGnmOXWE5gPQFU8vTcryqUD40-rMfSzKwElNzOfO7ojZjt4IDQ9edkh7GWTJonoNbOPaRieFs5vj_0BtD0GZchgDT1eSdZchlDsEeyKaDRAxouuENMHjyV0TS",
+      "c9I3zDFcSyYMFOWT7sv2VP:APA91bH1lSQ8VzbdSE45kve1bWeRUnHdBxYsv48SPvaSSM4ro4G7CJHhciVLZv_oT1QdoZIVkHjZtYuG5oLrlO7xMJTuWvu1vV5nncEkC2Err7Lwqf0TwnTvJl7wgx9eZdNASVWocNzr",
   };
   try {
     await fcm.send(message);

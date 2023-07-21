@@ -42,12 +42,10 @@ router.put("/PostBulletin", async (req, res) => {
     await db.collection("weeklyBulletin").doc(req.body.date).set(data);
     if (req.body.date > RECENTDATE) {
       RECENTDATE = req.body.date;
-      try {
-        const data = {
-          date: req.body.date,
-        };
-        await db.collection("Misc").doc("RecentWeeklyBulletin").set(data);
-      } catch {}
+      const data = {
+        date: req.body.date,
+      };
+      await db.collection("Misc").doc("RecentWeeklyBulletin").set(data);
     }
     res.send(RECENTDATE);
   } catch {
