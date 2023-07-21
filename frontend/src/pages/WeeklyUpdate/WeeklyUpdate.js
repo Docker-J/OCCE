@@ -18,23 +18,19 @@ import BulletinUploadModal from "../../components/WeeklyUpdate/BulletinUploadMod
 
 import "./WeeklyUpdate.css";
 import { useSelector } from "react-redux";
-import {
-  useLoaderData,
-  useRevalidator,
-  useSearchParams,
-} from "react-router-dom";
+import { useLoaderData, useNavigate, useRevalidator } from "react-router-dom";
 
 const WeeklyUpdate = () => {
   const user = useSelector((state) => state.authToken.admin);
-  const maxDate = useLoaderData();
+  const { maxDate, queryDate } = useLoaderData();
   const minDate = new Date("2022/04/03");
-  let revalidator = useRevalidator();
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  let revalidator = useRevalidator();
 
   const [bulletin, setBulletin] = useState(null);
   const [isSuccessSnackBarOpen, setIsSuccessSnackBarOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(queryDate);
   const [modalState, setModalState] = useState(false);
 
   const handleClose = (event, reason) => {
@@ -43,28 +39,6 @@ const WeeklyUpdate = () => {
     }
 
     setIsSuccessSnackBarOpen(false);
-  };
-
-  const getMaxDate = async () => {
-    try {
-      // const result = await axios.get("/api/WeeklyUpdate/RecentDate");
-      // console.log(result.data);
-
-      // const recentDate = new Date(result.data.replace(/-/g, "/"));
-      // setMaxDate(recentDate);
-
-      const queryDate = searchParams.get("date");
-
-      if (queryDate === null) {
-        setSelectedDate(maxDate);
-      } else {
-        const year = +queryDate.substring(0, 4);
-        const month = +queryDate.substring(4, 6);
-        const day = +queryDate.substring(6, 8);
-
-        setSelectedDate(new Date(year, month - 1, day));
-      }
-    } catch (err) {}
   };
 
   // Get Bulletin from Firestore
@@ -131,17 +105,14 @@ const WeeklyUpdate = () => {
   };
 
   useEffect(() => {
-    getMaxDate();
-  }, []);
-
-  useEffect(() => {
     if (selectedDate != null) {
       loadFile();
-      setSearchParams({
-        date: selectedDate.toLocaleDateString("sv").replace(/-/g, ""),
-      });
+      navigate(
+        "/weeklyupdate/" +
+          selectedDate.toLocaleDateString("sv").replace(/-/g, "")
+      );
     }
-  }, [selectedDate, loadFile, setSearchParams]);
+  }, [selectedDate, loadFile, navigate]);
 
   function compareDate(date1, date2) {
     return (

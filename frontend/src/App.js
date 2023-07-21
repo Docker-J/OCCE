@@ -119,7 +119,7 @@ const router = createBrowserRouter([
         element: <Announcements />,
       },
       {
-        path: "/weeklyupdate",
+        path: "/weeklyupdate/:date?",
         element: <WeeklyUpdate />,
         loader: weeklyUpdateLoader,
         shouldRevalidate: () => false,
