@@ -159,7 +159,7 @@ const router = createBrowserRouter([
         element: <MeditationON />,
       },
       {
-        path: "/online/meditationON/post/",
+        path: "/online/meditationON/:postID",
         element: <MeditationONPost />,
       },
 

@@ -93,7 +93,7 @@ const servers = [
   {
     name: "안주영 목사",
     title: "협동 목사",
-    img: "img/About/Ahnjooyoung.jpg",
+    img: "img/About/AhnJooyoung.jpg",
     alt: "",
   },
 ];

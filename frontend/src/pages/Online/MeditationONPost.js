@@ -8,43 +8,41 @@ import { Carousel } from "react-responsive-carousel";
 import styles from "react-responsive-carousel/lib/styles/carousel.min.css";
 
 const MeditationONPost = () => {
-  const [images, setImages] = useState(null);
+  // const [images, setImages] = useState(null);
 
   const params = new URLSearchParams(window.location.search);
   const docID = params.get("docID");
 
-  async function getAnnouncement(id) {
-    const docSnap = await getDoc(doc(db, "MeditationON", id));
-    setImages(docSnap.data().images);
-  }
+  // async function getAnnouncement(id) {
+  //   const docSnap = await getDoc(doc(db, "MeditationON", id));
+  //   setImages(docSnap.data().images);
+  // }
 
-  useEffect(() => {
-    getAnnouncement(docID);
-  });
+  // useEffect(() => {
+  //   getAnnouncement(docID);
+  // });
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        width: "90%",
-        maxWidth: "900px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        marginTop: "30px",
-      }}
-    >
-      {images ? (
+    <>
+      <h1>묵상 ON</h1>
+      <div
+        style={{
+          position: "absolute",
+          width: "90%",
+          maxWidth: "900px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          marginTop: "30px",
+        }}
+      >
         <Carousel styles={styles}>
-          {images.map((image) => (
-            <div>
-              <img src={image}></img>
-            </div>
-          ))}
+          <img src="/img/square.jpg" />
+          <img src="/img/square.jpg" />
+          <img src="/img/square.jpg" />
+          <img src="/img/square.jpg" />
         </Carousel>
-      ) : (
-        <CircularProgress />
-      )}
-    </div>
+      </div>
+    </>
   );
 };
 

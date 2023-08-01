@@ -99,64 +99,101 @@ const MeditationON = () => {
     console.log(querySnap.docs[0].data());
   }
 
-  useEffect(() => {
-    getImages();
-  }, []);
+  // useEffect(() => {
+  //   getImages();
+  // }, []);
 
   const fileToBase64 = async (file, cb) => {
     const compressedImage = await imageCompression(file, { maxSizeMB: 0.1 });
     const reader = new FileReader();
     reader.readAsDataURL(compressedImage);
-    reader.onload = function () {
+    reader.onload = function() {
       cb(null, reader.result);
     };
-    reader.onerror = function (error) {
+    reader.onerror = function(error) {
       cb(error, null);
     };
   };
 
   return (
     <>
+      <h1>묵상 ON</h1>
+
       <div
         style={{
           position: "absolute",
-          // width: "100%",
-          // maxWidth: "1500px",
+          width: "100%",
+          maxWidth: "1500px",
           left: "50%",
           transform: "translateX(-50%)",
         }}
       >
-        <h1>묵상 ON</h1>
-        {images ? (
-          <ImageList sx={{ width: "100%" }} cols={3}>
-            {images.docs.map((item) => (
-              <ImageListItem
-                component={Link}
-                to={"/meditationON/post?docID=" + item.id}
-              >
-                <img
-                  // src={`${
-                  //   item.data().images[0]
-                  // }?w=164&h=164&fit=crop&auto=format`}
-                  src={`${
-                    item.data().images[0]
-                  }?w=300&h=300&fit=crop&auto=format`}
-                  srcSet={item.data().images[0]}
-                  // onClick={}
-                  // srcSet={`${
-                  //   item.data().images[0]
-                  // }?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                  // alt={item.title}
-                  loading="lazy"
-                />
-              </ImageListItem>
-            ))}
-          </ImageList>
-        ) : (
-          <CircularProgress />
-        )}
+        <ImageList sx={{ mx: "0.5rem" }} cols={3}>
+          <ImageListItem component={Link} to={"/online/meditationON/" + 123456}>
+            <img
+              // src={`${
+              //   item.data().images[0]
+              // }?w=164&h=164&fit=crop&auto=format`}
+              src="/img/square.jpg?w=164&h=164&fit=crop&auto=format"
+              // onClick={}
+              srcSet="/img/Main/join.webp?w=164&h=164&fit=cover&auto=format&dpr=2 2x"
+              alt="test"
+              loading="lazy"
+            />
+          </ImageListItem>
+          <ImageListItem
+          // component={Link}
+          // to={"/meditationON/post?docID=" + item.id}
+          >
+            <img
+              // src={`${
+              //   item.data().images[0]
+              // }?w=164&h=164&fit=crop&auto=format`}
+              src="/img/Main/join.webp?w=300&h=300&fit=crop&auto=format"
+              // onClick={}
+              // srcSet={`${
+              //   item.data().images[0]
+              // }?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+              alt="test"
+              // loading="lazy"
+            />
+          </ImageListItem>
+          <ImageListItem
+          // component={Link}
+          // to={"/meditationON/post?docID=" + item.id}
+          >
+            <img
+              // src={`${
+              //   item.data().images[0]
+              // }?w=164&h=164&fit=crop&auto=format`}
+              src="/img/Main/join.webp?w=164&h=164&fit=crop&auto=format&dpr=2"
+              // onClick={}
+              // srcSet={`${
+              //   item.data().images[0]
+              // }?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+              alt="test"
+              // loading="lazy"
+            />
+          </ImageListItem>
+          <ImageListItem
+          // component={Link}
+          // to={"/meditationON/post?docID=" + item.id}
+          >
+            <img
+              // src={`${
+              //   item.data().images[0]
+              // }?w=164&h=164&fit=crop&auto=format`}
+              src="/img/Main/join.webp?w=164&h=164&fit=crop&auto=format&dpr=2"
+              // onClick={}
+              // srcSet={`${
+              //   item.data().images[0]
+              // }?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+              alt="test"
+              loading="lazy"
+            />
+          </ImageListItem>
+        </ImageList>
       </div>
-
       <Fab
         variant="primary"
         style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
@@ -186,9 +223,9 @@ const MeditationON = () => {
             Submit
           </Button>
 
-          {imagesPreview.map((image) => (
+          {/* {imagesPreview.map((image) => (
             <img src={image} />
-          ))}
+          ))} */}
         </Box>
       </Modal>
     </>
