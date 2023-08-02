@@ -24,9 +24,49 @@ import {
 import { db } from "../../api/firebase";
 
 import imageCompression from "browser-image-compression";
-import { Link } from "react-router-dom";
+import {
+  Link,
+  useFetcher,
+  useLoaderData,
+  useSearchParams,
+} from "react-router-dom";
+import axios from "axios";
+import MeditationONComp from "./MeditationONComp";
+
+const PAGE_SIZE = 9;
 
 const MeditationON = () => {
+  const fetcher = useFetcher();
+  const initialPosts = useLoaderData();
+  const [posts, setPosts] = useState(initialPosts);
+  const [end, setEnd] = useState(false);
+  let [searchParams, setSearchParams] = useSearchParams();
+
+  const loadNext = (event) => {
+    event.preventDefault();
+    fetcher.load(
+      `/online/meditationON?page=${Number(searchParams.get("page")) +
+        1}&lastVisible=${posts.at(-1).id}`
+    );
+  };
+
+  useEffect(() => {
+    if (posts.length % PAGE_SIZE !== 0) {
+      setEnd(true);
+    }
+    return () => {
+      sessionStorage.setItem("posts", JSON.stringify(posts));
+    };
+  }, [posts]);
+
+  useEffect(() => {
+    if (fetcher.data && fetcher.data.length > 0) {
+      setPosts((prevPosts) => [...prevPosts, ...fetcher.data]);
+      searchParams.set("page", Number(searchParams.get("page")) + 1);
+      setSearchParams(searchParams);
+    }
+  }, [fetcher.data]);
+
   const [openModal, setOpenModal] = useState(false);
 
   const handleOpen = () => {
@@ -86,22 +126,14 @@ const MeditationON = () => {
   };
 
   async function post(images) {
-    await addDoc(collection(db, "MeditationON"), {
-      images: images,
+    const data = {};
+    for (let i = 0; i < images.length; i++) {
+      data[i] = images.shift();
+    }
+    const test = await axios.post("/api/meditationON/uploadPost", {
+      images: data,
     });
   }
-
-  const [images, setImages] = useState(null);
-
-  async function getImages() {
-    const querySnap = await getDocs(collection(db, "MeditationON"));
-    setImages(querySnap);
-    console.log(querySnap.docs[0].data());
-  }
-
-  // useEffect(() => {
-  //   getImages();
-  // }, []);
 
   const fileToBase64 = async (file, cb) => {
     const compressedImage = await imageCompression(file, { maxSizeMB: 0.1 });
@@ -128,71 +160,10 @@ const MeditationON = () => {
           transform: "translateX(-50%)",
         }}
       >
-        <ImageList sx={{ mx: "0.5rem" }} cols={3}>
-          <ImageListItem component={Link} to={"/online/meditationON/" + 123456}>
-            <img
-              // src={`${
-              //   item.data().images[0]
-              // }?w=164&h=164&fit=crop&auto=format`}
-              src="/img/square.jpg?w=164&h=164&fit=crop&auto=format"
-              // onClick={}
-              srcSet="/img/Main/join.webp?w=164&h=164&fit=cover&auto=format&dpr=2 2x"
-              alt="test"
-              loading="lazy"
-            />
-          </ImageListItem>
-          <ImageListItem
-          // component={Link}
-          // to={"/meditationON/post?docID=" + item.id}
-          >
-            <img
-              // src={`${
-              //   item.data().images[0]
-              // }?w=164&h=164&fit=crop&auto=format`}
-              src="/img/Main/join.webp?w=300&h=300&fit=crop&auto=format"
-              // onClick={}
-              // srcSet={`${
-              //   item.data().images[0]
-              // }?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-              alt="test"
-              // loading="lazy"
-            />
-          </ImageListItem>
-          <ImageListItem
-          // component={Link}
-          // to={"/meditationON/post?docID=" + item.id}
-          >
-            <img
-              // src={`${
-              //   item.data().images[0]
-              // }?w=164&h=164&fit=crop&auto=format`}
-              src="/img/Main/join.webp?w=164&h=164&fit=crop&auto=format&dpr=2"
-              // onClick={}
-              // srcSet={`${
-              //   item.data().images[0]
-              // }?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-              alt="test"
-              // loading="lazy"
-            />
-          </ImageListItem>
-          <ImageListItem
-          // component={Link}
-          // to={"/meditationON/post?docID=" + item.id}
-          >
-            <img
-              // src={`${
-              //   item.data().images[0]
-              // }?w=164&h=164&fit=crop&auto=format`}
-              src="/img/Main/join.webp?w=164&h=164&fit=crop&auto=format&dpr=2"
-              // onClick={}
-              // srcSet={`${
-              //   item.data().images[0]
-              // }?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-              alt="test"
-              loading="lazy"
-            />
-          </ImageListItem>
-        </ImageList>
+        <MeditationONComp posts={posts} />
+        <Button disabled={end} onClick={(e) => loadNext(e)}>
+          Load More
+        </Button>
       </div>
       <Fab
         variant="primary"

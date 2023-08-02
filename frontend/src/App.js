@@ -8,6 +8,9 @@ import ResponsiveAppBar from "./header/ResponsiveAppBar";
 import Main from "./pages/Main/Main";
 import About from "./pages/About/About";
 import { loader as weeklyUpdateLoader } from "./route/WeeklyUpdateLoader";
+import { loader as meditationONLoader } from "./route/MeditationONLoader";
+import { loader as MeditationONPostLoader } from "./route/MeditationONPostLoader";
+
 // import NewComers from "./pages/NewComers";
 
 // import Community from "./pages/Community";
@@ -157,10 +160,13 @@ const router = createBrowserRouter([
       {
         path: "/online/meditationON",
         element: <MeditationON />,
+        loader: meditationONLoader,
+        shouldRevalidate: () => false,
       },
       {
         path: "/online/meditationON/:postID",
         element: <MeditationONPost />,
+        loader: MeditationONPostLoader,
       },
 
       {

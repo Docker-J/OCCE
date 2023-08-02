@@ -1,10 +1,11 @@
 import axios from "axios";
 
 export async function loader({ params }) {
-  const result = await axios.get(
-    `/api/MeditationON/getPosts?page=${params.page}`
-  );
-  const posts = result.data;
+  const result = await axios.get("/api/MeditationON/getPostDetail", {
+    params: {
+      id: params.postID,
+    },
+  });
 
-  return posts;
+  return result.data;
 }
