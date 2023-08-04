@@ -13,59 +13,101 @@ import {
 
 import AddIcon from "@mui/icons-material/Add";
 
-import {
-  collection,
-  getDocs,
-  addDoc,
-  doc,
-  getDoc,
-  query,
-} from "firebase/firestore";
-import { db } from "../../api/firebase";
-
-import imageCompression from "browser-image-compression";
-import {
-  Link,
-  useFetcher,
-  useLoaderData,
-  useSearchParams,
-} from "react-router-dom";
 import axios from "axios";
-import MeditationONComp from "./MeditationONComp";
+import { MemoizedMeditationONComp } from "./MeditationONComp";
+import MeditationONModal from "./MeditationONModal";
+import InfiniteScroll from "react-infinite-scroll-component";
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 12;
 
 const MeditationON = () => {
-  const fetcher = useFetcher();
-  const initialPosts = useLoaderData();
-  const [posts, setPosts] = useState(initialPosts);
+  const [posts, setPosts] = useState([]);
   const [end, setEnd] = useState(false);
-  let [searchParams, setSearchParams] = useSearchParams();
+  const [restored, setRestored] = useState(true);
 
-  const loadNext = (event) => {
-    event.preventDefault();
-    fetcher.load(
-      `/online/meditationON?page=${Number(searchParams.get("page")) +
-        1}&lastVisible=${posts.at(-1).id}`
+  const getPosts = async () => {
+    console.log("test getPosts");
+
+    const result = await axios.get(
+      `/api/MeditationON/getPosts${
+        posts.length === 0 ? "" : `?lastVisible=${posts.at(-1).id}`
+      }`
     );
+    setPosts((prev) => [...prev, ...result.data]);
   };
 
   useEffect(() => {
     if (posts.length % PAGE_SIZE !== 0) {
       setEnd(true);
     }
+  }, [posts]);
+
+  // const handlePopstate = (event) => {
+  //   console.log("test back");
+  //   // Check if the popstate event was triggered by the back or forward button
+  //   if (event.state !== null) {
+  //     // Perform your desired action here
+  //     // For example, you can call getPosts() here
+  //     restore();
+  //   }
+  // };
+
+  // function handlePopstate(event) {
+  //   if (event.state !== null) {
+  //     console.log("test back");
+  //     restore();
+  //   } else {
+  //     getPosts();
+  //   }
+  // }
+
+  const restore = () => {
+    setRestored(true);
+    console.log("test restore");
+    setPosts(JSON.parse(sessionStorage.getItem("posts")));
+  };
+
+  // useEffect(() => {
+  //   window.addEventListener("popstate", (event) => handlePopstate(event));
+
+  //   if (performance.getEntriesByType("navigation")[0].type === "reload") {
+  //     getPosts();
+  //   }
+
+  //   return () => {
+  //     window.removeEventListener("popstate", () => handlePopstate());
+  //   };
+  // }, []);
+
+  useEffect(() => {
+    window.onpopstate = () => {
+      restore();
+    };
+    setRestored(false);
+    return () => {
+      window.onpopstate = () => {};
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!restored) {
+      getPosts();
+    }
+  }, [restored]);
+
+  useEffect(() => {
     return () => {
       sessionStorage.setItem("posts", JSON.stringify(posts));
     };
-  }, [posts]);
+  });
 
-  useEffect(() => {
-    if (fetcher.data && fetcher.data.length > 0) {
-      setPosts((prevPosts) => [...prevPosts, ...fetcher.data]);
-      searchParams.set("page", Number(searchParams.get("page")) + 1);
-      setSearchParams(searchParams);
-    }
-  }, [fetcher.data]);
+  // useEffect(() => {
+  //   if (fetcher.data && fetcher.data.length > 0) {
+  //     setPosts((prevPosts) => [...prevPosts, ...fetcher.data]);
+  //     searchParams.set("page", Number(searchParams.get("page")) + 1);
+  //     setSearchParams(searchParams);
+  //   }
+  // }, [fetcher.data]);
 
   const [openModal, setOpenModal] = useState(false);
 
@@ -73,85 +115,12 @@ const MeditationON = () => {
     setOpenModal(true);
   };
 
-  const handleClose = () => {
-    setFilesToUpload([]);
-    setImagesPreview([]);
-    setOpenModal(false);
-  };
-
-  const style = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "800px",
-    height: "800px",
-    bgcolor: "#ffffff",
-    border: "0.1px solid #f57c00",
-    boxShadow: 24,
-    p: 2,
-  };
-
-  const [filesToUpload, setFilesToUpload] = useState([]);
-  const [imagesPreview, setImagesPreview] = useState([]);
-
-  const handleChangeFile = (e) => {
-    setFilesToUpload(e.target.files);
-  };
-
-  useEffect(() => {
-    Array.from(filesToUpload).forEach((image) => {
-      setImagesPreview([...imagesPreview, URL.createObjectURL(image)]);
-    });
-  }, [filesToUpload]);
-
-  async function imgToBase64() {
-    return new Promise((resolve) => {
-      let images = [];
-      for (let i = 0; i < filesToUpload.length; i++) {
-        fileToBase64(filesToUpload[i], (err, result) => {
-          images.push(result);
-          if (i === filesToUpload.length - 1) {
-            resolve(images);
-          }
-        });
-      }
-    });
-  }
-
-  const uploadFiles = () => {
-    imgToBase64().then((result) => {
-      post(result);
-    });
-  };
-
-  async function post(images) {
-    const data = {};
-    for (let i = 0; i < images.length; i++) {
-      data[i] = images.shift();
-    }
-    const test = await axios.post("/api/meditationON/uploadPost", {
-      images: data,
-    });
-  }
-
-  const fileToBase64 = async (file, cb) => {
-    const compressedImage = await imageCompression(file, { maxSizeMB: 0.1 });
-    const reader = new FileReader();
-    reader.readAsDataURL(compressedImage);
-    reader.onload = function() {
-      cb(null, reader.result);
-    };
-    reader.onerror = function(error) {
-      cb(error, null);
-    };
-  };
-
   return (
     <>
       <h1>묵상 ON</h1>
 
       <div
+        id="scrollableDiv"
         style={{
           position: "absolute",
           width: "100%",
@@ -160,10 +129,27 @@ const MeditationON = () => {
           transform: "translateX(-50%)",
         }}
       >
-        <MeditationONComp posts={posts} />
-        <Button disabled={end} onClick={(e) => loadNext(e)}>
-          Load More
-        </Button>
+        {posts.length !== 0 ? (
+          <InfiniteScroll
+            dataLength={posts.length}
+            next={getPosts}
+            hasMore={!end}
+            loader={<CircularProgress />}
+            scrollableTarget="scrollableDiv"
+          >
+            {
+              <ImageList
+                style={{ overflow: "hidden" }}
+                sx={{ mx: "0.5rem" }}
+                cols={3}
+              >
+                <MemoizedMeditationONComp posts={posts} />
+              </ImageList>
+            }
+          </InfiniteScroll>
+        ) : (
+          <CircularProgress />
+        )}
       </div>
       <Fab
         variant="primary"
@@ -172,33 +158,8 @@ const MeditationON = () => {
       >
         <AddIcon />
       </Fab>
-      <Modal
-        open={openModal}
-        onClose={handleClose}
-        // aria-labelledby="modal-modal-title"
-        // aria-describedby="modal-modal-description"
-      >
-        <Box sx={style} bgcolor="white">
-          <Button variant="contained" component="label">
-            Upload
-            <input
-              hidden
-              accept="image/*"
-              multiple
-              type="file"
-              onChange={(e) => handleChangeFile(e)}
-            />
-          </Button>
 
-          <Button onClick={uploadFiles} variant="contained" component="label">
-            Submit
-          </Button>
-
-          {/* {imagesPreview.map((image) => (
-            <img src={image} />
-          ))} */}
-        </Box>
-      </Modal>
+      <MeditationONModal openModal={openModal} setOpenModal={setOpenModal} />
     </>
   );
 };

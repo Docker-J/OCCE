@@ -160,8 +160,8 @@ const router = createBrowserRouter([
       {
         path: "/online/meditationON",
         element: <MeditationON />,
-        loader: meditationONLoader,
-        shouldRevalidate: () => false,
+        // loader: meditationONLoader,
+        // shouldRevalidate: () => false,
       },
       {
         path: "/online/meditationON/:postID",
