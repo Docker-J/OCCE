@@ -3,14 +3,13 @@ const router = express.Router();
 const { db, fcm } = require("./api/firebase.js");
 const { Timestamp } = require("firebase-admin/firestore");
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 12;
 
 router.get("/getPosts", async (req, res) => {
-  const page = parseInt(req.query.page);
-  var snapshot;
+  const lastVisibleID = req.query.lastVisible;
   try {
-    if (page === 1) {
-      snapshot = await db
+    if (lastVisibleID == null) {
+      var snapshot = await db
         .collection("MeditationON")
         .orderBy("timestamp", "desc")
         .limit(PAGE_SIZE)
@@ -19,10 +18,10 @@ router.get("/getPosts", async (req, res) => {
     } else {
       const lastVisible = await db
         .collection("MeditationON")
-        .doc(req.query.lastVisible)
+        .doc(lastVisibleID)
         .get();
 
-      snapshot = await db
+      var snapshot = await db
         .collection("MeditationON")
         .orderBy("timestamp", "desc")
         .startAfter(lastVisible)
