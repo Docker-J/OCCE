@@ -32,6 +32,7 @@ const Announcement = lazy(() =>
   import("./components/Announcement/Announcement")
 );
 const WeeklyUpdate = lazy(() => import("./pages/WeeklyUpdate/WeeklyUpdate"));
+const Photos = lazy(() => import("./pages/Photos/Photos"));
 const NewComers = lazy(() => import("./pages/NewComers/NewComers"));
 
 // Online
@@ -128,6 +129,10 @@ const router = createBrowserRouter([
         shouldRevalidate: () => false,
       },
       {
+        path: "/photos",
+        element: <Photos />,
+      },
+      {
         path: "/newcomers",
         element: <NewComers />,
       },
@@ -160,8 +165,6 @@ const router = createBrowserRouter([
       {
         path: "/online/meditationON",
         element: <MeditationON />,
-        // loader: meditationONLoader,
-        // shouldRevalidate: () => false,
       },
       {
         path: "/online/meditationON/:postID",

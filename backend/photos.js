@@ -6,16 +6,18 @@ const { db, fcm } = require("./api/firebase.js");
 
 const { fetchImageUrls } = require("google-photos-album-image-url-fetch");
 const htmlparser = require("htmlparser2");
+const { Timestamp } = require("firebase-admin/firestore");
 
-router.get("/uploadAlbum", async (req, res) => {
+router.post("/uploadAlbum", async (req, res) => {
   try {
-    const response = await axios.get(req.query.url);
+    const response = await axios.get(req.body.url);
     const html = response.data;
 
     const sendData = {
       title: "",
       cover: "",
       photos: [],
+      timestamp: Timestamp.now(),
     };
 
     var isTitleTag = false;
@@ -50,10 +52,12 @@ router.get("/uploadAlbum", async (req, res) => {
     parser.write(html);
     parser.end();
 
-    const photos = await fetchImageUrls(req.query.url);
+    const photos = await fetchImageUrls(req.body.url);
     sendData.photos = photos;
 
-    res.send(sendData);
+    await db.collection("photos").add(sendData);
+
+    res.sendStatus(200);
   } catch (err) {
     console.log(err);
     res.send(404);
@@ -62,9 +66,19 @@ router.get("/uploadAlbum", async (req, res) => {
 
 router.get("/getPhotos", async (req, res) => {
   try {
-    const data = await fetchImageUrls(req.query.url);
-    console.log(JSON.stringify(data, null, 2));
-    res.send(200);
+    var snapshot = await db
+      .collection("photos")
+      //   .orderBy("timestamp", "desc")
+      // .limit(PAGE_SIZE)
+      .select("title", "cover")
+      .get();
+
+    const dataArray = [];
+    snapshot.forEach((doc) => {
+      dataArray.push({ id: doc.id, ...doc.data() });
+    });
+    console.log(dataArray);
+    res.send(dataArray);
   } catch (err) {}
 });
 

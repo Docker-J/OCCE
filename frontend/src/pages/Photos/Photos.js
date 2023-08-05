@@ -6,71 +6,38 @@ import AddIcon from "@mui/icons-material/Add";
 
 import axios from "axios";
 import { MemoizedMeditationONComp } from "./MeditationONComp";
-import MeditationONModal from "./MeditationONModal";
+import MeditationONModal from "./PhotoUploadModal";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { useLoaderData } from "react-router-dom";
 
 const PAGE_SIZE = 12;
 
 const Photos = () => {
-  const initalPosts = useLoaderData();
-  const [posts, setPosts] = useState(initalPosts);
+  const [photos, setPhotos] = useState([]);
   const [end, setEnd] = useState(false);
   const [restored, setRestored] = useState(true);
 
-  const getPosts = async () => {
+  const getPhotos = async () => {
     console.log("test getPosts");
 
     const result = await axios.get(
-      `/api/MeditationON/getPosts${
-        posts.length === 0 ? "" : `?lastVisible=${posts.at(-1).id}`
+      `/api/photos/getPhotos${
+        photos.length === 0 ? "" : `?lastVisible=${photos.at(-1).id}`
       }`
     );
-    setPosts((prev) => [...prev, ...result.data]);
+    setPhotos((prev) => [...prev, ...result.data]);
   };
 
   useEffect(() => {
-    if (posts.length % PAGE_SIZE !== 0) {
+    if (photos.length % PAGE_SIZE !== 0) {
       setEnd(true);
     }
-  }, [posts]);
-
-  // const handlePopstate = (event) => {
-  //   console.log("test back");
-  //   // Check if the popstate event was triggered by the back or forward button
-  //   if (event.state !== null) {
-  //     // Perform your desired action here
-  //     // For example, you can call getPosts() here
-  //     restore();
-  //   }
-  // };
-
-  // function handlePopstate(event) {
-  //   if (event.state !== null) {
-  //     console.log("test back");
-  //     restore();
-  //   } else {
-  //     getPosts();
-  //   }
-  // }
+  }, [photos]);
 
   const restore = () => {
     setRestored(true);
     console.log("test restore");
-    setPosts(JSON.parse(sessionStorage.getItem("posts")));
+    setPhotos(JSON.parse(sessionStorage.getItem("photos")));
   };
-
-  // useEffect(() => {
-  //   window.addEventListener("popstate", (event) => handlePopstate(event));
-
-  //   if (performance.getEntriesByType("navigation")[0].type === "reload") {
-  //     getPosts();
-  //   }
-
-  //   return () => {
-  //     window.removeEventListener("popstate", () => handlePopstate());
-  //   };
-  // }, []);
 
   useEffect(() => {
     window.onpopstate = () => {
@@ -84,23 +51,15 @@ const Photos = () => {
 
   useEffect(() => {
     if (!restored) {
-      getPosts();
+      getPhotos();
     }
   }, [restored]);
 
   useEffect(() => {
     return () => {
-      sessionStorage.setItem("posts", JSON.stringify(posts));
+      sessionStorage.setItem("photos", JSON.stringify(photos));
     };
   });
-
-  // useEffect(() => {
-  //   if (fetcher.data && fetcher.data.length > 0) {
-  //     setPosts((prevPosts) => [...prevPosts, ...fetcher.data]);
-  //     searchParams.set("page", Number(searchParams.get("page")) + 1);
-  //     setSearchParams(searchParams);
-  //   }
-  // }, [fetcher.data]);
 
   const [openModal, setOpenModal] = useState(false);
 
@@ -121,10 +80,10 @@ const Photos = () => {
           transform: "translateX(-50%)",
         }}
       >
-        {posts.length !== 0 ? (
+        {photos.length !== 0 ? (
           <InfiniteScroll
-            dataLength={posts.length}
-            next={getPosts}
+            dataLength={photos.length}
+            next={getPhotos}
             hasMore={!end}
             loader={<CircularProgress />}
             scrollThreshold={0.75}
@@ -133,7 +92,7 @@ const Photos = () => {
           >
             {
               <ImageList sx={{ mx: "0.5rem" }} cols={3} gap={2.5}>
-                <MemoizedMeditationONComp posts={posts} />
+                <MemoizedMeditationONComp photos={photos} />
               </ImageList>
             }
           </InfiniteScroll>
