@@ -111,7 +111,6 @@ const MeditationON = () => {
       <h1>묵상 ON</h1>
 
       <div
-        id="scrollableDiv"
         style={{
           position: "absolute",
           width: "100%",
@@ -126,14 +125,12 @@ const MeditationON = () => {
             next={getPosts}
             hasMore={!end}
             loader={<CircularProgress />}
-            scrollableTarget="scrollableDiv"
+            scrollThreshold={0.75}
+            // scrollableTarget="scrollableDiv"
+            style={{ overflowY: "hidden" }}
           >
             {
-              <ImageList
-                style={{ overflow: "hidden" }}
-                sx={{ mx: "0.5rem" }}
-                cols={3}
-              >
+              <ImageList sx={{ mx: "0.5rem" }} cols={3} gap={2.5}>
                 <MemoizedMeditationONComp posts={posts} />
               </ImageList>
             }
