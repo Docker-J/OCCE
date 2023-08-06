@@ -32,7 +32,7 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
 
   useEffect(() => {
     Array.from(filesToUpload).forEach((image) => {
-      setImagesPreview([...imagesPreview, URL.createObjectURL(image)]);
+      setImagesPreview((prev) => [prev.push, URL.createObjectURL(image)]);
     });
   }, [filesToUpload]);
 
@@ -86,6 +86,12 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
       // aria-describedby="modal-modal-description"
     >
       <Box sx={style} bgcolor="white">
+        <div style={{ display: "flex" }}>
+          {imagesPreview.map((image) => (
+            <img src={image} />
+          ))}
+        </div>
+
         <Button variant="contained" component="label">
           Upload
           <input
@@ -100,10 +106,6 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
         <Button onClick={uploadFiles} variant="contained" component="label">
           Submit
         </Button>
-
-        {/* {imagesPreview.map((image) => (
-            <img src={image} />
-          ))} */}
       </Box>
     </Modal>
   );

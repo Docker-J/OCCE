@@ -10,6 +10,7 @@ import About from "./pages/About/About";
 import { loader as weeklyUpdateLoader } from "./route/WeeklyUpdateLoader";
 import { loader as meditationONLoader } from "./route/MeditationONLoader";
 import { loader as MeditationONPostLoader } from "./route/MeditationONPostLoader";
+import { loader as AlbumPhotosLoader } from "./route/AlbumPhotosLoader";
 
 // import NewComers from "./pages/NewComers";
 
@@ -32,8 +33,9 @@ const Announcement = lazy(() =>
   import("./components/Announcement/Announcement")
 );
 const WeeklyUpdate = lazy(() => import("./pages/WeeklyUpdate/WeeklyUpdate"));
-const Photos = lazy(() => import("./pages/Photos/Photos"));
 const NewComers = lazy(() => import("./pages/NewComers/NewComers"));
+const Photos = lazy(() => import("./pages/Photos/Photos"));
+const AlbumPhotos = lazy(() => import("./pages/Photos/AlbumPhotos"));
 
 // Online
 const MeditationON = lazy(() => import("./pages/Online/MeditationON"));
@@ -131,6 +133,11 @@ const router = createBrowserRouter([
       {
         path: "/photos",
         element: <Photos />,
+      },
+      {
+        path: "/photos/:albumID",
+        element: <AlbumPhotos />,
+        loader: AlbumPhotosLoader,
       },
       {
         path: "/newcomers",
