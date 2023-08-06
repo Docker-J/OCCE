@@ -8,6 +8,8 @@ const { fetchImageUrls } = require("google-photos-album-image-url-fetch");
 const htmlparser = require("htmlparser2");
 const { Timestamp } = require("firebase-admin/firestore");
 
+const PAGE_SIZE = 12;
+
 router.post("/uploadAlbum", async (req, res) => {
   try {
     const response = await axios.get(req.body.url);
@@ -68,8 +70,8 @@ router.get("/getPhotos", async (req, res) => {
   try {
     var snapshot = await db
       .collection("photos")
-      //   .orderBy("timestamp", "desc")
-      // .limit(PAGE_SIZE)
+      // .orderBy("timestamp", "desc")
+      .limit(PAGE_SIZE)
       .select("title", "cover")
       .get();
 
@@ -77,9 +79,19 @@ router.get("/getPhotos", async (req, res) => {
     snapshot.forEach((doc) => {
       dataArray.push({ id: doc.id, ...doc.data() });
     });
-    console.log(dataArray);
     res.send(dataArray);
   } catch (err) {}
+});
+
+router.get("/getAlbumDetail", async (req, res) => {
+  try {
+    const snapshot = await db.collection("photos").doc(req.query.id).get();
+
+    const data = snapshot.data();
+    // delete data.timestamp;
+
+    res.send(data);
+  } catch {}
 });
 
 module.exports = router;
