@@ -38,24 +38,24 @@ const ResponsiveAppBar = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.authToken);
 
-  const requestWebPushPermission = async () => {
-    console.log("권한 요청 중...");
-    try {
-      const permission = await Notification.requestPermission();
-      if (permission === "granted") {
-        getToken(messaging, {
-          vapidKey:
-            "BOLDzFLzljc4HkyVktgjo4-_QoXFxx__XZS6xBmGouvsisXHHe--2dSUUJtQ2cerl3v7ONBhrAPM661xRbpQcqo",
-        }).then((token) => {
-          console.log(token);
-        });
-      }
-    } catch {}
-  };
+  // const requestWebPushPermission = async () => {
+  //   console.log("권한 요청 중...");
+  //   try {
+  //     const permission = await Notification.requestPermission();
+  //     if (permission === "granted") {
+  //       getToken(messaging, {
+  //         vapidKey:
+  //           "BOLDzFLzljc4HkyVktgjo4-_QoXFxx__XZS6xBmGouvsisXHHe--2dSUUJtQ2cerl3v7ONBhrAPM661xRbpQcqo",
+  //       }).then((token) => {
+  //         console.log(token);
+  //       });
+  //     }
+  //   } catch {}
+  // };
 
-  useEffect(() => {
-    requestWebPushPermission();
-  }, []);
+  // useEffect(() => {
+  //   requestWebPushPermission();
+  // }, []);
 
   // console.log(token);
 
