@@ -113,7 +113,7 @@ const Main = () => {
         <QuestionAnswerOutlinedIcon />
       </Fab> */}
 
-      <CustomChatBot />
+      {/* <CustomChatBot /> */}
     </>
   );
 };
