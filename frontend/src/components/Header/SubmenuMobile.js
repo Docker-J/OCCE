@@ -9,6 +9,7 @@ import {
   bindMenu,
   bindToggle,
   bindHover,
+  anchorRef,
 } from "material-ui-popup-state/hooks";
 import HoverMenu from "material-ui-popup-state/HoverMenu";
 
@@ -27,13 +28,14 @@ const SubmenuMobile = (props) => {
   return (
     <>
       <MenuItem
+        ref={anchorRef(popupState)}
         key={props.page.title}
         onClick={props.page.to && handleClose}
         component={props.page.to && Link}
         to={props.page.to}
         sx={{ py: 1.5 }}
         {...(props.page.subpages && bindHover(popupState))}
-        {...(props.page.subpages && bindToggle(popupState))}
+        // {...(props.page.subpages && bindToggle(popupState))}
       >
         <Typography sx={{ fontSize: "13pt" }}>{props.page.title}</Typography>
         <ListItemIcon>

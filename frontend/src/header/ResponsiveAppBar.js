@@ -31,8 +31,8 @@ import {
   bindTrigger,
   usePopupState,
 } from "material-ui-popup-state/hooks";
-import { messaging } from "../api/firebase";
-import { getToken } from "firebase/messaging";
+// import { messaging } from "../api/firebase";
+// import { getToken } from "firebase/messaging";
 
 const ResponsiveAppBar = () => {
   const dispatch = useDispatch();
