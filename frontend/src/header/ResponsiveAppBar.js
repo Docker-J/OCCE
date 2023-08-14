@@ -234,7 +234,6 @@ const ResponsiveAppBar = () => {
             }}
           >
             <IconButton
-              ref={anchorRef(popupState)}
               size="large"
               aria-label="menus"
               aria-controls="menu-appbar"

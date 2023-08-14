@@ -1,14 +1,13 @@
 import { Link } from "react-router-dom";
 
-import { MenuItem, ListItemIcon, Typography } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { ListItemIcon, MenuItem, Typography } from "@mui/material";
 
 import {
-  usePopupState,
-  bindMenu,
   bindHover,
-  anchorRef,
+  bindMenu,
+  usePopupState,
 } from "material-ui-popup-state/hooks";
 import HoverMenu from "material-ui-popup-state/HoverMenu";
 
@@ -26,9 +25,8 @@ const SubmenuMobile = (props) => {
   return (
     <>
       <MenuItem
-        ref={anchorRef(popupState)}
         key={props.page.title}
-        onClick={props.page.to && handleClose}
+        onClick={props.page.to && props.menuPopupState.close}
         component={props.page.to && Link}
         to={props.page.to}
         sx={{ py: 1.5 }}
@@ -50,14 +48,11 @@ const SubmenuMobile = (props) => {
           {...bindMenu(popupState)}
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
           transformOrigin={{ vertical: "top", horizontal: "left" }}
-          // onClose={handleClose}
-          // onBlur={handleClose}
         >
           {props.page.subpages.map((subpage) => (
             <MenuItem
               key={subpage.title}
               onClick={handleClose}
-              onBlur={handleClose}
               component={Link}
               to={subpage.to}
             >
