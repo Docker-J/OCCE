@@ -9,7 +9,7 @@ const SubmenuMobile = (props) => {
   ) : (
     <CascadingSubmenu {...props}>
       {props.page.subpages.map((page) => (
-        <CascadingMenuItem page={page}>
+        <CascadingMenuItem key={page.title} page={page}>
           <Typography sx={{ fontSize: "13pt" }}>{page.title}</Typography>
         </CascadingMenuItem>
       ))}

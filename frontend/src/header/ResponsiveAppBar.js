@@ -262,11 +262,7 @@ const ResponsiveAppBar = () => {
               keepMounted
             >
               {pages.map((page) => (
-                <SubmenuMobile
-                  key={page.title}
-                  page={page}
-                  menuPopupState={popupState}
-                />
+                <SubmenuMobile key={page.title} page={page} />
               ))}
             </CascadingMenu>
           </Box>
