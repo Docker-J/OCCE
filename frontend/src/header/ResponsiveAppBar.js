@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import "./ResponsiveAppBar.css";
@@ -89,7 +89,7 @@ const ResponsiveAppBar = () => {
     },
     {
       title: "교회소식",
-      state: "newsPopupState",
+      popupId: "newsPopupState",
       subpages: [
         // {
         //   title: "공지사항",
@@ -115,7 +115,7 @@ const ResponsiveAppBar = () => {
     },
     {
       title: "ON-Line",
-      state: "onlinePopupState",
+      popupId: "onlinePopupState",
       subpages: [
         {
           title: "주일예배",
@@ -141,7 +141,7 @@ const ResponsiveAppBar = () => {
     },
     {
       title: "공동체",
-      state: "communityPopupState",
+      popupId: "communityPopupState",
       subpages: [
         {
           title: "소그룹",
@@ -155,7 +155,7 @@ const ResponsiveAppBar = () => {
     },
     {
       title: "다음세대",
-      state: "nextGenPopupState",
+      popupId: "nextGenPopupState",
       subpages: [
         {
           title: "유아유치부",
