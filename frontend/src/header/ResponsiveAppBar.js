@@ -31,6 +31,7 @@ import {
   bindTrigger,
   usePopupState,
 } from "material-ui-popup-state/hooks";
+import { CascadingMenu } from "../components/Header/CascadingMenu";
 // import { messaging } from "../api/firebase";
 // import { getToken } from "firebase/messaging";
 
@@ -243,9 +244,9 @@ const ResponsiveAppBar = () => {
             >
               <MenuIcon />
             </IconButton>
-            <Menu
+            <CascadingMenu
               id="menu-appbar"
-              {...bindMenu(popupState)}
+              popupState={popupState}
               anchorOrigin={{
                 vertical: "bottom",
                 horizontal: "left",
@@ -267,7 +268,7 @@ const ResponsiveAppBar = () => {
                   menuPopupState={popupState}
                 />
               ))}
-            </Menu>
+            </CascadingMenu>
           </Box>
 
           <Box

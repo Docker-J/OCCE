@@ -15,7 +15,7 @@ import {
 
 const Submenu = ({ page }) => {
   const popupState = usePopupState({
-    popupId: page.state,
+    popupId: page.popupId,
     variant: "popover",
   });
 

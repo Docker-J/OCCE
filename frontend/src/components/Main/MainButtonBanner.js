@@ -135,7 +135,7 @@ export default function ButtonBases() {
         alignItems: "center",
         justifyContent: "space-evenly",
         width: "100%",
-        minWidth: "200",
+        minWidth: "550",
         mt: "1vmin",
         mb: "1vmin",
       }}
