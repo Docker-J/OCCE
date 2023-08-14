@@ -51,6 +51,10 @@ const images = [
 const ImageButton = styled(ButtonBase)(({ theme }) => ({
   position: "relative",
   height: 200,
+  [theme.breakpoints.down("md")]: {
+    width: "48% !important", // Overrides inline-style
+    height: 180,
+  },
   [theme.breakpoints.down("sm")]: {
     width: "100% !important", // Overrides inline-style
     height: 120,
@@ -143,12 +147,8 @@ export default function ButtonBases() {
       {images.map((image) => (
         <ImageButton
           component={image.to && Link}
-          sx={{ margin: 1 }}
+          sx={{ m: 0.5, width: image.width }}
           key={image.title}
-          style={{
-            width: image.width,
-            minWidth: 250,
-          }}
           href={image.link}
           target={image.target}
           to={image.to}

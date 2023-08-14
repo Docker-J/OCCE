@@ -63,7 +63,7 @@ export const CascadingMenuItem = ({ onClick, ...props }) => {
   return (
     <MenuItem
       {...props}
-      sx={{ py: 1.5 }}
+      sx={{ py: 1.8 }}
       component={props.page.to && Link}
       to={props.page.to}
       onClick={handleClick}
@@ -81,7 +81,7 @@ export const CascadingSubmenu = ({ title, popupId, ...props }) => {
   });
   return (
     <>
-      <MenuItem sx={{ py: 1.5 }} {...bindHover(popupState)}>
+      <MenuItem sx={{ py: 1.8 }} {...bindHover(popupState)}>
         <Typography sx={{ fontSize: "13pt" }}>{props.page.title}</Typography>
         <ListItemIcon>
           {props.page.subpages &&
