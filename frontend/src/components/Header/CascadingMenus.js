@@ -50,14 +50,15 @@ export const CascadingHoverMenu = ({ popupState, ...props }) => {
 };
 
 export const CascadingMenuItem = ({ onClick, ...props }) => {
-  const { rootPopupState } = useContext(CascadingContext);
+  const { rootPopupState, parentPopupState } = useContext(CascadingContext);
   if (!rootPopupState) throw new Error("must be used inside a CascadingMenu");
   const handleClick = useCallback(
     (event) => {
+      parentPopupState.close(event);
       rootPopupState.close(event);
       if (onClick) onClick(event);
     },
-    [rootPopupState, onClick]
+    [rootPopupState, parentPopupState, onClick]
   );
 
   return (

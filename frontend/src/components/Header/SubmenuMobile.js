@@ -1,16 +1,15 @@
-import { Typography } from "@mui/material";
 import { CascadingMenuItem, CascadingSubmenu } from "./CascadingMenus";
 
 const SubmenuMobile = (props) => {
   return props.page.to ? (
     <CascadingMenuItem {...props}>
-      <Typography sx={{ fontSize: "13pt" }}>{props.page.title}</Typography>
+      <span style={{ fontSize: "13pt" }}>{props.page.title}</span>
     </CascadingMenuItem>
   ) : (
     <CascadingSubmenu {...props}>
       {props.page.subpages.map((page) => (
         <CascadingMenuItem key={page.title} page={page}>
-          <Typography sx={{ fontSize: "13pt" }}>{page.title}</Typography>
+          <span style={{ fontSize: "13pt" }}>{page.title}</span>
         </CascadingMenuItem>
       ))}
     </CascadingSubmenu>
