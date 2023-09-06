@@ -33,42 +33,11 @@ const MeditationON = () => {
     }
   }, [posts]);
 
-  // const handlePopstate = (event) => {
-  //   console.log("test back");
-  //   // Check if the popstate event was triggered by the back or forward button
-  //   if (event.state !== null) {
-  //     // Perform your desired action here
-  //     // For example, you can call getPosts() here
-  //     restore();
-  //   }
-  // };
-
-  // function handlePopstate(event) {
-  //   if (event.state !== null) {
-  //     console.log("test back");
-  //     restore();
-  //   } else {
-  //     getPosts();
-  //   }
-  // }
-
   const restore = () => {
     setRestored(true);
     console.log("test restore");
     setPosts(JSON.parse(sessionStorage.getItem("posts")));
   };
-
-  // useEffect(() => {
-  //   window.addEventListener("popstate", (event) => handlePopstate(event));
-
-  //   if (performance.getEntriesByType("navigation")[0].type === "reload") {
-  //     getPosts();
-  //   }
-
-  //   return () => {
-  //     window.removeEventListener("popstate", () => handlePopstate());
-  //   };
-  // }, []);
 
   useEffect(() => {
     window.onpopstate = () => {
@@ -91,14 +60,6 @@ const MeditationON = () => {
       sessionStorage.setItem("posts", JSON.stringify(posts));
     };
   });
-
-  // useEffect(() => {
-  //   if (fetcher.data && fetcher.data.length > 0) {
-  //     setPosts((prevPosts) => [...prevPosts, ...fetcher.data]);
-  //     searchParams.set("page", Number(searchParams.get("page")) + 1);
-  //     setSearchParams(searchParams);
-  //   }
-  // }, [fetcher.data]);
 
   const [openModal, setOpenModal] = useState(false);
 
