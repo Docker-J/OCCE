@@ -198,14 +198,20 @@ const ResponsiveAppBar = () => {
   return (
     <AppBar
       position={
-        currentPage === "/" || currentPage === "/aboutus"
+        currentPage === "/" ||
+        currentPage === "/aboutus" ||
+        currentPage === "/nextgen/preschool"
           ? "absolute"
           : "static"
       }
       style={{ background: "transparent", boxShadow: "none" }}
       sx={{
         color:
-          currentPage === "/" || currentPage === "/aboutus" ? "white" : "black",
+          currentPage === "/" ||
+          currentPage === "/aboutus" ||
+          currentPage === "/nextgen/preschool"
+            ? "white"
+            : "black",
       }}
     >
       <Container maxWidth="xl">
@@ -219,7 +225,9 @@ const ResponsiveAppBar = () => {
               <img
                 alt="Header Logo"
                 src={
-                  currentPage === "/" || currentPage === "/aboutus"
+                  currentPage === "/" ||
+                  currentPage === "/aboutus" ||
+                  currentPage === "/nextgen/preschool"
                     ? "/img/HeaderLogoColor.png"
                     : "/img/HeaderLogoBW.png"
                 }

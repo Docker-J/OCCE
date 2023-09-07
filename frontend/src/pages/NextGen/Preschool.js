@@ -4,7 +4,10 @@ import "./NextGen.css";
 const Preschool = () => {
   return (
     <>
-      <h1>유아유치부</h1>
+      <div className="title">
+        <h1>유아유치부</h1>
+      </div>
+
       <div className="container">
         <Typography variant="h5" fontWeight={800}>
           모임

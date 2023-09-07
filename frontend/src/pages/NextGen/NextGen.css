@@ -1,3 +1,12 @@
+.title {
+  position: relative;
+  background-image: url("KidsOnGoodSoil.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 35vmax;
+  max-height: 650px;
+}
+
 .container {
   position: absolute;
   left: 50%;
