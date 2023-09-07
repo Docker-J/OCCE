@@ -200,7 +200,7 @@ const ResponsiveAppBar = () => {
       position={
         currentPage === "/" ||
         currentPage === "/aboutus" ||
-        currentPage === "/nextgen/preschool"
+        currentPage.includes("/nextgen/")
           ? "absolute"
           : "static"
       }
@@ -209,7 +209,7 @@ const ResponsiveAppBar = () => {
         color:
           currentPage === "/" ||
           currentPage === "/aboutus" ||
-          currentPage === "/nextgen/preschool"
+          currentPage.includes("/nextgen/")
             ? "white"
             : "black",
       }}
@@ -227,7 +227,7 @@ const ResponsiveAppBar = () => {
                 src={
                   currentPage === "/" ||
                   currentPage === "/aboutus" ||
-                  currentPage === "/nextgen/preschool"
+                  currentPage.includes("/nextgen/")
                     ? "/img/HeaderLogoColor.png"
                     : "/img/HeaderLogoBW.png"
                 }
@@ -288,7 +288,7 @@ const ResponsiveAppBar = () => {
                 src={
                   currentPage === "/" ||
                   currentPage === "/aboutus" ||
-                  currentPage === "/nextgen/preschool"
+                  currentPage.includes("/nextgen/")
                     ? "/img/HeaderLogoColor.png"
                     : "/img/HeaderLogoBW.png"
                 }

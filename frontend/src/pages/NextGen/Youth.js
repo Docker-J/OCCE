@@ -3,7 +3,26 @@ import { Typography } from "@mui/material";
 const Youth = () => {
   return (
     <>
-      <h1>중고등부</h1>
+      <div className="title">
+        <div className="titleContent">
+          <Typography
+            variant="h4"
+            fontWeight={830}
+            textAlign="center"
+            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
+          >
+            중고등부
+          </Typography>
+          <Typography
+            textAlign="center"
+            variant="h5"
+            fontWeight={700}
+            sx={{ color: "white" }}
+          >
+            YOUTH ON the Rock
+          </Typography>
+        </div>
+      </div>
 
       <Typography
         sx={{ fontSize: "1.1em", color: "black" }}

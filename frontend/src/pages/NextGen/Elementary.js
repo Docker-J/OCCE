@@ -4,7 +4,26 @@ import "./NextGen.css";
 const Elementary = () => {
   return (
     <>
-      <h1>유초등부</h1>
+      <div className="title">
+        <div className="titleContent">
+          <Typography
+            variant="h4"
+            fontWeight={830}
+            textAlign="center"
+            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
+          >
+            유초등부
+          </Typography>
+          <Typography
+            textAlign="center"
+            variant="h5"
+            fontWeight={700}
+            sx={{ color: "white" }}
+          >
+            KIDS ON the Tree
+          </Typography>
+        </div>
+      </div>
 
       <div className="container">
         <Typography variant="h5" fontWeight={800}>
