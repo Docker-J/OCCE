@@ -5,7 +5,24 @@ const Preschool = () => {
   return (
     <>
       <div className="title">
-        <h1>유아유치부</h1>
+        <div className="titleContent">
+          <Typography
+            variant="h4"
+            fontWeight={830}
+            textAlign="center"
+            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
+          >
+            유아유치부
+          </Typography>
+          <Typography
+            textAlign="center"
+            variant="h5"
+            fontWeight={700}
+            sx={{ color: "white" }}
+          >
+            KIDS ON Good Soil
+          </Typography>
+        </div>
       </div>
 
       <div className="container">

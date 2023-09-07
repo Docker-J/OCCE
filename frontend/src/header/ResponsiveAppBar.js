@@ -286,7 +286,9 @@ const ResponsiveAppBar = () => {
                 alt="Header Logo"
                 className="mobileLogo"
                 src={
-                  currentPage === "/" || currentPage === "/aboutus"
+                  currentPage === "/" ||
+                  currentPage === "/aboutus" ||
+                  currentPage === "/nextgen/preschool"
                     ? "/img/HeaderLogoColor.png"
                     : "/img/HeaderLogoBW.png"
                 }

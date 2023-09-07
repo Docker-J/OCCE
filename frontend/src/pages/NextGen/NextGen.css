@@ -1,10 +1,22 @@
 .title {
   position: relative;
-  background-image: url("KidsOnGoodSoil.jpg");
+  background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)),
+    url("KidsOnGoodSoil.jpg");
   background-repeat: no-repeat;
   background-size: cover;
-  height: 35vmax;
+  background-position: 35%;
+  height: 30vmax;
+  padding-top: min(6vmax, 85px);
   max-height: 650px;
+}
+
+.titleContent {
+  width: 100%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  justify-content: center;
 }
 
 .container {
@@ -15,6 +27,7 @@
   width: 100%;
   max-width: 1500px;
   box-sizing: border-box;
+  margin-top: 18pt;
   padding-left: 1.5rem;
   padding-right: 1.5rem;
 }
