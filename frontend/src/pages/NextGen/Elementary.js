@@ -22,6 +22,15 @@ const Elementary = () => {
           >
             KIDS ON the Tree
           </Typography>
+
+          <br />
+          <Typography variant="body1" sx={{ color: "white" }}>
+            앞으로 달려가서 보기 위하여 돌무화과나무에 올라가니 이는 예수께서
+            그리로 지나가시게 됨이러라 <br />
+            So he ran ahead and climbed a sycamore-fig tree to see him, since
+            Jesus was coming that way.
+            <br />- 누가복음 Luke 19:4 -
+          </Typography>
         </div>
       </div>
 
@@ -37,16 +46,10 @@ const Elementary = () => {
           장소: Sunday School Room
           <br />※ 문의: 이수연 전도사
         </Typography>
-        <br />
+        {/* <br />
         <Typography variant="h5" fontWeight={800}>
           KIDS ON the Tree
-        </Typography>
-        <Typography sx={{ fontSize: "1.1em" }}>
-          앞으로 달려가서 보기 위하여 돌무화과나무에 올라가니 이는 예수께서
-          그리로 지나가시게 됨이러라 <br />
-          So he ran ahead and climbed a sycamore-fig tree to see him, since
-          Jesus was coming that way. - 누가복음 Luke 19:4 -
-        </Typography>
+        </Typography> */}
       </div>
     </>
   );

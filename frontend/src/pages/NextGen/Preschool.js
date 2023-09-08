@@ -9,18 +9,21 @@ const Preschool = () => {
           <Typography
             variant="h4"
             fontWeight={830}
-            textAlign="center"
             sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
           >
             유아유치부
           </Typography>
-          <Typography
-            textAlign="center"
-            variant="h5"
-            fontWeight={700}
-            sx={{ color: "white" }}
-          >
+          <Typography variant="h5" fontWeight={700} sx={{ color: "white" }}>
             KIDS ON Good Soil
+          </Typography>
+
+          <br />
+          <Typography variant="body1" sx={{ color: "white" }}>
+            더러는 좋은 땅에 떨어지매 자라 무성하여 결실하였으니 삼십 배나 육십
+            배나 백 배가 되었느니라 하시고 <br />
+            Still other seed fell on good soil. It came up, grew and produced a
+            crop, some multiplying thirty, some sixty, some a hundred times.
+            <br />- 마가복음 Mark 4:8 -
           </Typography>
         </div>
       </div>
@@ -35,7 +38,7 @@ const Preschool = () => {
           시간: 주일 오후 4시 <br />
           장소: Preschool Room <br />※ 문의: 김유정 전도사 <br />
         </Typography>
-
+        {/* 
         <br />
         <Typography>
           <Typography variant="h5" fontWeight={800}>
@@ -46,7 +49,7 @@ const Preschool = () => {
           Still other seed fell on good soil. It came up, grew and produced a
           crop, some multiplying thirty, some sixty, some a hundred times. -
           마가복음 Mark 4:8 -
-        </Typography>
+        </Typography> */}
       </div>
     </>
   );

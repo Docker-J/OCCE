@@ -21,6 +21,16 @@ const Youth = () => {
           >
             YOUTH ON the Rock
           </Typography>
+
+          <br />
+          <Typography variant="body1" sx={{ color: "white" }}>
+            그러므로 누구든지 나의 이 말을 듣고 행하는 자는 그 집을 반석 위에
+            지은 지혜로운 사람 같으리니
+            <br />
+            Therefore everyone who hears these words of mine and puts them into
+            practice is like a wise man who built his house on the rock.
+            <br />- 마태복음 Matthew 7:24 -
+          </Typography>
         </div>
       </div>
 
@@ -33,14 +43,14 @@ const Youth = () => {
         장소: Fireside Room
         <br />※ 문의: 김휘경 전도사
         <br />
-        YOUTH ON the Rock
+        {/* YOUTH ON the Rock
         <br />
         그러므로 누구든지 나의 이 말을 듣고 행하는 자는 그 집을 반석 위에 지은
         지혜로운 사람 같으리니
         <br />
         Therefore everyone who hears these words of mine and puts them into
         practice is like a wise man who built his house on the rock.
-        <br />- 마태복음 Matthew 7:24 -<br />
+        <br />- 마태복음 Matthew 7:24 -<br /> */}
         에드먼턴 온교회 Youth는, 마태복음 7장 24절을 주제 말씀으로 하여,
         말씀이신 그리스도의 "반석 위에" 집을 짓고, "하나님 앞에서 지혜로운
         사람"으로 함께 세워져 가기를 소망하는, 7학년부터 12학년까지의 중고등부
