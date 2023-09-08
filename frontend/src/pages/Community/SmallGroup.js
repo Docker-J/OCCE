@@ -4,7 +4,7 @@ import "../NextGen/NextGen.css";
 const SmallGroup = () => {
   return (
     <>
-      <h1>공동체</h1>
+      <h1>소그룹</h1>
 
       <div className="container">
         <Typography variant="h5" fontWeight={800}>

@@ -3,11 +3,17 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 35%;
-  height: max(20vmax, 400px);
-  padding-top: min(5vmax, 79px);
-  max-height: 650px;
+  height: max(50vmax, 320px);
+  max-height: 350px;
+  padding-top: 56px;
   padding-right: 1rem;
   padding-left: 1rem;
+}
+
+@media only screen and (min-width: 900px) {
+  .title {
+    padding-top: 79px;
+  }
 }
 
 .titleContent {
@@ -18,8 +24,7 @@
   box-sizing: border-box;
   transform: translate(-50%, -50%);
   justify-content: center;
-  padding-left: inherit;
-  padding-right: inherit;
+  padding: inherit;
 }
 
 .container {
