@@ -73,15 +73,15 @@ const servers = [
     alt: "",
   },
   {
-    name: "이수연 전도사",
-    title: "유초등부",
-    img: "img/About/LeeSooyeon.jpg",
-    alt: "",
-  },
-  {
     name: "김유정 전도사",
     title: "유치부",
     img: "img/About/KimYoojeong.jpg",
+    alt: "",
+  },
+  {
+    name: "이수연 전도사",
+    title: "유초등부",
+    img: "img/About/LeeSooyeon.jpg",
     alt: "",
   },
   {
