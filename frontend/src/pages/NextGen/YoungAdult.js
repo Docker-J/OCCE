@@ -2,9 +2,46 @@ import { Typography } from "@mui/material";
 import "./NextGen.css";
 
 const YoungAdult = () => {
+  const titleBackground = {
+    backgroundImage:
+      'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/NextGen/KidsOnGoodSoil.jpg")',
+  };
+
   return (
     <>
-      <h1>청년부</h1>
+      <div className="title" style={titleBackground}>
+        <div className="titleContent">
+          <Typography
+            variant="h4"
+            fontWeight={830}
+            textAlign="center"
+            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
+          >
+            청년부
+          </Typography>
+          <Typography
+            textAlign="center"
+            variant="h5"
+            fontWeight={700}
+            sx={{ color: "white" }}
+          >
+            YOUNG ADULTS ON Maeum
+          </Typography>
+
+          <br />
+          <Typography variant="body1" sx={{ color: "white" }}>
+            대답하여 이르되 네 마음을 다하며 목숨을 다하며 힘을 다하며 뜻을
+            다하여 주 너의 하나님을 사랑하고 또한 네 이웃을 네 자신 같이
+            사랑하라 하였나이다
+            <br />
+            He answered, "'Love the Lord your God with all your heart and with
+            all your soul and with all your strength and with all your mind';
+            and,'Love your neighbor as yourself.'""
+            <br />- 누가복음 Luke 10:27 -
+          </Typography>
+        </div>
+      </div>
+
       <div className="container">
         <Typography variant="h5" fontWeight={800}>
           모임{" "}

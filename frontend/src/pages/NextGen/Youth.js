@@ -1,9 +1,13 @@
 import { Typography } from "@mui/material";
 
 const Youth = () => {
+  const titleBackground = {
+    backgroundImage:
+      'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/NextGen/1.jpg")',
+  };
   return (
     <>
-      <div className="title">
+      <div className="title" style={titleBackground}>
         <div className="titleContent">
           <Typography
             variant="h4"

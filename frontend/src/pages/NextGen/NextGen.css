@@ -1,7 +1,5 @@
 .title {
   position: relative;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
-    url("KidsOnGoodSoil.jpg");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 35%;
