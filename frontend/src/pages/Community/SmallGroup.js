@@ -2,10 +2,24 @@ import { Typography } from "@mui/material";
 import "../NextGen/NextGen.css";
 
 const SmallGroup = () => {
+  const titleBackground = {
+    backgroundImage:
+      'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/NextGen/KidsOnGoodSoil.jpg")',
+  };
+
   return (
     <>
-      <h1>소그룹</h1>
-
+      <div className="title" style={titleBackground}>
+        <div className="titleContent">
+          <Typography
+            variant="h4"
+            fontWeight={830}
+            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
+          >
+            소그룹
+          </Typography>
+        </div>
+      </div>
       <div className="container">
         <Typography variant="h5" fontWeight={800}>
           정원

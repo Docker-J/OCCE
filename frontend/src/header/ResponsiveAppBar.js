@@ -200,7 +200,8 @@ const ResponsiveAppBar = () => {
       position={
         currentPage === "/" ||
         currentPage === "/aboutus" ||
-        currentPage.includes("/nextgen/")
+        currentPage.includes("/nextgen/") ||
+        currentPage.includes("/community/")
           ? "absolute"
           : "static"
       }
@@ -209,7 +210,8 @@ const ResponsiveAppBar = () => {
         color:
           currentPage === "/" ||
           currentPage === "/aboutus" ||
-          currentPage.includes("/nextgen/")
+          currentPage.includes("/nextgen/") ||
+          currentPage.includes("/community/")
             ? "white"
             : "black",
       }}
@@ -227,7 +229,8 @@ const ResponsiveAppBar = () => {
                 src={
                   currentPage === "/" ||
                   currentPage === "/aboutus" ||
-                  currentPage.includes("/nextgen/")
+                  currentPage.includes("/nextgen/") ||
+                  currentPage.includes("/community/")
                     ? "/img/HeaderLogoColor.png"
                     : "/img/HeaderLogoBW.png"
                 }
@@ -288,7 +291,8 @@ const ResponsiveAppBar = () => {
                 src={
                   currentPage === "/" ||
                   currentPage === "/aboutus" ||
-                  currentPage.includes("/nextgen/")
+                  currentPage.includes("/nextgen/") ||
+                  currentPage.includes("/community/")
                     ? "/img/HeaderLogoColor.png"
                     : "/img/HeaderLogoBW.png"
                 }
