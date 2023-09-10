@@ -82,7 +82,11 @@ export const CascadingSubmenu = ({ title, popupId, ...props }) => {
   });
   return (
     <>
-      <MenuItem sx={{ py: 1.8 }} {...bindHover(popupState)}>
+      <MenuItem
+        sx={{ py: 1.8 }}
+        onBlur={popupState.close}
+        {...bindHover(popupState)}
+      >
         <Typography sx={{ fontSize: "13pt" }}>{props.page.title}</Typography>
         <ListItemIcon>
           {props.page.subpages &&
