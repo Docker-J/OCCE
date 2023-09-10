@@ -6,7 +6,8 @@ const Ministry = () => {
   const titleBackground = {
     backgroundImage:
       'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Community/1.jpg")',
-    backgroundPositionY: "64%",
+    backgroundPositionX: "58%",
+    backgroundPositionY: "56%",
   };
   return (
     <>
