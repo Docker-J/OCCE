@@ -3,9 +3,32 @@ import "../NextGen/NextGen.css";
 import { Link } from "react-router-dom";
 
 const Ministry = () => {
+  const titleBackground = {
+    backgroundImage:
+      'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Community/1.jpg")',
+    backgroundPositionY: "64%",
+  };
   return (
     <>
-      <h1>사역</h1>
+      <div className="title" style={titleBackground}>
+        <div className="titleContent">
+          <Typography
+            variant="h4"
+            fontWeight={830}
+            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
+          >
+            사역
+          </Typography>
+          {/* <Typography
+            textAlign="center"
+            variant="h5"
+            fontWeight={700}
+            sx={{ color: "white" }}
+          >
+            정원
+          </Typography> */}
+        </div>
+      </div>
 
       <div className="container">
         <Typography variant="h5" fontWeight={800}>

@@ -4,7 +4,8 @@ import "../NextGen/NextGen.css";
 const SmallGroup = () => {
   const titleBackground = {
     backgroundImage:
-      'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/NextGen/KidsOnGoodSoil.jpg")',
+      'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Community/Garden.jpg")',
+    backgroundPositionY: "64%",
   };
 
   return (
@@ -18,14 +19,22 @@ const SmallGroup = () => {
           >
             소그룹
           </Typography>
+          <Typography
+            textAlign="center"
+            variant="h5"
+            fontWeight={700}
+            sx={{ color: "white" }}
+          >
+            정원
+          </Typography>
         </div>
       </div>
       <div className="container">
-        <Typography variant="h5" fontWeight={800}>
+        {/* <Typography variant="h5" fontWeight={800}>
           정원
-        </Typography>
+        </Typography> */}
         <Typography sx={{ fontSize: "1.1em" }}>
-          정원'은 하나님께서 태초에 사람에게 허락하신 에덴의 모형입니다.
+          '정원'은 하나님께서 태초에 사람에게 허락하신 에덴의 모형입니다.
           '정원'의 주인은 하나님이시고, '정원사'는 예수 그리스도이십니다.
           '정원지기'는 주께서 허락하신 공동체 내 영적 리더들로 주께서 기르시고
           꽃피우시는 정원을 살피고 진실하고 충성된 청지기로서 섬기게
@@ -35,7 +44,7 @@ const SmallGroup = () => {
           소그룹인 '정원'은, 그리스도 안에서 새로운 피조물로 태어나 하나님의
           가족 된 우리들이 말씀 안에 살아계신 하나님을 통해 태초의 에덴을
           경험하는 행복한 만남과 나눔과 성장 그리고 지상 최대 명령인 복음 전파의
-          자리입니다
+          자리입니다.
         </Typography>
       </div>
     </>

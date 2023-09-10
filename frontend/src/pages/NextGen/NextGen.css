@@ -3,16 +3,16 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 35%;
-  height: max(50vmax, 320px);
-  max-height: 350px;
-  padding-top: 48px;
+  height: max(45vh, 320px);
+  max-height: 360px;
+  padding-top: 40px;
   padding-right: 1rem;
   padding-left: 1rem;
 }
 
 @media only screen and (min-width: 900px) {
   .title {
-    padding-top: 68px;
+    padding-top: 50px;
   }
 }
 
