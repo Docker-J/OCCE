@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@aws-sdk/client-cognito-identity-provider": "^3.405.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.409.0",
     "axios": "^1.5.0",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
