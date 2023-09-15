@@ -5,7 +5,7 @@ const SmallGroup = () => {
   const titleBackground = {
     backgroundImage:
       'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Community/Garden.jpg")',
-    backgroundPositionY: "64%",
+    backgroundPositionY: "58%",
   };
 
   return (

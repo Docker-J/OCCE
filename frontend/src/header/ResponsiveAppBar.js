@@ -12,7 +12,9 @@ import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
-// import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import PersonIcon from "@mui/icons-material/Person";
+
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 // import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
@@ -201,7 +203,8 @@ const ResponsiveAppBar = () => {
         currentPage === "/" ||
         currentPage === "/aboutus" ||
         currentPage.includes("/nextgen/") ||
-        currentPage.includes("/community/")
+        currentPage.includes("/community/") ||
+        currentPage.includes("/online/")
           ? "absolute"
           : "static"
       }
@@ -211,7 +214,8 @@ const ResponsiveAppBar = () => {
           currentPage === "/" ||
           currentPage === "/aboutus" ||
           currentPage.includes("/nextgen/") ||
-          currentPage.includes("/community/")
+          currentPage.includes("/community/") ||
+          currentPage.includes("/online/")
             ? "white"
             : "black",
       }}
@@ -230,7 +234,8 @@ const ResponsiveAppBar = () => {
                   currentPage === "/" ||
                   currentPage === "/aboutus" ||
                   currentPage.includes("/nextgen/") ||
-                  currentPage.includes("/community/")
+                  currentPage.includes("/community/") ||
+                  currentPage.includes("/online/")
                     ? "/img/HeaderLogoColor.png"
                     : "/img/HeaderLogoBW.png"
                 }
@@ -292,7 +297,8 @@ const ResponsiveAppBar = () => {
                   currentPage === "/" ||
                   currentPage === "/aboutus" ||
                   currentPage.includes("/nextgen/") ||
-                  currentPage.includes("/community/")
+                  currentPage.includes("/community/") ||
+                  currentPage.includes("/online/")
                     ? "/img/HeaderLogoColor.png"
                     : "/img/HeaderLogoBW.png"
                 }
@@ -314,10 +320,16 @@ const ResponsiveAppBar = () => {
 
           <Box sx={{ ml: "15pt", flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              <IconButton {...bindTrigger(userPopupState)} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" />
+              <IconButton
+                size="large"
+                color="inherit"
+                sx={{ pl: 0 }}
+                {...bindTrigger(userPopupState)}
+              >
+                <PersonIcon fontSize="large" />
               </IconButton>
             </Tooltip>
+
             <Menu
               sx={{ mt: "45px" }}
               id="menu-appbar"

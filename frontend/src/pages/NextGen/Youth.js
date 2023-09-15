@@ -3,7 +3,7 @@ import { Typography } from "@mui/material";
 const Youth = () => {
   const titleBackground = {
     backgroundImage:
-      'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/NextGen/KidsOntheRock.jpg")',
+      'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/NextGen/KidsOntheRock.webp")',
     backgroundPositionY: "52%",
   };
   return (
