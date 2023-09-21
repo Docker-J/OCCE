@@ -485,15 +485,36 @@ const About = () => (
               <div className="slide" data-anchor="offering">
                 <LeftButton fullpageApi={fullpageApi} />
                 <Typography
-                  style={{ textAlign: "center" }}
+                  variant="h5"
+                  fontWeight="800"
+                  sx={{ color: "white" }}
+                >
+                  온라인 E-Transfer 헌금
+                </Typography>
+                <Typography
                   variant="subtitle1"
                   fontWeight="500"
                   sx={{ color: "white" }}
                 >
-                  온라인 E-Transfer 헌금 안내 ▪ 이메일 : occeoffer@gmail.com |
-                  비밀번호 설정 : occe0403
+                  이메일: occeoffer@gmail.com
                   <br />
-                  Cheque 헌금 Pay To : OCCE 또는 ON Community Church of Edmonton
+                  비밀번호: occe0403
+                </Typography>
+                <br />
+                <Typography
+                  variant="h5"
+                  fontWeight="800"
+                  sx={{ color: "white" }}
+                >
+                  Cheque 헌금
+                </Typography>
+                <Typography
+                  variant="subtitle1"
+                  fontWeight="500"
+                  sx={{ color: "white" }}
+                >
+                  Pay To : OCCE 또는 ON Community Church of Edmonton
+                  <br />
                   <br />
                   현장에서는 준비된 봉투를 사용하여 입구에서 헌금함에 헌금해
                   주시기 바랍니다. 헌금봉투 10개를 한 묶음으로 따로 준비해

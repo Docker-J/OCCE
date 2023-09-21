@@ -4,7 +4,7 @@ import "./NextGen.css";
 const YoungAdult = () => {
   const titleBackground = {
     backgroundImage:
-      'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/NextGen/KidsOnGoodSoil.jpg")',
+      'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/NextGen/4.jpg")',
   };
 
   return (
@@ -14,17 +14,11 @@ const YoungAdult = () => {
           <Typography
             variant="h4"
             fontWeight={830}
-            textAlign="center"
             sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
           >
             청년부
           </Typography>
-          <Typography
-            textAlign="center"
-            variant="h5"
-            fontWeight={700}
-            sx={{ color: "white" }}
-          >
+          <Typography variant="h5" fontWeight={700} sx={{ color: "white" }}>
             YOUNG ADULTS ON Maeum
           </Typography>
 

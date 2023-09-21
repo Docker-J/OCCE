@@ -3,14 +3,14 @@
   background-image: url("../../components/Main/main_background.png");
   background-repeat: no-repeat;
   background-size: cover;
-  padding-top: 56px;
-  height: 35vmax;
+  padding-top: 35px;
+  height: 40vmax;
   max-height: 650px;
 }
 
 @media only screen and (min-width: 900px) {
-  .title {
-    padding-top: 79px;
+  .churchName {
+    padding-top: 50px;
   }
 }
 

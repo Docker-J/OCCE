@@ -1,9 +1,11 @@
 import { Typography } from "@mui/material";
+import "./NextGen.css";
 
 const Youth = () => {
   const titleBackground = {
     backgroundImage:
-      'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/NextGen/1.jpg")',
+      'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/NextGen/KidsOntheRock.webp")',
+    backgroundPositionY: "52%",
   };
   return (
     <>
