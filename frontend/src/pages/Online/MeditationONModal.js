@@ -9,8 +9,9 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "800px",
-    height: "800px",
+    width: "50vw",
+    maxWidth: "1500px",
+    height: "90vh",
     bgcolor: "#ffffff",
     border: "0.1px solid #f57c00",
     boxShadow: 24,
@@ -31,8 +32,9 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
   };
 
   useEffect(() => {
+    setImagesPreview([]);
     Array.from(filesToUpload).forEach((image) => {
-      setImagesPreview((prev) => [prev.push, URL.createObjectURL(image)]);
+      setImagesPreview((prev) => [...prev, URL.createObjectURL(image)]);
     });
   }, [filesToUpload]);
 
@@ -78,6 +80,22 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
     };
   };
 
+  const removeImage = (e) => {
+    const previews = document.querySelectorAll(".previews");
+    const clickedItem = e.target;
+
+    let i;
+    for (i = 0; i < previews.length; i++) {
+      if (previews[i] === clickedItem) {
+        break;
+      }
+    }
+
+    const newArray = [...filesToUpload]; // Make a copy of the original array
+    newArray.splice(i, 1); // Remove the element at the specified index
+    setFilesToUpload(newArray);
+  };
+
   return (
     <Modal
       open={openModal}
@@ -88,12 +106,18 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
       <Box sx={style} bgcolor="white">
         <div style={{ display: "flex" }}>
           {imagesPreview.map((image) => (
-            <img src={image} />
+            <img
+              className="previews"
+              src={image}
+              width={100}
+              alt="preview"
+              onClick={(e) => removeImage(e)}
+            />
           ))}
         </div>
 
         <Button variant="contained" component="label">
-          Upload
+          Choose Files
           <input
             hidden
             accept="image/*"
@@ -104,7 +128,7 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
         </Button>
 
         <Button onClick={uploadFiles} variant="contained" component="label">
-          Submit
+          Upload
         </Button>
       </Box>
     </Modal>
