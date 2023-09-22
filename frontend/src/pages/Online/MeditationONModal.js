@@ -9,13 +9,20 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "50vw",
-    maxWidth: "1500px",
-    height: "90vh",
+    width: "80vw",
+    height: "80vh",
+    maxWidth: "1300px",
     bgcolor: "#ffffff",
-    border: "0.1px solid #f57c00",
+    // border: "1pt solid #f57c00",
     boxShadow: 24,
-    p: 2,
+    borderRadius: "0.5em",
+    p: 1,
+    pt: 5,
+    pb: 5,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
   };
 
   const handleClose = () => {
@@ -28,28 +35,39 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
   const [imagesPreview, setImagesPreview] = useState([]);
 
   const handleChangeFile = (e) => {
-    setFilesToUpload(e.target.files);
+    setFilesToUpload((prev) => [...prev, ...e.target.files]);
   };
 
   useEffect(() => {
     setImagesPreview([]);
-    Array.from(filesToUpload).forEach((image) => {
+    filesToUpload.forEach((image) => {
       setImagesPreview((prev) => [...prev, URL.createObjectURL(image)]);
     });
   }, [filesToUpload]);
 
   async function imgToBase64() {
-    return new Promise((resolve) => {
-      let images = [];
-      for (let i = 0; i < filesToUpload.length; i++) {
-        fileToBase64(filesToUpload[i], (err, result) => {
-          images.push(result);
-          if (i === filesToUpload.length - 1) {
-            resolve(images);
-          }
+    // return new Promise((resolve) => {
+    //   const images = [];
+    //   for (let i = 0; i < filesToUpload.length; i++) {
+    //     fileToBase64(filesToUpload[i], (err, result) => {
+    //       images.push(result);
+    //       // if (i === filesToUpload.length - 1) {
+    //       // }
+    //     });
+    //   }
+    //   resolve(images);
+    // });
+
+    const promises = filesToUpload.map((file) => {
+      return new Promise((resolve) => {
+        fileToBase64(file, (err, result) => {
+          resolve(result);
         });
-      }
+      });
     });
+
+    const images = await Promise.all(promises);
+    return images;
   }
 
   const uploadFiles = () => {
@@ -60,9 +78,13 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
 
   async function post(images) {
     const data = {};
-    for (let i = 0; i < images.length; i++) {
-      data[i] = images.shift();
-    }
+
+    images.forEach((image, index) => {
+      data[index] = image;
+    });
+
+    console.log(data);
+
     const test = await axios.post("/api/meditationON/uploadPost", {
       images: data,
     });
@@ -109,15 +131,21 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
             <img
               className="previews"
               src={image}
-              width={100}
+              width={300}
               alt="preview"
               onClick={(e) => removeImage(e)}
             />
           ))}
         </div>
 
-        <Button variant="contained" component="label">
-          Choose Files
+        <div
+          style={{
+            width: "95%",
+            height: "50%",
+            border: "1pt solid #f57c00",
+            borderRadius: "1em",
+          }}
+        >
           <input
             hidden
             accept="image/*"
@@ -125,9 +153,25 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
             type="file"
             onChange={(e) => handleChangeFile(e)}
           />
-        </Button>
+          Click or Drag Files
+          <Button variant="outlined" component="label">
+            Choose Files
+            <input
+              hidden
+              accept="image/*"
+              multiple
+              type="file"
+              onChange={(e) => handleChangeFile(e)}
+            />
+          </Button>
+        </div>
 
-        <Button onClick={uploadFiles} variant="contained" component="label">
+        <Button
+          onClick={uploadFiles}
+          variant="outlined"
+          component="label"
+          disabled={filesToUpload.length === 0}
+        >
           Upload
         </Button>
       </Box>
