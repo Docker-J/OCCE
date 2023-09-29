@@ -9,33 +9,33 @@ const images = [
   {
     url: "img/Main/location.webp",
     title: "주일예배 장소",
-    width: "31%",
+    width: "32%",
     link: "https://goo.gl/maps/gqpiA88gJSvbjfDD9",
     target: "_blank",
   },
   {
     url: "img/Main/time.webp",
     title: "예배 시간",
-    width: "31%",
+    width: "32%",
     to: "/aboutus#aboutus",
   },
   {
     url: "img/Main/news.webp",
     title: "최신 주보 보기",
-    width: "31%",
+    width: "32%",
     to: "/weeklyupdate",
   },
   {
     url: "img/Main/youtube.webp",
     title: "교회 유튜브 바로가기",
-    width: "31%",
+    width: "32%",
     link: "https://www.youtube.com/c/oncce",
     target: "_blank",
   },
   {
     url: "img/Main/join.webp",
     title: "교인 등록하기",
-    width: "31%",
+    width: "32%",
     link:
       "https://docs.google.com/forms/d/e/1FAIpQLSfYN9EECPuQ0e4TrPfok4UhMH3zKnvjUckKwGfe3SkQM-0O-A/viewform",
     target: "_blank",
@@ -43,7 +43,7 @@ const images = [
   {
     url: "img/Main/offering.webp",
     title: "헌금 안내",
-    width: "31%",
+    width: "32%",
     link: "aboutus#aboutus/offering",
   },
 ];
@@ -140,8 +140,8 @@ export default function ButtonBases() {
         justifyContent: "space-evenly",
         width: "100%",
         minWidth: "550",
-        mt: "1vmin",
-        mb: "1vmin",
+        mt: "0.5em",
+        pb: "0.5em",
       }}
     >
       {images.map((image) => (

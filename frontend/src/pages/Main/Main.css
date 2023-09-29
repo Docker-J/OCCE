@@ -4,13 +4,14 @@
   background-repeat: no-repeat;
   background-size: cover;
   padding-top: 35px;
-  height: 40vmax;
+  height: 40vh;
   max-height: 650px;
 }
 
 @media only screen and (min-width: 900px) {
   .churchName {
     padding-top: 50px;
+    height: 68vh;
   }
 }
 
@@ -168,12 +169,12 @@
 
 .cards {
   max-width: 1536px;
-  margin-top: 5vh;
-  margin-bottom: 3vh;
   justify-content: space-around;
   align-items: center;
   display: flex;
   flex-wrap: wrap;
+  margin-top: 5vh;
+  margin-bottom: 5vh;
 }
 
 /* .cards > Card {
