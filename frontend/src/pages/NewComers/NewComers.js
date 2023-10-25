@@ -7,6 +7,7 @@ import { Typography } from "@mui/material";
 import { useWindowSize } from "@uidotdev/usehooks";
 
 import "./NewComers.css";
+import NewComersTimeline from "./NewComersTimeline";
 
 const initialNodes = [
   {
@@ -126,7 +127,7 @@ const NewComers = () => {
         가족이 되심을 기쁨으로 환영합니다. 아래와 같은 과정을 통해 온 공동체의
         가족으로 함께 하게 됩니다.
       </Typography>
-      <div id="flowContainer" style={{ width: "100%", height: "60vh" }}>
+      {/* <div id="flowContainer" style={{ width: "100%", height: "60vh" }}>
         <ReactFlow
           onInit={onInit}
           nodes={nodes}
@@ -139,7 +140,9 @@ const NewComers = () => {
           edgesUpdatable={false}
           nodesConnectable={false}
         ></ReactFlow>
-      </div>
+      </div> */}
+
+      <NewComersTimeline />
     </div>
   );
 };
