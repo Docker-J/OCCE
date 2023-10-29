@@ -82,18 +82,18 @@
 
 .section5Body {
   max-width: 1500px;
+  height: 100vh;
   margin: auto;
   padding: 0 5vw;
-  height: 100%;
 }
 
 .serversPicture {
   height: max-content;
   width: max-content;
   border-radius: 0.7rem;
-  border-style: solid;
-  border-color: white;
-  border-width: 1.5rem;
+  /* border-style: solid;
+  border-color: white; */
+  border-width: 0;
   background-color: white;
   margin: auto;
 }

@@ -16,6 +16,7 @@ import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
 import Arrow from "../../components/About/Arrow";
+import MinisterCarousel from "./MinisterCarousel";
 
 const serviceInfo = [
   {
@@ -386,7 +387,7 @@ const About = () => (
 
           <div className="section" id="section5">
             <div className="section5Body">
-              <LeftButton
+              {/* <LeftButton
                 style={{
                   position: "absolute",
                   top: "50%",
@@ -403,8 +404,9 @@ const About = () => (
                   zIndex: 2,
                 }}
                 fullpageApi={fullpageApi}
-              />
-              {servers.map((server) => (
+              /> */}
+              <MinisterCarousel />
+              {/* {servers.map((server) => (
                 <div className="slide" data-anchor="chin">
                   <div className="serversPicture">
                     <img
@@ -416,7 +418,7 @@ const About = () => (
                         height: "max(50vmin, 205px)",
                         maxWidth: "400px",
                         maxHeight: "550px",
-                        borderRadius: "0.7rem",
+                        borderRadius: "0.7rem 0.7rem 0 0",
                       }}
                     />
                     <p
@@ -431,7 +433,7 @@ const About = () => (
                     <p style={{ color: "black" }}>{server.title}</p>
                   </div>
                 </div>
-              ))}
+              ))} */}
             </div>
             <Arrow onClick={() => fullpageApi.moveSectionDown()} />
           </div>
