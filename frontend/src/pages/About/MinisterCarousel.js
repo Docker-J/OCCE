@@ -10,6 +10,7 @@ const slides = [
     content: (
       <Card
         imagen="img/About/ChinSeongIn.jpg"
+        imageOffset={{ left: "-53%" }}
         title="진성인 목사"
         position="담임 목사"
       />
@@ -20,6 +21,7 @@ const slides = [
     content: (
       <Card
         imagen="img/About/KimYoojeong.jpg"
+        imageOffset={{ left: "-52%" }}
         title="김유정 전도사"
         position="유치부"
       />
@@ -30,6 +32,7 @@ const slides = [
     content: (
       <Card
         imagen="img/About/LeeSooyeon.jpg"
+        imageOffset={{ left: "-52%" }}
         title="이수연 전도사"
         position="초등부"
       />
@@ -40,6 +43,7 @@ const slides = [
     content: (
       <Card
         imagen="img/About/KimHwikyung.jpg"
+        imageOffset={{ left: "-55%" }}
         title="김휘경 전도사"
         position="중고등부/찬양/행정"
       />
@@ -50,6 +54,7 @@ const slides = [
     content: (
       <Card
         imagen="img/About/AhnJooyoung.jpg"
+        imageOffset={{ left: "-49%" }}
         title="안주영 목사"
         position="협동 목사"
       />
@@ -62,12 +67,18 @@ const MinisterCarousel = () => {
     return { ...element, onClick: () => setGoToSlide(index) };
   });
 
-  const [offsetRadius, setOffsetRadius] = useState(2);
   const [goToSlide, setGoToSlide] = useState(null);
   const [cards] = useState(table);
 
   return (
-    <div style={{ height: "100%", width: "40%", margin: "0 auto" }}>
+    <div
+      style={{
+        height: "100%",
+        width: "90vw",
+        maxWidth: "min(730px, 55vmax)",
+        margin: "auto",
+      }}
+    >
       <Carousel
         slides={cards}
         goToSlide={goToSlide}

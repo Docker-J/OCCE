@@ -1,8 +1,9 @@
+import { Typography } from "@mui/material";
 import Styles from "./Card.module.css";
 import React, { useState } from "react";
 import { useSpring, animated } from "react-spring";
 
-function Card({ imagen, title, position }) {
+function Card({ imagen, imageOffset, title, position }) {
   const [show, setShown] = useState(false);
 
   const props3 = useSpring({
@@ -13,18 +14,24 @@ function Card({ imagen, title, position }) {
   });
 
   return (
-    <animated.div
-      className={Styles.card}
-      style={props3}
-      onMouseEnter={() => setShown(true)}
-      onMouseLeave={() => setShown(false)}
-    >
-      <div className={Styles.crop}>
-        <img src={imagen} alt="" />
-      </div>
-      <h2>{title}</h2>
-      <p>{position}</p>
-    </animated.div>
+    <div className={Styles.boxWrapper}>
+      <animated.div
+        className={Styles.card}
+        style={props3}
+        onMouseEnter={() => setShown(true)}
+        onMouseLeave={() => setShown(false)}
+      >
+        <div className={Styles.crop}>
+          <img src={imagen} style={imageOffset} alt="" />
+        </div>
+        <div className={Styles.text}>
+          <Typography className={Styles.title} variant="h5" fontWeight={800}>
+            {title}
+          </Typography>
+          <Typography>{position}</Typography>
+        </div>
+      </animated.div>
+    </div>
   );
 }
 
