@@ -38,8 +38,12 @@ const Photos = lazy(() => import("./pages/Photos/Photos"));
 const AlbumPhotos = lazy(() => import("./pages/Photos/AlbumPhotos"));
 
 // Online
-const MeditationON = lazy(() => import("./pages/Online/MeditationON"));
-const MeditationONPost = lazy(() => import("./pages/Online/MeditationONPost"));
+const MeditationON = lazy(() =>
+  import("./pages/Online/MeditationON/MeditationON")
+);
+const MeditationONPost = lazy(() =>
+  import("./pages/Online/MeditationON/MeditationONPost")
+);
 const PrayON = lazy(() => import("./pages/Online/PrayON"));
 const Worship = lazy(() => import("./pages/Online/Worship"));
 const SundayService = lazy(() => import("./pages/Online/SundayService"));

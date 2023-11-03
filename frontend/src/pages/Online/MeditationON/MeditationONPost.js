@@ -3,7 +3,7 @@ import { useLoaderData } from "react-router-dom";
 import { Carousel } from "react-responsive-carousel";
 import styles from "react-responsive-carousel/lib/styles/carousel.min.css";
 
-import "../NextGen/NextGen.css";
+import "../../NextGen/NextGen.css";
 import { Typography } from "@mui/material";
 
 const titleBackground = {
