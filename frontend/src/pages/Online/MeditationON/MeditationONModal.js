@@ -1,7 +1,13 @@
-import { Box, Button, Modal } from "@mui/material";
+import { Box, Button, IconButton, Modal } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import imageCompression from "browser-image-compression";
+import { useDropzone } from "react-dropzone";
+
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const MeditationONModal = ({ openModal, setOpenModal }) => {
   const style = {
@@ -34,8 +40,8 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
   const [filesToUpload, setFilesToUpload] = useState([]);
   const [imagesPreview, setImagesPreview] = useState([]);
 
-  const handleChangeFile = (e) => {
-    setFilesToUpload((prev) => [...prev, ...e.target.files]);
+  const handleChangeFile = (file) => {
+    setFilesToUpload((prev) => [...prev, ...file]);
   };
 
   useEffect(() => {
@@ -103,20 +109,35 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
   };
 
   const removeImage = (e) => {
-    const previews = document.querySelectorAll(".previews");
-    const clickedItem = e.target;
+    const clickedItem = e.target.src;
 
     let i;
-    for (i = 0; i < previews.length; i++) {
-      if (previews[i] === clickedItem) {
+    for (i = 0; i < imagesPreview.length; i++) {
+      if (imagesPreview[i] === clickedItem) {
         break;
       }
     }
-
+    URL.revokeObjectURL(imagesPreview[i]);
     const newArray = [...filesToUpload]; // Make a copy of the original array
     newArray.splice(i, 1); // Remove the element at the specified index
     setFilesToUpload(newArray);
   };
+
+  useEffect(() => {
+    return () => {
+      imagesPreview.map((preview) => URL.revokeObjectURL(preview));
+    };
+  });
+
+  const { getRootProps, getInputProps, open } = useDropzone({
+    noClick: true,
+    accept: {
+      "image/*": [],
+    },
+    onDrop: (acceptedFiles) => {
+      handleChangeFile(acceptedFiles);
+    },
+  });
 
   return (
     <Modal
@@ -126,54 +147,79 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
       // aria-describedby="modal-modal-description"
     >
       <Box sx={style} bgcolor="white">
-        <div style={{ display: "flex" }}>
-          {imagesPreview.map((image) => (
-            <img
-              className="previews"
-              src={image}
-              width={300}
-              alt="preview"
-              onClick={(e) => removeImage(e)}
-            />
-          ))}
-        </div>
-
         <div
           style={{
             width: "95%",
-            height: "50%",
-            border: "1pt solid #f57c00",
+            height: "90%",
+            border: "1pt dotted #f57c00",
             borderRadius: "1em",
+            overflowY: "auto",
           }}
+          {...getRootProps()}
         >
-          <input
-            hidden
-            accept="image/*"
-            multiple
-            type="file"
-            onChange={(e) => handleChangeFile(e)}
-          />
-          Click or Drag Files
-          <Button variant="outlined" component="label">
-            Choose Files
-            <input
-              hidden
-              accept="image/*"
-              multiple
-              type="file"
-              onChange={(e) => handleChangeFile(e)}
-            />
-          </Button>
+          <input onChange={(e) => handleChangeFile(e)} {...getInputProps()} />
+          {filesToUpload.length === 0 ? (
+            "Click or Drag Files"
+          ) : (
+            <DndProvider backend={HTML5Backend}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  margin: "10pt",
+                }}
+              >
+                {imagesPreview.map((image) => (
+                  <div
+                    style={{
+                      position: "relative",
+                      display: "inline-flex",
+                      borderRadius: 2,
+                      border: "1px solid #eaeaea",
+                      marginBottom: 8,
+                      marginRight: 8,
+                      width: "18vw",
+                      height: "18vw",
+                      padding: 4,
+                      boxSizing: "border-box",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        minWidth: 0,
+                        overflow: "hidden",
+                      }}
+                    >
+                      <img
+                        src={image}
+                        alt="preview"
+                        style={{
+                          display: "block",
+                          width: "auto",
+                          height: "100%",
+                        }}
+                        onClick={(e) => removeImage(e)}
+                      />
+                    </div>
+                    <IconButton
+                      style={{
+                        position: "absolute",
+                        display: "block",
+                        zIndex: 99,
+                        top: 0,
+                        right: 0,
+                      }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </div>
+                ))}
+              </div>
+            </DndProvider>
+          )}
         </div>
-
-        <Button
-          onClick={uploadFiles}
-          variant="outlined"
-          component="label"
-          disabled={filesToUpload.length === 0}
-        >
-          Upload
-        </Button>
       </Box>
     </Modal>
   );
