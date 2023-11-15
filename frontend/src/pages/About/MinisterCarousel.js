@@ -75,7 +75,7 @@ const MinisterCarousel = () => {
       style={{
         height: "100%",
         width: "90vw",
-        maxWidth: "min(730px, 55vmax)",
+        maxWidth: "min(700px, 45vmax)",
         margin: "auto",
       }}
     >

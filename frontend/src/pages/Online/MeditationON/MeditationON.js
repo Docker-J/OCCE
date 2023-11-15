@@ -9,7 +9,7 @@ import { MemoizedMeditationONComp } from "./MeditationONComp";
 import MeditationONModal from "./MeditationONModal";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-import "../NextGen/NextGen.css";
+import "../../NextGen/NextGen.css";
 
 const PAGE_SIZE = 12;
 const titleBackground = {
