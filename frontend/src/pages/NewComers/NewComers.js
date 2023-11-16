@@ -1,6 +1,5 @@
 import { Typography } from "@mui/material";
 
-import "./NewComers.css";
 import NewComersTimeline from "./NewComersTimeline";
 
 const NewComers = () => {
