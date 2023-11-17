@@ -4,7 +4,7 @@ import "../NextGen/NextGen.css";
 const SmallGroup = () => {
   const titleBackground = {
     backgroundImage:
-      'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Community/Garden.jpg")',
+      'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Community/SmallGroup.webp")',
     backgroundPositionY: "58%",
   };
 
