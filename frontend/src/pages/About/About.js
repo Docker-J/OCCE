@@ -16,7 +16,7 @@ import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
 import Arrow from "../../components/About/Arrow";
-import MinisterCarousel from "./MinisterCarousel";
+import MinisterCarousel from "../../components/About/MinisterCarousel";
 
 const serviceInfo = [
   {
@@ -203,7 +203,7 @@ const About = () => (
                 >
                   의미) 우리의 삶의 자리
                   <br />
-                  사명) 우리를 심으신 이땅에 대한 사랑과 섬김, 기도와 복음
+                  사명) 우리를 심으신 이 땅에 대한 사랑과 섬김, 기도와 복음
                   전파를 잊지 말라는 하나님의 부르심
                 </Typography>
               </div>
@@ -229,7 +229,7 @@ const About = () => (
 
               <div className="slide" data-anchor="on">
                 <Typography
-                  variant="h2"
+                  variant="h3"
                   fontWeight="600"
                   sx={{ textAlign: "left", color: "white" }}
                 >
@@ -249,8 +249,8 @@ const About = () => (
 
               <div className="slide" data-anchor="building">
                 <Typography
-                  variant="h2"
-                  fontWeight="600"
+                  variant="h3"
+                  fontWeight="700"
                   sx={{ textAlign: "left", color: "white" }}
                 >
                   교회
@@ -299,10 +299,10 @@ const About = () => (
                   fontWeight="500"
                   sx={{ color: "white", ml: "15px" }}
                 >
-                  내가 주인된 시대 속에서, 예배와 말씀을 통해 우리 삶의
-                  창조자이며 참 주인되시며 인도자이신 성부 성자 성령 하나님의
+                  내가 주인 된 시대 속에서, 예배와 말씀을 통해 우리 삶의
+                  창조자이며 참 주인 되시며 인도자이신 성부 성자 성령 하나님의
                   사랑을 맛보고 나누며, 하나님을 향한 우리의 사랑을 온전히
-                  올려드립니다. 온교회는 교회 성전 중심으로 모이는 것만
+                  올려드립니다. 온 교회는 교회 성전 중심으로 모이는 것만
                   중요시하는 공동체가 아니라, 모일 때 힘써 모여 예배드리고
                   기도하지만 일상의 자리에서 하나님을 높이며 그의 나라와 의를
                   구하며 말씀대로 살아가는 삶의 예배를 중요시하는 공동체입니다.
@@ -329,57 +329,6 @@ const About = () => (
                   공동체와 이웃을 말씀대로 사랑하고 섬기며 살아갑니다.
                 </Typography>
               </div>
-
-              {/* <div className="slide" data-anchor="wordscentered">
-                    <Typography
-                      style={{ textAlign: "left" }}
-                      variant="h4"
-                      fontWeight="800"
-                      sx={{ color: "white" }}
-                    >
-                      말씀 중심
-                    </Typography>
-
-                    <Typography
-                      style={{ textAlign: "left" }}
-                      variant="h6"
-                      fontWeight="550"
-                      sx={{ color: "white", ml: "15px" }}
-                    >
-                      ON-line 묵상
-                      <br />
-                      말씀 교육 <br />
-                      -다음세대: 교회학교 -장년: 단계별 훈련
-                    </Typography>
-                  </div>
-
-                  <div className="slide" data-anchor="community">
-                    <Typography
-                      style={{ textAlign: "left" }}
-                      variant="h4"
-                      fontWeight="800"
-                      sx={{ color: "white" }}
-                    >
-                      공동체
-                    </Typography>
-
-                    <Typography
-                      style={{ textAlign: "left" }}
-                      variant="h6"
-                      fontWeight="550"
-                      sx={{ color: "white", ml: "15px" }}
-                    >
-                      성례(성찬과 세례)
-                      <br />
-                      정원모임
-                      <br />
-                      중보기도
-                      <br />
-                      -중보기도 모임 -기도 ON
-                      <br />
-                      주일 예배 후 교제(다과, 말씀과 삶 나눔)
-                    </Typography>
-                  </div> */}
             </div>
 
             <Arrow onClick={() => fullpageApi.moveSectionDown()} />
@@ -387,53 +336,7 @@ const About = () => (
 
           <div className="section" id="section5">
             <div className="section5Body">
-              {/* <LeftButton
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "2%",
-                  zIndex: 2,
-                }}
-                fullpageApi={fullpageApi}
-              />
-              <RightButton
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  right: "2%",
-                  zIndex: 2,
-                }}
-                fullpageApi={fullpageApi}
-              /> */}
               <MinisterCarousel />
-              {/* {servers.map((server) => (
-                <div className="slide" data-anchor="chin">
-                  <div className="serversPicture">
-                    <img
-                      alt={server.alt}
-                      src={server.img}
-                      style={{
-                        objectFit: "cover",
-                        width: "max(35vw, 155px)",
-                        height: "max(50vmin, 205px)",
-                        maxWidth: "400px",
-                        maxHeight: "550px",
-                        borderRadius: "0.7rem 0.7rem 0 0",
-                      }}
-                    />
-                    <p
-                      style={{
-                        fontSize: "1.25rem",
-                        color: "black",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {server.name}
-                    </p>
-                    <p style={{ color: "black" }}>{server.title}</p>
-                  </div>
-                </div>
-              ))} */}
             </div>
             <Arrow onClick={() => fullpageApi.moveSectionDown()} />
           </div>

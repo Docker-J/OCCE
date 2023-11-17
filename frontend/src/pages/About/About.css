@@ -4,7 +4,7 @@
 
 #section1 {
   background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)),
-    url("../../components/About/FirstStep.webp");
+    url("../../components/About/img/FirstStep.webp");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 83%;
@@ -23,7 +23,7 @@
   display: flex;
   justify-content: center;
   background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)),
-    url("../../components/About/calling.webp");
+    url("../../components/About/img/Calling.webp");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 35%;
@@ -39,7 +39,7 @@
   display: flex;
   justify-content: center;
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2)),
-    url("../../components/About/Direction.webp");
+    url("../../components/About/img/Direction.webp");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -56,7 +56,7 @@
   display: flex;
   justify-content: center;
   background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-    url("../../components/About/AboutUs.webp");
+    url("../../components/About/img/AboutUs.webp");
   background-repeat: no-repeat;
   background-size: cover;
   background-position-x: center;
@@ -75,7 +75,7 @@
   display: flex;
   justify-content: center;
   background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-    url("../../components/About/servers.jpg");
+    url("../../components/About/img/Servers.jpg");
   background-repeat: no-repeat;
   background-size: cover;
 }

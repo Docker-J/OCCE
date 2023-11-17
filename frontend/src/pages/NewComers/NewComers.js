@@ -5,9 +5,7 @@ import "./NewComers.css";
 
 const titleBackground = {
   backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Online/Worship.jpg")',
-  backgroundPositionX: "55%",
-  backgroundPositionY: "38%",
+    'linear-gradient(rgba(0, 0, 0, 0.20), rgba(0, 0, 0, 0.20)), url("/img/NewComers/NewComers.jpg")',
 };
 
 const NewComers = () => {

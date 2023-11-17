@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 const Ministry = () => {
   const titleBackground = {
     backgroundImage:
-      'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Community/1.jpg")',
+      'linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("/img/Community/1.jpg")',
     backgroundPositionX: "58%",
     backgroundPositionY: "56%",
   };
