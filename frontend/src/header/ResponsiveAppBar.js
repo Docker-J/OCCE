@@ -202,6 +202,7 @@ const ResponsiveAppBar = () => {
       position={
         currentPage === "/" ||
         currentPage === "/aboutus" ||
+        currentPage.includes("/newcomers") ||
         currentPage.includes("/nextgen/") ||
         currentPage.includes("/community/") ||
         currentPage.includes("/online/")
@@ -213,6 +214,7 @@ const ResponsiveAppBar = () => {
         color:
           currentPage === "/" ||
           currentPage === "/aboutus" ||
+          currentPage.includes("/newcomers") ||
           currentPage.includes("/nextgen/") ||
           currentPage.includes("/community/") ||
           currentPage.includes("/online/")
@@ -233,6 +235,7 @@ const ResponsiveAppBar = () => {
                 src={
                   currentPage === "/" ||
                   currentPage === "/aboutus" ||
+                  currentPage.includes("/newcomers") ||
                   currentPage.includes("/nextgen/") ||
                   currentPage.includes("/community/") ||
                   currentPage.includes("/online/")
@@ -296,6 +299,7 @@ const ResponsiveAppBar = () => {
                 src={
                   currentPage === "/" ||
                   currentPage === "/aboutus" ||
+                  currentPage.includes("/newcomers") ||
                   currentPage.includes("/nextgen/") ||
                   currentPage.includes("/community/") ||
                   currentPage.includes("/online/")

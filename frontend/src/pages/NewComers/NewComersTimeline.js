@@ -5,6 +5,12 @@ import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineDot from "@mui/lab/TimelineDot";
 
+import EditNoteIcon from "@mui/icons-material/EditNote";
+import HowToRegIcon from "@mui/icons-material/HowToReg";
+import SchoolIcon from "@mui/icons-material/School";
+import LocalFloristIcon from "@mui/icons-material/LocalFlorist";
+import CelebrationIcon from "@mui/icons-material/Celebration";
+
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { useState } from "react";
 import { Popover, Typography } from "@mui/material";
@@ -27,18 +33,25 @@ const NewComersTimeline = () => {
     <Timeline position="alternate">
       <TimelineItem>
         <TimelineSeparator>
-          <TimelineDot variant="outlined" color="primary" />
-          <TimelineConnector />
+          <TimelineDot variant="outlined" color="primary">
+            <EditNoteIcon color="primary" />
+          </TimelineDot>
+          <TimelineConnector sx={{ height: "30px" }} />
         </TimelineSeparator>
-        <TimelineContent>방문카드 작성</TimelineContent>
+        <TimelineContent sx={{ py: "18px" }}>
+          <Typography fontWeight={600}>방문카드 작성</Typography>
+        </TimelineContent>
       </TimelineItem>
       <TimelineItem>
         <TimelineSeparator>
-          <TimelineDot variant="outlined" color="primary" />
-          <TimelineConnector />
+          <TimelineDot variant="outlined" color="primary">
+            <HowToRegIcon color="primary" />
+          </TimelineDot>
+          <TimelineConnector sx={{ height: "30px" }} />
         </TimelineSeparator>
-        <TimelineContent>
+        <TimelineContent sx={{ py: "18px" }}>
           <Typography
+            fontWeight={600}
             onMouseEnter={(e) => handlePopoverOpen(e, 1)}
             onMouseLeave={handlePopoverClose}
           >
@@ -72,11 +85,14 @@ const NewComersTimeline = () => {
       </TimelineItem>
       <TimelineItem>
         <TimelineSeparator>
-          <TimelineDot variant="outlined" color="primary" />
-          <TimelineConnector />
+          <TimelineDot variant="outlined" color="primary">
+            <SchoolIcon color="primary" />
+          </TimelineDot>
+          <TimelineConnector sx={{ height: "30px" }} />
         </TimelineSeparator>
-        <TimelineContent>
+        <TimelineContent sx={{ py: "18px" }}>
           <Typography
+            fontWeight={600}
             onMouseEnter={(e) => handlePopoverOpen(e, 2)}
             onMouseLeave={handlePopoverClose}
           >
@@ -109,16 +125,24 @@ const NewComersTimeline = () => {
       </TimelineItem>
       <TimelineItem>
         <TimelineSeparator>
-          <TimelineDot variant="outlined" color="primary" />
-          <TimelineConnector />
+          <TimelineDot variant="outlined" color="primary">
+            <LocalFloristIcon color="primary" />
+          </TimelineDot>
+          <TimelineConnector sx={{ height: "30px" }} />
         </TimelineSeparator>
-        <TimelineContent>소그룹(정원) 배치</TimelineContent>
+        <TimelineContent sx={{ py: "18px" }}>
+          <Typography fontWeight={600}>소그룹(정원) 배치</Typography>
+        </TimelineContent>
       </TimelineItem>
       <TimelineItem>
         <TimelineSeparator>
-          <TimelineDot variant="outlined" color="primary" />
+          <TimelineDot variant="outlined" color="primary">
+            <CelebrationIcon color="primary" />
+          </TimelineDot>
         </TimelineSeparator>
-        <TimelineContent>새가족 환영회</TimelineContent>
+        <TimelineContent sx={{ py: "18px" }}>
+          <Typography fontWeight={600}>새가족 환영회</Typography>
+        </TimelineContent>
       </TimelineItem>
     </Timeline>
   );
