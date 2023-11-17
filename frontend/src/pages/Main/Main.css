@@ -1,17 +1,17 @@
 .churchName {
   position: relative;
-  background-image: url("../../components/Main/main_background.png");
+  background-image: url("../../components/Main/background.svg");
   background-repeat: no-repeat;
   background-size: cover;
   padding-top: 35px;
-  height: 40vh;
+  height: 50vh;
   max-height: 650px;
 }
 
 @media only screen and (min-width: 900px) {
   .churchName {
     padding-top: 50px;
-    height: 68vh;
+    height: 60vh;
   }
 }
 

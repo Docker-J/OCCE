@@ -14,7 +14,7 @@ import "../../NextGen/NextGen.css";
 const PAGE_SIZE = 12;
 const titleBackground = {
   backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Online/MeditationON.jpg")',
+    'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Online/MeditationON.webp")',
 };
 
 const MeditationON = () => {

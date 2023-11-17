@@ -66,39 +66,6 @@ const serviceInfo = [
   },
 ];
 
-const servers = [
-  {
-    name: "진성인 목사",
-    title: "담임 목사",
-    img: "img/About/ChinSeongIn.jpg",
-    alt: "",
-  },
-  {
-    name: "김유정 전도사",
-    title: "유치부",
-    img: "img/About/KimYoojeong.jpg",
-    alt: "",
-  },
-  {
-    name: "이수연 전도사",
-    title: "유초등부",
-    img: "img/About/LeeSooyeon.jpg",
-    alt: "",
-  },
-  {
-    name: "김휘경 전도사",
-    title: "중고등부/찬양/행정",
-    img: "img/About/KimHwikyung.jpg",
-    alt: "",
-  },
-  {
-    name: "안주영 목사",
-    title: "협동 목사",
-    img: "img/About/AhnJooyoung.jpg",
-    alt: "",
-  },
-];
-
 const LeftButton = ({ fullpageApi, style }) => {
   return (
     <Button
@@ -137,7 +104,7 @@ const About = () => (
     interlockedSlides={true}
     verticalCentered={true}
     // navigation={true}
-    navigationPosition="right"
+    // navigationPosition="right"
     controlArrows={false}
     render={({ state, fullpageApi }) => {
       return (
@@ -334,7 +301,7 @@ const About = () => (
             <Arrow onClick={() => fullpageApi.moveSectionDown()} />
           </div>
 
-          <div className="section" id="section5">
+          <div className="section fp-noscroll" id="section5">
             <div className="section5Body">
               <MinisterCarousel />
             </div>

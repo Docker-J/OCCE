@@ -4,7 +4,7 @@ import "../NextGen/NextGen.css";
 
 const titleBackground = {
   backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Online/PrayON.jpg")',
+    'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Online/PrayON.webp")',
   // backgroundPositionX: "55%",
   backgroundPositionY: "26%",
 };

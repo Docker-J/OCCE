@@ -4,7 +4,7 @@ import "./NextGen.css";
 const Elementary = () => {
   const titleBackground = {
     backgroundImage:
-      'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/NextGen/KidsOntheTree.jpg")',
+      'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/NextGen/KidsOntheTree.webp")',
   };
   return (
     <>

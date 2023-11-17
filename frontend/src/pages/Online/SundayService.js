@@ -4,7 +4,7 @@ import "../NextGen/NextGen.css";
 
 const titleBackground = {
   backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("/img/Online/SundayService.jpg")',
+    'linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("/img/Online/SundayService.webp")',
   backgroundPositionX: "50%",
   backgroundPositionY: "70%",
 };
