@@ -20,14 +20,6 @@ const Ministry = () => {
           >
             사역
           </Typography>
-          {/* <Typography
-            textAlign="center"
-            variant="h5"
-            fontWeight={700}
-            sx={{ color: "white" }}
-          >
-            정원
-          </Typography> */}
         </div>
       </div>
 
