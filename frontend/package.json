@@ -21,6 +21,7 @@
     "ckeditor5-custom-build": "file:ckeditor5",
     "file": "^0.2.2",
     "firebase": "^10.5.2",
+    "immutability-helper": "^3.1.1",
     "material-ui-popup-state": "^5.0.10",
     "pdf-to-base64": "^1.0.3",
     "prop-types": "^15.8.1",
