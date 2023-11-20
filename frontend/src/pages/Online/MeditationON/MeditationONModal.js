@@ -226,8 +226,14 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
         </div>
 
         <div style={{ display: "flex", marginTop: "2em" }}>
-          <Button variant="outlined">Submit</Button>
-          <Button variant="outlined" onClick={removeAllImage}>
+          <Button variant="outlined" disabled={filesToUpload.length <= 0}>
+            Submit
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={removeAllImage}
+            disabled={filesToUpload.length <= 0}
+          >
             Clear All
           </Button>
           <Button variant="outlined" onClick={handleClose}>
