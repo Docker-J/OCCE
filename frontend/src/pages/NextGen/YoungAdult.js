@@ -38,9 +38,9 @@ const YoungAdult = () => {
 
       <div className="container">
         <Typography variant="h5" fontWeight={800}>
-          모임{" "}
+          모임
         </Typography>
-        <Typography sx={{ fontSize: "1.1em" }}>
+        <Typography className="subjectContent" sx={{ fontSize: "1.1em" }}>
           Brunch Club: 주일 오전 11시 30분 <br />
           성경 공부: 주일 오후 4시 <br />※ 문의: 안주영 목사 <br />
         </Typography>
@@ -48,7 +48,7 @@ const YoungAdult = () => {
         <Typography variant="h5" fontWeight={800}>
           Brunch Club
         </Typography>
-        <Typography sx={{ fontSize: "1.1em" }}>
+        <Typography className="subjectContent" sx={{ fontSize: "1.1em" }}>
           - 브런치 클럽은 주님의 가르침과 초대 교회의 본을 따라 매 주일 정기적인
           식탁의 교제를 나눕니다.
           <br />- 브런치 클럽은 경청의 예배를 드리는 시간입니다.

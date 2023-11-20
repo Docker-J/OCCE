@@ -27,7 +27,7 @@ const Ministry = () => {
         <Typography variant="h5" fontWeight={800}>
           정원 순환 사역
         </Typography>
-        <Typography sx={{ fontSize: "1.1em" }}>
+        <Typography className="subjectContent" sx={{ fontSize: "1.1em" }}>
           주일 안내팀과 친교팀은 각 팀 staff의 안내에 따라 매달 순서를 맡은
           소그룹 <Link to="/community/smallgroup">'정원' </Link>이 순환하여
           섬깁니다.
@@ -36,7 +36,7 @@ const Ministry = () => {
         <Typography variant="h5" fontWeight={800}>
           온 교회 사역 지원
         </Typography>
-        <Typography sx={{ fontSize: "1.1em" }}>
+        <Typography className="subjectContent" sx={{ fontSize: "1.1em" }}>
           교회에 필요한 사역 지원을 수시로 받고 있습니다. 허락하신 달란트대로
           주의 몸 된 교회를 함께 세우고, 온 맘과 온 힘을 다해 하나님과 이웃을
           사랑하는 공동체가 되길 소망합니다. 아래의 사역 분야를 참고해 주시고,

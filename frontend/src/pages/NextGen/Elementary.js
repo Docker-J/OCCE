@@ -42,7 +42,7 @@ const Elementary = () => {
         <Typography variant="h5" fontWeight={800}>
           모임
         </Typography>
-        <Typography sx={{ fontSize: "1.1em" }}>
+        <Typography className="subjectContent" sx={{ fontSize: "1.1em" }}>
           나이: 1~6학년
           <br />
           시간: 주일 오후 4시

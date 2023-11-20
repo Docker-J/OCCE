@@ -45,7 +45,7 @@ const Youth = () => {
         <Typography variant="h5" fontWeight={800}>
           모임
         </Typography>
-        <Typography sx={{ fontSize: "1.1em" }}>
+        <Typography className="subjectContent" sx={{ fontSize: "1.1em" }}>
           시간: 주일 오후 4시
           <br />
           장소: Fireside Room

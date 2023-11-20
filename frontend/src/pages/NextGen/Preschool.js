@@ -37,7 +37,7 @@ const Preschool = () => {
         <Typography variant="h5" fontWeight={800}>
           모임
         </Typography>
-        <Typography sx={{ fontSize: "1.1em" }}>
+        <Typography className="subjectContent" sx={{ fontSize: "1.1em" }}>
           나이: 만 5세(kindergarten)까지
           <br />
           시간: 주일 오후 4시 <br />
