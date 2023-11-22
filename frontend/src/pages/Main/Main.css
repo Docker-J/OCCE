@@ -1,170 +1,32 @@
-.churchName {
-  position: relative;
-  background-image: url("../../components/Main/background.svg");
-  background-repeat: no-repeat;
-  background-size: cover;
-  padding-top: 35px;
+.slider {
   height: 50vh;
   max-height: 650px;
 }
 
 @media only screen and (min-width: 900px) {
-  .churchName {
-    padding-top: 50px;
+  .slider {
     height: 60vh;
   }
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg) scale(1);
-  }
-  to {
-    transform: rotate(90deg) scale(0.7);
-  }
-}
-
-@keyframes spintoHorizontal {
-  0% {
-    transform: rotate(0deg) scale(1);
-  }
-  90% {
-    transform: rotate(-95deg) scale(1.4);
-  }
-  100% {
-    transform: rotate(-90deg) scale(1.4);
-  }
-}
-
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes goLeft {
-  from {
-    transform: translateX(0%);
-  }
-  to {
-    transform: translateX(-30%);
-  }
-}
-
-@keyframes goLeftFurther {
-  from {
-    transform: translateX(-30%);
-  }
-  to {
-    transform: translateX(-65%);
-  }
-}
-
-@keyframes goRight {
-  from {
-    transform: translateX(0%);
-  }
-  to {
-    transform: translateX(50%);
-  }
-}
-
-@keyframes goRightFurther {
-  from {
-    transform: translateX(50%);
-  }
-  to {
-    transform: translateX(120%);
-  }
-}
-
-.nameExplanationContainer {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 100%;
-  height: calc(25vmax + 4vh);
-  max-height: 430px;
-  padding-top: inherit;
-}
-
-.horizontalLogo {
-  max-width: 400px;
-  width: 21vmax;
-  height: auto;
-  padding-top: 4vh;
-  padding-bottom: 4vh;
-  animation: spin 4s ease-in-out 2s 1 forwards,
-    fadeOut 4s ease-in-out 11s 1 forwards;
-}
-
-.nameExplanation {
-  position: absolute;
-  width: 100%;
-  animation: fadeOut 4s ease-in-out 2s 1 forwards;
-}
-
-.nameExplanation2 {
-  position: absolute;
-  width: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  opacity: 0;
-  justify-content: center;
-  animation: fadeIn 4s ease-in-out 6s 1 none,
-    fadeOut 4s ease-in-out 10s 1 forwards;
-}
-
-.nameExplanation3 {
-  position: absolute;
-  width: 100%;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  max-width: 1500px;
+.churchName {
   display: flex;
-  align-items: center;
-  opacity: 0;
   justify-content: center;
-  animation: fadeIn 4s ease-in-out 14s 1 forwards;
+  height: 100%;
+  background-image: url("../../components/Main/background.svg");
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
-.edmonton {
-  animation: goLeft 4s ease-in-out 16s 1 none,
-    goLeftFurther 4s ease-in-out 20s 1 forwards;
-}
-
-.verticalLogo {
-  position: absolute;
-  left: 50.5%;
-  opacity: 0;
-  max-width: 5vmax;
-  animation: fadeIn 4s ease-in-out 16.5s 1 forwards,
-    spintoHorizontal 4s ease-in-out 20s 1 forwards;
-}
-
-.church {
-  animation: goRight 4s ease-in-out 16s 1 none,
-    goRightFurther 4s ease-in-out 20s 1 forwards;
+.carousel img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .churchName > .learnMoreAbtChurch {
   position: absolute;
-  bottom: 3vh;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 16px;
 }
 
 .cards {
@@ -176,19 +38,3 @@
   margin-top: 5vh;
   margin-bottom: 5vh;
 }
-
-/* .cards > Card {
-  margin: 2vh;
-  margin-right: 5%;
-} */
-
-/* Responsive layout - when the screen is less than 700px wide, make the two columns stack on top of each other instead of next to each other */
-/* @media screen and (max-width: 850px) {
-  .cards {
-    flex-direction: column;
-  }
-
-  .cards > card {
-    margin: 4vh;
-  }
-} */

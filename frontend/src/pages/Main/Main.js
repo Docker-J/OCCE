@@ -7,102 +7,41 @@ import ButtonBases from "../../components/Main/MainButtonBanner";
 import "./Main.css";
 // import { useState } from "react";
 import CustomChatBot from "../../components/Main/CustomChatBot";
+import MainAnimation from "./MainAnimation";
+import { Carousel } from "react-responsive-carousel";
+
+import styles from "react-responsive-carousel/lib/styles/carousel.min.css";
 
 const Main = () => {
   return (
     <>
-      <div className="churchName">
-        <div className="nameExplanationContainer">
-          <img
-            className="horizontalLogo"
-            src="img/ONLogo.svg"
-            alt="logo of ON Community Church of Edmonton"
-          />
+      <Carousel
+        showThumbs={false}
+        showStatus={false}
+        showIndicators={false}
+        styles={styles}
+      >
+        <div className="churchName">
+          <MainAnimation />
 
-          <div className="nameExplanation">
-            <Typography
-              className="old"
-              variant="h5"
-              fontWeight="530"
-              fontSize={"min(5vw, 36px)"}
-              style={{ color: "#f1cdb0" }}
-            >
-              Based ON the OLD truth
-            </Typography>
-            <Typography
-              className="new"
-              variant="h5"
-              fontWeight="530"
-              fontSize={"min(5vw, 36px)"}
-              color="white"
-            >
-              Moving ON to the NEW standard
-            </Typography>
-          </div>
-
-          <div className="nameExplanation2">
-            <Typography
-              variant="h5"
-              fontWeight="530"
-              fontSize={"min(5vw, 36px)"}
-              style={{ color: "#f1cdb0" }}
-            >
-              온 맘 다해 하나님을 사랑하고
-            </Typography>
-            <Typography
-              variant="h5"
-              fontWeight="530"
-              fontSize={"min(5vw, 36px)"}
-              color="white"
-            >
-              온 힘 다해 이웃을 사랑하는 교회
-            </Typography>
-          </div>
-          <div className="nameExplanation3">
-            <Typography
-              className="edmonton"
-              variant="h5"
-              fontWeight="530"
-              fontSize={"3.4vmax"}
-              style={{ color: "#f1cdb0" }}
-            >
-              에드먼턴
-            </Typography>
-
-            <img
-              className="verticalLogo"
-              src="img/ONLogoVertical.svg"
-              alt="Vertical Logo"
-              // style={{ maxWidth: "5vh" }}
-            />
-
-            <Typography
-              className="church"
-              variant="h5"
-              fontWeight="530"
-              fontSize={"3.4vmax"}
-              color="white"
-            >
-              교회
-            </Typography>
-          </div>
+          <Button
+            className="learnMoreAbtChurch"
+            component={Link}
+            to="/aboutus#churchname"
+            variant="outlined"
+            size="medium"
+            sx={{
+              color: "white",
+              borderColor: "white",
+              ":hover": { borderColor: "white", bgcolor: "#964B00" },
+            }}
+          >
+            온 교회 이야기
+          </Button>
         </div>
 
-        <Button
-          className="learnMoreAbtChurch"
-          component={Link}
-          to="/aboutus#churchname"
-          variant="outlined"
-          size="medium"
-          sx={{
-            color: "white",
-            borderColor: "white",
-            ":hover": { borderColor: "white", bgcolor: "#964B00" },
-          }}
-        >
-          온 교회 이야기
-        </Button>
-      </div>
+        <img src="https://picsum.photos/seed/picsum/200" />
+      </Carousel>
 
       <ButtonBases className="cards" />
 

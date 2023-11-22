@@ -1,0 +1,42 @@
+.nameExplanationContainer {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+  /* height: calc(25vmax + 4vh);
+  max-height: 430px; */
+  padding-top: inherit;
+}
+
+.horizontalLogo {
+  max-width: 400px;
+  width: 21vmax;
+  height: auto;
+  padding-top: 4vh;
+  padding-bottom: 4vh;
+}
+
+.nameExplanation {
+  position: absolute;
+  width: 100%;
+}
+
+.nameExplanation3 {
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  /* max-width: 1500px; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.verticalLogo {
+  position: absolute;
+  left: 50.5%;
+  opacity: 0;
+  max-width: 5vmax;
+  height: auto !important;
+  object-fit: contain !important;
+}

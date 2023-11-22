@@ -118,12 +118,10 @@ const router = createBrowserRouter([
         path: "/",
         element: <Main />,
       },
-
       {
         path: "/aboutus",
         element: <About />,
       },
-
       {
         path: "/announcements",
         element: <Announcements />,
@@ -147,7 +145,6 @@ const router = createBrowserRouter([
         path: "/newcomers",
         element: <NewComers />,
       },
-
       {
         path: "/community/smallgroup",
         element: <SmallGroup />,
@@ -156,7 +153,6 @@ const router = createBrowserRouter([
         path: "/community/ministry",
         element: <Ministry />,
       },
-
       {
         path: "/online/sundayservice",
         element: <SundayService />,
