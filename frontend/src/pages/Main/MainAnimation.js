@@ -1,14 +1,23 @@
 import { Typography } from "@mui/material";
-import { useSpring, animated, easings, useSpringRef } from "@react-spring/web";
+import {
+  useSpring,
+  animated,
+  easings,
+  useSpringRef,
+  useChain,
+} from "@react-spring/web";
 
 import "./MainNameAnimation.css";
 import { useState } from "react";
 
 const MainAnimation = () => {
-  const spinRef = useSpringRef();
+  const api = useSpringRef();
+  const fadeInRef = useSpringRef();
+  const fadeOutRef = useSpringRef();
+  const fadeOut2Ref = useSpringRef();
 
   const spin = useSpring({
-    ref: spinRef,
+    ref: api,
     from: { transform: "rotate(0deg) scale(1)" },
     to: { transform: "rotate(90deg) scale(0.65)" },
     delay: 2000,
@@ -20,9 +29,10 @@ const MainAnimation = () => {
   });
 
   const fadeOut2 = useSpring({
+    ref: fadeOut2Ref,
     from: { opacity: 1 },
     to: { opacity: 0 },
-    delay: 2000,
+    // delay: 2000,
     reset: true,
     config: {
       duration: 4000,
@@ -31,9 +41,10 @@ const MainAnimation = () => {
   });
 
   const fadeIn = useSpring({
+    ref: fadeInRef,
     from: { opacity: 0 },
-    to: [{ opacity: 1 }, { opacity: 0 }],
-    delay: 6000,
+    to: { opacity: 1 },
+    // delay: 6000,
     reset: true,
     config: {
       duration: 4000,
@@ -42,9 +53,10 @@ const MainAnimation = () => {
   });
 
   const fadeOut = useSpring({
+    ref: fadeOutRef,
     from: { opacity: 1 },
     to: { opacity: 0 },
-    delay: 11000,
+    // delay: 11000,
     reset: true,
     config: {
       duration: 4000,
@@ -96,21 +108,30 @@ const MainAnimation = () => {
     },
   });
 
+  const test = () => {
+    // api.set({ opacity: 1 });
+    api.set({ transform: "rotate(0deg) scale(1)", opacity: 1 });
+    api.start();
+  };
+
   const spinHorizontal = useSpring({
     from: { transform: "rotate(0deg) scale(1)" },
     to: { transform: "rotate(-90deg) scale(1.4)" },
-    delay: 21200,
+    delay: 20500,
     reset: true,
     config: {
-      duration: 3600,
+      duration: 5000,
       easing: easings.easeOutBack,
     },
-    onRest: () => setResetKey((prev) => prev + 1),
+    onRest: test,
   });
+
   const [resetKey, setResetKey] = useState(0);
 
+  useChain([api, fadeOut2Ref, fadeInRef, fadeOutRef], [0, 1, 2, 3], 2500);
+
   return (
-    <div key={resetKey} className="nameExplanationContainer">
+    <div key={resetKey} onClick={test} className="nameExplanationContainer">
       <animated.img
         style={{
           maxWidth: "400px",
@@ -145,7 +166,10 @@ const MainAnimation = () => {
         </Typography>
       </animated.div>
 
-      <animated.div className="nameExplanation2" style={{ ...fadeIn }}>
+      <animated.div
+        className="nameExplanation2"
+        style={{ ...fadeIn, ...fadeOut }}
+      >
         <Typography
           variant="h5"
           fontWeight="530"
