@@ -21,6 +21,10 @@
   width: 100%;
 }
 
+.nameExplanation2 {
+  opacity: 0;
+}
+
 .nameExplanation3 {
   position: absolute;
   width: 100%;

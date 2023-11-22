@@ -8,20 +8,37 @@ import {
 } from "@react-spring/web";
 
 import "./MainNameAnimation.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const MainAnimation = () => {
   const api = useSpringRef();
   const fadeInRef = useSpringRef();
   const fadeOutRef = useSpringRef();
   const fadeOut2Ref = useSpringRef();
+  const fadeIn2Ref = useSpringRef();
+  const moveLeftRef = useSpringRef();
+  const moveRightRef = useSpringRef();
+  const fadeIn3Ref = useSpringRef();
+  const spinHorizontalRef = useSpringRef();
+
+  const springRefs = [
+    api,
+    fadeInRef,
+    fadeOutRef,
+    fadeOut2Ref,
+    fadeIn2Ref,
+    moveLeftRef,
+    moveRightRef,
+    fadeIn3Ref,
+    spinHorizontalRef,
+  ];
 
   const spin = useSpring({
     ref: api,
     from: { transform: "rotate(0deg) scale(1)" },
     to: { transform: "rotate(90deg) scale(0.65)" },
     delay: 2000,
-    reset: true,
+    // reset: true,
     config: {
       duration: 4000,
       easing: easings.easeInOutSine,
@@ -33,7 +50,7 @@ const MainAnimation = () => {
     from: { opacity: 1 },
     to: { opacity: 0 },
     // delay: 2000,
-    reset: true,
+    // reset: true,
     config: {
       duration: 4000,
       easing: easings.easeInOutSine,
@@ -43,11 +60,11 @@ const MainAnimation = () => {
   const fadeIn = useSpring({
     ref: fadeInRef,
     from: { opacity: 0 },
-    to: { opacity: 1 },
+    to: [{ opacity: 1 }, { opacity: 0 }],
     // delay: 6000,
-    reset: true,
+    // reset: true,
     config: {
-      duration: 4000,
+      duration: 3500,
       easing: easings.easeInOutSine,
     },
   });
@@ -56,8 +73,7 @@ const MainAnimation = () => {
     ref: fadeOutRef,
     from: { opacity: 1 },
     to: { opacity: 0 },
-    // delay: 11000,
-    reset: true,
+    // reset: true,
     config: {
       duration: 4000,
       easing: easings.easeInOutSine,
@@ -65,10 +81,10 @@ const MainAnimation = () => {
   });
 
   const fadeIn2 = useSpring({
+    ref: fadeIn2Ref,
     from: { opacity: 0 },
     to: { opacity: 1 },
-    delay: 14000,
-    reset: true,
+    // reset: true,
     config: {
       duration: 4000,
       easing: easings.easeInOutSine,
@@ -76,10 +92,10 @@ const MainAnimation = () => {
   });
 
   const moveLeft = useSpring({
+    ref: moveLeftRef,
     from: { transform: "translateX(0%)" },
     to: [{ transform: "translateX(-30%)" }, { transform: "translateX(-65%)" }],
-    delay: 16000,
-    reset: true,
+    // reset: true,
     config: {
       duration: 4000,
       easing: easings.easeInOutSine,
@@ -87,10 +103,10 @@ const MainAnimation = () => {
   });
 
   const moveRight = useSpring({
+    ref: moveRightRef,
     from: { transform: "translateX(0%)" },
     to: [{ transform: "translateX(50%)" }, { transform: "translateX(120%)" }],
-    delay: 16000,
-    reset: true,
+    // reset: true,
     config: {
       duration: 4000,
       easing: easings.easeInOutSine,
@@ -98,29 +114,51 @@ const MainAnimation = () => {
   });
 
   const fadeIn3 = useSpring({
+    ref: fadeIn3Ref,
     from: { opacity: 0 },
     to: { opacity: 1 },
-    delay: 16500,
-    reset: true,
+    // reset: true,
     config: {
       duration: 4000,
       easing: easings.easeInOutSine,
     },
   });
 
+  const [pause, setPause] = useState(false);
+
   const test = () => {
     // api.set({ opacity: 1 });
-    api.set({ transform: "rotate(0deg) scale(1)", opacity: 1 });
-    api.start();
+    // api.set({ transform: "rotate(0deg) scale(1)", opacity: 1 });
+    if (!pause) {
+      springRefs.forEach((ref) => ref.pause());
+      setPause(true);
+    }
+
+    if (pause) {
+      springRefs.forEach((ref) => ref.resume());
+      setPause(false);
+    }
   };
 
+  // useEffect(() => {
+  //   if (!pause) {
+  //     springRefs.forEach((ref) => ref.pause());
+  //     setPause(true);
+  //   }
+
+  //   if (pause) {
+  //     springRefs.forEach((ref) => ref.resume());
+  //     setPause(false);
+  //   }
+  // }, [pause]);
+
   const spinHorizontal = useSpring({
+    ref: spinHorizontalRef,
     from: { transform: "rotate(0deg) scale(1)" },
     to: { transform: "rotate(-90deg) scale(1.4)" },
-    delay: 20500,
-    reset: true,
+    // reset: true,
     config: {
-      duration: 5000,
+      duration: 4800,
       easing: easings.easeOutBack,
     },
     onRest: test,
@@ -128,7 +166,21 @@ const MainAnimation = () => {
 
   const [resetKey, setResetKey] = useState(0);
 
-  useChain([api, fadeOut2Ref, fadeInRef, fadeOutRef], [0, 1, 2, 3], 2500);
+  useChain(
+    [
+      api,
+      fadeOut2Ref,
+      fadeInRef,
+      fadeOutRef,
+      fadeIn2Ref,
+      moveLeftRef,
+      moveRightRef,
+      fadeIn3Ref,
+      spinHorizontalRef,
+    ],
+    [0, 1, 2, 3, 4, 4.6, 4.6, 5, 6.6],
+    3000
+  );
 
   return (
     <div key={resetKey} onClick={test} className="nameExplanationContainer">
@@ -166,10 +218,7 @@ const MainAnimation = () => {
         </Typography>
       </animated.div>
 
-      <animated.div
-        className="nameExplanation2"
-        style={{ ...fadeIn, ...fadeOut }}
-      >
+      <animated.div className="nameExplanation2" style={{ ...fadeIn }}>
         <Typography
           variant="h5"
           fontWeight="530"
