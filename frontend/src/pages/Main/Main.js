@@ -18,7 +18,8 @@ const Main = () => {
       <Carousel
         showThumbs={false}
         showStatus={false}
-        showIndicators={false}
+        // showIndicators={false}
+        infiniteLoop
         styles={styles}
       >
         <div className="churchName">

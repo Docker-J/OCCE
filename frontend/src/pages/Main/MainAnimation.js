@@ -38,7 +38,7 @@ const MainAnimation = () => {
     from: { transform: "rotate(0deg) scale(1)" },
     to: { transform: "rotate(90deg) scale(0.65)" },
     delay: 2000,
-    // reset: true,
+    reset: true,
     config: {
       duration: 4000,
       easing: easings.easeInOutSine,
@@ -50,7 +50,7 @@ const MainAnimation = () => {
     from: { opacity: 1 },
     to: { opacity: 0 },
     // delay: 2000,
-    // reset: true,
+    reset: true,
     config: {
       duration: 4000,
       easing: easings.easeInOutSine,
@@ -62,7 +62,7 @@ const MainAnimation = () => {
     from: { opacity: 0 },
     to: [{ opacity: 1 }, { opacity: 0 }],
     // delay: 6000,
-    // reset: true,
+    reset: true,
     config: {
       duration: 3500,
       easing: easings.easeInOutSine,
@@ -73,7 +73,7 @@ const MainAnimation = () => {
     ref: fadeOutRef,
     from: { opacity: 1 },
     to: { opacity: 0 },
-    // reset: true,
+    reset: true,
     config: {
       duration: 4000,
       easing: easings.easeInOutSine,
@@ -84,7 +84,7 @@ const MainAnimation = () => {
     ref: fadeIn2Ref,
     from: { opacity: 0 },
     to: { opacity: 1 },
-    // reset: true,
+    reset: true,
     config: {
       duration: 4000,
       easing: easings.easeInOutSine,
@@ -95,7 +95,7 @@ const MainAnimation = () => {
     ref: moveLeftRef,
     from: { transform: "translateX(0%)" },
     to: [{ transform: "translateX(-30%)" }, { transform: "translateX(-65%)" }],
-    // reset: true,
+    reset: true,
     config: {
       duration: 4000,
       easing: easings.easeInOutSine,
@@ -106,7 +106,7 @@ const MainAnimation = () => {
     ref: moveRightRef,
     from: { transform: "translateX(0%)" },
     to: [{ transform: "translateX(50%)" }, { transform: "translateX(120%)" }],
-    // reset: true,
+    reset: true,
     config: {
       duration: 4000,
       easing: easings.easeInOutSine,
@@ -117,7 +117,7 @@ const MainAnimation = () => {
     ref: fadeIn3Ref,
     from: { opacity: 0 },
     to: { opacity: 1 },
-    // reset: true,
+    reset: true,
     config: {
       duration: 4000,
       easing: easings.easeInOutSine,
@@ -127,16 +127,19 @@ const MainAnimation = () => {
   const [pause, setPause] = useState(false);
 
   const test = () => {
-    // api.set({ opacity: 1 });
-    // api.set({ transform: "rotate(0deg) scale(1)", opacity: 1 });
-    if (!pause) {
-      springRefs.forEach((ref) => ref.pause());
-      setPause(true);
-    }
-
-    if (pause) {
-      springRefs.forEach((ref) => ref.resume());
-      setPause(false);
+    if (api) {
+      console.log(api.current);
+      fadeOutRef.start({
+        from: { opacity: 0 },
+        to: { opacity: 1 },
+        immediate: true,
+      });
+      fadeIn2Ref.start({
+        from: { opacity: 1 },
+        to: { opacity: 0 },
+        immediate: true,
+      });
+      // fadeOutRef.start();
     }
   };
 
@@ -178,12 +181,16 @@ const MainAnimation = () => {
       fadeIn3Ref,
       spinHorizontalRef,
     ],
-    [0, 1, 2, 3, 4, 4.6, 4.6, 5, 6.6],
+    [0, 1, 2, 3, 4, 4.6, 4.6, 5, 6.4],
     3000
   );
 
   return (
-    <div key={resetKey} onClick={test} className="nameExplanationContainer">
+    <div
+      key={resetKey}
+      onClick={() => test()}
+      className="nameExplanationContainer"
+    >
       <animated.img
         style={{
           maxWidth: "400px",
