@@ -1,67 +1,138 @@
 const express = require("express");
 const router = express.Router();
-const { db, fcm } = require("./api/firebase.js");
-const { Timestamp } = require("firebase-admin/firestore");
+const { fcm } = require("./api/firebase.js");
+const axios = require("axios");
+const multer = require("multer");
+const FormData = require("form-data");
+const uuid = require("uuid");
 
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const {
+  QueryCommand,
+  PutCommand,
+  DynamoDBDocumentClient,
+} = require("@aws-sdk/lib-dynamodb");
+
+const CLOUDFLARE_ACCOUNT_ID = "f4b5f3fab40742f7a3975f012a237dc7";
+const CLOUDFLARE_API_KEY = "QmOu9granM7PXJVR25NzlQ03CA-0kcPe-CPjrCoM";
+
+const client = new DynamoDBClient({ region: "us-west-2" });
+const docClient = DynamoDBDocumentClient.from(client);
+
+const multerStorage = multer.memoryStorage();
+const upload = multer({ storage: multerStorage });
+
+const TABLE_NAME = "MeditationON";
+const PRIMARY_KEY = "ID";
 const PAGE_SIZE = 12;
 
 router.get("/getPosts", async (req, res) => {
   const lastVisibleID = req.query.lastVisible;
-  try {
-    if (lastVisibleID == null) {
-      var snapshot = await db
-        .collection("MeditationON")
-        .orderBy("timestamp", "desc")
-        .limit(PAGE_SIZE)
-        .select("0")
-        .get();
-    } else {
-      const lastVisible = await db
-        .collection("MeditationON")
-        .doc(lastVisibleID)
-        .get();
 
-      var snapshot = await db
-        .collection("MeditationON")
-        .orderBy("timestamp", "desc")
-        .startAfter(lastVisible)
-        .limit(PAGE_SIZE)
-        .select("0")
-        .get();
-    }
+  const scanParam = {
+    TableName: TABLE_NAME,
+    IndexName: "SortTimestamp",
+    Limit: PAGE_SIZE,
+    ProjectionExpression: "ID, #t, Cover",
+    ScanIndexForward: false,
+    KeyConditionExpression: "#sort = :sort",
+    ExpressionAttributeNames: {
+      "#t": "Timestamp",
+      "#sort": "sort",
+    },
+    ExpressionAttributeValues: {
+      ":sort": 0,
+    },
+  };
+
+  if (lastVisibleID != null) {
+    scanParam.ExclusiveStartKey = {
+      ID: lastVisibleID,
+      Timestamp: req.query.timeStamp,
+      sort: 0,
+    };
+  }
+
+  const command = new QueryCommand(scanParam);
+
+  try {
+    const result = await docClient.send(command);
 
     const dataArray = [];
-    snapshot.forEach((doc) => {
-      dataArray.push({ id: doc.id, ...doc.data() });
+    result.Items.forEach((data) => {
+      dataArray.push(data);
     });
 
     res.send(dataArray);
   } catch (error) {
-    res.send(error);
+    console.log(error);
   }
 });
 
 router.get("/getPostDetail", async (req, res) => {
   try {
-    const snapshot = await db
-      .collection("MeditationON")
-      .doc(req.query.id)
-      .get();
+    const scanParam = {
+      TableName: TABLE_NAME,
+      Limit: PAGE_SIZE,
+      ProjectionExpression: "Images",
+      KeyConditionExpression: "ID = :postID",
+      ExpressionAttributeValues: {
+        ":postID": req.query.id,
+      },
+    };
 
-    const data = snapshot.data();
-    delete data.timestamp;
+    const command = new QueryCommand(scanParam);
 
-    res.send(data);
-  } catch {}
+    const result = await docClient.send(command);
+
+    res.send(result.Items[0].Images);
+    console.log(result);
+  } catch (error) {
+    console.log(error);
+  }
 });
 
-router.post("/uploadPost", async (req, res) => {
-  req.body.images.timestamp = Timestamp.now();
-  try {
-    const snapshot = await db.collection("MeditationON").add(req.body.images);
+router.post("/uploadImage", upload.any("images"), async (req, res) => {
+  const ids = {};
+  const images = req.files;
 
-    res.send(snapshot.id);
-  } catch {}
+  try {
+    for (const [index, image] of images.entries()) {
+      const formData = new FormData();
+      formData.append("file", image.buffer, image.originalname);
+
+      const result = await axios.post(
+        `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1`,
+        formData,
+        {
+          headers: {
+            "Content-Type": `multipart/form-data; boundary=${formData._boundary}`,
+            Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
+          },
+        }
+      );
+
+      ids[index] = result.data.result.id;
+    }
+
+    const command = new PutCommand({
+      TableName: TABLE_NAME,
+      Item: {
+        ID: uuid.v4(),
+        Timestamp: new Date().toISOString(),
+        Cover: ids[0],
+        Images: ids,
+        sort: 0,
+      },
+    });
+
+    const response = await docClient.send(command);
+    console.log(response);
+
+    res.sendStatus(201);
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 module.exports = router;

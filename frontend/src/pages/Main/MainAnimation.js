@@ -164,7 +164,7 @@ const MainAnimation = () => {
       duration: 4800,
       easing: easings.easeOutBack,
     },
-    onRest: test,
+    // onRest: test,
   });
 
   const [resetKey, setResetKey] = useState(0);
@@ -188,7 +188,7 @@ const MainAnimation = () => {
   return (
     <div
       key={resetKey}
-      onClick={() => test()}
+      // onClick={() => test()}
       className="nameExplanationContainer"
     >
       <animated.img

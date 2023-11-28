@@ -1,7 +1,14 @@
-import { Box, Button, Modal, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Modal,
+  Snackbar,
+  Typography,
+} from "@mui/material";
 import axios from "axios";
 import { useCallback, useState } from "react";
-import imageCompression from "browser-image-compression";
 import { useDropzone } from "react-dropzone";
 import update from "immutability-helper";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -49,61 +56,29 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
     });
   };
 
-  async function imgToBase64() {
-    // return new Promise((resolve) => {
-    //   const images = [];
-    //   for (let i = 0; i < filesToUpload.length; i++) {
-    //     fileToBase64(filesToUpload[i], (err, result) => {
-    //       images.push(result);
-    //       // if (i === filesToUpload.length - 1) {
-    //       // }
-    //     });
-    //   }
-    //   resolve(images);
-    // });
+  const uploadImages = async () => {
+    const form = new FormData();
 
-    const promises = filesToUpload.map((file) => {
-      return new Promise((resolve) => {
-        fileToBase64(file, (err, result) => {
-          resolve(result);
-        });
+    filesToUpload.forEach((image) => {
+      form.append("images", image);
+    });
+
+    try {
+      setLoading(true);
+
+      const result = await axios.post("/api/meditationON/uploadImage", form, {
+        headers: {
+          "Content-Type": `multipart/form-data`,
+        },
       });
-    });
 
-    const images = await Promise.all(promises);
-    return images;
-  }
-
-  const uploadFiles = () => {
-    imgToBase64().then((result) => {
-      post(result);
-    });
-  };
-
-  async function post(images) {
-    const data = {};
-
-    images.forEach((image, index) => {
-      data[index] = image;
-    });
-
-    console.log(data);
-
-    const test = await axios.post("/api/meditationON/uploadPost", {
-      images: data,
-    });
-  }
-
-  const fileToBase64 = async (file, cb) => {
-    const compressedImage = await imageCompression(file, { maxSizeMB: 0.1 });
-    const reader = new FileReader();
-    reader.readAsDataURL(compressedImage);
-    reader.onload = function() {
-      cb(null, reader.result);
-    };
-    reader.onerror = function(error) {
-      cb(error, null);
-    };
+      setIsSuccessSnackBarOpen(true);
+      setLoading(false);
+      handleClose();
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    }
   };
 
   const removeImage = (i) => {
@@ -126,16 +101,6 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
     setImagesPreview([]);
   };
 
-  const { getRootProps, getInputProps, open } = useDropzone({
-    noClick: true,
-    accept: {
-      "image/*": [],
-    },
-    onDrop: (acceptedFiles) => {
-      handleChangeFile(acceptedFiles);
-    },
-  });
-
   const movePhoto = useCallback((dragIndex, hoverIndex) => {
     setFilesToUpload((prev) =>
       update(prev, {
@@ -155,6 +120,16 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
     );
   }, []);
 
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: {
+      "image/*": [],
+    },
+    onDrop: (acceptedFiles) => {
+      handleChangeFile(acceptedFiles);
+    },
+    noDragEventsBubbling: true,
+  });
+
   const renderCard = useCallback((image, index) => {
     return (
       <PreviewCard
@@ -167,81 +142,117 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
     );
   }, []);
 
-  return (
-    <Modal
-      open={openModal}
-      onClose={handleClose}
-      // aria-labelledby="modal-modal-title"
-      // aria-describedby="modal-modal-description"
-    >
-      <Box sx={style} bgcolor="white">
-        <DndProvider backend={HTML5Backend}>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              flexWrap: "wrap",
-              alignContent: "flex-start",
-              justifyContent: "space-between",
-              margin: "10pt",
-              width: "95%",
-              height: "75%",
-              overflowX: "auto",
-            }}
-          >
-            {imagesPreview.map((image, index) => renderCard(image, index))}
-          </div>
-        </DndProvider>
-        <div
-          style={{
-            width: "95%",
-            height: "20%",
-            border: "1pt dotted #f57c00",
-            borderRadius: "1em",
-            overflowY: "auto",
-          }}
-          {...getRootProps()}
-        >
-          <input onChange={(e) => handleChangeFile(e)} {...getInputProps()} />
-          <Box
-            sx={{
-              position: "relative",
-              height: "100%",
-              widht: "100%",
-            }}
-            onClick={open}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-              }}
-            >
-              <AddCircleOutlineIcon fontSize="large" color="primary" />
-              <Typography>Click or Drag Files to here</Typography>
-            </div>
-          </Box>
-        </div>
+  const [loading, setLoading] = useState(false);
+  const [isSuccessSnackBarOpen, setIsSuccessSnackBarOpen] = useState(false);
+  const handleSnackBarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
 
-        <div style={{ display: "flex", marginTop: "2em" }}>
-          <Button variant="outlined" disabled={filesToUpload.length <= 0}>
-            Submit
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={removeAllImage}
-            disabled={filesToUpload.length <= 0}
-          >
-            Clear All
-          </Button>
-          <Button variant="outlined" onClick={handleClose}>
-            Close
-          </Button>
-        </div>
-      </Box>
-    </Modal>
+    setIsSuccessSnackBarOpen(false);
+  };
+
+  if (loading) return <CircularProgress />;
+
+  return (
+    <>
+      <Modal
+        open={openModal}
+        onClose={handleClose}
+        // aria-labelledby="modal-modal-title"
+        // aria-describedby="modal-modal-description"
+      >
+        <Box sx={style} bgcolor="white">
+          {loading ? (
+            <CircularProgress />
+          ) : (
+            <>
+              <DndProvider backend={HTML5Backend}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    alignContent: "flex-start",
+                    justifyContent: "space-between",
+                    margin: "10pt",
+                    width: "95%",
+                    height: "75%",
+                    overflowX: "auto",
+                  }}
+                >
+                  {imagesPreview.map((image, index) =>
+                    renderCard(image, index)
+                  )}
+                </div>
+              </DndProvider>
+
+              <div
+                style={{
+                  width: "95%",
+                  height: "20%",
+                  border: "1pt dotted #f57c00",
+                  borderRadius: "1em",
+                  overflowY: "auto",
+                }}
+                {...getRootProps()}
+              >
+                <input {...getInputProps()} />
+                <Box
+                  sx={{
+                    position: "relative",
+                    height: "100%",
+                    widht: "100%",
+                  }}
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                    }}
+                  >
+                    <AddCircleOutlineIcon fontSize="large" color="primary" />
+                    <Typography>Click or Drag Files to here</Typography>
+                  </div>
+                </Box>
+              </div>
+
+              <div style={{ display: "flex", marginTop: "2em" }}>
+                <Button
+                  variant="outlined"
+                  disabled={filesToUpload.length <= 0}
+                  onClick={uploadImages}
+                >
+                  Submit
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={removeAllImage}
+                  disabled={filesToUpload.length <= 0}
+                >
+                  Clear All
+                </Button>
+                <Button variant="outlined" onClick={handleClose}>
+                  Close
+                </Button>
+              </div>
+            </>
+          )}
+        </Box>
+      </Modal>
+
+      <Snackbar
+        open={isSuccessSnackBarOpen}
+        autoHideDuration={8000}
+        onClose={handleSnackBarClose}
+      >
+        <Alert severity="success" onClose={handleSnackBarClose}>
+          Uploaded Succesfully!
+        </Alert>
+      </Snackbar>
+    </>
   );
 };
 

@@ -1,0 +1,10 @@
+.carousel :global(.slider) {
+  height: 50vh;
+  max-height: 650px;
+}
+
+@media only screen and (min-width: 900px) {
+  .carousel :global(.slider) {
+    height: 60vh;
+  }
+}

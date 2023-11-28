@@ -1,6 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 
-import { CircularProgress, Fab, ImageList, Typography } from "@mui/material";
+import {
+  CircularProgress,
+  Fab,
+  ImageList,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 
@@ -10,6 +16,7 @@ import MeditationONModal from "./MeditationONModal";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import "../../NextGen/NextGen.css";
+import AdminComponent from "../../../util/AdminComponent";
 
 const PAGE_SIZE = 12;
 const titleBackground = {
@@ -18,19 +25,30 @@ const titleBackground = {
 };
 
 const MeditationON = () => {
+  const matches = useMediaQuery("(min-width:1200px)");
+
   const [posts, setPosts] = useState([]);
   const [end, setEnd] = useState(false);
   const [restored, setRestored] = useState(true);
 
   const getPosts = async () => {
     console.log("test getPosts");
+    console.log(posts);
 
     const result = await axios.get(
       `/api/MeditationON/getPosts${
-        posts.length === 0 ? "" : `?lastVisible=${posts.at(-1).id}`
+        posts.length === 0
+          ? ""
+          : `?lastVisible=${posts.at(-1).ID}&timeStamp=${
+              posts.at(-1).Timestamp
+            }`
       }`
     );
-    setPosts((prev) => [...prev, ...result.data]);
+    if (result.data.length > 0) {
+      setPosts((prev) => [...prev, ...result.data]);
+    } else {
+      setEnd(true);
+    }
   };
 
   useEffect(() => {
@@ -116,21 +134,20 @@ const MeditationON = () => {
           marginTop: "1em",
         }}
       >
-        {posts.length !== 0 ? (
+        {posts.length > 0 ? (
           <InfiniteScroll
             dataLength={posts.length}
             next={getPosts}
             hasMore={!end}
             loader={<CircularProgress />}
-            scrollThreshold={0.75}
-            // scrollableTarget="scrollableDiv"
+            scrollThreshold={1}
             style={{ overflowY: "hidden" }}
           >
             {
               <ImageList
                 ref={scrollRef}
                 sx={{ mx: "0.5rem" }}
-                cols={3}
+                cols={matches ? 4 : 3}
                 gap={2.5}
               >
                 <MemoizedMeditationONComp posts={posts} />
@@ -142,13 +159,15 @@ const MeditationON = () => {
         )}
       </div>
 
-      <Fab
-        variant="primary"
-        style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
-        onClick={handleOpen}
-      >
-        <AddIcon />
-      </Fab>
+      <AdminComponent>
+        <Fab
+          variant="primary"
+          style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
+          onClick={handleOpen}
+        >
+          <AddIcon />
+        </Fab>
+      </AdminComponent>
 
       <MeditationONModal openModal={openModal} setOpenModal={setOpenModal} />
     </>

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-import { Button, Typography } from "@mui/material";
+import { Button } from "@mui/material";
 // import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
 
 import ButtonBases from "../../components/Main/MainButtonBanner";
@@ -11,11 +11,14 @@ import MainAnimation from "./MainAnimation";
 import { Carousel } from "react-responsive-carousel";
 
 import styles from "react-responsive-carousel/lib/styles/carousel.min.css";
+import test from "./test.module.css";
+import CustomCarousel from "../Online/MeditationON/CustomCarousel";
 
 const Main = () => {
   return (
     <>
-      <Carousel
+      <CustomCarousel
+        className={test.carousel}
         showThumbs={false}
         showStatus={false}
         // showIndicators={false}
@@ -40,9 +43,8 @@ const Main = () => {
             온 교회 이야기
           </Button>
         </div>
-
-        <img src="https://picsum.photos/seed/picsum/200" />
-      </Carousel>
+        {/* <img src="https://picsum.photos/seed/picsum/200" /> */}
+      </CustomCarousel>
 
       <ButtonBases className="cards" />
 
