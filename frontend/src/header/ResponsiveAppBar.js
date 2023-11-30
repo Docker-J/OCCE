@@ -28,7 +28,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { removeCookieToken } from "../storage/Cookie";
 import { DELETE_TOKEN } from "../store/Auth";
 import {
-  anchorRef,
   bindMenu,
   bindTrigger,
   usePopupState,
@@ -36,6 +35,8 @@ import {
 import { CascadingMenu } from "../components/Header/CascadingMenus";
 // import { messaging } from "../api/firebase";
 // import { getToken } from "firebase/messaging";
+
+import pages from "./Pages.js";
 
 const ResponsiveAppBar = () => {
   const dispatch = useDispatch();
@@ -85,101 +86,6 @@ const ResponsiveAppBar = () => {
   const currentPage = useLocation().pathname;
   // const currnetHash = useLocation().hash;
 
-  const pages = [
-    {
-      title: "교회소개",
-      to: "aboutus#beginning",
-    },
-    {
-      title: "교회소식",
-      popupId: "newsPopupState",
-      subpages: [
-        // {
-        //   title: "공지사항",
-        //   to: "announcements",
-        // },
-        {
-          title: "주보",
-          to: "weeklyupdate",
-        },
-        {
-          title: "새가족",
-          to: "newcomers",
-        },
-        {
-          title: "교회사진",
-          to: "photos",
-        },
-        // {
-        //   title: "교회영상",
-        //   to: "videos",
-        // },
-      ],
-    },
-    {
-      title: "ON-Line",
-      popupId: "onlinePopupState",
-      subpages: [
-        {
-          title: "주일예배",
-          to: "online/sundayservice",
-        },
-        {
-          title: "말씀",
-          to: "online/sermon",
-        },
-        {
-          title: "찬양",
-          to: "online/worship",
-        },
-        {
-          title: "기도ON",
-          to: "online/prayON",
-        },
-        {
-          title: "묵상ON",
-          to: "online/meditationon",
-        },
-      ],
-    },
-    {
-      title: "공동체",
-      popupId: "communityPopupState",
-      subpages: [
-        {
-          title: "소그룹",
-          to: "community/smallgroup",
-        },
-        {
-          title: "사역",
-          to: "community/ministry",
-        },
-      ],
-    },
-    {
-      title: "다음세대",
-      popupId: "nextGenPopupState",
-      subpages: [
-        {
-          title: "유아유치부",
-          to: "nextgen/preschool",
-        },
-        {
-          title: "유초등부",
-          to: "nextgen/elementary",
-        },
-        {
-          title: "중고등부",
-          to: "nextgen/youth",
-        },
-        {
-          title: "청년부",
-          to: "nextgen/youngadult",
-        },
-      ],
-    },
-  ];
-
   const settings_signed = [
     {
       title: "Sign Out",
@@ -197,29 +103,42 @@ const ResponsiveAppBar = () => {
     removeCookieToken();
   };
 
+  const appBarPosition =
+    currentPage === "/" ||
+    currentPage === "/aboutus" ||
+    currentPage.includes("/newcomers") ||
+    currentPage.includes("/nextgen/") ||
+    currentPage.includes("/community/") ||
+    currentPage.includes("/online/")
+      ? "absolute"
+      : "static";
+
+  const appBarColor =
+    currentPage === "/" ||
+    currentPage === "/aboutus" ||
+    currentPage.includes("/newcomers") ||
+    currentPage.includes("/nextgen/") ||
+    currentPage.includes("/community/") ||
+    currentPage.includes("/online/")
+      ? "white"
+      : "black";
+
+  const logoColor =
+    currentPage === "/" ||
+    currentPage === "/aboutus" ||
+    currentPage.includes("/newcomers") ||
+    currentPage.includes("/nextgen/") ||
+    currentPage.includes("/community/") ||
+    currentPage.includes("/online/")
+      ? "/img/HeaderLogoColor.png"
+      : "/img/HeaderLogoBW.png";
+
   return (
     <AppBar
-      position={
-        currentPage === "/" ||
-        currentPage === "/aboutus" ||
-        currentPage.includes("/newcomers") ||
-        currentPage.includes("/nextgen/") ||
-        currentPage.includes("/community/") ||
-        currentPage.includes("/online/")
-          ? "absolute"
-          : "static"
-      }
+      position={appBarPosition}
       style={{ background: "transparent", boxShadow: "none" }}
       sx={{
-        color:
-          currentPage === "/" ||
-          currentPage === "/aboutus" ||
-          currentPage.includes("/newcomers") ||
-          currentPage.includes("/nextgen/") ||
-          currentPage.includes("/community/") ||
-          currentPage.includes("/online/")
-            ? "white"
-            : "black",
+        color: appBarColor,
       }}
     >
       <Container maxWidth="xl">
@@ -232,16 +151,7 @@ const ResponsiveAppBar = () => {
             <Link to="/">
               <img
                 alt="Header Logo"
-                src={
-                  currentPage === "/" ||
-                  currentPage === "/aboutus" ||
-                  currentPage.includes("/newcomers") ||
-                  currentPage.includes("/nextgen/") ||
-                  currentPage.includes("/community/") ||
-                  currentPage.includes("/online/")
-                    ? "/img/HeaderLogoColor.png"
-                    : "/img/HeaderLogoBW.png"
-                }
+                src={logoColor}
                 style={{ width: "240px" }}
               />
             </Link>
@@ -296,16 +206,7 @@ const ResponsiveAppBar = () => {
               <img
                 alt="Header Logo"
                 className="mobileLogo"
-                src={
-                  currentPage === "/" ||
-                  currentPage === "/aboutus" ||
-                  currentPage.includes("/newcomers") ||
-                  currentPage.includes("/nextgen/") ||
-                  currentPage.includes("/community/") ||
-                  currentPage.includes("/online/")
-                    ? "/img/HeaderLogoColor.png"
-                    : "/img/HeaderLogoBW.png"
-                }
+                src={logoColor}
                 style={{ width: "180px" }}
               />
             </Link>
