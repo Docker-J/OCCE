@@ -1,30 +1,39 @@
 import axios from "axios";
-import { redirect } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
+var restored;
+
+window.onpopstate = () => {
+  console.log("backed!");
+  restored = true;
+};
 
 export async function loader({ request }) {
-  const url = new URL(request.url);
-  const searchParams = new URLSearchParams(url.search);
+  console.log("request");
 
-  if (!searchParams.has("page")) {
-    return redirect("?page=1");
-  }
-
-  const page = searchParams.get("page");
-  const lastVisible = searchParams.get("lastVisible");
-
-  if (page > 1 && lastVisible === null) {
+  if (restored === true) {
     const savedData = sessionStorage.getItem("posts");
-    if (savedData.length > 0) {
+    if (savedData !== null) {
+      restored = false;
+      console.log("restored!!!");
       return JSON.parse(sessionStorage.getItem("posts"));
     }
   }
 
+  const url = new URL(request.url);
+  const searchParams = new URLSearchParams(url.search);
+
+  const lastVisible = searchParams.get("lastVisible");
+  const timeStamp = searchParams.get("timeStamp");
+
   const result = await axios.get(
-    `/api/MeditationON/getPosts?page=${searchParams.get("page")}`,
-    {
-      params: { lastVisible: searchParams.get("lastVisible") },
-    }
+    `/api/MeditationON/getPosts${
+      lastVisible === null
+        ? ""
+        : `?lastVisible=${lastVisible}&timeStamp=${timeStamp}`
+    }`
   );
 
+  // console.log(result.data);
   return result.data;
 }
