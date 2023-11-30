@@ -1,10 +1,15 @@
 import { useLoaderData } from "react-router-dom";
 
 import { Carousel } from "react-responsive-carousel";
-import styles from "react-responsive-carousel/lib/styles/carousel.min.css";
+
+import { Avatar, Typography } from "@mui/material";
+import { useState } from "react";
+
+import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
 import "../../NextGen/NextGen.css";
-import { Typography } from "@mui/material";
+import CustomCarousel from "./CustomCarousel";
 
 const titleBackground = {
   backgroundImage:
@@ -13,8 +18,6 @@ const titleBackground = {
 
 const MeditationONPost = () => {
   const images = useLoaderData();
-
-  console.log(images);
 
   return (
     <>
@@ -30,20 +33,39 @@ const MeditationONPost = () => {
         </div>
       </div>
       <div
+        className="carousel-container"
         style={{
-          position: "absolute",
-          width: "90%",
-          maxWidth: "900px",
+          // display: "flex",
+          // flexDirection: "row",
+          // alignItems: "center",
+          position: "relative",
+          width: "95%",
+          maxWidth: "800px",
           left: "50%",
           transform: "translateX(-50%)",
           marginTop: "30px",
+          marginBottom: "30px",
         }}
       >
-        <Carousel styles={styles}>
-          {Object.values(images).map((image, key) => (
-            <img key={key} src={image} alt="test" />
-          ))}
-        </Carousel>
+        <CustomCarousel>
+          {Object.values(images).map((image, index) => {
+            // if (
+            //   index === selectedItem ||
+            //   index === selectedItem + 1 ||
+            //   index === selectedItem - 1
+            // ) {
+            return (
+              <img
+                style={{ objectFit: "contain" }}
+                key={index}
+                src={`https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${image}/MeditationON`}
+                alt="test"
+                loading="lazy"
+              />
+            );
+            // } else return <></>;
+          })}
+        </CustomCarousel>
       </div>
     </>
   );

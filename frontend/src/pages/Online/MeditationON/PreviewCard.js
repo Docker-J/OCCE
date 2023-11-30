@@ -6,6 +6,18 @@ import { useDrag, useDrop } from "react-dnd";
 
 const PreviewCard = ({ id, image, index, movePhoto, removeImage }) => {
   const ref = useRef(null);
+
+  const [{ isDragging }, drag] = useDrag({
+    type: "previewcard",
+    item: () => {
+      return { id, index };
+    },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
+  const opacity = isDragging ? 0 : 1;
   const [{ handlerId }, drop] = useDrop({
     accept: "previewcard",
     collect(monitor) {
@@ -52,16 +64,7 @@ const PreviewCard = ({ id, image, index, movePhoto, removeImage }) => {
       item.index = hoverIndex;
     },
   });
-  const [{ isDragging }, drag] = useDrag({
-    type: "previewcard",
-    item: () => {
-      return { id, index };
-    },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  });
-  const opacity = isDragging ? 0 : 1;
+
   drag(drop(ref));
 
   return (

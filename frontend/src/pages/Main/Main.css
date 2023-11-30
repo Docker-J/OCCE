@@ -1,4 +1,4 @@
-.slider {
+/* .slider {
   height: 50vh;
   max-height: 650px;
 }
@@ -7,7 +7,7 @@
   .slider {
     height: 60vh;
   }
-}
+} */
 
 .churchName {
   display: flex;
@@ -24,7 +24,7 @@
   object-fit: cover;
 }
 
-.churchName > .learnMoreAbtChurch {
+.churchName .learnMoreAbtChurch {
   position: absolute;
   bottom: 32px;
 }

@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -14,6 +16,7 @@ const { fcm } = require("./api/firebase.js");
 
 app.use(cors());
 app.use(bodyParser.json({ limit: "5mb" }));
+
 app.use("/api/User", users);
 app.use("/api/WeeklyUpdate", weeklybulletin);
 app.use("/api/photos", photos);
