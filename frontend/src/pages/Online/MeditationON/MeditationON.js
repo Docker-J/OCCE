@@ -16,7 +16,7 @@ import MeditationONModal from "./MeditationONModal";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import "../../NextGen/NextGen.css";
-import AdminComponent from "../../../util/AdminComponent";
+import AdminComponent from "../../../common/AdminComponent";
 
 const PAGE_SIZE = 12;
 const titleBackground = {

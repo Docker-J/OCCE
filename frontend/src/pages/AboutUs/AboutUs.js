@@ -1,5 +1,4 @@
-import React from "react";
-import "./About.css";
+import "./AboutUs.css";
 import ReactFullpage from "@fullpage/react-fullpage";
 
 import {
@@ -15,9 +14,9 @@ import {
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
-import Arrow from "../../components/About/Arrow";
-import MinisterCarousel from "../../components/About/MinisterCarousel";
-import { ServiceAndGatheringInfo } from "./ServiceAndGatheringInfo";
+import Arrow from "../../components/AboutUs/Arrow";
+import MinisterCarousel from "../../components/AboutUs/MinisterCarousel";
+import { ServiceAndGatheringInfo } from "../../components/AboutUs/ServiceAndGatheringInfo";
 
 const LeftButton = ({ fullpageApi, style }) => {
   return (
