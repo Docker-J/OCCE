@@ -199,7 +199,7 @@ const router = createBrowserRouter([
   },
 ]);
 
-function App() {
+const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <Suspense>
@@ -207,6 +207,6 @@ function App() {
       </Suspense>
     </ThemeProvider>
   );
-}
+};
 
 export default App;

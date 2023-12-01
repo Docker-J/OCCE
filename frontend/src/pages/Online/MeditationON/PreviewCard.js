@@ -17,7 +17,7 @@ const PreviewCard = ({ id, image, index, movePhoto, removeImage }) => {
     }),
   });
 
-  const opacity = isDragging ? 0 : 1;
+  const opacity = isDragging ? 0.7 : 1;
   const [{ handlerId }, drop] = useDrop({
     accept: "previewcard",
     collect(monitor) {

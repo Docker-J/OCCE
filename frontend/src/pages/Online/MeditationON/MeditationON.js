@@ -29,11 +29,10 @@ const MeditationON = () => {
 
   const [posts, setPosts] = useState([]);
   const [end, setEnd] = useState(false);
-  const [restored, setRestored] = useState(true);
+  const [restored, setRestored] = useState(null);
 
   const getPosts = async () => {
     console.log("test getPosts");
-    console.log(posts);
 
     const result = await axios.get(
       `/api/MeditationON/getPosts${
@@ -44,6 +43,7 @@ const MeditationON = () => {
             }`
       }`
     );
+
     if (result.data.length > 0) {
       setPosts((prev) => [...prev, ...result.data]);
     } else {
@@ -57,15 +57,11 @@ const MeditationON = () => {
     }
   }, [posts]);
 
-  const restore = () => {
-    setRestored(true);
-    console.log("test restore");
-    setPosts(JSON.parse(sessionStorage.getItem("posts")));
-  };
-
   useEffect(() => {
     window.onpopstate = () => {
-      restore();
+      setRestored(true);
+      console.log("test restore");
+      setPosts(JSON.parse(sessionStorage.getItem("posts")));
     };
     setRestored(false);
     return () => {
@@ -74,7 +70,7 @@ const MeditationON = () => {
   }, []);
 
   useEffect(() => {
-    if (!restored) {
+    if (restored !== null && !restored) {
       getPosts();
     }
   }, [restored]);
@@ -95,15 +91,17 @@ const MeditationON = () => {
   useEffect(() => {
     if (scrollRef.current && !end && posts.length >= 12) {
       setTimeout(() => {
-        const contentHeight = scrollRef.current.clientHeight;
-        const screenHeight = window.innerHeight - 500;
+        try {
+          const contentHeight = scrollRef.current.clientHeight;
+          const screenHeight = window.innerHeight - 500;
 
-        console.log("test content", contentHeight);
-        console.log("test screen", screenHeight);
+          console.log("test content", contentHeight);
+          console.log("test screen", screenHeight);
 
-        if (contentHeight > 100 && contentHeight < screenHeight) {
-          getPosts();
-        }
+          if (contentHeight > 100 && contentHeight < screenHeight) {
+            getPosts();
+          }
+        } catch (error) {}
       }, 500);
     }
 

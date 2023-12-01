@@ -1,12 +1,11 @@
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 var restored;
 
-window.onpopstate = () => {
-  console.log("backed!");
-  restored = true;
-};
+// window.onpopstate = () => {
+//   console.log("backed!");
+//   restored = true;
+// };
 
 export async function loader({ request }) {
   console.log("request");
