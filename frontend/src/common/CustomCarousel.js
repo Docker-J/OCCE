@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import { Avatar } from "@mui/material";
 import { Carousel } from "react-responsive-carousel";
 
@@ -17,8 +15,6 @@ const indicatorStyles = {
 };
 
 const CustomCarousel = (props) => {
-  const [selectedItem, setSelectedItem] = useState(0);
-
   return (
     <Carousel
       renderArrowPrev={(clickHandler, hasPrev) =>
@@ -87,7 +83,6 @@ const CustomCarousel = (props) => {
       styles={styles}
       showThumbs={false}
       showStatus={false}
-      onChange={(index) => setSelectedItem(index)}
       {...props}
     >
       {props.children}

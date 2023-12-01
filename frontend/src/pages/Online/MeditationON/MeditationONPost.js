@@ -1,15 +1,9 @@
 import { useLoaderData } from "react-router-dom";
 
-import { Carousel } from "react-responsive-carousel";
-
-import { Avatar, Typography } from "@mui/material";
-import { useState } from "react";
-
-import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import { Typography } from "@mui/material";
 
 import "../../NextGen/NextGen.css";
-import CustomCarousel from "./CustomCarousel";
+import CustomCarousel from "../../../common/CustomCarousel";
 
 const titleBackground = {
   backgroundImage:

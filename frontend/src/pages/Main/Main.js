@@ -7,11 +7,11 @@ import ButtonBases from "../../components/Main/MainButtonBanner";
 import "./Main.css";
 // import { useState } from "react";
 import CustomChatBot from "../../components/Main/CustomChatBot";
-import MainAnimation from "./MainAnimation";
+import MainAnimation from "../../components/Main/MainAnimation";
 
 import styles from "react-responsive-carousel/lib/styles/carousel.min.css";
 import test from "./MainCarousel.module.css";
-import CustomCarousel from "../Online/MeditationON/CustomCarousel";
+import CustomCarousel from "../../common/CustomCarousel";
 
 const Main = () => {
   return (

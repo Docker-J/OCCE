@@ -6,7 +6,7 @@ import "./App.css";
 import ResponsiveAppBar from "./header/ResponsiveAppBar";
 
 import Main from "./pages/Main/Main";
-import About from "./pages/About/About";
+import About from "./pages/AboutUs/AboutUs";
 import { loader as weeklyUpdateLoader } from "./route/WeeklyUpdateLoader";
 import { loader as meditationONLoader } from "./route/MeditationONLoader";
 import { loader as MeditationONPostLoader } from "./route/MeditationONPostLoader";
@@ -28,26 +28,30 @@ import { loader as AlbumPhotosLoader } from "./route/AlbumPhotosLoader";
 // const About = lazy(() => import("./pages/About/About"));
 
 //Announcements
-const Announcements = lazy(() => import("./pages/Announcements/Announcements"));
-const Announcement = lazy(() =>
-  import("./components/Announcement/Announcement")
+// const Announcements = lazy(() =>
+//   import("./pages/News/Announcements/Announcements")
+// );
+// const Announcement = lazy(() =>
+//   import("./components/Announcement/Announcement")
+// );
+const WeeklyUpdate = lazy(() =>
+  import("./pages/News/WeeklyUpdate/WeeklyUpdate")
 );
-const WeeklyUpdate = lazy(() => import("./pages/WeeklyUpdate/WeeklyUpdate"));
-const NewComers = lazy(() => import("./pages/NewComers/NewComers"));
+const NewComers = lazy(() => import("./pages/News/NewComers/NewComers"));
 const Photos = lazy(() => import("./pages/Photos/Photos"));
 const AlbumPhotos = lazy(() => import("./pages/Photos/AlbumPhotos"));
 
 // Online
+const SundayService = lazy(() => import("./pages/Online/SundayService"));
+const Sermon = lazy(() => import("./pages/Online/Sermon"));
+const Worship = lazy(() => import("./pages/Online/Worship"));
+const PrayON = lazy(() => import("./pages/Online/PrayON"));
 const MeditationON = lazy(() =>
   import("./pages/Online/MeditationON/MeditationON")
 );
 const MeditationONPost = lazy(() =>
   import("./pages/Online/MeditationON/MeditationONPost")
 );
-const PrayON = lazy(() => import("./pages/Online/PrayON"));
-const Worship = lazy(() => import("./pages/Online/Worship"));
-const SundayService = lazy(() => import("./pages/Online/SundayService"));
-const Sermon = lazy(() => import("./pages/Online/Sermon"));
 
 // Community
 const SmallGroup = lazy(() => import("./pages/Community/SmallGroup"));
@@ -84,32 +88,6 @@ const AppBarWrapper = () => {
   );
 };
 
-// const router = createBrowserRouter(
-//   <Route element={<AppBarWrapper />}>
-//     <Route path="/" element={<Main />} />
-//     <Route path="/aboutus" element={<About />} />
-//     <Route exact path="/announcements" element={<Announcements />} />
-//     <Route path="/announcements/announcement/" element={<Announcement />} />
-//     <Route path="/weeklyupdate" element={<WeeklyUpdate />} />
-//     <Route path="/newcomers" element={<NewComers />} />
-
-//     <Route path="/community/smallgroup" element={<SmallGroup />} />
-//     <Route path="/community/ministry" element={<Ministry />} />
-
-//     <Route path="/online/sundayservice" element={<SundayService />} />
-//     <Route path="/online/sermon" element={<Sermon />} />
-//     <Route path="/online/worship" element={<Worship />} />
-//     <Route path="/online/prayON" element={<PrayON />} />
-//     <Route exact path="/online/meditationON" element={<MeditationON />} />
-//     <Route path="/online/meditationON/post/" element={<MeditationONPost />} />
-
-//     <Route path="/nextgen/preschool" element={<Preschool />} />
-//     <Route path="/nextgen/elementary" element={<Elementary />} />
-//     <Route path="/nextgen/youth" element={<Youth />} />
-//     <Route path="/nextgen/youngadult" element={<YoungAdult />} />
-//   </Route>
-// );
-
 const router = createBrowserRouter([
   {
     element: <AppBarWrapper />,
@@ -122,10 +100,10 @@ const router = createBrowserRouter([
         path: "/aboutus",
         element: <About />,
       },
-      {
-        path: "/announcements",
-        element: <Announcements />,
-      },
+      // {
+      //   path: "/announcements",
+      //   element: <Announcements />,
+      // },
       {
         path: "/weeklyupdate/:date?",
         element: <WeeklyUpdate />,
