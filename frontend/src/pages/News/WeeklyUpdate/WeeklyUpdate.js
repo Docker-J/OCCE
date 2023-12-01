@@ -12,9 +12,9 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import UploadIcon from "@mui/icons-material/Upload";
 
-import ButtonDatePicker from "../../../components/WeeklyUpdate/ButtonDatePicker";
-import PDFReader from "../../../components/WeeklyUpdate/PDFReader";
-import BulletinUploadModal from "../../../components/WeeklyUpdate/BulletinUploadModal";
+import ButtonDatePicker from "../../../components/News/WeeklyUpdate/ButtonDatePicker";
+import PDFReader from "../../../components/News/WeeklyUpdate/PDFReader";
+import BulletinUploadModal from "../../../components/News/WeeklyUpdate/BulletinUploadModal";
 
 import "./WeeklyUpdate.css";
 import { useLoaderData, useNavigate, useRevalidator } from "react-router-dom";
