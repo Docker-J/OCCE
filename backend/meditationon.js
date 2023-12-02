@@ -1,26 +1,17 @@
-const express = require("express");
+import express from "express";
+import { fcm } from "./api/firebase.js";
+import axios from "axios";
+import FormData from "form-data";
+import { v4 as uuid } from "uuid";
+
+import { QueryCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
+import docClient from "./api/dynamodb.js";
+import { upload } from "./middleware/multer.js";
+
 const router = express.Router();
-const { fcm } = require("./api/firebase.js");
-const axios = require("axios");
-const multer = require("multer");
-const FormData = require("form-data");
-const uuid = require("uuid");
 
-const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const {
-  QueryCommand,
-  PutCommand,
-  DynamoDBDocumentClient,
-} = require("@aws-sdk/lib-dynamodb");
-
-const CLOUDFLARE_ACCOUNT_ID = "f4b5f3fab40742f7a3975f012a237dc7";
+const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
 const CLOUDFLARE_IMG_API_KEY = process.env.CLOUDFLARE_IMG_API_KEY;
-
-const client = new DynamoDBClient({ region: "us-west-2" });
-const docClient = DynamoDBDocumentClient.from(client);
-
-const multerStorage = multer.memoryStorage();
-const upload = multer({ storage: multerStorage });
 
 const TABLE_NAME = "MeditationON";
 const PAGE_SIZE = 12;
@@ -134,4 +125,4 @@ router.post("/uploadImage", upload.any("images"), async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

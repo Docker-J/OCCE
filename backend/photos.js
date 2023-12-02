@@ -1,12 +1,11 @@
-const express = require("express");
-const axios = require("axios");
+import express from "express";
 const router = express.Router();
+import { db, fcm } from "./api/firebase.js";
+import axios from "axios";
 
-const { db, fcm } = require("./api/firebase.js");
-
-const { fetchImageUrls } = require("google-photos-album-image-url-fetch");
-const htmlparser = require("htmlparser2");
-const { Timestamp } = require("firebase-admin/firestore");
+import { fetchImageUrls } from "google-photos-album-image-url-fetch";
+import * as htmlparser from "htmlparser2";
+import { Timestamp } from "firebase-admin/firestore";
 
 const PAGE_SIZE = 12;
 
@@ -94,4 +93,4 @@ router.get("/getAlbumDetail", async (req, res) => {
   } catch {}
 });
 
-module.exports = router;
+export default router;

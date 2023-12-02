@@ -1,21 +1,20 @@
-require("dotenv").config();
+import {} from "dotenv/config";
 
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
+import express from "express";
+import cors from "cors";
+
+import users from "./users.js";
+import weeklybulletin from "./weeklybulletin.js";
+import photos from "./photos.js";
+import meditationon from "./meditationon.js";
+
+import { fcm } from "./api/firebase.js";
+
 const app = express();
-
 const PORT = process.env.port || 3001;
 
-const users = require("./users.js");
-const weeklybulletin = require("./weeklybulletin.js");
-const photos = require("./photos.js");
-const meditationon = require("./meditationon.js");
-
-const { fcm } = require("./api/firebase.js");
-
 app.use(cors());
-app.use(bodyParser.json({ limit: "5mb" }));
+app.use(express.json());
 
 app.use("/api/User", users);
 app.use("/api/WeeklyUpdate", weeklybulletin);

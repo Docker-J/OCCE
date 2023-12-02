@@ -1,8 +1,9 @@
-const express = require("express");
-const axios = require("axios");
+import express from "express";
 const router = express.Router();
+import { db, fcm } from "./api/firebase.js";
+import axios from "axios";
 
-const {
+import {
   CognitoIdentityProviderClient,
   InitiateAuthCommand,
   AdminListGroupsForUserCommand,
@@ -10,7 +11,7 @@ const {
   ConfirmSignUpCommand,
   ResendConfirmationCodeCommand,
   GlobalSignOutCommand,
-} = require("@aws-sdk/client-cognito-identity-provider");
+} from "@aws-sdk/client-cognito-identity-provider";
 
 const cognitoClient = new CognitoIdentityProviderClient({
   region: "us-west-2",
@@ -165,4 +166,4 @@ router.post("/signOut", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

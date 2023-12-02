@@ -1,12 +1,12 @@
-const { initializeApp, applicationDefault } = require("firebase-admin/app");
-const { getFirestore } = require("firebase-admin/firestore");
-const { messaging } = require("firebase-admin");
+import { initializeApp, applicationDefault } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
+import messaging from "firebase-admin";
 
 initializeApp({
   credential: applicationDefault(),
 });
-const db = getFirestore();
-const fcm = messaging();
+export const db = getFirestore();
+export const fcm = messaging;
 
 // Initialize Firebase
-module.exports = { db, fcm };
+// module.exports = { db, fcm };
