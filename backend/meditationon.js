@@ -13,14 +13,14 @@ const router = express.Router();
 const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
 const CLOUDFLARE_IMG_API_KEY = process.env.CLOUDFLARE_IMG_API_KEY;
 
-const TABLE_NAME = "MeditationON";
+const TABLENAME = "MeditationON";
 const PAGE_SIZE = 12;
 
 router.get("/getPosts", async (req, res) => {
   const lastVisibleID = req.query.lastVisible;
 
   const scanParam = {
-    TableName: TABLE_NAME,
+    TableName: TABLENAME,
     IndexName: "SortTimestamp",
     Limit: PAGE_SIZE,
     ProjectionExpression: "ID, #t, Cover",
@@ -62,7 +62,7 @@ router.get("/getPosts", async (req, res) => {
 router.get("/getPostDetail", async (req, res) => {
   try {
     const scanParam = {
-      TableName: TABLE_NAME,
+      TableName: TABLENAME,
       Limit: PAGE_SIZE,
       ProjectionExpression: "Images",
       KeyConditionExpression: "ID = :postID",
@@ -106,7 +106,7 @@ router.post("/uploadImage", upload.any("images"), async (req, res) => {
     }
 
     const command = new PutCommand({
-      TableName: TABLE_NAME,
+      TableName: TABLENAME,
       Item: {
         ID: uuid.v4(),
         Timestamp: new Date().toISOString(),

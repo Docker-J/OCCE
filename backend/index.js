@@ -4,7 +4,7 @@ import express from "express";
 import cors from "cors";
 
 import users from "./users.js";
-import weeklybulletin from "./weeklybulletin.js";
+import weeklyupdate from "./weeklyupdate.js";
 import photos from "./photos.js";
 import meditationon from "./meditationon.js";
 
@@ -14,10 +14,10 @@ const app = express();
 const PORT = process.env.port || 3001;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "5mb" }));
 
 app.use("/api/User", users);
-app.use("/api/WeeklyUpdate", weeklybulletin);
+app.use("/api/WeeklyUpdate", weeklyupdate);
 app.use("/api/photos", photos);
 app.use("/api/MeditationON", meditationon);
 

@@ -1,14 +1,20 @@
 import express from "express";
 const router = express.Router();
-import { db, fcm } from "./api/firebase.js";
+import { fcm } from "./api/firebase.js";
 
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { PutCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  ListObjectsV2Command,
+} from "@aws-sdk/client-s3";
+import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import docClient from "./api/dynamodb.js";
+import { upload } from "./middleware/multer.js";
 
 const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
 const BUCKET = "weeklyupdate";
-const TABLE_NAME = "WeeklyUpdate";
+const TABLENAME = "WeeklyUpdate";
 const R2 = new S3Client({
   region: "auto",
   endpoint: `https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
@@ -22,7 +28,7 @@ var RECENTDATE;
 
 const getRecentdate = async () => {
   const scanParam = {
-    TableName: TABLE_NAME,
+    TableName: TABLENAME,
     IndexName: "SortDate",
     Limit: 1,
     ScanIndexForward: false,
@@ -36,17 +42,17 @@ const getRecentdate = async () => {
   };
 
   try {
-    // const snapshot = await db
-    //   .collection("Misc")
-    //   .doc("RecentWeeklyBulletin")
-    //   .get();
-
-    // RECENTDATE = snapshot.data().date;
-
     const command = new QueryCommand(scanParam);
     const result = await docClient.send(command);
 
-    res.send(result.Items[0].Date);
+    const testCommand = new ListObjectsV2Command({
+      Bucket: BUCKET,
+      MaxKeys: 1,
+    });
+    const testRes = await R2.send(testCommand);
+    console.log(testRes.Contents[0].Key);
+
+    RECENTDATE = result.Items[0].Date;
   } catch (error) {
     console.log(error);
   }
@@ -62,40 +68,33 @@ router.get("/RecentDate", async (req, res) => {
 });
 
 router.get("/GetBulletin", async (req, res) => {
+  console.log("get");
   try {
-    const snapshot = await db
-      .collection("weeklyBulletin")
-      .doc(req.query.date)
-      .get();
-    res.send(snapshot.data().file);
-  } catch {}
+    const command = new GetObjectCommand({
+      Bucket: BUCKET,
+      Key: req.query.date,
+    });
+
+    const result = await R2.send(command);
+    const test = await result.Body.transformToByteArray();
+
+    res.send(test);
+  } catch (error) {
+    console.log(error);
+  }
 });
 
-// router.put("/PostBulletin", async (req, res) => {
-//   const data = {
-//     file: req.body.file,
-//   };
-//   try {
-//     await db.collection("weeklyBulletin").doc(req.body.date).set(data);
-//     if (req.body.date > RECENTDATE) {
-//       RECENTDATE = req.body.date;
-//       const data = {
-//         date: req.body.date,
-//       };
-//       await db.collection("Misc").doc("RecentWeeklyBulletin").set(data);
-//     }
-//     res.send(RECENTDATE);
-//   } catch {
-//     res.send("Error");
-//   }
-// });
-
 // Prepare R2
-router.put("/PostBulletin", async (req, res) => {
+router.put("/PostBulletin", upload.single("images"), async (req, res) => {
+  const data = req.file.buffer;
+
+  console.log(req.file);
+
   const command = new PutObjectCommand({
-    Body: req.body.file,
     Bucket: BUCKET,
     Key: req.body.date,
+    Body: data,
+    ContentType: "application/pdf",
   });
 
   try {
@@ -104,7 +103,7 @@ router.put("/PostBulletin", async (req, res) => {
       RECENTDATE = req.body.date;
     }
     const dbCommand = new PutCommand({
-      TableName: TABLE_NAME,
+      TableName: TABLENAME,
       Item: {
         Date: req.body.date,
         sort: 0,
@@ -113,7 +112,9 @@ router.put("/PostBulletin", async (req, res) => {
     await docClient.send(dbCommand);
 
     res.send(RECENTDATE);
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 export default router;
