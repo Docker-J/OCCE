@@ -5,7 +5,7 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { format } from "date-fns";
 
-function ButtonField(props) {
+const ButtonField = (props) => {
   const {
     setIsDatePickerOpen,
     id,
@@ -28,7 +28,7 @@ function ButtonField(props) {
       {format(value, "MM/dd/yyyy")}
     </Button>
   );
-}
+};
 
 ButtonField.propTypes = {
   disabled: PropTypes.bool,
@@ -44,7 +44,7 @@ ButtonField.propTypes = {
   label: PropTypes.node,
 };
 
-function ButtonDatePicker(props) {
+const ButtonDatePicker = (props) => {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
   const notSunday = (date) => {
@@ -65,21 +65,9 @@ function ButtonDatePicker(props) {
         onClose={() => setIsDatePickerOpen(false)}
         shouldDisableDate={notSunday}
         disableHighlightToday
-        // renderInput={(props) => (
-        //   <Button
-        //     ref={props.inputRef}
-        //     variant="outlined"
-        //     size="large"
-        //     onClick={() =>
-        //       setIsDatePickerOpen((isDatePickerOpen) => !isDatePickerOpen)
-        //     }
-        //   >
-        //     {props.inputProps.value}
-        //   </Button>
-        // )}
       />
     </LocalizationProvider>
   );
-}
+};
 
 export default ButtonDatePicker;

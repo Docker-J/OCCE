@@ -4,6 +4,7 @@ import ButtonDatePicker from "./ButtonDatePicker";
 import { useDropzone } from "react-dropzone";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import PDFReader from "./PDFReader";
+import { Document, Page } from "react-pdf";
 
 const style = {
   position: "absolute",
@@ -11,13 +12,13 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: "80vw",
-  height: "80vh",
+  height: "90vh",
   maxWidth: "1300px",
   bgcolor: "#ffffff",
   boxShadow: 24,
   borderRadius: "0.5em",
   p: 1,
-  py: 5,
+  py: 3,
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
@@ -27,6 +28,17 @@ const style = {
 const BulletinUploadModal = (props) => {
   const [selectedDate, setSelectedDate] = useState();
   const [fileToUpload, setFileToUpload] = useState(null);
+
+  const test = useRef(null);
+  const [height, setHeight] = useState(0);
+
+  useEffect(() => {
+    if (test.current) {
+      setHeight(test.current.clientHeight);
+    }
+  }, [fileToUpload]);
+
+  console.log(height);
 
   const handleClose = () => {
     setFileToUpload(null);
@@ -48,6 +60,13 @@ const BulletinUploadModal = (props) => {
     nextSunday();
   }, []);
 
+  const [numPages, setNumPages] = useState(null);
+  const [pageNumber, setPageNumber] = useState(1);
+
+  function onDocumentLoadSuccess({ numPages }) {
+    setNumPages(numPages);
+  }
+
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
       "application/pdf": [],
@@ -59,7 +78,7 @@ const BulletinUploadModal = (props) => {
   });
 
   return (
-    <Modal open={props.open} onClose={props.onClose}>
+    <Modal open={props.open} onClose={handleClose}>
       <Box sx={style} bgcolor="white">
         <h2>Choose Date</h2>
 
@@ -69,23 +88,28 @@ const BulletinUploadModal = (props) => {
           onChange={setSelectedDate}
         />
 
-        <h2>Choose File</h2>
-        {/* <input
-          type="file"
-          id="bulletin"
-          name="theFile"
-          onChange={handleChangeFile}
-          accept="application/pdf"
-        /> */}
-        <PDFReader file={fileToUpload} />
+        <div ref={test} style={{ height: "60%" }}>
+          <p>{fileToUpload ? fileToUpload.name : null}</p>
+          <Document file={fileToUpload} onLoadSuccess={onDocumentLoadSuccess}>
+            <Page
+              renderTextLayer={false}
+              className="page"
+              // scale={scale}
+              height={height - 80}
+              // width={100}
+              pageNumber={pageNumber}
+            />
+          </Document>
+        </div>
 
         <div
           style={{
             width: "95%",
-            height: "20%",
+            height: "15%",
             border: "1pt dotted #f57c00",
             borderRadius: "1em",
             overflowY: "auto",
+            marginBottom: "1em",
           }}
           {...getRootProps()}
         >
@@ -106,7 +130,7 @@ const BulletinUploadModal = (props) => {
               }}
             >
               <AddCircleOutlineIcon fontSize="large" color="primary" />
-              <Typography>Click or Drag Files to here</Typography>
+              <Typography>Click or Drag File to here</Typography>
             </div>
           </Box>
         </div>

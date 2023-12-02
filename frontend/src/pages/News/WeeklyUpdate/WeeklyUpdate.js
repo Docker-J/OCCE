@@ -155,32 +155,32 @@ const WeeklyUpdate = () => {
         <CircularProgress />
       )}
 
-      <AdminComponent>
-        <Fab
-          id="uploadBulletinButton"
-          variant="extended"
-          onClick={() => setModalState(true)}
-        >
-          <UploadIcon sx={{ mr: 1 }} />
-          Upload
-        </Fab>
+      {/* <AdminComponent> */}
+      <Fab
+        id="uploadBulletinButton"
+        variant="extended"
+        onClick={() => setModalState(true)}
+      >
+        <UploadIcon sx={{ mr: 1 }} />
+        Upload
+      </Fab>
 
-        <BulletinUploadModal
-          open={modalState}
-          onModalUpload={uploadBulletin}
-          setModalState={setModalState}
-        />
+      <BulletinUploadModal
+        open={modalState}
+        onModalUpload={uploadBulletin}
+        setModalState={setModalState}
+      />
 
-        <Snackbar
-          open={isSuccessSnackBarOpen}
-          autoHideDuration={8000}
-          onClose={handleClose}
-        >
-          <Alert severity="success" onClose={handleClose}>
-            Uploaded Succesfully!
-          </Alert>
-        </Snackbar>
-      </AdminComponent>
+      <Snackbar
+        open={isSuccessSnackBarOpen}
+        autoHideDuration={8000}
+        onClose={handleClose}
+      >
+        <Alert severity="success" onClose={handleClose}>
+          Uploaded Succesfully!
+        </Alert>
+      </Snackbar>
+      {/* </AdminComponent> */}
     </>
   );
 };

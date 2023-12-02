@@ -59,7 +59,7 @@ function PDFReader(props) {
     ? document.documentElement.clientHeight
     : window.innerHeight;
 
-  const [windowDimension, detectHW] = useState({
+  const [documentDimension, detectHW] = useState({
     width: height / width >= 16 / 10 ? width - 30 : null,
     height: height / width < 16 / 10 ? height : null,
   });
@@ -84,7 +84,7 @@ function PDFReader(props) {
     return () => {
       window.removeEventListener("resize", detectSize);
     };
-  }, [windowDimension]);
+  }, [documentDimension]);
 
   return (
     <>
@@ -102,14 +102,23 @@ function PDFReader(props) {
       <Document
         file={props.file}
         onLoadSuccess={onDocumentLoadSuccess}
-        loading={<CircularProgress />}
+        loading={
+          <div
+            style={{
+              height: documentDimension.height,
+              width: documentDimension.width,
+            }}
+          >
+            <CircularProgress />
+          </div>
+        }
       >
         <Page
           renderTextLayer={false}
           className="page"
           scale={scale}
-          height={windowDimension.height}
-          width={windowDimension.width}
+          // height={documentDimension.height}
+          width={documentDimension.width}
           pageNumber={pageNumber}
         />
       </Document>
