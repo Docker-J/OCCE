@@ -46,8 +46,14 @@ const WeeklyUpdate = () => {
       const result = await axios.get("/api/WeeklyUpdate/GetBulletin", {
         params: { date: selectedDate.toLocaleDateString("sv") },
       });
-      setBulletin(result.data);
-    } catch (err) {}
+
+      const byteArray = new Uint8Array(Object.values(result.data));
+      const pdf = new Blob([byteArray.buffer], { type: "application/pdf" });
+
+      setBulletin(pdf);
+    } catch (err) {
+      console.log(err);
+    }
   }, [selectedDate]);
 
   const closeModal = () => {
@@ -55,32 +61,25 @@ const WeeklyUpdate = () => {
   };
 
   const uploadBulletin = async (file, date) => {
-    fileToBase64(file, (err, result) => {
-      axios
-        .put("/api/WeeklyUpdate/PostBulletin/", {
-          file: result,
-          date: date.toLocaleDateString("sv"),
-        })
-        .then((res) => {
-          console.log(res.data);
-          // setMaxDate(new Date(res.data.replace(/-/g, "/")));
-          setSelectedDate(date);
-          revalidator.revalidate(); //get new maxdate
-          closeModal();
-          setIsSuccessSnackBarOpen(true);
-        });
-    });
-  };
+    try {
+      const form = new FormData();
+      form.append("images", file);
+      form.append("date", date.toLocaleDateString("sv"));
+      const res = await axios.put("/api/WeeklyUpdate/PostBulletin/", form, {
+        headers: {
+          "Content-Type": `multipart/form-data`,
+        },
+      });
 
-  const fileToBase64 = (file, cb) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = function() {
-      cb(null, reader.result);
-    };
-    reader.onerror = function(error) {
-      cb(error, null);
-    };
+      console.log(res.data);
+      // setMaxDate(new Date(res.data.replace(/-/g, "/")));
+      setSelectedDate(date);
+      revalidator.revalidate(); //get new maxdate
+      closeModal();
+      setIsSuccessSnackBarOpen(true);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const previousBulletin = () => {
@@ -169,7 +168,7 @@ const WeeklyUpdate = () => {
         <BulletinUploadModal
           open={modalState}
           onModalUpload={uploadBulletin}
-          onClose={closeModal}
+          setModalState={setModalState}
         />
 
         <Snackbar
