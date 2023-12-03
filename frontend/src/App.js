@@ -11,6 +11,7 @@ import { loader as weeklyUpdateLoader } from "./route/WeeklyUpdateLoader";
 import { loader as meditationONLoader } from "./route/MeditationONLoader";
 import { loader as MeditationONPostLoader } from "./route/MeditationONPostLoader";
 import { loader as AlbumPhotosLoader } from "./route/AlbumPhotosLoader";
+import Footer from "./header/Footer";
 
 // import NewComers from "./pages/NewComers";
 
@@ -82,8 +83,21 @@ const theme = createTheme({
 const AppBarWrapper = () => {
   return (
     <>
+      {/* <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          height: "auto",
+          minHeight: "100vh",
+          justifyContent: "space-between",
+        }}
+      > */}
       <ResponsiveAppBar />
+      {/* <div> */}
       <Outlet />
+      {/* </div>
+        <Footer />
+      </div> */}
     </>
   );
 };

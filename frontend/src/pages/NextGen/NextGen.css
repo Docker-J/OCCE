@@ -28,9 +28,6 @@
 }
 
 .container {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
   text-align: left;
   width: 100%;
   max-width: 1500px;
