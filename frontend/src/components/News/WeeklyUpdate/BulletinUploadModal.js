@@ -25,6 +25,8 @@ const style = {
   justifyContent: "center",
 };
 
+const MIN_DATE = "2022/04/03";
+
 const BulletinUploadModal = (props) => {
   const [selectedDate, setSelectedDate] = useState();
   const [fileToUpload, setFileToUpload] = useState(null);
@@ -60,13 +62,6 @@ const BulletinUploadModal = (props) => {
     nextSunday();
   }, []);
 
-  const [numPages, setNumPages] = useState(null);
-  const [pageNumber, setPageNumber] = useState(1);
-
-  function onDocumentLoadSuccess({ numPages }) {
-    setNumPages(numPages);
-  }
-
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
       "application/pdf": [],
@@ -84,20 +79,20 @@ const BulletinUploadModal = (props) => {
 
         <ButtonDatePicker
           value={selectedDate}
-          minDate={new Date("2022/04/03")}
+          minDate={new Date(MIN_DATE)}
           onChange={setSelectedDate}
         />
 
         <div ref={test} style={{ height: "60%" }}>
           <p>{fileToUpload ? fileToUpload.name : null}</p>
-          <Document file={fileToUpload} onLoadSuccess={onDocumentLoadSuccess}>
+          <Document file={fileToUpload}>
             <Page
               renderTextLayer={false}
               className="page"
               // scale={scale}
               height={height - 80}
               // width={100}
-              pageNumber={pageNumber}
+              pageNumber={1}
             />
           </Document>
         </div>

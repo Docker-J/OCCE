@@ -76,6 +76,8 @@ router.get("/GetBulletin", async (req, res) => {
     });
 
     const result = await R2.send(command);
+    console.log(result);
+
     const test = await result.Body.transformToByteArray();
 
     res.send(test);
@@ -86,9 +88,9 @@ router.get("/GetBulletin", async (req, res) => {
 
 // Prepare R2
 router.put("/PostBulletin", upload.single("images"), async (req, res) => {
-  const data = req.file.buffer;
-
   console.log(req.file);
+
+  const data = req.file.buffer;
 
   const command = new PutObjectCommand({
     Bucket: BUCKET,

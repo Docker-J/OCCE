@@ -117,7 +117,7 @@ function PDFReader(props) {
           renderTextLayer={false}
           className="page"
           scale={scale}
-          // height={documentDimension.height}
+          height={documentDimension.height}
           width={documentDimension.width}
           pageNumber={pageNumber}
         />

@@ -32,6 +32,8 @@ const WeeklyUpdate = () => {
   const [modalState, setModalState] = useState(false);
   const [isSuccessSnackBarOpen, setIsSuccessSnackBarOpen] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -42,14 +44,18 @@ const WeeklyUpdate = () => {
 
   // Get Bulletin from Firestore
   const loadFile = useCallback(async () => {
+    setLoading(true);
     try {
       const result = await axios.get("/api/WeeklyUpdate/GetBulletin", {
-        params: { date: selectedDate.toLocaleDateString("en-ZA") },
+        params: {
+          date: selectedDate.toLocaleDateString("en-CA").replace(/-/g, ""),
+        },
       });
 
       const byteArray = new Uint8Array(Object.values(result.data));
       const pdf = new Blob([byteArray.buffer], { type: "application/pdf" });
 
+      setLoading(false);
       setBulletin(pdf);
     } catch (err) {
       console.log(err);
@@ -64,7 +70,7 @@ const WeeklyUpdate = () => {
     try {
       const form = new FormData();
       form.append("images", file);
-      form.append("date", date.toLocaleDateString("en-ZA"));
+      form.append("date", date.toLocaleDateString("en-CA").replace(/-/g, ""));
       const res = await axios.put("/api/WeeklyUpdate/PostBulletin/", form, {
         headers: {
           "Content-Type": `multipart/form-data`,
@@ -107,7 +113,7 @@ const WeeklyUpdate = () => {
       loadFile();
       navigate(
         "/weeklyupdate/" +
-          selectedDate.toLocaleDateString("en-ZA").replace(/\//g, "")
+          selectedDate.toLocaleDateString("en-CA").replace(/-/g, "")
       );
     }
   }, [selectedDate, loadFile, navigate]);
@@ -124,7 +130,9 @@ const WeeklyUpdate = () => {
     <>
       <h1>주보</h1>
 
-      {bulletin ? (
+      {loading ? (
+        <CircularProgress />
+      ) : (
         <>
           <IconButton
             id="previousBulletin"
@@ -151,36 +159,34 @@ const WeeklyUpdate = () => {
 
           <PDFReader file={bulletin} />
         </>
-      ) : (
-        <CircularProgress />
       )}
 
-      {/* <AdminComponent> */}
-      <Fab
-        id="uploadBulletinButton"
-        variant="extended"
-        onClick={() => setModalState(true)}
-      >
-        <UploadIcon sx={{ mr: 1 }} />
-        Upload
-      </Fab>
+      <AdminComponent>
+        <Fab
+          id="uploadBulletinButton"
+          variant="extended"
+          onClick={() => setModalState(true)}
+        >
+          <UploadIcon sx={{ mr: 1 }} />
+          Upload
+        </Fab>
 
-      <BulletinUploadModal
-        open={modalState}
-        onModalUpload={uploadBulletin}
-        setModalState={setModalState}
-      />
+        <BulletinUploadModal
+          open={modalState}
+          onModalUpload={uploadBulletin}
+          setModalState={setModalState}
+        />
 
-      <Snackbar
-        open={isSuccessSnackBarOpen}
-        autoHideDuration={8000}
-        onClose={handleClose}
-      >
-        <Alert severity="success" onClose={handleClose}>
-          Uploaded Succesfully!
-        </Alert>
-      </Snackbar>
-      {/* </AdminComponent> */}
+        <Snackbar
+          open={isSuccessSnackBarOpen}
+          autoHideDuration={8000}
+          onClose={handleClose}
+        >
+          <Alert severity="success" onClose={handleClose}>
+            Uploaded Succesfully!
+          </Alert>
+        </Snackbar>
+      </AdminComponent>
     </>
   );
 };
