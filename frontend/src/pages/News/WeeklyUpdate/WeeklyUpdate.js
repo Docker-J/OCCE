@@ -44,7 +44,7 @@ const WeeklyUpdate = () => {
   const loadFile = useCallback(async () => {
     try {
       const result = await axios.get("/api/WeeklyUpdate/GetBulletin", {
-        params: { date: selectedDate.toLocaleDateString("sv") },
+        params: { date: selectedDate.toLocaleDateString("en-ZA") },
       });
 
       const byteArray = new Uint8Array(Object.values(result.data));
@@ -64,7 +64,7 @@ const WeeklyUpdate = () => {
     try {
       const form = new FormData();
       form.append("images", file);
-      form.append("date", date.toLocaleDateString("sv"));
+      form.append("date", date.toLocaleDateString("en-ZA"));
       const res = await axios.put("/api/WeeklyUpdate/PostBulletin/", form, {
         headers: {
           "Content-Type": `multipart/form-data`,
@@ -107,7 +107,7 @@ const WeeklyUpdate = () => {
       loadFile();
       navigate(
         "/weeklyupdate/" +
-          selectedDate.toLocaleDateString("sv").replace(/-/g, "")
+          selectedDate.toLocaleDateString("en-ZA").replace(/\//g, "")
       );
     }
   }, [selectedDate, loadFile, navigate]);

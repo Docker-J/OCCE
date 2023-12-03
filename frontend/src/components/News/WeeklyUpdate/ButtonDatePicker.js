@@ -4,6 +4,7 @@ import { Button } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { format } from "date-fns";
+import * as enCA from "date-fns/locale/en-CA";
 
 const ButtonField = (props) => {
   const {
@@ -25,7 +26,7 @@ const ButtonField = (props) => {
       aria-label={ariaLabel}
       onClick={() => setIsDatePickerOpen?.((prev) => !prev)}
     >
-      {format(value, "MM/dd/yyyy")}
+      {format(value, "yyyy/MM/dd")}
     </Button>
   );
 };
