@@ -11,8 +11,8 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 
 import axios from "axios";
-import { MemoizedMeditationONComp } from "./MeditationONComp";
-import MeditationONModal from "./MeditationONModal";
+import { MemoizedMeditationONComp } from "../../../components/Online/MeditationON/MeditationONImageListItem";
+import MeditationONModal from "../../../components/Online/MeditationON/MeditationONModal";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import "../../NextGen/NextGen.css";
@@ -165,9 +165,9 @@ const MeditationON = () => {
         >
           <AddIcon />
         </Fab>
-      </AdminComponent>
 
-      <MeditationONModal openModal={openModal} setOpenModal={setOpenModal} />
+        <MeditationONModal openModal={openModal} setOpenModal={setOpenModal} />
+      </AdminComponent>
     </>
   );
 };
