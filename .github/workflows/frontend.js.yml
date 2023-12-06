@@ -36,20 +36,36 @@ jobs:
         cd frontend
         npm run build
 
-    - name: Upgrade AWS CLI version and setup lightsailctl
+    - name: Push to Build Repo
       run: |
-        aws --version
-        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-        unzip awscliv2.zip
-        sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
-        which aws
-        aws --version
-        sudo curl "https://s3.us-west-2.amazonaws.com/lightsailctl/latest/linux-amd64/lightsailctl" -o "/usr/local/bin/lightsailctl"
-        sudo chmod +x /usr/local/bin/lightsailctl
+        cd frontend/build
+        git init
+        git add .
+        git commit -m "bump build"
+        git remote add origin git@github.com:Docker-J/OCCE_Frontend_Build.git
+        git push -u origin main
 
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        role-to-assume: ${{ secrets.AWS_ARN_OICN_ACCESS }}
-        role-session-name: Github
-        aws-region: us-west-2
+    - name: Update on Lightsail
+      run: |
+        ssh ~~
+        cd OCCE_FRONTEND_BUILD
+        git pull
+        sudo systemctl nginx restart
+
+    # - name: Upgrade AWS CLI version and setup lightsailctl
+    #   run: |
+    #     aws --version
+    #     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    #     unzip awscliv2.zip
+    #     sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+    #     which aws
+    #     aws --version
+    #     sudo curl "https://s3.us-west-2.amazonaws.com/lightsailctl/latest/linux-amd64/lightsailctl" -o "/usr/local/bin/lightsailctl"
+    #     sudo chmod +x /usr/local/bin/lightsailctl
+
+    # - name: Configure AWS Credentials
+    #   uses: aws-actions/configure-aws-credentials@v4
+    #   with:
+    #     role-to-assume: ${{ secrets.AWS_ARN_OICN_ACCESS }}
+    #     role-session-name: Github
+    #     aws-region: us-west-2
