@@ -95,7 +95,7 @@ const ResponsiveAppBar = () => {
 
   const settings_not_signed = [
     { title: "Sign In", onClick: () => setSignInModalOpen(true) },
-    { title: "Sign Up", onClick: () => setSignUpModalOpen(true) },
+    // { title: "Sign Up", onClick: () => setSignUpModalOpen(true) },
   ];
 
   const signOutSuccess = () => {
