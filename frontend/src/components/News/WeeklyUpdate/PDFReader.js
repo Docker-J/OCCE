@@ -1,19 +1,18 @@
 import { Button, ButtonGroup, CircularProgress } from "@mui/material";
-import { isMobile } from "react-device-detect";
 import { useState, useEffect } from "react";
 import { pdfjs, Page, Document } from "react-pdf";
 
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "./PDFReader.css";
 
-// pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-//   "npm:pdfjs-dist/build/pdf.worker.min.js",
-//   import.meta.url
-// ).toString();
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.js",
+  import.meta.url
+).toString();
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
-function PDFReader(props) {
+function PDFReader({ file, documentDimension }) {
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [scale, setScale] = useState(1);
@@ -50,57 +49,27 @@ function PDFReader(props) {
 
   useEffect(() => {
     setPageNumber(1);
-  }, [props.file]);
-
-  const width = isMobile
-    ? document.documentElement.clientWidth
-    : window.innerWidth;
-  const height = isMobile
-    ? document.documentElement.clientHeight
-    : window.innerHeight;
-
-  const [documentDimension, detectHW] = useState({
-    width: height / width >= 16 / 10 ? width - 30 : null,
-    height: height / width < 16 / 10 ? height : null,
-  });
-
-  const detectSize = () => {
-    const width = isMobile
-      ? document.documentElement.clientWidth
-      : window.innerWidth;
-    const height = isMobile
-      ? document.documentElement.clientHeight
-      : window.innerHeight;
-
-    detectHW({
-      width: height / width >= 16 / 10 ? width - 30 : null,
-      height: height / width < 16 / 10 ? height : null,
-    });
-  };
-
-  useEffect(() => {
-    window.addEventListener("resize", detectSize);
-
-    return () => {
-      window.removeEventListener("resize", detectSize);
-    };
-  }, [documentDimension]);
+  }, [file]);
 
   return (
-    <>
-      <div style={{ marginTop: "1em", marginBottom: "1em" }}>
-        <ButtonGroup id="scaleButton">
-          <Button onClick={add} variant={"outlined"}>
-            +
-          </Button>
-          <Button onClick={minus} variant={"outlined"} disabled={scale <= 1}>
-            -
-          </Button>
-        </ButtonGroup>
-      </div>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <ButtonGroup id="scaleButton" sx={{ my: "1em" }}>
+        <Button onClick={add} variant="outlined">
+          +
+        </Button>
+        <Button onClick={minus} variant="outlined" disabled={scale <= 1}>
+          -
+        </Button>
+      </ButtonGroup>
 
       <Document
-        file={props.file}
+        file={file}
         onLoadSuccess={onDocumentLoadSuccess}
         loading={
           <div
@@ -120,31 +89,40 @@ function PDFReader(props) {
           height={documentDimension.height}
           width={documentDimension.width}
           pageNumber={pageNumber}
+          loading={
+            <div
+              style={{
+                height: documentDimension.height,
+                width: documentDimension.width,
+              }}
+            >
+              <CircularProgress />
+            </div>
+          }
         />
       </Document>
 
       <p style={{ color: "black" }}>
         Page {pageNumber || (numPages ? 1 : "--")} of {numPages || "--"}
       </p>
+
       <ButtonGroup id="pageButton">
         <Button
-          type="button"
-          variant={"outlined"}
+          variant="outlined"
           disabled={pageNumber <= 1}
           onClick={previousPage}
         >
           Previous
         </Button>
         <Button
-          type="button"
-          variant={"outlined"}
+          variant="outlined"
           disabled={pageNumber >= numPages}
           onClick={nextPage}
         >
           Next
         </Button>
       </ButtonGroup>
-    </>
+    </div>
   );
 }
 

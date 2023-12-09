@@ -3,7 +3,6 @@ import { Box, Button, Modal, Typography } from "@mui/material";
 import ButtonDatePicker from "./ButtonDatePicker";
 import { useDropzone } from "react-dropzone";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import PDFReader from "./PDFReader";
 import { Document, Page } from "react-pdf";
 
 const style = {
@@ -89,7 +88,6 @@ const BulletinUploadModal = (props) => {
             <Page
               renderTextLayer={false}
               className="page"
-              // scale={scale}
               height={height - 80}
               // width={100}
               pageNumber={1}

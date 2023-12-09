@@ -4,7 +4,6 @@ import { Button } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { format } from "date-fns";
-import * as enCA from "date-fns/locale/en-CA";
 
 const ButtonField = (props) => {
   const {

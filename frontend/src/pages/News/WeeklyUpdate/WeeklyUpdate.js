@@ -12,6 +12,8 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import UploadIcon from "@mui/icons-material/Upload";
 
+import { isMobile } from "react-device-detect";
+
 import ButtonDatePicker from "../../../components/News/WeeklyUpdate/ButtonDatePicker";
 import PDFReader from "../../../components/News/WeeklyUpdate/PDFReader";
 import BulletinUploadModal from "../../../components/News/WeeklyUpdate/BulletinUploadModal";
@@ -55,8 +57,8 @@ const WeeklyUpdate = () => {
       const byteArray = new Uint8Array(Object.values(result.data));
       const pdf = new Blob([byteArray.buffer], { type: "application/pdf" });
 
-      setLoading(false);
       setBulletin(pdf);
+      setLoading(false);
     } catch (err) {
       console.log(err);
     }
@@ -126,39 +128,72 @@ const WeeklyUpdate = () => {
     );
   }
 
+  const width = isMobile
+    ? document.documentElement.clientWidth
+    : window.innerWidth;
+  const height = isMobile
+    ? document.documentElement.clientHeight
+    : window.innerHeight;
+
+  const [documentDimension, detectHW] = useState({
+    width: height / width >= 16 / 10 ? width - 30 : null,
+    height: height / width < 16 / 10 ? height : null,
+  });
+
+  const detectSize = () => {
+    const width = isMobile
+      ? document.documentElement.clientWidth
+      : window.innerWidth;
+    const height = isMobile
+      ? document.documentElement.clientHeight
+      : window.innerHeight;
+
+    detectHW({
+      width: height / width >= 16 / 10 ? width - 30 : null,
+      height: height / width < 16 / 10 ? height : null,
+    });
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", detectSize);
+
+    return () => {
+      window.removeEventListener("resize", detectSize);
+    };
+  }, [documentDimension]);
+
   return (
     <>
       <h1>주보</h1>
 
+      <IconButton
+        id="previousBulletin"
+        onClick={previousBulletin}
+        disabled={compareDate(selectedDate, minDate) || loading}
+      >
+        <ArrowBackIosIcon />
+      </IconButton>
+
+      <ButtonDatePicker
+        value={selectedDate}
+        minDate={minDate}
+        maxDate={maxDate}
+        onChange={setSelectedDate}
+      />
+
+      <IconButton
+        id="nextBulletin"
+        onClick={nextBulletin}
+        disabled={compareDate(selectedDate, maxDate) || loading}
+      >
+        <ArrowForwardIosIcon />
+      </IconButton>
       {loading ? (
-        <CircularProgress />
+        <div>
+          <CircularProgress sx={{ mt: 2 }} />
+        </div>
       ) : (
-        <>
-          <IconButton
-            id="previousBulletin"
-            onClick={previousBulletin}
-            disabled={compareDate(selectedDate, minDate)}
-          >
-            <ArrowBackIosIcon />
-          </IconButton>
-
-          <ButtonDatePicker
-            value={selectedDate}
-            minDate={minDate}
-            maxDate={maxDate}
-            onChange={setSelectedDate}
-          />
-
-          <IconButton
-            id="nextBulletin"
-            onClick={nextBulletin}
-            disabled={compareDate(selectedDate, maxDate)}
-          >
-            <ArrowForwardIosIcon />
-          </IconButton>
-
-          <PDFReader file={bulletin} />
-        </>
+        <PDFReader file={bulletin} documentDimension={documentDimension} />
       )}
 
       <AdminComponent>
