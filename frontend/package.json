@@ -14,7 +14,7 @@
     "@react-spring/web": "^9.7.3",
     "@reduxjs/toolkit": "^2.0.1",
     "@testing-library/jest-dom": "^6.1.2",
-    "@testing-library/react": "^14.0.0",
+    "@testing-library/react": "^14.1.2",
     "@testing-library/user-event": "^14.4.3",
     "@uidotdev/usehooks": "^2.2.0",
     "axios": "^1.6.2",
