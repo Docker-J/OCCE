@@ -8,8 +8,7 @@ on:
     branches: [ "main" ]
     # paths:
     #   - 'frontend/**'
-  # pull_request:
-  #   branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,6 +17,9 @@ jobs:
     
     steps:
     - uses: actions/checkout@v3
+
+    - name: Set CI environment variable to false
+      run: echo "CI=false" >> $GITHUB_ENV
     
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
@@ -36,21 +38,23 @@ jobs:
         cd frontend
         npm run build
 
+    - name: Set up Git
+      uses: actions/checkout@v2
+
     - name: Push to Build Repo
+      env:
+        BUILD_REPO_TOKEN: ${{ secrets.BUILD_REPO_TOKEN }}
       run: |
         cd frontend/build
-        git init
-        git add .
-        git commit -m "bump build"
-        git remote add origin git@github.com:Docker-J/OCCE_Frontend_Build.git
-        git push -u origin main
+        git remote add build git@github.com:Docker-J/OCCE_Frontend_Build.git
+        git push -u build main
 
-    - name: Update on Lightsail
-      run: |
-        ssh ~~
-        cd OCCE_FRONTEND_BUILD
-        git pull
-        sudo systemctl nginx restart
+    # - name: Update on Lightsail
+    #   run: |
+    #     ssh ~~
+    #     cd OCCE_FRONTEND_BUILD
+    #     git pull
+    #     sudo systemctl nginx restart
 
     # - name: Upgrade AWS CLI version and setup lightsailctl
     #   run: |
