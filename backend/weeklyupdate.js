@@ -45,13 +45,6 @@ const getRecentdate = async () => {
     const command = new QueryCommand(scanParam);
     const result = await docClient.send(command);
 
-    const testCommand = new ListObjectsV2Command({
-      Bucket: BUCKET,
-      MaxKeys: 1,
-    });
-    const testRes = await R2.send(testCommand);
-    console.log(testRes.Contents[0].Key);
-
     RECENTDATE = result.Items[0].Date;
   } catch (error) {
     console.log(error);
@@ -76,7 +69,7 @@ router.get("/GetBulletin", async (req, res) => {
     });
 
     const result = await R2.send(command);
-    console.log(result);
+    // console.log(result);
 
     const test = await result.Body.transformToByteArray();
 
