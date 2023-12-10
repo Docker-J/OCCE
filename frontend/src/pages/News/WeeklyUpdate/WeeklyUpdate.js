@@ -50,7 +50,7 @@ const WeeklyUpdate = () => {
     try {
       const result = await axios.get("/api/WeeklyUpdate/GetBulletin", {
         params: {
-          date: selectedDate.toLocaleDateString("en-CA").replace(/-/g, ""),
+          date: selectedDate.toLocaleDateString("sv").replace(/-/g, ""),
         },
       });
 
@@ -72,7 +72,7 @@ const WeeklyUpdate = () => {
     try {
       const form = new FormData();
       form.append("images", file);
-      form.append("date", date.toLocaleDateString("en-CA").replace(/-/g, ""));
+      form.append("date", date.toLocaleDateString("sv").replace(/-/g, ""));
       const res = await axios.put("/api/WeeklyUpdate/PostBulletin/", form, {
         headers: {
           "Content-Type": `multipart/form-data`,
@@ -115,10 +115,13 @@ const WeeklyUpdate = () => {
       loadFile();
       navigate(
         "/weeklyupdate/" +
-          selectedDate.toLocaleDateString("en-CA").replace(/-/g, "")
+          selectedDate.toLocaleDateString("sv").replace(/-/g, "")
       );
     }
   }, [selectedDate, loadFile, navigate]);
+  console.log(
+    "/weeklyupdate/" + selectedDate.toLocaleDateString("sv").replace(/-/g, "")
+  );
 
   function compareDate(date1, date2) {
     return (

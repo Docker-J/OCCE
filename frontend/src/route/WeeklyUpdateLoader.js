@@ -14,9 +14,9 @@ export async function loader({ params }) {
     return { maxDate, queryDate };
   }
 
-  const year = +params.date.substring(0, 4);
-  const month = +params.date.substring(4, 6);
-  const day = +params.date.substring(6, 8);
+  const year = params.date.substring(0, 4);
+  const month = params.date.substring(4, 6);
+  const day = params.date.substring(6, 8);
   const queryDate = new Date(year, month - 1, day);
   return { maxDate, queryDate };
 }
