@@ -8,12 +8,10 @@ import {
 } from "@react-spring/web";
 
 import "./MainNameAnimation.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const MainAnimation = () => {
-  const [resetKey, setResetKey] = useState(0);
-
-  const spinRef = useSpringRef();
+  const api = useSpringRef();
   const fadeInRef = useSpringRef();
   const fadeOutRef = useSpringRef();
   const fadeOut2Ref = useSpringRef();
@@ -23,48 +21,20 @@ const MainAnimation = () => {
   const fadeIn3Ref = useSpringRef();
   const spinHorizontalRef = useSpringRef();
 
-  const initialState = () => {
-    spinRef.start({
-      to: { transform: "rotate(0deg) scale(1)" },
-      immediate: true,
-    });
-    fadeOutRef.start({
-      to: { opacity: 1 },
-      immediate: true,
-    });
-    fadeInRef.start({
-      to: { opacity: 0 },
-      immediate: true,
-    });
-    fadeOut2Ref.start({
-      to: { opacity: 1 },
-      immediate: true,
-    });
-    fadeIn2Ref.start({
-      to: { opacity: 0 },
-      immediate: true,
-    });
-    fadeIn3Ref.start({
-      to: { opacity: 0 },
-      immediate: true,
-    });
-    moveLeftRef.start({
-      to: { transform: "translateX(0%)" },
-      immediate: true,
-    });
-    moveRightRef.start({
-      to: { transform: "translateX(0%)" },
-      immediate: true,
-    });
-    spinHorizontalRef.start({
-      to: { transform: "rotate(0deg) scale(1)" },
-      immediate: true,
-    });
-    setResetKey((prev) => prev + 1);
-  };
+  const springRefs = [
+    api,
+    fadeInRef,
+    fadeOutRef,
+    fadeOut2Ref,
+    fadeIn2Ref,
+    moveLeftRef,
+    moveRightRef,
+    fadeIn3Ref,
+    spinHorizontalRef,
+  ];
 
   const spin = useSpring({
-    ref: spinRef,
+    ref: api,
     from: { transform: "rotate(0deg) scale(1)" },
     to: { transform: "rotate(90deg) scale(0.65)" },
     delay: 2000,
@@ -154,21 +124,54 @@ const MainAnimation = () => {
     },
   });
 
+  const [pause, setPause] = useState(false);
+
+  const test = () => {
+    if (api) {
+      console.log(api.current);
+      fadeOutRef.start({
+        from: { opacity: 0 },
+        to: { opacity: 1 },
+        immediate: true,
+      });
+      fadeIn2Ref.start({
+        from: { opacity: 1 },
+        to: { opacity: 0 },
+        immediate: true,
+      });
+      // fadeOutRef.start();
+    }
+  };
+
+  // useEffect(() => {
+  //   if (!pause) {
+  //     springRefs.forEach((ref) => ref.pause());
+  //     setPause(true);
+  //   }
+
+  //   if (pause) {
+  //     springRefs.forEach((ref) => ref.resume());
+  //     setPause(false);
+  //   }
+  // }, [pause]);
+
   const spinHorizontal = useSpring({
     ref: spinHorizontalRef,
     from: { transform: "rotate(0deg) scale(1)" },
     to: { transform: "rotate(-90deg) scale(1.4)" },
-    reset: true,
+    // reset: true,
     config: {
-      duration: 3500,
+      duration: 4800,
       easing: easings.easeOutBack,
     },
-    onRest: initialState,
+    // onRest: test,
   });
+
+  const [resetKey, setResetKey] = useState(0);
 
   useChain(
     [
-      spinRef,
+      api,
       fadeOut2Ref,
       fadeInRef,
       fadeOutRef,
@@ -178,12 +181,16 @@ const MainAnimation = () => {
       fadeIn3Ref,
       spinHorizontalRef,
     ],
-    [0, 1, 2, 3, 4, 4.6, 4.6, 5, 6.2],
+    [0, 1, 2, 3, 4, 4.6, 4.6, 5, 6.4],
     3000
   );
 
   return (
-    <div key={resetKey} className="nameExplanationContainer">
+    <div
+      key={resetKey}
+      // onClick={() => test()}
+      className="nameExplanationContainer"
+    >
       <animated.img
         style={{
           maxWidth: "400px",
@@ -238,7 +245,6 @@ const MainAnimation = () => {
       </animated.div>
 
       <animated.div className="nameExplanation3" style={{ ...fadeIn2 }}>
-        {/* <animated.div style={{ display: "flex", ...final }}> */}
         <animated.div style={{ ...moveLeft }}>
           <Typography
             className="edmonton"
@@ -269,7 +275,6 @@ const MainAnimation = () => {
           alt="Vertical Logo"
           style={{ ...fadeIn3, ...spinHorizontal }}
         />
-        {/* </animated.div> */}
       </animated.div>
     </div>
   );
