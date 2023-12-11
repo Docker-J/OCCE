@@ -1,22 +1,19 @@
 import axios from "axios";
+import { parse } from "date-fns";
+
+const DATE_FORMAT = "yyyyMMdd";
 
 export async function loader({ params }) {
   const result = await axios.get("/api/WeeklyUpdate/RecentDate");
   const date = JSON.stringify(result.data);
-  let formattedDateStr = `${date.slice(0, 4)}/${date.slice(4, 6)}/${date.slice(
-    6
-  )}`;
 
-  const maxDate = new Date(formattedDateStr);
+  const maxDate = parse(date, DATE_FORMAT, new Date());
 
   if (!params.date) {
     const queryDate = maxDate;
     return { maxDate, queryDate };
   }
 
-  const year = params.date.substring(0, 4);
-  const month = params.date.substring(4, 6);
-  const day = params.date.substring(6, 8);
-  const queryDate = new Date(year, month - 1, day);
+  const queryDate = parse(params.date, DATE_FORMAT, new Date());
   return { maxDate, queryDate };
 }

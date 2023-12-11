@@ -21,6 +21,7 @@ import BulletinUploadModal from "../../../components/News/WeeklyUpdate/BulletinU
 import "./WeeklyUpdate.css";
 import { useLoaderData, useNavigate, useRevalidator } from "react-router-dom";
 import AdminComponent from "../../../common/AdminComponent";
+import { add, compareAsc, format, sub } from "date-fns";
 
 const WeeklyUpdate = () => {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ const WeeklyUpdate = () => {
     try {
       const result = await axios.get("/api/WeeklyUpdate/GetBulletin", {
         params: {
-          date: selectedDate.toLocaleDateString("sv").replace(/-/g, ""),
+          date: format(selectedDate, "yyyyMMdd"),
         },
       });
 
@@ -72,7 +73,7 @@ const WeeklyUpdate = () => {
     try {
       const form = new FormData();
       form.append("images", file);
-      form.append("date", date.toLocaleDateString("sv").replace(/-/g, ""));
+      form.append("date", format(selectedDate, "yyyyMMdd"));
       const res = await axios.put("/api/WeeklyUpdate/PostBulletin/", form, {
         headers: {
           "Content-Type": `multipart/form-data`,
@@ -91,45 +92,19 @@ const WeeklyUpdate = () => {
   };
 
   const previousBulletin = () => {
-    setSelectedDate(
-      new Date(
-        selectedDate.getFullYear(),
-        selectedDate.getMonth(),
-        selectedDate.getDate() - 7
-      )
-    );
+    setSelectedDate((prev) => sub(prev, { days: 7 }));
   };
 
   const nextBulletin = () => {
-    setSelectedDate(
-      new Date(
-        selectedDate.getFullYear(),
-        selectedDate.getMonth(),
-        selectedDate.getDate() + 7
-      )
-    );
+    setSelectedDate((prev) => add(prev, { days: 7 }));
   };
 
   useEffect(() => {
     if (selectedDate != null) {
       loadFile();
-      navigate(
-        "/weeklyupdate/" +
-          selectedDate.toLocaleDateString("sv").replace(/-/g, "")
-      );
+      navigate("/weeklyupdate/" + format(selectedDate, "yyyyMMdd"));
     }
   }, [selectedDate, loadFile, navigate]);
-  console.log(
-    "/weeklyupdate/" + selectedDate.toLocaleDateString("sv").replace(/-/g, "")
-  );
-
-  function compareDate(date1, date2) {
-    return (
-      date1.getFullYear() === date2.getFullYear() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getDate() === date2.getDate()
-    );
-  }
 
   const width = isMobile
     ? document.documentElement.clientWidth
@@ -172,7 +147,7 @@ const WeeklyUpdate = () => {
       <IconButton
         id="previousBulletin"
         onClick={previousBulletin}
-        disabled={compareDate(selectedDate, minDate) || loading}
+        disabled={compareAsc(selectedDate, minDate) === 0 || loading}
       >
         <ArrowBackIosIcon />
       </IconButton>
@@ -187,7 +162,7 @@ const WeeklyUpdate = () => {
       <IconButton
         id="nextBulletin"
         onClick={nextBulletin}
-        disabled={compareDate(selectedDate, maxDate) || loading}
+        disabled={compareAsc(selectedDate, maxDate) === 0 || loading}
       >
         <ArrowForwardIosIcon />
       </IconButton>
