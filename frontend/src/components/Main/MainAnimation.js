@@ -160,7 +160,7 @@ const MainAnimation = () => {
     to: { transform: "rotate(-90deg) scale(1.4)" },
     reset: true,
     config: {
-      duration: 3500,
+      duration: 6000,
       easing: easings.easeOutBack,
     },
     onRest: initialState,
@@ -178,7 +178,7 @@ const MainAnimation = () => {
       fadeIn3Ref,
       spinHorizontalRef,
     ],
-    [0, 1, 2, 3, 4, 4.6, 4.6, 5, 6.2],
+    [0, 1, 2, 3, 4, 4.6, 4.6, 5, 6.3],
     3000
   );
 
