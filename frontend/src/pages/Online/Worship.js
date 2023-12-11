@@ -1,6 +1,7 @@
 import { Typography } from "@mui/material";
 import "./online.css";
 import "../NextGen/NextGen.css";
+import YoutubePlaylist from "../../components/Online/YoutubePlaylist";
 
 const titleBackground = {
   backgroundImage:
@@ -25,17 +26,7 @@ const Worship = () => {
       </div>
 
       <div className="main">
-        <div className="video">
-          <div className="video-container">
-            <iframe
-              src="https://www.youtube.com/embed/videoseries?list=PL-MVshquUXWHGJNBM8QtFDNqMpCwOKs6e"
-              title="YouTube video player"
-              frameborder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
-          </div>
-        </div>
+        <YoutubePlaylist src="https://www.youtube.com/embed/videoseries?list=PL-MVshquUXWHGJNBM8QtFDNqMpCwOKs6e" />
       </div>
     </>
   );
