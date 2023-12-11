@@ -18,16 +18,12 @@ function PDFReader({ file, documentDimension }) {
   const [scale, setScale] = useState(1);
 
   const add = () => {
-    setScale((prev) => {
-      return prev + 0.2;
-    });
+    setScale((prev) => prev + 0.2);
   };
 
   const minus = () => {
     if (scale !== 1) {
-      setScale((prev) => {
-        return prev - 0.2;
-      });
+      setScale((prev) => prev - 0.2);
     }
   };
 
