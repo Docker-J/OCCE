@@ -45,7 +45,9 @@ const Main = () => {
         {/* <img src="https://picsum.photos/seed/picsum/200" /> */}
       </CustomCarousel>
 
-      <ButtonBases className="cards" />
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <ButtonBases className="cards" />
+      </div>
 
       {/* <Fab
         variant="primary"

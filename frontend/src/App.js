@@ -39,8 +39,8 @@ const WeeklyUpdate = lazy(() =>
   import("./pages/News/WeeklyUpdate/WeeklyUpdate")
 );
 const NewComers = lazy(() => import("./pages/News/NewComers/NewComers"));
-const Photos = lazy(() => import("./pages/Photos/Photos"));
-const AlbumPhotos = lazy(() => import("./pages/Photos/AlbumPhotos"));
+const Photos = lazy(() => import("./pages/News/Photos/Photos"));
+const AlbumPhotos = lazy(() => import("./pages/News/Photos/AlbumPhotos"));
 
 // Online
 const SundayService = lazy(() => import("./pages/Online/SundayService"));
@@ -61,7 +61,7 @@ const Ministry = lazy(() => import("./pages/Community/Ministry"));
 // NextGen
 const Preschool = lazy(() => import("./pages/NextGen/Preschool"));
 const Elementary = lazy(() => import("./pages/NextGen/Elementary"));
-const Youth = lazy(() => import("./pages/NextGen/Youth"));
+const Youth = lazy(() => import("./pages/NextGen/Youth/Youth"));
 const YoungAdult = lazy(() => import("./pages/NextGen/YoungAdult"));
 
 const theme = createTheme({
@@ -80,31 +80,46 @@ const theme = createTheme({
   },
 });
 
-const AppBarWrapper = () => {
+const HeaderFooterWrapper = () => {
   return (
     <>
-      {/* <div
+      <div
         style={{
           display: "flex",
           flexDirection: "column",
-          height: "auto",
-          minHeight: "100vh",
           justifyContent: "space-between",
+          minHeight: "100vh",
         }}
-      > */}
-      <ResponsiveAppBar />
-      {/* <div> */}
-      <Outlet />
-      {/* </div>
+      >
+        <ResponsiveAppBar />
+        <div
+        // style={{
+        //   display: "flex",
+        //   justifyContent: "center",
+        //   alignItems: "center",
+        //   flexDirection: "column",
+        // }}
+        >
+          <Outlet />
+        </div>
         <Footer />
-      </div> */}
+      </div>
+    </>
+  );
+};
+
+const HeaderWrapper = () => {
+  return (
+    <>
+      <ResponsiveAppBar />
+      <Outlet />
     </>
   );
 };
 
 const router = createBrowserRouter([
   {
-    element: <AppBarWrapper />,
+    element: <HeaderFooterWrapper />,
     children: [
       {
         path: "/",
@@ -161,16 +176,15 @@ const router = createBrowserRouter([
         path: "/online/prayON",
         element: <PrayON />,
       },
-      {
-        path: "/online/meditationON",
-        element: <MeditationON />,
-      },
+      // {
+      //   path: "/online/meditationON",
+      //   element: <MeditationON />,
+      // },
       {
         path: "/online/meditationON/:postID",
         element: <MeditationONPost />,
         loader: MeditationONPostLoader,
       },
-
       {
         path: "/nextgen/preschool",
         element: <Preschool />,
@@ -186,6 +200,15 @@ const router = createBrowserRouter([
       {
         path: "/nextgen/youngadult",
         element: <YoungAdult />,
+      },
+    ],
+  },
+  {
+    element: <HeaderWrapper />,
+    children: [
+      {
+        path: "/online/meditationON",
+        element: <MeditationON />,
       },
     ],
   },

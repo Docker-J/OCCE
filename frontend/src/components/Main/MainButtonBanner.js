@@ -130,9 +130,9 @@ export default function ButtonBases() {
   return (
     <Box
       sx={{
-        position: "absolute",
-        left: "50%",
-        transform: "translateX(-50%)",
+        // position: "absolute",
+        // left: "50%",
+        // transform: "translateX(-50%)",
         maxWidth: "1536px",
         display: "flex",
         flexWrap: "wrap",
