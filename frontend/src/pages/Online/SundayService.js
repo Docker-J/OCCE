@@ -1,5 +1,5 @@
 import { Typography } from "@mui/material";
-import "./online.css";
+import "./Online.css";
 import "../NextGen/NextGen.css";
 import YoutubePlaylist from "../../components/Online/YoutubePlaylist";
 
@@ -13,8 +13,8 @@ const titleBackground = {
 const SundayService = () => {
   return (
     <>
-      <div className="title" style={titleBackground}>
-        <div className="titleContent">
+      <div className="title-wrapper" style={titleBackground}>
+        <div className="title">
           <Typography
             variant="h4"
             fontWeight={830}

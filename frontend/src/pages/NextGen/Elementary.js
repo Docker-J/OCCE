@@ -8,8 +8,8 @@ const Elementary = () => {
   };
   return (
     <>
-      <div className="title" style={titleBackground}>
-        <div className="titleContent">
+      <div className="title-wrapper" style={titleBackground}>
+        <div className="title">
           <Typography
             variant="h4"
             fontWeight={830}
@@ -38,22 +38,20 @@ const Elementary = () => {
         </div>
       </div>
 
-      <div className="container">
-        <Typography variant="h5" fontWeight={800}>
-          모임
-        </Typography>
-        <Typography className="subjectContent" sx={{ fontSize: "1.1em" }}>
-          나이: 1~6학년
-          <br />
-          시간: 주일 오후 4시
-          <br />
-          장소: Sunday School Room
-          <br />※ 문의: 이수연 전도사
-        </Typography>
-        {/* <br />
-        <Typography variant="h5" fontWeight={800}>
-          KIDS ON the Tree
-        </Typography> */}
+      <div className="container-wrapper">
+        <div className="container">
+          <Typography variant="h5" fontWeight={800}>
+            모임
+          </Typography>
+          <Typography className="subjectContent" sx={{ fontSize: "1.1em" }}>
+            나이: 1~6학년
+            <br />
+            시간: 주일 오후 4시
+            <br />
+            장소: Sunday School Room
+            <br />※ 문의: 이수연 전도사
+          </Typography>
+        </div>
       </div>
     </>
   );

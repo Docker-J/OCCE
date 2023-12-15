@@ -17,6 +17,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 
 import "../../NextGen/NextGen.css";
 import AdminComponent from "../../../common/AdminComponent";
+import Footer from "../../../header/Footer";
 
 const PAGE_SIZE = 12;
 const titleBackground = {
@@ -108,10 +109,12 @@ const MeditationON = () => {
     // re-run effect when items change
   }, [posts]);
 
+  console.log(end);
+
   return (
     <>
-      <div className="title" style={titleBackground}>
-        <div className="titleContent">
+      <div className="title-wrapper" style={titleBackground}>
+        <div className="title">
           <Typography
             variant="h4"
             fontWeight={830}
@@ -122,39 +125,41 @@ const MeditationON = () => {
         </div>
       </div>
 
-      <div
-        style={{
-          position: "absolute",
-          width: "100%",
-          maxWidth: "1500px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          marginTop: "1em",
-        }}
-      >
-        {posts.length > 0 ? (
-          <InfiniteScroll
-            dataLength={posts.length}
-            next={getPosts}
-            hasMore={!end}
-            loader={<CircularProgress />}
-            scrollThreshold={1}
-            style={{ overflowY: "hidden" }}
-          >
-            {
-              <ImageList
-                ref={scrollRef}
-                sx={{ mx: "0.5rem" }}
-                cols={matches ? 4 : 3}
-                gap={2.5}
-              >
-                <MemoizedMeditationONComp posts={posts} />
-              </ImageList>
-            }
-          </InfiniteScroll>
-        ) : (
-          <CircularProgress />
-        )}
+      <div className="container-wrapper">
+        <div
+          className="container"
+          style={{
+            paddingLeft: "0.2em",
+            paddingRight: "0.2em",
+            marginTop: "0.2em",
+          }}
+        >
+          {posts.length > 0 ? (
+            <InfiniteScroll
+              dataLength={posts.length}
+              next={getPosts}
+              hasMore={!end}
+              loader={<CircularProgress />}
+              scrollThreshold={1}
+              style={{ overflowY: "hidden" }}
+            >
+              {
+                <ImageList
+                  ref={scrollRef}
+                  sx={{ mx: "0.5rem" }}
+                  cols={matches ? 4 : 3}
+                  gap={2.5}
+                >
+                  <MemoizedMeditationONComp posts={posts} />
+                </ImageList>
+              }
+            </InfiniteScroll>
+          ) : (
+            <CircularProgress />
+          )}
+
+          {end && <Footer />}
+        </div>
       </div>
 
       <AdminComponent>
