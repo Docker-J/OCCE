@@ -138,7 +138,7 @@ const MainAnimation = () => {
     to: [{ transform: "translateX(50%)" }, { transform: "translateX(120%)" }],
     reset: true,
     config: {
-      duration: 4000,
+      duration: 3700,
       easing: easings.easeInOutSine,
     },
   });
@@ -163,7 +163,10 @@ const MainAnimation = () => {
       duration: 6000,
       easing: easings.easeOutBack,
     },
-    onRest: initialState,
+    onRest: () =>
+      setTimeout(() => {
+        initialState();
+      }, 5000),
   });
 
   useChain(
