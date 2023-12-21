@@ -167,7 +167,7 @@ const WeeklyUpdate = () => {
         <ArrowForwardIosIcon />
       </IconButton>
       {loading ? (
-        <div>
+        <div style={{ height: "100vh" }}>
           <CircularProgress sx={{ mt: 2 }} />
         </div>
       ) : (

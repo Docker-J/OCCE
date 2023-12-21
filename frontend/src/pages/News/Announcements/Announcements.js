@@ -17,7 +17,7 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 
 import "./Announcements.css";
-import AnnouncementPostModal from "../../../components/Announcement/AnnouncementPostModal";
+import AnnouncementPostModal from "../../../components/News/Announcement/AnnouncementPostModal";
 
 const Announcements = () => {
   const [body, setBody] = useState("");

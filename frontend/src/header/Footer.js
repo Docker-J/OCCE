@@ -2,7 +2,7 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import { Avatar, Divider, Typography } from "@mui/material";
-import MyComponent from "./Map";
+import LocationGoogleMap from "./LocationGoogleMap";
 
 const Footer = () => {
   return (
@@ -12,13 +12,15 @@ const Footer = () => {
         displaY: "flex",
         flexDirection: "column",
         alignItems: "center",
-        backgroundColor: "#d9d9d9",
+        backgroundColor: "#e8eaed",
         bottom: 0,
         display: "flex",
         justifyContent: "center",
         // borderRadius: "1.5em 1.5em 0px 0px",
       }}
     >
+      <LocationGoogleMap />
+
       <div
         style={{
           width: "98%",
@@ -45,10 +47,8 @@ const Footer = () => {
           <Typography>온 힘 다해 이웃을 사랑하는 교회</Typography>
         </div>
         {/* <p>office@oncce.ca</p> */}
-
+        <div style={{ width: "100%" }}></div>
         <div style={{ display: "flex" }}>
-          <Divider variant="fullWidth" />
-
           <div>
             <Typography>Follow Us ON</Typography>
             <div
@@ -70,7 +70,6 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      <MyComponent />
     </div>
   );
 };
