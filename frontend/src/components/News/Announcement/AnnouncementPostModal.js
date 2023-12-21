@@ -1,0 +1,79 @@
+import { Box, Button, Modal, TextField } from "@mui/material";
+import TextEditor from "./TextEditor";
+import { useState } from "react";
+
+// import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+// import { db } from "../../api/firebase";
+
+import { useEffect } from "react";
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "80vw",
+  height: "80vh",
+  maxWidth: "1300px",
+  bgcolor: "#ffffff",
+  boxShadow: 24,
+  borderRadius: "0.5em",
+  p: 1,
+  py: 5,
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "space-around",
+};
+
+const AnnouncementPostModal = ({ openModal, setOpenModal }) => {
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [postButton, setPostButton] = useState(false);
+
+  const getBody = (body) => {
+    setBody(body);
+  };
+
+  // async function postAnnouncement() {
+  //   await addDoc(collection(db, "Announcement"), {
+  //     title: title,
+  //     body: body,
+  //     date: serverTimestamp(),
+  //   });
+  // }
+
+  const handleClose = () => {
+    setOpenModal(false);
+  };
+
+  return (
+    <Modal open={openModal} onClose={handleClose}>
+      <Box sx={style} bgcolor="white">
+        <TextField
+          id="filled-basic"
+          label="Title"
+          variant="outlined"
+          sx={{ width: "100%" }}
+          onChange={(event) => setTitle(event.target.value)}
+        />
+        <TextEditor body={body} getBody={getBody} />
+
+        <div>
+          <Button
+            variant="outlined"
+            disabled={title.trim() === "" || body.trim() === ""}
+            // onClick={postAnnouncement}
+          >
+            Post
+          </Button>
+          <Button variant="outlined" onClick={handleClose}>
+            Cancel
+          </Button>
+        </div>
+      </Box>
+    </Modal>
+  );
+};
+
+export default AnnouncementPostModal;
