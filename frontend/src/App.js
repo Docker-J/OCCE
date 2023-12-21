@@ -16,7 +16,6 @@ import Footer from "./header/Footer";
 // import NewComers from "./pages/NewComers";
 
 // import Community from "./pages/Community";
-// import Announcements from "./pages/Announcements/Announcements";
 // import Announcement from "./components/Announcement/Announcement";
 // import MeditationON from "./pages/Online/MeditationON";
 // import MeditationONPost from "./pages/Online/MeditationONPost";
@@ -35,6 +34,9 @@ import Footer from "./header/Footer";
 // const Announcement = lazy(() =>
 //   import("./components/Announcement/Announcement")
 // );
+const Announcements = lazy(() =>
+  import("./pages/News/Announcements/Announcements")
+);
 const WeeklyUpdate = lazy(() =>
   import("./pages/News/WeeklyUpdate/WeeklyUpdate")
 );
@@ -129,10 +131,10 @@ const router = createBrowserRouter([
         path: "/aboutus",
         element: <About />,
       },
-      // {
-      //   path: "/announcements",
-      //   element: <Announcements />,
-      // },
+      {
+        path: "/announcements",
+        element: <Announcements />,
+      },
       {
         path: "/weeklyupdate/:date?",
         element: <WeeklyUpdate />,

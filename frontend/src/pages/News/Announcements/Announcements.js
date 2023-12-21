@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 
 import {
-  Box,
   CircularProgress,
   Fab,
-  Modal,
   Pagination,
   Paper,
   Table,
@@ -14,32 +12,15 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  useScrollTrigger,
 } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 
-import {
-  collection,
-  getDocs,
-  addDoc,
-  doc,
-  setDoc,
-  getDoc,
-  orderBy,
-  query,
-  limit,
-  startAfter,
-} from "firebase/firestore";
-
-import { db } from "../../api/firebase";
-
 import "./Announcements.css";
-import BoardPost from "../../components/Announcement/BoardPost";
+import AnnouncementPostModal from "../../../components/Announcement/AnnouncementPostModal";
 
 const Announcements = () => {
   const [body, setBody] = useState("");
-
   const getBody = (body) => {
     setBody(body);
   };
@@ -62,47 +43,47 @@ const Announcements = () => {
     setOpenModal(false);
   };
 
-  async function getInitialAnnouncements() {
-    const numberOfAnnouncements = await getDoc(
-      doc(db, "Misc", "Announcements")
-    );
-    setNumberOfAnnouncements(numberOfAnnouncements.data().posts);
+  // async function getInitialAnnouncements() {
+  //   const numberOfAnnouncements = await getDoc(
+  //     doc(db, "Misc", "Announcements")
+  //   );
+  //   setNumberOfAnnouncements(numberOfAnnouncements.data().posts);
 
-    const querySnap = await getDocs(
-      query(collection(db, "Announcement"), orderBy("date", "desc"), limit(10))
-    );
-    setAnnouncements(querySnap);
-  }
+  //   const querySnap = await getDocs(
+  //     query(collection(db, "Announcement"), orderBy("date", "desc"), limit(10))
+  //   );
+  //   setAnnouncements(querySnap);
+  // }
 
-  async function getAnnouncements() {
-    const querySnap = await getDocs(
-      query(
-        collection(db, "Announcement"),
-        orderBy("date", "desc"),
-        startAfter(lastVisible),
-        limit(10)
-      )
-    );
-    setAnnouncements(querySnap);
-  }
+  // async function getAnnouncements() {
+  //   const querySnap = await getDocs(
+  //     query(
+  //       collection(db, "Announcement"),
+  //       orderBy("date", "desc"),
+  //       startAfter(lastVisible),
+  //       limit(10)
+  //     )
+  //   );
+  //   setAnnouncements(querySnap);
+  // }
 
-  async function postAnnouncement() {
-    await setDoc(doc(db, "Misc", "Announcements"), {
-      posts: 15,
-    });
-  }
+  // async function postAnnouncement() {
+  //   await setDoc(doc(db, "Misc", "Announcements"), {
+  //     posts: 15,
+  //   });
+  // }
 
   function pageChnageHandler(event, pageNumber) {
     setCurrentPage(pageNumber);
   }
 
-  useEffect(() => {
-    getInitialAnnouncements();
-  }, []);
+  // useEffect(() => {
+  //   getInitialAnnouncements();
+  // }, []);
 
-  useEffect(() => {
-    getAnnouncements();
-  }, [currentPage]);
+  // useEffect(() => {
+  //   getAnnouncements();
+  // }, [currentPage]);
 
   useEffect(() => {
     if (announcements !== null) {
@@ -204,16 +185,10 @@ const Announcements = () => {
         <AddIcon />
       </Fab>
 
-      <Modal
-        open={openModal}
-        onClose={handleClose}
-        // aria-labelledby="modal-modal-title"
-        // aria-describedby="modal-modal-description"
-      >
-        <Box sx={style} bgcolor="white">
-          <BoardPost handleClose={handleClose} />
-        </Box>
-      </Modal>
+      <AnnouncementPostModal
+        openModal={openModal}
+        setOpenModal={setOpenModal}
+      />
     </>
   );
 };
