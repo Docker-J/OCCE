@@ -17,6 +17,7 @@ const TextEditor = ({ getBody }) => {
           const data = editor.getData();
           getBody(data);
         }}
+
         // onBlur={(event, editor) => {
         //   console.log("Blur.", editor);
         // }}

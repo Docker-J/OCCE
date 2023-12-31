@@ -106,6 +106,8 @@ const ResponsiveAppBar = () => {
   const appBarPosition =
     currentPage === "/" ||
     currentPage === "/aboutus" ||
+    currentPage.includes("/announcements") ||
+    currentPage.includes("/weeklyupdate") ||
     currentPage.includes("/newcomers") ||
     currentPage.includes("/nextgen/") ||
     currentPage.includes("/community/") ||
@@ -116,6 +118,8 @@ const ResponsiveAppBar = () => {
   const appBarColor =
     currentPage === "/" ||
     currentPage === "/aboutus" ||
+    currentPage.includes("/announcements") ||
+    currentPage.includes("/weeklyupdate") ||
     currentPage.includes("/newcomers") ||
     currentPage.includes("/nextgen/") ||
     currentPage.includes("/community/") ||
@@ -126,6 +130,8 @@ const ResponsiveAppBar = () => {
   const logoColor =
     currentPage === "/" ||
     currentPage === "/aboutus" ||
+    currentPage.includes("/announcements") ||
+    currentPage.includes("/weeklyupdate") ||
     currentPage.includes("/newcomers") ||
     currentPage.includes("/nextgen/") ||
     currentPage.includes("/community/") ||

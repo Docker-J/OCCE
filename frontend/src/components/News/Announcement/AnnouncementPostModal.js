@@ -2,10 +2,8 @@ import { Box, Button, Modal, TextField } from "@mui/material";
 import TextEditor from "./TextEditor";
 import { useState } from "react";
 
-// import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-// import { db } from "../../api/firebase";
-
 import { useEffect } from "react";
+import axios from "axios";
 
 const style = {
   position: "absolute",
@@ -18,30 +16,33 @@ const style = {
   bgcolor: "#ffffff",
   boxShadow: 24,
   borderRadius: "0.5em",
-  p: 1,
-  py: 5,
+  p: 5,
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  justifyContent: "space-around",
+  justifyContent: "space-between",
 };
 
 const AnnouncementPostModal = ({ openModal, setOpenModal }) => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [postButton, setPostButton] = useState(false);
 
   const getBody = (body) => {
     setBody(body);
   };
 
-  // async function postAnnouncement() {
-  //   await addDoc(collection(db, "Announcement"), {
-  //     title: title,
-  //     body: body,
-  //     date: serverTimestamp(),
-  //   });
-  // }
+  const postAnnouncement = async () => {
+    try {
+      const result = await axios.put("/api/Announcements/postAnnouncement", {
+        title: title,
+        body: body,
+      });
+
+      handleClose();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleClose = () => {
     setOpenModal(false);
@@ -55,7 +56,7 @@ const AnnouncementPostModal = ({ openModal, setOpenModal }) => {
           label="Title"
           variant="outlined"
           sx={{ width: "100%" }}
-          onChange={(event) => setTitle(event.target.value)}
+          onChange={(e) => setTitle(e.target.value)}
         />
         <TextEditor body={body} getBody={getBody} />
 
@@ -63,7 +64,7 @@ const AnnouncementPostModal = ({ openModal, setOpenModal }) => {
           <Button
             variant="outlined"
             disabled={title.trim() === "" || body.trim() === ""}
-            // onClick={postAnnouncement}
+            onClick={postAnnouncement}
           >
             Post
           </Button>

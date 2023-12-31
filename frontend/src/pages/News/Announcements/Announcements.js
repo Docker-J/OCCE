@@ -1,182 +1,50 @@
-import { useState, useEffect } from "react";
-import { Link, useLoaderData } from "react-router-dom";
+import { useState } from "react";
+import { useLoaderData } from "react-router-dom";
 
-import {
-  CircularProgress,
-  Fab,
-  Pagination,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from "@mui/material";
+import { Fab, Typography } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 
 import "./Announcements.css";
 import AnnouncementPostModal from "../../../components/News/Announcement/AnnouncementPostModal";
+import BoardTable from "../../../components/News/Announcement/BoardTable";
+
+import "../../NextGen/NextGen.css";
+
+const titleBackground = {
+  backgroundImage:
+    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)), url("/img/Announcements.jpg")',
+};
 
 const Announcements = () => {
-  const [body, setBody] = useState("");
-  const getBody = (body) => {
-    setBody(body);
-  };
-
-  const [numberOfAnnouncements, setNumberOfAnnouncements] = useState(1);
-  const [announcements, setAnnouncements] = useState(null);
-  const [pages, setPages] = useState(0);
-  const [prevPage, setPrevPage] = useState(0);
-  const [currentPage, setCurrentPage] = useState(0);
+  const { count, announcements } = useLoaderData();
+  const pages = Math.ceil(count / 10);
   const [openModal, setOpenModal] = useState(false);
-
-  const lastVisible =
-    announcements && announcements.docs[announcements.docs.length - 1];
 
   const handleOpen = () => {
     setOpenModal(true);
   };
 
-  const handleClose = () => {
-    setOpenModal(false);
-  };
-
-  // async function getInitialAnnouncements() {
-  //   const numberOfAnnouncements = await getDoc(
-  //     doc(db, "Misc", "Announcements")
-  //   );
-  //   setNumberOfAnnouncements(numberOfAnnouncements.data().posts);
-
-  //   const querySnap = await getDocs(
-  //     query(collection(db, "Announcement"), orderBy("date", "desc"), limit(10))
-  //   );
-  //   setAnnouncements(querySnap);
-  // }
-
-  // async function getAnnouncements() {
-  //   const querySnap = await getDocs(
-  //     query(
-  //       collection(db, "Announcement"),
-  //       orderBy("date", "desc"),
-  //       startAfter(lastVisible),
-  //       limit(10)
-  //     )
-  //   );
-  //   setAnnouncements(querySnap);
-  // }
-
-  // async function postAnnouncement() {
-  //   await setDoc(doc(db, "Misc", "Announcements"), {
-  //     posts: 15,
-  //   });
-  // }
-
-  function pageChnageHandler(event, pageNumber) {
-    setCurrentPage(pageNumber);
-  }
-
-  // useEffect(() => {
-  //   getInitialAnnouncements();
-  // }, []);
-
-  // useEffect(() => {
-  //   getAnnouncements();
-  // }, [currentPage]);
-
-  useEffect(() => {
-    if (announcements !== null) {
-      if (numberOfAnnouncements % 10 !== 0) {
-        setPages(Math.floor(numberOfAnnouncements / 10 + 1));
-      } else {
-        setPages(Math.floor(numberOfAnnouncements / 10));
-      }
-    }
-  }, [announcements]);
-
-  const style = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "80vw",
-    maxWidth: "1500px",
-    height: "80vh",
-    bgcolor: "#ffffff",
-    border: "0.1px solid #f57c00",
-    boxShadow: 24,
-    p: 2,
-  };
-
   return (
     <>
-      <div
-        className="board"
-        style={{
-          width: "100%",
-          maxWidth: "1500px",
-        }}
-      >
-        <h1>공지사항</h1>
-
-        <div>
-          <TableContainer
-            className="table"
-            component={Paper}
-            sx={{ width: "85%" }}
+      <div className="title-wrapper" style={titleBackground}>
+        <div className="title">
+          <Typography
+            variant="h4"
+            fontWeight={830}
+            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
           >
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell align="center" width="80%">
-                    제목
-                  </TableCell>
-                  <TableCell align="center"> 작성일 </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {announcements ? (
-                  announcements.docs.map((announcement) => (
-                    <TableRow
-                      component={Link}
-                      to={
-                        "/announcements/announcement?docID=" + announcement.id
-                      }
-                      key={announcement.id}
-                      sx={{ textDecoration: "none" }}
-                    >
-                      <TableCell>{announcement.data().title}</TableCell>
-                      <TableCell align="right">
-                        {announcement
-                          .data()
-                          .date.toDate()
-                          .toLocaleDateString("en-US")}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <CircularProgress />
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-
-          <Pagination
-            className="pagination"
-            count={pages}
-            variant="outlined"
-            color="primary"
-            hideNextButton={pages === 1}
-            hidePrevButton={pages === numberOfAnnouncements}
-            onChange={(event, pageNumber) =>
-              pageChnageHandler(event, pageNumber)
-            }
-          />
+            공지사항
+          </Typography>
         </div>
       </div>
+
+      <div className="container-wrapper">
+        <div className="container">
+          <BoardTable announcements={announcements} pages={pages} />
+        </div>
+      </div>
+
       <Fab
         variant="primary"
         style={{ position: "fixed", right: "2vw", bottom: "3vh" }}

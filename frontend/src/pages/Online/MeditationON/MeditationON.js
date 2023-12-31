@@ -157,8 +157,6 @@ const MeditationON = () => {
           ) : (
             <CircularProgress />
           )}
-
-          {end && <Footer />}
         </div>
       </div>
 
@@ -173,6 +171,8 @@ const MeditationON = () => {
 
         <MeditationONModal openModal={openModal} setOpenModal={setOpenModal} />
       </AdminComponent>
+
+      {end && <Footer />}
     </>
   );
 };

@@ -7,8 +7,11 @@ import ResponsiveAppBar from "./header/ResponsiveAppBar";
 
 import Main from "./pages/Main/Main";
 import About from "./pages/AboutUs/AboutUs";
-import { loader as weeklyUpdateLoader } from "./route/WeeklyUpdateLoader";
-import { loader as meditationONLoader } from "./route/MeditationONLoader";
+
+import { loader as AnnouncementsLoader } from "./route/AnnouncementsLoader";
+import { loader as AnnouncementLoader } from "./route/AnnouncementLoader";
+import { loader as WeeklyUpdateLoader } from "./route/WeeklyUpdateLoader";
+// import { loader as meditationONLoader } from "./route/MeditationONLoader";
 import { loader as MeditationONPostLoader } from "./route/MeditationONPostLoader";
 import { loader as AlbumPhotosLoader } from "./route/AlbumPhotosLoader";
 import Footer from "./header/Footer";
@@ -16,7 +19,6 @@ import Footer from "./header/Footer";
 // import NewComers from "./pages/NewComers";
 
 // import Community from "./pages/Community";
-// import Announcement from "./components/Announcement/Announcement";
 // import MeditationON from "./pages/Online/MeditationON";
 // import MeditationONPost from "./pages/Online/MeditationONPost";
 // import PrayON from "./pages/Online/PrayON";
@@ -27,15 +29,12 @@ import Footer from "./header/Footer";
 // const Main = lazy(() => import("./pages/Main/Main"));
 // const About = lazy(() => import("./pages/About/About"));
 
-//Announcements
-// const Announcements = lazy(() =>
-//   import("./pages/News/Announcements/Announcements")
-// );
-// const Announcement = lazy(() =>
-//   import("./components/Announcement/Announcement")
-// );
+// News
 const Announcements = lazy(() =>
   import("./pages/News/Announcements/Announcements")
+);
+const Announcement = lazy(() =>
+  import("./pages/News/Announcements/Announcement")
 );
 const WeeklyUpdate = lazy(() =>
   import("./pages/News/WeeklyUpdate/WeeklyUpdate")
@@ -95,12 +94,9 @@ const HeaderFooterWrapper = () => {
       >
         <ResponsiveAppBar />
         <div
-        // style={{
-        //   display: "flex",
-        //   justifyContent: "center",
-        //   alignItems: "center",
-        //   flexDirection: "column",
-        // }}
+          style={{
+            flexGrow: 1,
+          }}
         >
           <Outlet />
         </div>
@@ -134,11 +130,17 @@ const router = createBrowserRouter([
       {
         path: "/announcements",
         element: <Announcements />,
+        loader: AnnouncementsLoader,
+      },
+      {
+        path: "/announcements/:announcementID",
+        element: <Announcement />,
+        loader: AnnouncementLoader,
       },
       {
         path: "/weeklyupdate/:date?",
         element: <WeeklyUpdate />,
-        loader: weeklyUpdateLoader,
+        loader: WeeklyUpdateLoader,
         shouldRevalidate: () => false,
       },
       {
