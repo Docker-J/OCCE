@@ -7,6 +7,7 @@ import {
   Fab,
   IconButton,
   Snackbar,
+  Typography,
 } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -18,10 +19,17 @@ import ButtonDatePicker from "../../../components/News/WeeklyUpdate/ButtonDatePi
 import PDFReader from "../../../components/News/WeeklyUpdate/PDFReader";
 import BulletinUploadModal from "../../../components/News/WeeklyUpdate/BulletinUploadModal";
 
-import "./WeeklyUpdate.css";
 import { useLoaderData, useNavigate, useRevalidator } from "react-router-dom";
 import AdminComponent from "../../../common/AdminComponent";
 import { add, compareAsc, format, sub } from "date-fns";
+
+import "./WeeklyUpdate.css";
+import "../../NextGen/NextGen.css";
+
+const titleBackground = {
+  backgroundImage:
+    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)), url("/img/WeeklyUpdate.jpg")',
+};
 
 const WeeklyUpdate = () => {
   const navigate = useNavigate();
@@ -142,37 +150,53 @@ const WeeklyUpdate = () => {
 
   return (
     <>
-      <h1>주보</h1>
-
-      <IconButton
-        id="previousBulletin"
-        onClick={previousBulletin}
-        disabled={compareAsc(selectedDate, minDate) === 0 || loading}
-      >
-        <ArrowBackIosIcon />
-      </IconButton>
-
-      <ButtonDatePicker
-        value={selectedDate}
-        minDate={minDate}
-        maxDate={maxDate}
-        onChange={setSelectedDate}
-      />
-
-      <IconButton
-        id="nextBulletin"
-        onClick={nextBulletin}
-        disabled={compareAsc(selectedDate, maxDate) === 0 || loading}
-      >
-        <ArrowForwardIosIcon />
-      </IconButton>
-      {loading ? (
-        <div style={{ height: "100vh" }}>
-          <CircularProgress sx={{ mt: 2 }} />
+      <div className="title-wrapper" style={titleBackground}>
+        <div className="title">
+          <Typography
+            variant="h4"
+            fontWeight={830}
+            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
+          >
+            주보
+          </Typography>
         </div>
-      ) : (
-        <PDFReader file={bulletin} documentDimension={documentDimension} />
-      )}
+      </div>
+
+      <div className="container-wrapper">
+        <div className="container">
+          <>
+            <IconButton
+              id="previousBulletin"
+              onClick={previousBulletin}
+              disabled={compareAsc(selectedDate, minDate) === 0 || loading}
+            >
+              <ArrowBackIosIcon />
+            </IconButton>
+
+            <ButtonDatePicker
+              value={selectedDate}
+              minDate={minDate}
+              maxDate={maxDate}
+              onChange={setSelectedDate}
+            />
+
+            <IconButton
+              id="nextBulletin"
+              onClick={nextBulletin}
+              disabled={compareAsc(selectedDate, maxDate) === 0 || loading}
+            >
+              <ArrowForwardIosIcon />
+            </IconButton>
+          </>
+          {loading ? (
+            <div style={{ height: "100vh" }}>
+              <CircularProgress sx={{ mt: 2 }} />
+            </div>
+          ) : (
+            <PDFReader file={bulletin} documentDimension={documentDimension} />
+          )}
+        </div>
+      </div>
 
       <AdminComponent>
         <Fab
