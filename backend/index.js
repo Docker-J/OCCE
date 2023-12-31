@@ -4,6 +4,7 @@ import express from "express";
 import cors from "cors";
 
 import users from "./users.js";
+import announcements from "./announcements.js";
 import weeklyupdate from "./weeklyupdate.js";
 import photos from "./photos.js";
 import meditationon from "./meditationon.js";
@@ -17,6 +18,7 @@ app.use(cors());
 app.use(express.json({ limit: "5mb" }));
 
 app.use("/api/User", users);
+app.use("/api/Announcements", announcements);
 app.use("/api/WeeklyUpdate", weeklyupdate);
 app.use("/api/photos", photos);
 app.use("/api/MeditationON", meditationon);

@@ -11,7 +11,7 @@ import { upload } from "./middleware/multer.js";
 const router = express.Router();
 
 const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
-const CLOUDFLARE_IMG_API_KEY = process.env.CLOUDFLARE_IMG_API_KEY;
+const CLOUDFLARE_API_KEY = process.env.CLOUDFLARE_API_KEY;
 
 const TABLENAME = "MeditationON";
 const PAGE_SIZE = 12;
@@ -97,7 +97,7 @@ router.post("/uploadImage", upload.any("images"), async (req, res) => {
         {
           headers: {
             "Content-Type": `multipart/form-data; boundary=${formData._boundary}`,
-            Authorization: `Bearer ${CLOUDFLARE_IMG_API_KEY}`,
+            Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
           },
         }
       );
@@ -108,7 +108,7 @@ router.post("/uploadImage", upload.any("images"), async (req, res) => {
     const command = new PutCommand({
       TableName: TABLENAME,
       Item: {
-        ID: uuid.v4(),
+        ID: uuid(),
         Timestamp: new Date().toISOString(),
         Cover: ids[0],
         Images: ids,
