@@ -4,8 +4,9 @@
   transform: translateX(-50%);
 } */
 
-.pagination {
+.MuiPagination-ul {
   margin-top: 30px;
+  justify-content: center;
   /* position: absolute;
   left: 50%;
   transform: translateX(-50%); */

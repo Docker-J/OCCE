@@ -65,7 +65,10 @@ const BoardTable = ({ announcements, pages }) => {
         color="primary"
         // hideNextButton={pages === 1}
         // hidePrevButton={pages === numberOfAnnouncements}\
-        sx={{ margin: "auto", my: 4, textAlign: "center" }}
+        sx={{
+          margin: "auto",
+          my: 4,
+        }}
         onChange={(_, pageNumber) => navigate(`?page=${pageNumber}`)}
       />
     </>
