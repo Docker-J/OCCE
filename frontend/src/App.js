@@ -47,6 +47,7 @@ const AlbumPhotos = lazy(() => import("./pages/News/Photos/AlbumPhotos"));
 const SundayService = lazy(() => import("./pages/Online/SundayService"));
 const Sermon = lazy(() => import("./pages/Online/Sermon"));
 const Worship = lazy(() => import("./pages/Online/Worship"));
+const DawnQT = lazy(() => import("./pages/Online/DawnQT"));
 const PrayON = lazy(() => import("./pages/Online/PrayON"));
 const MeditationON = lazy(() =>
   import("./pages/Online/MeditationON/MeditationON")
@@ -175,6 +176,10 @@ const router = createBrowserRouter([
       {
         path: "/online/worship",
         element: <Worship />,
+      },
+      {
+        path: "/online/dawnQT",
+        element: <DawnQT />,
       },
       {
         path: "/online/prayON",

@@ -49,6 +49,10 @@ if (process.env.NODE_ENV === "development") {
           to: "online/worship",
         },
         {
+          title: "새벽QT",
+          to: "online/dawnQT",
+        },
+        {
           title: "기도ON",
           to: "online/prayON",
         },
@@ -142,6 +146,10 @@ if (process.env.NODE_ENV === "development") {
         {
           title: "찬양",
           to: "online/worship",
+        },
+        {
+          title: "새벽QT",
+          to: "online/dawnQT",
         },
         {
           title: "기도ON",
