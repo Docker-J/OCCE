@@ -17,7 +17,7 @@ const center = {
   lng: -113.47254286783863,
 };
 
-const LocationGoogleMap = memo(() => {
+const GoogleMap = memo(() => {
   const [markerRef, marker] = useAdvancedMarkerRef();
 
   const [infowindowShown, setInfowindowShown] = useState(false);
@@ -54,4 +54,4 @@ const LocationGoogleMap = memo(() => {
   );
 });
 
-export default LocationGoogleMap;
+export default GoogleMap;

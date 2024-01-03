@@ -2,7 +2,7 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import { Avatar, Divider, Typography } from "@mui/material";
-import LocationGoogleMap from "./LocationGoogleMap";
+import GoogleMap from "./GoogleMap";
 
 const Footer = () => {
   return (
@@ -25,7 +25,6 @@ const Footer = () => {
           height: "100%",
           maxWidth: "1536px",
           paddingTop: 30,
-
           paddingBottom: 30,
           display: "flex",
           justifyContent: "space-between",
@@ -45,7 +44,7 @@ const Footer = () => {
           <Typography>온 힘 다해 이웃을 사랑하는 교회</Typography>
         </div>
       </div>
-      <LocationGoogleMap />
+      <GoogleMap />
 
       <div
         style={{
