@@ -1,5 +1,4 @@
 import { Typography } from "@mui/material";
-import "./Online.css";
 import "../NextGen/NextGen.css";
 import YoutubePlaylist from "../../components/Online/YoutubePlaylist";
 
@@ -25,8 +24,10 @@ const Worship = () => {
         </div>
       </div>
 
-      <div className="main">
-        <YoutubePlaylist src="https://www.youtube.com/embed/videoseries?list=PL-MVshquUXWHGJNBM8QtFDNqMpCwOKs6e" />
+      <div className="container-wrapper">
+        <div className="container">
+          <YoutubePlaylist src="https://www.youtube.com/embed/videoseries?list=PL-MVshquUXWHGJNBM8QtFDNqMpCwOKs6e" />
+        </div>
       </div>
     </>
   );

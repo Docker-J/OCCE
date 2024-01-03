@@ -1,7 +1,0 @@
-.main {
-  position: relative;
-  width: 100%;
-  max-width: 1500px;
-  left: 50%;
-  transform: translateX(-50%);
-}

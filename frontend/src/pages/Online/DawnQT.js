@@ -1,13 +1,12 @@
 import { Typography } from "@mui/material";
-import "./Online.css";
 import "../NextGen/NextGen.css";
 import YoutubePlaylist from "../../components/Online/YoutubePlaylist";
 
 const titleBackground = {
   backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Online/PrayON.webp")',
+    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)), url("/img/Online/DawnQT.jpg")',
   // backgroundPositionX: "55%",
-  backgroundPositionY: "26%",
+  backgroundPositionY: "15%",
 };
 
 const DawnQT = () => {
@@ -25,8 +24,10 @@ const DawnQT = () => {
         </div>
       </div>
 
-      <div className="main">
-        <YoutubePlaylist src="https://www.youtube.com/embed/videoseries?list=PL-MVshquUXWGPQZ17w6vqSLGE4yJtYQ9H" />
+      <div className="container-wrapper">
+        <div className="container">
+          <YoutubePlaylist src="https://www.youtube.com/embed/videoseries?list=PL-MVshquUXWGPQZ17w6vqSLGE4yJtYQ9H" />
+        </div>
       </div>
     </>
   );
