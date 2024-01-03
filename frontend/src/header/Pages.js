@@ -62,7 +62,7 @@ if (process.env.NODE_ENV === "development") {
         },
         {
           title: "291일 성경1독",
-          to: "online/291Bible",
+          to: "online/bible291",
         },
       ],
     },
@@ -165,7 +165,7 @@ if (process.env.NODE_ENV === "development") {
         },
         {
           title: "291일 성경1독",
-          to: "online/291Bible",
+          to: "online/bible291",
         },
       ],
     },

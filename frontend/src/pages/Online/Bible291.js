@@ -1,5 +1,10 @@
 import { Typography } from "@mui/material";
 import "../NextGen/NextGen.css";
+import Papa from "papaparse";
+import { useEffect, useState } from "react";
+import { format } from "date-fns";
+import YoutubePlaylist from "./../../components/Online/YoutubePlaylist";
+import { useLoaderData } from "react-router-dom";
 
 const titleBackground = {
   backgroundImage:
@@ -8,6 +13,8 @@ const titleBackground = {
 };
 
 const Bible291 = () => {
+  const { today, match } = useLoaderData();
+
   return (
     <>
       <div className="title-wrapper" style={titleBackground}>
@@ -23,7 +30,33 @@ const Bible291 = () => {
       </div>
 
       <div className="container-wrapper">
-        <div className="container" style={{ width: "100%" }}>
+        <div className="container">
+          <Typography variant="h5" fontWeight={830}>
+            {today}
+          </Typography>
+
+          {match ? (
+            <>
+              <Typography variant="h5" fontWeight={830}>
+                오늘의 1독 말씀은
+                <Typography display="inline" variant="h5" fontWeight={900}>
+                  {` ${match.read} `}
+                </Typography>
+                입니다.
+              </Typography>
+
+              <YoutubePlaylist
+                src={`https://www.youtube.com/embed/videoseries?list=PL-${
+                  match.link.split("PL-")[1]
+                }`}
+              />
+            </>
+          ) : (
+            <Typography variant="h5" fontWeight={830}>
+              오늘은 성경 1독을 쉬어가는 날입니다
+            </Typography>
+          )}
+
           <img style={{ maxWidth: "100%" }} src="/img/Online/291Bible/1.jpg" />
           <img style={{ maxWidth: "100%" }} src="/img/Online/291Bible/2.jpg" />
           <img style={{ maxWidth: "100%" }} src="/img/Online/291Bible/3.jpg" />

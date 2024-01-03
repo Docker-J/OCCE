@@ -13,6 +13,7 @@ import { loader as AnnouncementLoader } from "./route/AnnouncementLoader";
 import { loader as WeeklyUpdateLoader } from "./route/WeeklyUpdateLoader";
 // import { loader as meditationONLoader } from "./route/MeditationONLoader";
 import { loader as MeditationONPostLoader } from "./route/MeditationONPostLoader";
+import { loader as Bible291Loader } from "./route/Bible291Loader";
 import { loader as AlbumPhotosLoader } from "./route/AlbumPhotosLoader";
 import Footer from "./header/Footer";
 
@@ -196,8 +197,9 @@ const router = createBrowserRouter([
         loader: MeditationONPostLoader,
       },
       {
-        path: "/online/291Bible",
+        path: "/online/bible291",
         element: <Bible291 />,
+        loader: Bible291Loader,
       },
       {
         path: "/nextgen/preschool",
