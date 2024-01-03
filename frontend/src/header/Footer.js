@@ -19,8 +19,6 @@ const Footer = () => {
         // borderRadius: "1.5em 1.5em 0px 0px",
       }}
     >
-      <LocationGoogleMap />
-
       <div
         style={{
           width: "98%",
@@ -46,6 +44,23 @@ const Footer = () => {
           <Typography>온 맘 다해 하나님을 사랑하고</Typography>
           <Typography>온 힘 다해 이웃을 사랑하는 교회</Typography>
         </div>
+      </div>
+      <LocationGoogleMap />
+
+      <div
+        style={{
+          width: "98%",
+          height: "100%",
+          maxWidth: "1536px",
+          paddingTop: 30,
+
+          paddingBottom: 30,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexDirection: "column",
+        }}
+      >
         {/* <p>office@oncce.ca</p> */}
         <div style={{ width: "100%" }}></div>
         <div style={{ display: "flex" }}>

@@ -8,12 +8,17 @@ export async function loader({ request }) {
   }
 
   const getCount = await axios.get("/api/Announcements/getAnnouncementsCount");
+  const getPinned = await axios.get(
+    "/api/Announcements/getPinnedAnnouncements"
+  );
   const getAnnouncements = await axios.get(
     `/api/Announcements/getAnnouncements?page=${page}`
   );
 
   const count = getCount.data.count;
-  const announcements = getAnnouncements.data;
+  const pinned = getPinned.data;
+  const unpinned = getAnnouncements.data;
+  const announcements = pinned.concat(unpinned);
 
   return { count, announcements };
 }

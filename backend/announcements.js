@@ -21,7 +21,9 @@ var ANNOUNCEMENTS_COUNT;
 var PINNED_ANNOUNCEMENTS;
 
 const getAnnouncementsCount = async () => {
-  const data = { sql: `SELECT COUNT(*) AS count FROM ${TABLENAME}` };
+  const data = {
+    sql: `SELECT COUNT(*) AS count FROM ${TABLENAME} WHERE pin = 0`,
+  };
   try {
     const result = await axios.post(URL, data, {
       headers: {
@@ -37,9 +39,9 @@ const getAnnouncementsCount = async () => {
   }
 };
 
-const getPINNED_AANOUNCEMENTS = async () => {
+const getPINNED_ANNOUNCEMENTS = async () => {
   const data = {
-    params: [true],
+    params: [1],
     sql: `SELECT * FROM ${TABLENAME} WHERE pin = ?`,
   };
   try {
@@ -49,9 +51,8 @@ const getPINNED_AANOUNCEMENTS = async () => {
         Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
       },
     });
-    console.log(result.data);
 
-    PINNED_ANNOUNCEMENTS = result.data.result[0].results[0];
+    PINNED_ANNOUNCEMENTS = result.data.result[0].results;
   } catch (error) {
     console.log(error);
   }
@@ -66,13 +67,21 @@ router.get("/getAnnouncementsCount", async (req, res) => {
   }
 });
 
+router.get("/getPinnedAnnouncements", async (req, res) => {
+  if (PINNED_ANNOUNCEMENTS) {
+    res.send(PINNED_ANNOUNCEMENTS);
+  } else {
+    await getPINNED_ANNOUNCEMENTS();
+    res.send(PINNED_ANNOUNCEMENTS);
+  }
+});
+
 router.get("/getAnnouncements", async (req, res) => {
   const page = req.query.page;
 
   const data = {
-    // params: [false],
-    // sql: `SELECT * FROM ${TABLENAME} WHERE pin = ? ORDER BY timestamp DESC LIMIT ${PAGE_SIZE}`,
-    sql: `SELECT * FROM ${TABLENAME} ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
+    params: [0],
+    sql: `SELECT * FROM ${TABLENAME} WHERE pin = ? ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
       page ? (page - 1) * PAGE_SIZE : 0
     }`,
   };
@@ -126,6 +135,29 @@ router.put("/postAnnouncement", async (req, res) => {
 
     ANNOUNCEMENTS_COUNT += 1;
     res.send(result.data);
+  } catch (error) {
+    console.log(error);
+    res.send(error);
+  }
+});
+
+router.put("/pinAnnouncement", async (req, res) => {
+  const data = {
+    params: [req.body.pin, req.body.id],
+    sql: `UPDATE ${TABLENAME} SET pin = ? WHERE id = ?`,
+  };
+
+  try {
+    const result = await axios.post(URL, data, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
+      },
+    });
+
+    getAnnouncementsCount;
+    getPINNED_ANNOUNCEMENTS();
+    res.sendStatus(201);
   } catch (error) {
     console.log(error);
     res.send(error);

@@ -4,27 +4,47 @@ import {
   SpeedDialIcon,
   Typography,
 } from "@mui/material";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useRevalidator } from "react-router-dom";
 import PushPinIcon from "@mui/icons-material/PushPin";
+import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { format } from "date-fns";
 
 import "../../NextGen/NextGen.css";
+import axios from "axios";
 
 const titleBackground = {
   backgroundImage:
     'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)), url("/img/Announcements.jpg")',
 };
 
-const actions = [
-  { icon: <EditNoteIcon />, name: "Edit" },
-  { icon: <PushPinIcon />, name: "Pin" },
-  { icon: <DeleteIcon />, name: "Delete" },
-];
-
 const Announcement = () => {
-  const { title, body, timestamp, pin } = useLoaderData();
+  let revalidator = useRevalidator();
+  const { id, title, body, timestamp, pin } = useLoaderData();
+
+  const pinAnnouncement = async () => {
+    try {
+      const result = await axios.put("/api/Announcements/pinAnnouncement", {
+        id: id,
+        pin: pin ? 0 : 1,
+      });
+
+      revalidator.revalidate();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const actions = [
+    { icon: <EditNoteIcon />, name: "Edit" },
+    {
+      icon: pin ? <PushPinIcon /> : <PushPinOutlinedIcon />,
+      name: pin ? "Unpin" : "Pin",
+      onClick: pinAnnouncement,
+    },
+    { icon: <DeleteIcon />, name: "Delete" },
+  ];
 
   return (
     <>
@@ -48,9 +68,10 @@ const Announcement = () => {
         }}
       >
         <div style={{ maxWidth: "1500px", width: "100%", textAlign: "left" }}>
-          {pin && <PushPinIcon />}
-
-          <h1 style={{ textAlign: "left", wordWrap: "break-word" }}>{title}</h1>
+          <h1 style={{ textAlign: "left", wordWrap: "break-word" }}>
+            <PushPinIcon sx={{ opacity: pin ? 1 : 0, mr: 2 }} />
+            {title}
+          </h1>
 
           <p style={{ textAlign: "right" }}>
             {format(new Date(timestamp), "yyyy/MM/dd")}
@@ -73,6 +94,7 @@ const Announcement = () => {
                 key={action.name}
                 icon={action.icon}
                 tooltipTitle={action.name}
+                onClick={action.onClick}
               />
             ))}
           </SpeedDial>

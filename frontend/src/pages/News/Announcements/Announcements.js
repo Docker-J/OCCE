@@ -10,6 +10,7 @@ import AnnouncementPostModal from "../../../components/News/Announcement/Announc
 import BoardTable from "../../../components/News/Announcement/BoardTable";
 
 import "../../NextGen/NextGen.css";
+import BoardPagination from "../../../components/News/Announcement/BoardPagination";
 
 const titleBackground = {
   backgroundImage:
@@ -41,7 +42,8 @@ const Announcements = () => {
 
       <div className="container-wrapper">
         <div className="container">
-          <BoardTable announcements={announcements} pages={pages} />
+          <BoardTable announcements={announcements} />
+          <BoardPagination pages={pages} />
         </div>
       </div>
 

@@ -1,11 +1,9 @@
-import { useState } from "react";
-
 import Editor from "ckeditor5-custom-build/build/ckeditor";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 
 const TextEditor = ({ getBody }) => {
   return (
-    <div style={{ width: "100%", alignItems: "center" }}>
+    <div style={{ width: "100%" }}>
       <CKEditor
         editor={Editor}
         // data="<p>Hello from CKEditor 5!</p>"
