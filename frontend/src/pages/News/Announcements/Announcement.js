@@ -4,7 +4,7 @@ import {
   SpeedDialIcon,
   Typography,
 } from "@mui/material";
-import { useLoaderData, useRevalidator } from "react-router-dom";
+import { useLoaderData, useNavigate, useRevalidator } from "react-router-dom";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import EditNoteIcon from "@mui/icons-material/EditNote";
@@ -20,6 +20,7 @@ const titleBackground = {
 };
 
 const Announcement = () => {
+  const navigate = useNavigate();
   let revalidator = useRevalidator();
   const { id, title, body, timestamp, pin } = useLoaderData();
 
@@ -36,6 +37,18 @@ const Announcement = () => {
     }
   };
 
+  const deleteAnnouncement = async () => {
+    try {
+      const result = await axios.delete(
+        `/api/Announcements/deleteAnnouncement?id=${id}`
+      );
+
+      navigate("/announcements");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const actions = [
     { icon: <EditNoteIcon />, name: "Edit" },
     {
@@ -43,7 +56,7 @@ const Announcement = () => {
       name: pin ? "Unpin" : "Pin",
       onClick: pinAnnouncement,
     },
-    { icon: <DeleteIcon />, name: "Delete" },
+    { icon: <DeleteIcon />, name: "Delete", onClick: deleteAnnouncement },
   ];
 
   return (

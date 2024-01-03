@@ -164,4 +164,25 @@ router.put("/pinAnnouncement", async (req, res) => {
   }
 });
 
+router.delete("/deleteAnnouncement", async (req, res) => {
+  const data = {
+    params: [req.query.id],
+    sql: `DELETE FROM ${TABLENAME} WHERE id = ?`,
+  };
+
+  try {
+    const result = await axios.post(URL, data, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
+      },
+    });
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.send(error);
+  }
+});
+
 export default router;
