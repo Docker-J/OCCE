@@ -55,6 +55,7 @@ const MeditationON = lazy(() =>
 const MeditationONPost = lazy(() =>
   import("./pages/Online/MeditationON/MeditationONPost")
 );
+const Bible291 = lazy(() => import("./pages/Online/Bible291"));
 
 // Community
 const SmallGroup = lazy(() => import("./pages/Community/SmallGroup"));
@@ -193,6 +194,10 @@ const router = createBrowserRouter([
         path: "/online/meditationON/:postID",
         element: <MeditationONPost />,
         loader: MeditationONPostLoader,
+      },
+      {
+        path: "/online/291Bible",
+        element: <Bible291 />,
       },
       {
         path: "/nextgen/preschool",

@@ -60,6 +60,10 @@ if (process.env.NODE_ENV === "development") {
           title: "묵상ON",
           to: "online/meditationon",
         },
+        {
+          title: "291일 성경1독",
+          to: "online/291Bible",
+        },
       ],
     },
     {
@@ -158,6 +162,10 @@ if (process.env.NODE_ENV === "development") {
         {
           title: "묵상ON",
           to: "online/meditationon",
+        },
+        {
+          title: "291일 성경1독",
+          to: "online/291Bible",
         },
       ],
     },
