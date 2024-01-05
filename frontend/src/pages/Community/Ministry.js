@@ -2,13 +2,14 @@ import { List, ListItem, Typography } from "@mui/material";
 import "../NextGen/NextGen.css";
 import { Link } from "react-router-dom";
 
+const titleBackground = {
+  backgroundImage:
+    'linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("/img/Community/Ministry.webp")',
+  backgroundPositionX: "58%",
+  backgroundPositionY: "56%",
+};
+
 const Ministry = () => {
-  const titleBackground = {
-    backgroundImage:
-      'linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("/img/Community/Ministry.webp")',
-    backgroundPositionX: "58%",
-    backgroundPositionY: "56%",
-  };
   return (
     <>
       <div className="title-wrapper" style={titleBackground}>

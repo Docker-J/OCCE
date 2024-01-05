@@ -1,12 +1,12 @@
 import { Typography } from "@mui/material";
 import "./NextGen.css";
 
-const Preschool = () => {
-  const titleBackground = {
-    backgroundImage:
-      'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/NextGen/KidsOnGoodSoil.webp")',
-  };
+const titleBackground = {
+  backgroundImage:
+    'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/NextGen/KidsOnGoodSoil.webp")',
+};
 
+const Preschool = () => {
   return (
     <>
       <div className="title-wrapper" style={titleBackground}>

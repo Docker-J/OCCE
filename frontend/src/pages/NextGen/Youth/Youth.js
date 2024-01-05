@@ -1,13 +1,15 @@
 import { Typography } from "@mui/material";
-import "../NextGen.css";
 import YouthTimeline from "./YouthTimeline";
 
+import "../NextGen.css";
+
+const titleBackground = {
+  backgroundImage:
+    'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/NextGen/KidsOntheRock.webp")',
+  backgroundPositionY: "52%",
+};
+
 const Youth = () => {
-  const titleBackground = {
-    backgroundImage:
-      'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/NextGen/KidsOntheRock.webp")',
-    backgroundPositionY: "52%",
-  };
   return (
     <>
       <div className="title-wrapper" style={titleBackground}>

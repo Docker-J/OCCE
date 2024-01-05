@@ -163,7 +163,7 @@ const WeeklyUpdate = () => {
       </div>
 
       <div className="container-wrapper">
-        <div className="container">
+        <div className="container" style={{ textAlign: "center" }}>
           <>
             <IconButton
               id="previousBulletin"

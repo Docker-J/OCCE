@@ -129,9 +129,7 @@ const MeditationON = () => {
         <div
           className="container"
           style={{
-            paddingLeft: "0.2em",
-            paddingRight: "0.2em",
-            marginTop: "0.2em",
+            padding: "0em 0.2em",
           }}
         >
           {posts.length > 0 ? (
@@ -144,12 +142,7 @@ const MeditationON = () => {
               style={{ overflowY: "hidden" }}
             >
               {
-                <ImageList
-                  ref={scrollRef}
-                  sx={{ mx: "0.5rem" }}
-                  cols={matches ? 4 : 3}
-                  gap={2.5}
-                >
+                <ImageList ref={scrollRef} cols={matches ? 4 : 3} gap={2.5}>
                   <MemoizedMeditationONComp posts={posts} />
                 </ImageList>
               }
