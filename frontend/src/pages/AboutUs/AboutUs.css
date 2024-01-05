@@ -51,7 +51,7 @@
 #section5 {
   display: flex;
   justify-content: center;
-  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
     url("../../components/AboutUs/img/Servers.jpg");
   background-repeat: no-repeat;
   background-size: cover;
@@ -66,6 +66,7 @@
 .section5Body {
   max-width: 1500px;
   height: 100vh;
+  padding: 0;
 }
 
 .section4Body {

@@ -20,6 +20,17 @@ const slides = [
     key: uuidv4(),
     content: (
       <Card
+        // imagen="img/About/AhnJooyoung.jpg"
+        // imageOffset={{ left: "-49%" }}
+        title="김태영 목사"
+        position="행정"
+      />
+    ),
+  },
+  {
+    key: uuidv4(),
+    content: (
+      <Card
         imagen="img/About/KimYoojeong.jpg"
         imageOffset={{ left: "-52%" }}
         title="김유정 전도사"
@@ -45,18 +56,7 @@ const slides = [
         imagen="img/About/KimHwikyung.jpg"
         imageOffset={{ left: "-55%" }}
         title="김휘경 전도사"
-        position="중고등부/찬양/행정"
-      />
-    ),
-  },
-  {
-    key: uuidv4(),
-    content: (
-      <Card
-        imagen="img/About/AhnJooyoung.jpg"
-        imageOffset={{ left: "-49%" }}
-        title="안주영 목사"
-        position="협동 목사"
+        position="중고등부/청년부/찬양"
       />
     ),
   },
@@ -74,8 +74,8 @@ const MinisterCarousel = () => {
     <div
       style={{
         height: "100%",
-        width: "90vw",
-        maxWidth: "min(700px, 45vmax)",
+        width: "100%",
+        maxWidth: "max(450px, 40vw)",
         margin: "auto",
       }}
     >
