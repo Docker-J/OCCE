@@ -103,41 +103,41 @@ const ResponsiveAppBar = () => {
     removeCookieToken();
   };
 
-  const appBarPosition =
-    currentPage === "/" ||
-    currentPage === "/aboutus" ||
-    currentPage.includes("/announcements") ||
-    currentPage.includes("/weeklyupdate") ||
-    currentPage.includes("/newcomers") ||
-    currentPage.includes("/nextgen/") ||
-    currentPage.includes("/community/") ||
-    currentPage.includes("/online/")
-      ? "absolute"
-      : "static";
+  const appBarPosition = "absolute";
+  // currentPage === "/" ||
+  // currentPage === "/aboutus" ||
+  // currentPage.includes("/announcements") ||
+  // currentPage.includes("/weeklyupdate") ||
+  // currentPage.includes("/newcomers") ||
+  // currentPage.includes("/nextgen/") ||
+  // currentPage.includes("/community/") ||
+  // currentPage.includes("/online/")
+  //   ? "absolute"
+  //   : "static";
 
-  const appBarColor =
-    currentPage === "/" ||
-    currentPage === "/aboutus" ||
-    currentPage.includes("/announcements") ||
-    currentPage.includes("/weeklyupdate") ||
-    currentPage.includes("/newcomers") ||
-    currentPage.includes("/nextgen/") ||
-    currentPage.includes("/community/") ||
-    currentPage.includes("/online/")
-      ? "white"
-      : "black";
+  const appBarColor = "white";
+  // currentPage === "/" ||
+  // currentPage === "/aboutus" ||
+  // currentPage.includes("/announcements") ||
+  // currentPage.includes("/weeklyupdate") ||
+  // currentPage.includes("/newcomers") ||
+  // currentPage.includes("/nextgen/") ||
+  // currentPage.includes("/community/") ||
+  // currentPage.includes("/online/")
+  //   ? "white"
+  //   : "black";
 
-  const logoColor =
-    currentPage === "/" ||
-    currentPage === "/aboutus" ||
-    currentPage.includes("/announcements") ||
-    currentPage.includes("/weeklyupdate") ||
-    currentPage.includes("/newcomers") ||
-    currentPage.includes("/nextgen/") ||
-    currentPage.includes("/community/") ||
-    currentPage.includes("/online/")
-      ? "/img/HeaderLogoColor.png"
-      : "/img/HeaderLogoBW.png";
+  const logoColor = "/img/HeaderLogoColor.png";
+  // currentPage === "/" ||
+  // currentPage === "/aboutus" ||
+  // currentPage.includes("/announcements") ||
+  // currentPage.includes("/weeklyupdate") ||
+  // currentPage.includes("/newcomers") ||
+  // currentPage.includes("/nextgen/") ||
+  // currentPage.includes("/community/") ||
+  // currentPage.includes("/online/")
+  // ? "/img/HeaderLogoColor.png"
+  // : "/img/HeaderLogoBW.png";
 
   return (
     <AppBar
