@@ -67,15 +67,6 @@ router.get("/getAnnouncementsCount", async (req, res) => {
   }
 });
 
-router.get("/getPinnedAnnouncements", async (req, res) => {
-  if (PINNED_ANNOUNCEMENTS) {
-    res.send(PINNED_ANNOUNCEMENTS);
-  } else {
-    await getPINNED_ANNOUNCEMENTS();
-    res.send(PINNED_ANNOUNCEMENTS);
-  }
-});
-
 router.get("/getAnnouncements", async (req, res) => {
   const page = req.query.page;
 
@@ -92,7 +83,16 @@ router.get("/getAnnouncements", async (req, res) => {
         Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
       },
     });
-    res.send(result.data.result[0].results);
+
+    if (!PINNED_ANNOUNCEMENTS) {
+      await getPINNED_ANNOUNCEMENTS();
+    }
+
+    const annoucements = PINNED_ANNOUNCEMENTS.concat(
+      result.data.result[0].results
+    );
+
+    res.send(annoucements);
   } catch (error) {
     console.log(error);
     res.send(error);
