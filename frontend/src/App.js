@@ -80,7 +80,7 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: "nanumsquare",
+    fontFamily: "NanumSquareNeoVariable",
   },
 });
 

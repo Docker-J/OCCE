@@ -1,8 +1,9 @@
 @import url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/nanumsquare.css);
+@import url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquareNeo@1.0/nanumsquareneo.css);
 
 body {
   word-break: keep-all;
-  font-family: "NanumSquare", sans-serif;
+  font-family: "NanumSquareNeoVariable", sans-serif;
   text-align: center;
   /* width: 85%;
   max-width: 1900px; */
