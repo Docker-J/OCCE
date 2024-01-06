@@ -2,6 +2,7 @@ import {
   SpeedDial,
   SpeedDialAction,
   SpeedDialIcon,
+  Stack,
   Typography,
 } from "@mui/material";
 import { useLoaderData, useNavigate, useRevalidator } from "react-router-dom";
@@ -76,8 +77,10 @@ const Announcement = () => {
       <div className="container-wrapper">
         <div className="container">
           <h1 style={{ textAlign: "left", wordWrap: "break-word" }}>
-            <PushPinIcon sx={{ opacity: pin ? 1 : 0, mr: 2 }} />
-            {title}
+            <Stack direction="row" alignItems="center">
+              <PushPinIcon sx={{ opacity: pin ? 1 : 0, mr: 2 }} />
+              {title}
+            </Stack>
           </h1>
 
           <p style={{ textAlign: "right" }}>
