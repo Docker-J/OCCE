@@ -90,6 +90,8 @@ const Announcement = () => {
             {format(new Date(timestamp), "yyyy/MM/dd")}
           </p>
 
+          <hr />
+
           <div
             className="content"
             dangerouslySetInnerHTML={{
