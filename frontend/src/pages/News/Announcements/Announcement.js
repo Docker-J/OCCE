@@ -72,15 +72,9 @@ const Announcement = () => {
           </Typography>
         </div>
       </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          padding: "3em",
-          boxSizing: "border-box",
-        }}
-      >
-        <div style={{ maxWidth: "1500px", width: "100%", textAlign: "left" }}>
+
+      <div className="container-wrapper">
+        <div className="container">
           <h1 style={{ textAlign: "left", wordWrap: "break-word" }}>
             <PushPinIcon sx={{ opacity: pin ? 1 : 0, mr: 2 }} />
             {title}
