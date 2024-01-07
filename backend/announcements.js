@@ -33,7 +33,7 @@ const getAnnouncementsCount = async () => {
     });
     console.log(result.data);
 
-    ANNOUNCEMENTS_COUNT = result.data.result[0].results[0];
+    ANNOUNCEMENTS_COUNT = result.data.result[0].results[0].count;
   } catch (error) {
     console.log(error);
   }
@@ -59,12 +59,12 @@ const getPINNED_ANNOUNCEMENTS = async () => {
 };
 
 router.get("/getAnnouncementsCount", async (req, res) => {
-  if (ANNOUNCEMENTS_COUNT) {
-    res.send(ANNOUNCEMENTS_COUNT);
-  } else {
+  if (!ANNOUNCEMENTS_COUNT) {
     await getAnnouncementsCount();
-    res.send(ANNOUNCEMENTS_COUNT);
   }
+
+  const data = { count: ANNOUNCEMENTS_COUNT };
+  res.send(data);
 });
 
 router.get("/getAnnouncements", async (req, res) => {
