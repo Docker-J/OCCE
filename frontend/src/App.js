@@ -1,6 +1,5 @@
 import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 import React, { lazy, Suspense } from "react";
-import { createTheme, ThemeProvider } from "@mui/material";
 import "./App.css";
 
 import ResponsiveAppBar from "./header/ResponsiveAppBar";
@@ -67,22 +66,6 @@ const Preschool = lazy(() => import("./pages/NextGen/Preschool"));
 const Elementary = lazy(() => import("./pages/NextGen/Elementary"));
 const Youth = lazy(() => import("./pages/NextGen/Youth/Youth"));
 const YoungAdult = lazy(() => import("./pages/NextGen/YoungAdult"));
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      light: "#f79633",
-      main: "#f57c00",
-      dark: "#ab5600",
-    },
-    secondary: {
-      main: "#ffffff",
-    },
-  },
-  typography: {
-    fontFamily: "NanumSquareNeoVariable",
-  },
-});
 
 const HeaderFooterWrapper = () => {
   return (
@@ -232,11 +215,9 @@ const router = createBrowserRouter([
 
 const App = () => {
   return (
-    <ThemeProvider theme={theme}>
-      <Suspense>
-        <RouterProvider router={router} />
-      </Suspense>
-    </ThemeProvider>
+    <Suspense>
+      <RouterProvider router={router} />
+    </Suspense>
   );
 };
 

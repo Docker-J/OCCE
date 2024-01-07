@@ -4,6 +4,7 @@ import { signIn } from "../../api/user";
 import { useDispatch } from "react-redux";
 import { SET_TOKEN } from "../../store/Auth";
 import { setRefreshToken } from "../../storage/Cookie";
+import { closeModal } from "../../store/modalSlice";
 
 const style = {
   position: "absolute",
@@ -25,7 +26,7 @@ const style = {
   justifyContent: "center",
 };
 
-const SignInModal = (props) => {
+const SignInModal = () => {
   const dispatch = useDispatch();
 
   const [email, setEmail] = useState("");
@@ -53,7 +54,7 @@ const SignInModal = (props) => {
   const handleClose = () => {
     setEmail("");
     setPassword("");
-    props.onClose();
+    dispatch(closeModal());
   };
 
   const handleSnackBarClose = (event, reason) => {
@@ -66,7 +67,7 @@ const SignInModal = (props) => {
 
   return (
     <>
-      <Modal open={props.open} onClose={handleClose}>
+      <Modal open={true} onClose={handleClose}>
         <Box sx={style} bgcolor="white">
           <h1 style={{ marginTop: 0 }}>Sign In</h1>
           <TextField

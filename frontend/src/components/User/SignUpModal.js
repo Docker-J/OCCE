@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Box, Button, Modal, TextField } from "@mui/material";
+import { useDispatch } from "react-redux";
+import { closeModal } from "../../store/modalSlice";
 
 const style = {
   position: "absolute",
@@ -16,7 +18,8 @@ const style = {
   p: 2,
 };
 
-const SignUpModal = (props) => {
+const SignUpModal = () => {
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -30,11 +33,11 @@ const SignUpModal = (props) => {
   const handleClose = () => {
     setEmail("");
     setPassword("");
-    props.onClose();
+    dispatch(closeModal());
   };
 
   return (
-    <Modal open={props.open} onClose={handleClose}>
+    <Modal open={true} onClose={handleClose}>
       <Box sx={style} bgcolor="white">
         <h1>Sign Up</h1>
         <TextField

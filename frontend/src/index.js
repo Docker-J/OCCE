@@ -7,15 +7,37 @@ import reportWebVitals from "./reportWebVitals";
 import store from "./store";
 import { Provider } from "react-redux";
 import { CookiesProvider } from "react-cookie";
+import { createTheme, ThemeProvider } from "@mui/material";
+
+import ModalManager from "./util/ModalManager";
 
 const container = document.getElementById("root");
 const root = createRoot(container);
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      light: "#f79633",
+      main: "#f57c00",
+      dark: "#ab5600",
+    },
+    secondary: {
+      main: "#ffffff",
+    },
+  },
+  typography: {
+    fontFamily: "NanumSquareNeoVariable",
+  },
+});
 
 root.render(
   // <React.StrictMode>
   <CookiesProvider>
     <Provider store={store}>
-      <App />
+      <ThemeProvider theme={theme}>
+        <App />
+        <ModalManager />
+      </ThemeProvider>
     </Provider>
   </CookiesProvider>
   // </React.StrictMode>

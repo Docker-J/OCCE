@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import "./ResponsiveAppBar.css";
 
@@ -21,8 +20,6 @@ import MenuItem from "@mui/material/MenuItem";
 
 import Submenu from "../components/Header/Submenu";
 import SubmenuMobile from "../components/Header/SubmenuMobile";
-import SignInModal from "../components/User/SignInModal";
-import SignUpModal from "../components/User/SignUpModal";
 import { signOut } from "../api/user";
 import { useDispatch, useSelector } from "react-redux";
 import { removeCookieToken } from "../storage/Cookie";
@@ -37,6 +34,8 @@ import { CascadingMenu } from "../components/Header/CascadingMenus";
 // import { getToken } from "firebase/messaging";
 
 import pages from "./Pages.js";
+import { openModal } from "../store/modalSlice.js";
+import { MODAL_TYPES } from "../constant/MODAL_TYPES.js";
 
 const ResponsiveAppBar = () => {
   const dispatch = useDispatch();
@@ -63,9 +62,6 @@ const ResponsiveAppBar = () => {
 
   // console.log(token);
 
-  const [signInModalOpen, setSignInModalOpen] = useState(false);
-  const [signUpModalOpen, setSignUpModalOpen] = useState(false);
-
   const popupState = usePopupState({
     variant: "popover",
     popupId: "menu",
@@ -76,14 +72,7 @@ const ResponsiveAppBar = () => {
     popupId: "user",
   });
 
-  const onSignInModalClose = () => {
-    setSignInModalOpen(false);
-  };
-  const onSignUpModalClose = () => {
-    setSignUpModalOpen(false);
-  };
-
-  const currentPage = useLocation().pathname;
+  // const currentPage = useLocation().pathname;
   // const currnetHash = useLocation().hash;
 
   const settings_signed = [
@@ -94,8 +83,16 @@ const ResponsiveAppBar = () => {
   ];
 
   const settings_not_signed = [
-    { title: "Sign In", onClick: () => setSignInModalOpen(true) },
-    // { title: "Sign Up", onClick: () => setSignUpModalOpen(true) },
+    {
+      title: "Sign In",
+      onClick: () =>
+        dispatch(openModal({ modalType: MODAL_TYPES.SignInModal })),
+    },
+    {
+      title: "Sign Up",
+      onClick: () =>
+        dispatch(openModal({ modalType: MODAL_TYPES.SignUpModal })),
+    },
   ];
 
   const signOutSuccess = () => {
@@ -273,8 +270,8 @@ const ResponsiveAppBar = () => {
         </Toolbar>
       </Container>
 
-      <SignInModal open={signInModalOpen} onClose={onSignInModalClose} />
-      <SignUpModal open={signUpModalOpen} onClose={onSignUpModalClose} />
+      {/* <SignInModal open={signInModalOpen} onClose={onSignInModalClose} /> */}
+      {/* <SignUpModal open={signUpModalOpen} onClose={onSignUpModalClose} /> */}
     </AppBar>
   );
 };
