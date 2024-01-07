@@ -36,11 +36,7 @@ const Bible291 = () => {
           {match ? (
             <>
               <Typography variant="h5" fontWeight={830}>
-                오늘의 1독 말씀은
-                <Typography display="inline" variant="h5" fontWeight={900}>
-                  {` ${match.read} `}
-                </Typography>
-                입니다.
+                오늘의 1독 말씀은 "{`${match.read}`}" 입니다.
               </Typography>
 
               <YoutubePlaylist
