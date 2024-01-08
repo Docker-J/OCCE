@@ -81,8 +81,6 @@ router.get("/GetBulletin", async (req, res) => {
 
 // Prepare R2
 router.put("/PostBulletin", upload.single("images"), async (req, res) => {
-  console.log(req.file);
-
   const data = req.file.buffer;
 
   const command = new PutObjectCommand({
@@ -106,7 +104,7 @@ router.put("/PostBulletin", upload.single("images"), async (req, res) => {
     });
     await docClient.send(dbCommand);
 
-    res.send(RECENTDATE);
+    res.send(req.body.date);
   } catch (error) {
     console.log(error);
   }

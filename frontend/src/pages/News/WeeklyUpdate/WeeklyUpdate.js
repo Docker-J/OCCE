@@ -1,14 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
-import {
-  Alert,
-  CircularProgress,
-  Fab,
-  IconButton,
-  Snackbar,
-  Typography,
-} from "@mui/material";
+import { CircularProgress, Fab, IconButton, Typography } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import UploadIcon from "@mui/icons-material/Upload";
@@ -17,14 +10,16 @@ import { isMobile } from "react-device-detect";
 
 import ButtonDatePicker from "../../../components/News/WeeklyUpdate/ButtonDatePicker";
 import PDFReader from "../../../components/News/WeeklyUpdate/PDFReader";
-import BulletinUploadModal from "../../../components/News/WeeklyUpdate/BulletinUploadModal";
 
 import { useLoaderData, useNavigate, useRevalidator } from "react-router-dom";
 import AdminComponent from "../../../common/AdminComponent";
-import { add, compareAsc, format, sub } from "date-fns";
+import { add, format, isSameDay, sub } from "date-fns";
 
 import "./WeeklyUpdate.css";
 import "../../NextGen/NextGen.css";
+import { useDispatch } from "react-redux";
+import { openModal } from "../../../store/modalSlice";
+import { MODAL_TYPES } from "../../../constant/MODAL_TYPES";
 
 const titleBackground = {
   backgroundImage:
@@ -32,26 +27,16 @@ const titleBackground = {
 };
 
 const WeeklyUpdate = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  let revalidator = useRevalidator();
 
   const { maxDate, queryDate } = useLoaderData();
   const minDate = new Date("2022/04/03");
 
   const [bulletin, setBulletin] = useState(null);
   const [selectedDate, setSelectedDate] = useState(queryDate);
-  const [modalState, setModalState] = useState(false);
-  const [isSuccessSnackBarOpen, setIsSuccessSnackBarOpen] = useState(false);
 
   const [loading, setLoading] = useState(false);
-
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setIsSuccessSnackBarOpen(false);
-  };
 
   // Get Bulletin from Firestore
   const loadFile = useCallback(async () => {
@@ -73,32 +58,6 @@ const WeeklyUpdate = () => {
     }
   }, [selectedDate]);
 
-  const closeModal = () => {
-    setModalState(false);
-  };
-
-  const uploadBulletin = async (file, date) => {
-    try {
-      const form = new FormData();
-      form.append("images", file);
-      form.append("date", format(selectedDate, "yyyyMMdd"));
-      const res = await axios.put("/api/WeeklyUpdate/PostBulletin/", form, {
-        headers: {
-          "Content-Type": `multipart/form-data`,
-        },
-      });
-
-      console.log(res.data);
-      // setMaxDate(new Date(res.data.replace(/-/g, "/")));
-      setSelectedDate(date);
-      revalidator.revalidate(); //get new maxdate
-      closeModal();
-      setIsSuccessSnackBarOpen(true);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const previousBulletin = () => {
     setSelectedDate((prev) => sub(prev, { days: 7 }));
   };
@@ -108,10 +67,8 @@ const WeeklyUpdate = () => {
   };
 
   useEffect(() => {
-    if (selectedDate != null) {
-      loadFile();
-      navigate("/weeklyupdate/" + format(selectedDate, "yyyyMMdd"));
-    }
+    loadFile();
+    navigate("/weeklyupdate/" + format(selectedDate, "yyyyMMdd"));
   }, [selectedDate, loadFile, navigate]);
 
   const width = isMobile
@@ -168,7 +125,7 @@ const WeeklyUpdate = () => {
             <IconButton
               id="previousBulletin"
               onClick={previousBulletin}
-              disabled={compareAsc(selectedDate, minDate) === 0 || loading}
+              disabled={isSameDay(selectedDate, minDate) || loading}
             >
               <ArrowBackIosIcon />
             </IconButton>
@@ -183,7 +140,7 @@ const WeeklyUpdate = () => {
             <IconButton
               id="nextBulletin"
               onClick={nextBulletin}
-              disabled={compareAsc(selectedDate, maxDate) === 0 || loading}
+              disabled={isSameDay(selectedDate, maxDate) || loading}
             >
               <ArrowForwardIosIcon />
             </IconButton>
@@ -202,27 +159,18 @@ const WeeklyUpdate = () => {
         <Fab
           id="uploadBulletinButton"
           variant="extended"
-          onClick={() => setModalState(true)}
+          onClick={() =>
+            dispatch(
+              openModal({
+                modalType: MODAL_TYPES.WeeklyUpdatePostModal,
+                props: { setParentDate: setSelectedDate },
+              })
+            )
+          }
         >
           <UploadIcon sx={{ mr: 1 }} />
           Upload
         </Fab>
-
-        <BulletinUploadModal
-          open={modalState}
-          onModalUpload={uploadBulletin}
-          setModalState={setModalState}
-        />
-
-        <Snackbar
-          open={isSuccessSnackBarOpen}
-          autoHideDuration={8000}
-          onClose={handleClose}
-        >
-          <Alert severity="success" onClose={handleClose}>
-            Uploaded Succesfully!
-          </Alert>
-        </Snackbar>
       </AdminComponent>
     </>
   );

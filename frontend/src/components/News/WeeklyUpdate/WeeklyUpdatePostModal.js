@@ -1,9 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Box, Button, Modal, Typography } from "@mui/material";
+import { Alert, Box, Button, Modal, Snackbar, Typography } from "@mui/material";
 import ButtonDatePicker from "./ButtonDatePicker";
 import { useDropzone } from "react-dropzone";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Document, Page } from "react-pdf";
+import { add, endOfWeek, format } from "date-fns";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { closeModal } from "../../../store/modalSlice";
 
 const style = {
   position: "absolute",
@@ -26,9 +30,15 @@ const style = {
 
 const MIN_DATE = "2022/04/03";
 
-const BulletinUploadModal = (props) => {
-  const [selectedDate, setSelectedDate] = useState();
+const WeeklyUpdatePostModal = (props) => {
+  const dispatch = useDispatch();
+
+  const [selectedDate, setSelectedDate] = useState(
+    add(endOfWeek(new Date()), { days: 1 })
+  );
   const [fileToUpload, setFileToUpload] = useState(null);
+
+  const [isSuccessSnackBarOpen, setIsSuccessSnackBarOpen] = useState(false);
 
   const test = useRef(null);
   const [height, setHeight] = useState(0);
@@ -39,40 +49,61 @@ const BulletinUploadModal = (props) => {
     }
   }, [fileToUpload]);
 
-  console.log(height);
-
   const handleClose = () => {
     setFileToUpload(null);
-    props.setModalState(false);
+    dispatch(closeModal());
   };
 
-  const nextSunday = () => {
-    const today = new Date();
-    today.setDate(today.getDate() + ((-1 - today.getDay() + 7) % 7) + 1);
-    setSelectedDate(today);
-  };
+  // function nextSunday() {
+  //   const today = new Date();
+  //   today.setDate(today.getDate() + ((-1 - today.getDay() + 7) % 7) + 1);
+  //   return today;
+  // }
 
   const handleChangeFile = (file) => {
-    console.log(file);
     setFileToUpload(file[0]);
   };
-
-  useEffect(() => {
-    nextSunday();
-  }, []);
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
       "application/pdf": [],
     },
-    onDrop: (acceptedFiles) => {
-      handleChangeFile(acceptedFiles);
+    onDrop: (acceptedFile) => {
+      handleChangeFile(acceptedFile);
     },
     multiple: false,
   });
 
+  const successSnackBar = () => {
+    return (
+      <Snackbar open={true} autoHideDuration={8000}>
+        <Alert severity="success">Uploaded Succesfully!</Alert>
+      </Snackbar>
+    );
+  };
+
+  const uploadBulletin = async () => {
+    try {
+      const form = new FormData();
+      const date = format(selectedDate, "yyyyMMdd");
+      form.append("images", fileToUpload);
+      form.append("date", date);
+      await axios.put("/api/WeeklyUpdate/PostBulletin/", form, {
+        headers: {
+          "Content-Type": `multipart/form-data`,
+        },
+      });
+
+      handleClose();
+      props.setParentDate(selectedDate);
+      successSnackBar();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
-    <Modal open={props.open} onClose={handleClose}>
+    <Modal open={true} onClose={handleClose}>
       <Box sx={style} bgcolor="white">
         <h2>Choose Date</h2>
 
@@ -128,20 +159,17 @@ const BulletinUploadModal = (props) => {
           </Box>
         </div>
 
-        <p>
-          <Button
-            variant="outlined"
-            onClick={() => props.onModalUpload(fileToUpload, selectedDate)}
-          >
+        <div>
+          <Button variant="outlined" onClick={uploadBulletin}>
             Upload
           </Button>
           <Button variant="outlined" onClick={handleClose}>
             Close
           </Button>
-        </p>
+        </div>
       </Box>
     </Modal>
   );
 };
 
-export default BulletinUploadModal;
+export default WeeklyUpdatePostModal;

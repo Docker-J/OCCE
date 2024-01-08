@@ -1,45 +1,29 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { selectModal } from "../store/modalSlice";
 
 import { MODAL_TYPES } from "../constant/MODAL_TYPES";
 import SignInModal from "../components/User/SignInModal";
 import SignUpModal from "../components/User/SignUpModal";
 import AnnouncementPostModal from "../components/News/Announcement/AnnouncementPostModal";
-import BulletinUploadModal from "./../components/News/WeeklyUpdate/BulletinUploadModal";
+import WeeklyUpdatePostModal from "../components/News/WeeklyUpdate/WeeklyUpdatePostModal";
+import MeditationONModal from "../components/Online/MeditationON/MeditationONModal";
 
-const MODAL_COMPONENTS = [
-  {
-    type: MODAL_TYPES.SignInModal,
-    component: <SignInModal />,
-  },
-  {
-    type: MODAL_TYPES.SignUpModal,
-    component: <SignUpModal />,
-  },
-  {
-    type: MODAL_TYPES.AnnouncementPostModal,
-    component: <AnnouncementPostModal />,
-  },
-  {
-    type: MODAL_TYPES.WeeklyUpdatePostModal,
-    component: <BulletinUploadModal />,
-  },
-];
+const MODAL_COMPONENTS = {
+  [MODAL_TYPES.SignInModal]: SignInModal,
+  [MODAL_TYPES.SignUpModal]: SignUpModal,
+  [MODAL_TYPES.AnnouncementPostModal]: AnnouncementPostModal,
+  [MODAL_TYPES.WeeklyUpdatePostModal]: WeeklyUpdatePostModal,
+  [MODAL_TYPES.MeditationONPostModal]: MeditationONModal,
+};
 
 const ModalManager = () => {
-  const { modalType, isOpen } = useSelector(selectModal);
-  //   const dispatch = useDispatch();
+  const { modalType, props, isOpen } = useSelector(selectModal);
+  console.log(props);
   if (!isOpen) return;
 
-  const findModal = MODAL_COMPONENTS.find((modal) => {
-    return modal.type === modalType;
-  });
+  const ModalComponent = MODAL_COMPONENTS[modalType];
 
-  const renderModal = () => {
-    return findModal.component;
-  };
-
-  return renderModal();
+  return <ModalComponent {...props} />;
 };
 
 export default ModalManager;

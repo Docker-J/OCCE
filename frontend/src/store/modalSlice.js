@@ -5,14 +5,17 @@ export const modalSlice = createSlice({
   initialState: {
     modalType: "",
     isOpen: false,
+    props: {},
   },
   reducers: {
     openModal: (state, actions) => {
-      const { modalType } = actions.payload;
+      const { modalType, props } = actions.payload;
       state.modalType = modalType;
+      state.props = props;
       state.isOpen = true;
     },
     closeModal: (state) => {
+      state.props = {};
       state.isOpen = false;
     },
   },
