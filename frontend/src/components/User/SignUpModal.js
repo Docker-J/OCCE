@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box, Button, Modal, TextField } from "@mui/material";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../store/modalSlice";
 
 const style = {
@@ -19,7 +19,9 @@ const style = {
 };
 
 const SignUpModal = () => {
+  const { isOpen } = useSelector((state) => state.modal);
   const dispatch = useDispatch();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -37,7 +39,7 @@ const SignUpModal = () => {
   };
 
   return (
-    <Modal open={true} onClose={handleClose}>
+    <Modal open={isOpen} onClose={handleClose}>
       <Box sx={style} bgcolor="white">
         <h1>Sign Up</h1>
         <TextField

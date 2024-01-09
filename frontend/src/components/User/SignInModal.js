@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Alert, Box, Button, Modal, Snackbar, TextField } from "@mui/material";
 import { signIn } from "../../api/user";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { SET_TOKEN } from "../../store/Auth";
 import { setRefreshToken } from "../../storage/Cookie";
 import { closeModal } from "../../store/modalSlice";
@@ -27,6 +27,7 @@ const style = {
 };
 
 const SignInModal = () => {
+  const { isOpen } = useSelector((state) => state.modal);
   const dispatch = useDispatch();
 
   const [email, setEmail] = useState("");
@@ -67,7 +68,7 @@ const SignInModal = () => {
 
   return (
     <>
-      <Modal open={true} onClose={handleClose}>
+      <Modal open={isOpen} onClose={handleClose}>
         <Box sx={style} bgcolor="white">
           <h1 style={{ marginTop: 0 }}>Sign In</h1>
           <TextField

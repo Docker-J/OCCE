@@ -6,7 +6,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Document, Page } from "react-pdf";
 import { add, endOfWeek, format } from "date-fns";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../../store/modalSlice";
 
 const style = {
@@ -31,6 +31,7 @@ const style = {
 const MIN_DATE = "2022/04/03";
 
 const WeeklyUpdatePostModal = (props) => {
+  const { isOpen } = useSelector((state) => state.modal);
   const dispatch = useDispatch();
 
   const [selectedDate, setSelectedDate] = useState(
@@ -103,7 +104,7 @@ const WeeklyUpdatePostModal = (props) => {
   };
 
   return (
-    <Modal open={true} onClose={handleClose}>
+    <Modal open={isOpen} onClose={handleClose}>
       <Box sx={style} bgcolor="white">
         <h2>Choose Date</h2>
 
