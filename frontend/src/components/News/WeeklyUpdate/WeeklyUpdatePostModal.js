@@ -39,8 +39,6 @@ const WeeklyUpdatePostModal = (props) => {
   );
   const [fileToUpload, setFileToUpload] = useState(null);
 
-  const [isSuccessSnackBarOpen, setIsSuccessSnackBarOpen] = useState(false);
-
   const test = useRef(null);
   const [height, setHeight] = useState(0);
 
@@ -54,12 +52,6 @@ const WeeklyUpdatePostModal = (props) => {
     setFileToUpload(null);
     dispatch(closeModal());
   };
-
-  // function nextSunday() {
-  //   const today = new Date();
-  //   today.setDate(today.getDate() + ((-1 - today.getDay() + 7) % 7) + 1);
-  //   return today;
-  // }
 
   const handleChangeFile = (file) => {
     setFileToUpload(file[0]);
