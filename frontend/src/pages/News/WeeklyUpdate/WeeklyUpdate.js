@@ -36,7 +36,7 @@ const WeeklyUpdate = () => {
   const [bulletin, setBulletin] = useState(null);
   const [selectedDate, setSelectedDate] = useState(queryDate);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Get Bulletin from Firestore
   const loadFile = useCallback(async () => {
