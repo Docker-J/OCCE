@@ -52,9 +52,11 @@ const WeeklyUpdate = () => {
       const pdf = new Blob([byteArray.buffer], { type: "application/pdf" });
 
       setBulletin(pdf);
-      setLoading(false);
     } catch (err) {
       console.log(err);
+      setBulletin(null);
+    } finally {
+      setLoading(false);
     }
   }, [selectedDate]);
 

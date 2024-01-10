@@ -69,13 +69,13 @@ router.get("/GetBulletin", async (req, res) => {
     });
 
     const result = await R2.send(command);
-    // console.log(result);
 
-    const test = await result.Body.transformToByteArray();
+    const pdf = await result.Body.transformToByteArray();
 
-    res.send(test);
+    res.send(pdf);
   } catch (error) {
     console.log(error);
+    res.send(404);
   }
 });
 

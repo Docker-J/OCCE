@@ -47,14 +47,8 @@ function PDFReader({ file, documentDimension }) {
     setPageNumber(1);
   }, [file]);
 
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
+  return file ? (
+    <div>
       <ButtonGroup id="scaleButton" sx={{ my: "1em" }}>
         <Button onClick={add} variant="outlined">
           +
@@ -119,6 +113,8 @@ function PDFReader({ file, documentDimension }) {
         </Button>
       </ButtonGroup>
     </div>
+  ) : (
+    <p>해당 날짜의 주보가 존재하지 않습니다.</p>
   );
 }
 
