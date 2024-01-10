@@ -28,8 +28,10 @@ import {
 import "./WeeklyUpdate.css";
 import "../../NextGen/NextGen.css";
 import { useDispatch } from "react-redux";
-import { openModal } from "../../../store/modalSlice";
+// import { openModal } from "../../../store/modalSlice";
 import { MODAL_TYPES } from "../../../constant/MODAL_TYPES";
+import useModals from "../../../util/useModal";
+import WeeklyUpdatePostModal from "../../../components/News/WeeklyUpdate/WeeklyUpdatePostModal";
 
 const titleBackground = {
   backgroundImage:
@@ -37,6 +39,7 @@ const titleBackground = {
 };
 
 const WeeklyUpdate = () => {
+  const { openModal } = useModals();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -184,12 +187,16 @@ const WeeklyUpdate = () => {
           id="uploadBulletinButton"
           variant="extended"
           onClick={() =>
-            dispatch(
-              openModal({
-                modalType: MODAL_TYPES.WeeklyUpdatePostModal,
-                props: { setParentDate: setSelectedDate },
-              })
-            )
+            // dispatch(
+            //   openModal({
+            //     modalType: MODAL_TYPES.WeeklyUpdatePostModal,
+            //     props: { setParentDate: setSelectedDate },
+            //   })
+            // )
+
+            openModal(WeeklyUpdatePostModal, {
+              setParentDate: setSelectedDate,
+            })
           }
         >
           <UploadIcon sx={{ mr: 1 }} />

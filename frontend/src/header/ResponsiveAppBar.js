@@ -34,10 +34,12 @@ import { CascadingMenu } from "../components/Header/CascadingMenus";
 // import { getToken } from "firebase/messaging";
 
 import pages from "./Pages.js";
-import { openModal } from "../store/modalSlice.js";
-import { MODAL_TYPES } from "../constant/MODAL_TYPES.js";
+import useModals from "../util/useModal.js";
+import SignInModal from "./../components/User/SignInModal";
+import SignUpModal from "./../components/User/SignUpModal";
 
 const ResponsiveAppBar = () => {
+  const { openModal } = useModals();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.authToken);
 
@@ -85,13 +87,11 @@ const ResponsiveAppBar = () => {
   const settings_not_signed = [
     {
       title: "Sign In",
-      onClick: () =>
-        dispatch(openModal({ modalType: MODAL_TYPES.SignInModal })),
+      onClick: () => openModal(SignInModal, {}),
     },
     {
       title: "Sign Up",
-      onClick: () =>
-        dispatch(openModal({ modalType: MODAL_TYPES.SignUpModal })),
+      onClick: () => openModal(SignUpModal, {}),
     },
   ];
 
@@ -269,9 +269,6 @@ const ResponsiveAppBar = () => {
           </Box>
         </Toolbar>
       </Container>
-
-      {/* <SignInModal open={signInModalOpen} onClose={onSignInModalClose} /> */}
-      {/* <SignUpModal open={signUpModalOpen} onClose={onSignUpModalClose} /> */}
     </AppBar>
   );
 };

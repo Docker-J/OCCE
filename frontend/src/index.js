@@ -9,7 +9,8 @@ import { Provider } from "react-redux";
 import { CookiesProvider } from "react-cookie";
 import { createTheme, ThemeProvider } from "@mui/material";
 
-import ModalManager from "./util/ModalManager";
+import ModalsProvider from "./util/ModalsProvider";
+import Modals from "./util/Modals";
 
 const container = document.getElementById("root");
 const root = createRoot(container);
@@ -35,8 +36,10 @@ root.render(
   <CookiesProvider>
     <Provider store={store}>
       <ThemeProvider theme={theme}>
-        <App />
-        <ModalManager />
+        <ModalsProvider>
+          <App />
+          <Modals />
+        </ModalsProvider>
       </ThemeProvider>
     </Provider>
   </CookiesProvider>
