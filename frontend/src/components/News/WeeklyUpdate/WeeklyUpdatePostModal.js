@@ -161,7 +161,11 @@ const WeeklyUpdatePostModal = (props) => {
         </div>
 
         <div>
-          <Button variant="outlined" onClick={uploadBulletin}>
+          <Button
+            variant="outlined"
+            onClick={uploadBulletin}
+            disabled={!fileToUpload}
+          >
             Upload
           </Button>
           <Button variant="outlined" onClick={handleClose}>
