@@ -13,7 +13,17 @@ import PDFReader from "../../../components/News/WeeklyUpdate/PDFReader";
 
 import { useLoaderData, useNavigate, useRevalidator } from "react-router-dom";
 import AdminComponent from "../../../common/AdminComponent";
-import { add, format, isSameDay, sub } from "date-fns";
+import {
+  addDays,
+  endOfWeek,
+  format,
+  isAfter,
+  isBefore,
+  isSameDay,
+  isSunday,
+  startOfWeek,
+  subDays,
+} from "date-fns";
 
 import "./WeeklyUpdate.css";
 import "../../NextGen/NextGen.css";
@@ -60,12 +70,16 @@ const WeeklyUpdate = () => {
     }
   }, [selectedDate]);
 
-  const previousBulletin = () => {
-    setSelectedDate((prev) => sub(prev, { days: 7 }));
+  const previousSunday = () => {
+    setSelectedDate((prev) =>
+      isSunday(prev) ? subDays(prev, 7) : startOfWeek(prev, { weekStartsOn: 0 })
+    );
   };
 
-  const nextBulletin = () => {
-    setSelectedDate((prev) => add(prev, { days: 7 }));
+  const nextSunday = () => {
+    setSelectedDate((prev) =>
+      isSunday(prev) ? addDays(prev, 7) : endOfWeek(prev, { weekStartsOn: 1 })
+    );
   };
 
   useEffect(() => {
@@ -126,8 +140,12 @@ const WeeklyUpdate = () => {
           <>
             <IconButton
               id="previousBulletin"
-              onClick={previousBulletin}
-              disabled={isSameDay(selectedDate, minDate) || loading}
+              onClick={previousSunday}
+              disabled={
+                isSameDay(selectedDate, minDate) ||
+                isBefore(selectedDate, minDate) ||
+                loading
+              }
             >
               <ArrowBackIosIcon />
             </IconButton>
@@ -141,8 +159,12 @@ const WeeklyUpdate = () => {
 
             <IconButton
               id="nextBulletin"
-              onClick={nextBulletin}
-              disabled={isSameDay(selectedDate, maxDate) || loading}
+              onClick={nextSunday}
+              disabled={
+                isSameDay(selectedDate, maxDate) ||
+                isAfter(selectedDate, maxDate) ||
+                loading
+              }
             >
               <ArrowForwardIosIcon />
             </IconButton>
