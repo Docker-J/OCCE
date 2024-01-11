@@ -144,7 +144,7 @@ const WeeklyUpdate = () => {
           <>
             <IconButton
               id="previousBulletin"
-              onClick={revalidator.revalidate}
+              onClick={previousSunday}
               disabled={
                 isSameDay(selectedDate, minDate) ||
                 isBefore(selectedDate, minDate) ||
