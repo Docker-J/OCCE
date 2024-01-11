@@ -27,9 +27,6 @@ import {
 
 import "./WeeklyUpdate.css";
 import "../../NextGen/NextGen.css";
-import { useDispatch } from "react-redux";
-// import { openModal } from "../../../store/modalSlice";
-import { MODAL_TYPES } from "../../../constant/MODAL_TYPES";
 import useModals from "../../../util/useModal";
 import WeeklyUpdatePostModal from "../../../components/News/WeeklyUpdate/WeeklyUpdatePostModal";
 
@@ -39,8 +36,8 @@ const titleBackground = {
 };
 
 const WeeklyUpdate = () => {
+  let revalidator = useRevalidator();
   const { openModal } = useModals();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const { maxDate, queryDate } = useLoaderData();
@@ -116,6 +113,10 @@ const WeeklyUpdate = () => {
     });
   };
 
+  const refresh = () => {
+    revalidator.revalidate();
+  };
+
   useEffect(() => {
     window.addEventListener("resize", detectSize);
 
@@ -143,7 +144,7 @@ const WeeklyUpdate = () => {
           <>
             <IconButton
               id="previousBulletin"
-              onClick={previousSunday}
+              onClick={revalidator.revalidate}
               disabled={
                 isSameDay(selectedDate, minDate) ||
                 isBefore(selectedDate, minDate) ||
@@ -172,6 +173,7 @@ const WeeklyUpdate = () => {
               <ArrowForwardIosIcon />
             </IconButton>
           </>
+
           {loading ? (
             <div style={{ height: "100vh" }}>
               <CircularProgress sx={{ mt: 2 }} />
@@ -187,15 +189,9 @@ const WeeklyUpdate = () => {
           id="uploadBulletinButton"
           variant="extended"
           onClick={() =>
-            // dispatch(
-            //   openModal({
-            //     modalType: MODAL_TYPES.WeeklyUpdatePostModal,
-            //     props: { setParentDate: setSelectedDate },
-            //   })
-            // )
-
             openModal(WeeklyUpdatePostModal, {
               setParentDate: setSelectedDate,
+              onSubmit: refresh,
             })
           }
         >

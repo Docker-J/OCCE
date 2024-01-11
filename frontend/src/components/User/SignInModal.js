@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Alert, Box, Button, Modal, Snackbar, TextField } from "@mui/material";
+import { Box, Button, Modal, TextField } from "@mui/material";
 import { signIn } from "../../api/user";
 import { useDispatch } from "react-redux";
 import { SET_TOKEN } from "../../store/Auth";
 import { setRefreshToken } from "../../storage/Cookie";
+import useSnackbar from "../../util/useSnackbar";
 
 const style = {
   position: "absolute",
@@ -27,11 +28,10 @@ const style = {
 
 const SignInModal = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
+  const { openSnackbar } = useSnackbar();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const [isSuccessSnackBarOpen, setIsSuccessSnackBarOpen] = useState(false);
 
   const signInSuccess = (result) => {
     const data = {
@@ -42,7 +42,7 @@ const SignInModal = ({ isOpen, onClose }) => {
 
     dispatch(SET_TOKEN(data));
     setRefreshToken(result.refreshToken);
-    setIsSuccessSnackBarOpen(true);
+    openSnackbar("success", "Signed In Succesfully!");
     handleClose();
   };
 
@@ -54,14 +54,6 @@ const SignInModal = ({ isOpen, onClose }) => {
     setEmail("");
     setPassword("");
     onClose();
-  };
-
-  const handleSnackBarClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setIsSuccessSnackBarOpen(false);
   };
 
   return (
@@ -96,16 +88,6 @@ const SignInModal = ({ isOpen, onClose }) => {
           {/* <Button onClick={handleClose}>Close</Button> */}
         </Box>
       </Modal>
-
-      <Snackbar
-        open={isSuccessSnackBarOpen}
-        autoHideDuration={8000}
-        onClose={handleSnackBarClose}
-      >
-        <Alert severity="success" onClose={handleSnackBarClose}>
-          Signed In Succesfully!
-        </Alert>
-      </Snackbar>
     </>
   );
 };

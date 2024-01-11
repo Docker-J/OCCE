@@ -11,6 +11,8 @@ import { createTheme, ThemeProvider } from "@mui/material";
 
 import ModalsProvider from "./util/ModalsProvider";
 import Modals from "./util/Modals";
+import SnackbarProvider from "./util/SnackBarProvider";
+import SnackBar from "./util/SnackBar";
 
 const container = document.getElementById("root");
 const root = createRoot(container);
@@ -36,10 +38,13 @@ root.render(
   <CookiesProvider>
     <Provider store={store}>
       <ThemeProvider theme={theme}>
-        <ModalsProvider>
-          <App />
-          <Modals />
-        </ModalsProvider>
+        <SnackbarProvider>
+          <ModalsProvider>
+            <App />
+            <Modals />
+          </ModalsProvider>
+          <SnackBar />
+        </SnackbarProvider>
       </ThemeProvider>
     </Provider>
   </CookiesProvider>

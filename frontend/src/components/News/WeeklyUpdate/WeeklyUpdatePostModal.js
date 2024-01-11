@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Alert, Box, Button, Modal, Snackbar, Typography } from "@mui/material";
+import { Box, Button, Modal, Typography } from "@mui/material";
 import ButtonDatePicker from "./ButtonDatePicker";
 import { useDropzone } from "react-dropzone";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Document, Page } from "react-pdf";
 import { add, endOfWeek, format } from "date-fns";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import useSnackbar from "../../../util/useSnackbar";
 
 const style = {
   position: "absolute",
@@ -30,6 +30,8 @@ const style = {
 const MIN_DATE = "2022/04/03";
 
 const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
+  const { openSnackbar } = useSnackbar();
+
   const [selectedDate, setSelectedDate] = useState(
     add(endOfWeek(new Date()), { days: 1 })
   );
@@ -63,14 +65,6 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
     multiple: false,
   });
 
-  const successSnackBar = () => {
-    return (
-      <Snackbar open={true} autoHideDuration={8000}>
-        <Alert severity="success">Uploaded Succesfully!</Alert>
-      </Snackbar>
-    );
-  };
-
   const uploadBulletin = async () => {
     try {
       const form = new FormData();
@@ -83,9 +77,9 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
         },
       });
 
-      handleClose();
+      openSnackbar("success", "Uploaded Succesfully!");
       setParentDate(selectedDate);
-      successSnackBar();
+      handleClose();
     } catch (error) {
       console.log(error);
     }

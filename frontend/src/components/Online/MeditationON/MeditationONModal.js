@@ -1,10 +1,8 @@
 import {
-  Alert,
   Box,
   Button,
   CircularProgress,
   Modal,
-  Snackbar,
   Typography,
 } from "@mui/material";
 import axios from "axios";
@@ -17,13 +15,14 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 import PreviewCard from "./PreviewCard";
+import useSnackbar from "../../../util/useSnackbar";
 
 const style = {
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: "80vw",
+  width: "90vw",
   height: "80vh",
   maxWidth: "1300px",
   bgcolor: "#ffffff",
@@ -38,6 +37,8 @@ const style = {
 };
 
 const MeditationONModal = ({ openModal, setOpenModal }) => {
+  const { openSnackbar } = useSnackbar();
+
   const handleClose = () => {
     removeAllImage();
     setOpenModal(false);
@@ -72,8 +73,8 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
         },
       });
 
-      setIsSuccessSnackBarOpen(true);
       setLoading(false);
+      openSnackbar("success", "Uploaded Succesfully!");
       handleClose();
     } catch (error) {
       setLoading(false);
@@ -143,14 +144,6 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
   }, []);
 
   const [loading, setLoading] = useState(false);
-  const [isSuccessSnackBarOpen, setIsSuccessSnackBarOpen] = useState(false);
-  const handleSnackBarClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setIsSuccessSnackBarOpen(false);
-  };
 
   return (
     <>
@@ -240,16 +233,6 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
           )}
         </Box>
       </Modal>
-
-      <Snackbar
-        open={isSuccessSnackBarOpen}
-        autoHideDuration={8000}
-        onClose={handleSnackBarClose}
-      >
-        <Alert severity="success" onClose={handleSnackBarClose}>
-          Uploaded Succesfully!
-        </Alert>
-      </Snackbar>
     </>
   );
 };

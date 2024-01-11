@@ -9,6 +9,8 @@ export async function loader({ params }) {
 
   const maxDate = parse(date, DATE_FORMAT, new Date());
 
+  console.log("called");
+
   if (!params.date) {
     const queryDate = maxDate;
     return { maxDate, queryDate };
