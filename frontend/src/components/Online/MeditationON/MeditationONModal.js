@@ -73,12 +73,16 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
         },
       });
 
-      setLoading(false);
       openSnackbar("success", "Uploaded Succesfully!");
       handleClose();
     } catch (error) {
-      setLoading(false);
       console.log(error);
+      openSnackbar(
+        "error",
+        "Error Occured. Please contact to the administrator."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -146,94 +150,90 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
   const [loading, setLoading] = useState(false);
 
   return (
-    <>
-      <Modal
-        open={openModal}
-        onClose={handleClose}
-        // aria-labelledby="modal-modal-title"
-        // aria-describedby="modal-modal-description"
-      >
-        <Box sx={style} bgcolor="white">
-          {loading ? (
-            <CircularProgress />
-          ) : (
-            <>
-              <DndProvider backend={HTML5Backend}>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    flexWrap: "wrap",
-                    alignContent: "flex-start",
-                    justifyContent: "space-between",
-                    margin: "10pt",
-                    width: "95%",
-                    height: "75%",
-                    overflowX: "auto",
-                  }}
-                >
-                  {imagesPreview.map((image, index) =>
-                    renderCard(image, index)
-                  )}
-                </div>
-              </DndProvider>
-
+    <Modal
+      open={openModal}
+      onClose={handleClose}
+      // aria-labelledby="modal-modal-title"
+      // aria-describedby="modal-modal-description"
+    >
+      <Box sx={style} bgcolor="white">
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <>
+            <DndProvider backend={HTML5Backend}>
               <div
                 style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  alignContent: "flex-start",
+                  justifyContent: "space-between",
+                  margin: "10pt",
                   width: "95%",
-                  height: "20%",
-                  border: "1pt dotted #f57c00",
-                  borderRadius: "1em",
-                  overflowY: "auto",
+                  height: "75%",
+                  overflowX: "auto",
                 }}
-                {...getRootProps()}
               >
-                <input {...getInputProps()} />
-                <Box
-                  sx={{
-                    position: "relative",
-                    height: "100%",
-                    widht: "100%",
+                {imagesPreview.map((image, index) => renderCard(image, index))}
+              </div>
+            </DndProvider>
+
+            <div
+              style={{
+                width: "95%",
+                height: "20%",
+                border: "1pt dotted #f57c00",
+                borderRadius: "1em",
+                overflowY: "auto",
+              }}
+              {...getRootProps()}
+            >
+              <input {...getInputProps()} />
+              <Box
+                sx={{
+                  position: "relative",
+                  height: "100%",
+                  widht: "100%",
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
                   }}
                 >
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                    }}
-                  >
-                    <AddCircleOutlineIcon fontSize="large" color="primary" />
-                    <Typography>Click or Drag Files to here</Typography>
-                  </div>
-                </Box>
-              </div>
+                  <AddCircleOutlineIcon fontSize="large" color="primary" />
+                  <Typography>Click or Drag Files to here</Typography>
+                </div>
+              </Box>
+            </div>
 
-              <div style={{ display: "flex", marginTop: "2em" }}>
-                <Button
-                  variant="outlined"
-                  disabled={filesToUpload.length <= 0}
-                  onClick={uploadImages}
-                >
-                  Submit
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={removeAllImage}
-                  disabled={filesToUpload.length <= 0}
-                >
-                  Clear All
-                </Button>
-                <Button variant="outlined" onClick={handleClose}>
-                  Close
-                </Button>
-              </div>
-            </>
-          )}
-        </Box>
-      </Modal>
-    </>
+            <div style={{ display: "flex", marginTop: "2em" }}>
+              <Button
+                variant="outlined"
+                disabled={filesToUpload.length <= 0}
+                onClick={uploadImages}
+              >
+                Submit
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={removeAllImage}
+                disabled={filesToUpload.length <= 0}
+              >
+                Clear All
+              </Button>
+              <Button variant="outlined" onClick={handleClose}>
+                Close
+              </Button>
+            </div>
+          </>
+        )}
+      </Box>
+    </Modal>
   );
 };
 
