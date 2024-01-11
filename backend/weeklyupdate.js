@@ -75,7 +75,7 @@ router.get("/GetBulletin", async (req, res) => {
     res.send(pdf);
   } catch (error) {
     console.log(error);
-    res.send(404);
+    res.sendStatus(404);
   }
 });
 
@@ -107,6 +107,7 @@ router.put("/PostBulletin", upload.single("images"), async (req, res) => {
     res.send(req.body.date);
   } catch (error) {
     console.log(error);
+    res.sendStatus(500);
   }
 });
 

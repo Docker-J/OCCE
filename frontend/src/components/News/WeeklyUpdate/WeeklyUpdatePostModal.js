@@ -1,5 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Box, Button, Modal, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Modal,
+  Typography,
+} from "@mui/material";
 import ButtonDatePicker from "./ButtonDatePicker";
 import { useDropzone } from "react-dropzone";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -67,6 +73,8 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
 
   const uploadBulletin = async () => {
     try {
+      setLoading(true);
+
       const form = new FormData();
       const date = format(selectedDate, "yyyyMMdd");
       form.append("images", fileToUpload);
@@ -82,78 +90,92 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
       handleClose();
     } catch (error) {
       console.log(error);
+      openSnackbar(
+        "error",
+        "Error Occured. Please contact to the administrator."
+      );
+    } finally {
+      setLoading(false);
     }
   };
+
+  const [loading, setLoading] = useState(false);
 
   return (
     <Modal open={isOpen} onClose={onClose}>
       <Box sx={style} bgcolor="white">
-        <h2>Choose Date</h2>
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <>
+            <h2>Choose Date</h2>
 
-        <ButtonDatePicker
-          value={selectedDate}
-          minDate={new Date(MIN_DATE)}
-          onChange={setSelectedDate}
-        />
-
-        <div ref={test} style={{ height: "60%" }}>
-          <p>{fileToUpload ? fileToUpload.name : null}</p>
-          <Document file={fileToUpload}>
-            <Page
-              renderTextLayer={false}
-              className="page"
-              height={height - 80}
-              // width={100}
-              pageNumber={1}
+            <ButtonDatePicker
+              value={selectedDate}
+              minDate={new Date(MIN_DATE)}
+              onChange={setSelectedDate}
             />
-          </Document>
-        </div>
 
-        <div
-          style={{
-            width: "95%",
-            height: "15%",
-            border: "1pt dotted #f57c00",
-            borderRadius: "1em",
-            overflowY: "auto",
-            marginBottom: "1em",
-          }}
-          {...getRootProps()}
-        >
-          <input {...getInputProps()} />
-          <Box
-            sx={{
-              position: "relative",
-              height: "100%",
-              widht: "100%",
-            }}
-          >
+            <div ref={test} style={{ height: "60%" }}>
+              <p>{fileToUpload ? fileToUpload.name : null}</p>
+              <Document file={fileToUpload}>
+                <Page
+                  renderTextLayer={false}
+                  className="page"
+                  height={height - 80}
+                  // width={100}
+                  pageNumber={1}
+                />
+              </Document>
+            </div>
+
             <div
               style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
+                width: "95%",
+                height: "15%",
+                border: "1pt dotted #f57c00",
+                borderRadius: "1em",
+                overflowY: "auto",
+                marginBottom: "1em",
               }}
+              {...getRootProps()}
             >
-              <AddCircleOutlineIcon fontSize="large" color="primary" />
-              <Typography>Click or Drag File to here</Typography>
+              <input {...getInputProps()} />
+              <Box
+                sx={{
+                  position: "relative",
+                  height: "100%",
+                  widht: "100%",
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                  }}
+                >
+                  <AddCircleOutlineIcon fontSize="large" color="primary" />
+                  <Typography>Click or Drag File to here</Typography>
+                </div>
+              </Box>
             </div>
-          </Box>
-        </div>
 
-        <div>
-          <Button
-            variant="outlined"
-            onClick={uploadBulletin}
-            disabled={!fileToUpload}
-          >
-            Upload
-          </Button>
-          <Button variant="outlined" onClick={handleClose}>
-            Close
-          </Button>
-        </div>
+            <div>
+              <Button
+                variant="outlined"
+                onClick={uploadBulletin}
+                disabled={!fileToUpload}
+              >
+                Upload
+              </Button>
+              <Button variant="outlined" onClick={handleClose}>
+                Close
+              </Button>
+            </div>
+          </>
+        )}
       </Box>
     </Modal>
   );
