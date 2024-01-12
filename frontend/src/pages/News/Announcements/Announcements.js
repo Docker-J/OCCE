@@ -11,6 +11,7 @@ import BoardTable from "../../../components/News/Announcement/BoardTable";
 
 import "../../NextGen/NextGen.css";
 import BoardPagination from "../../../components/News/Announcement/BoardPagination";
+import useModals from "../../../util/useModal";
 
 const titleBackground = {
   backgroundImage:
@@ -20,11 +21,8 @@ const titleBackground = {
 const Announcements = () => {
   const { count, announcements } = useLoaderData();
   const pages = Math.ceil(count / 10);
-  const [openModal, setOpenModal] = useState(false);
 
-  const handleOpen = () => {
-    setOpenModal(true);
-  };
+  const { openModal } = useModals();
 
   return (
     <>
@@ -50,15 +48,10 @@ const Announcements = () => {
       <Fab
         variant="primary"
         style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
-        onClick={handleOpen}
+        onClick={() => openModal(AnnouncementPostModal, {})}
       >
         <AddIcon />
       </Fab>
-
-      <AnnouncementPostModal
-        openModal={openModal}
-        setOpenModal={setOpenModal}
-      />
     </>
   );
 };

@@ -23,7 +23,7 @@ const style = {
   justifyContent: "space-between",
 };
 
-const AnnouncementPostModal = ({ openModal, setOpenModal }) => {
+const AnnouncementPostModal = ({ isOpen, onClose}) => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
 
@@ -45,11 +45,11 @@ const AnnouncementPostModal = ({ openModal, setOpenModal }) => {
   };
 
   const handleClose = () => {
-    setOpenModal(false);
+    onClose();
   };
 
   return (
-    <Modal open={openModal} onClose={handleClose}>
+    <Modal open={isOpen} onClose={handleClose}>
       <Box sx={style} bgcolor="white">
         <TextField
           id="filled-basic"
