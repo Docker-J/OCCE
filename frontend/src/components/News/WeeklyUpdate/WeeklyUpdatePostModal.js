@@ -35,7 +35,12 @@ const style = {
 
 const MIN_DATE = "2022/04/03";
 
-const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
+const WeeklyUpdatePostModal = ({
+  isOpen,
+  onClose,
+  setParentDate,
+  handleSubmit,
+}) => {
   const { openSnackbar } = useSnackbar();
 
   const [selectedDate, setSelectedDate] = useState(
@@ -54,6 +59,7 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
 
   const handleClose = () => {
     setFileToUpload(null);
+    handleSubmit();
     onClose();
   };
 

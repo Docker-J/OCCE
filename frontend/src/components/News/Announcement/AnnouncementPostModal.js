@@ -23,7 +23,7 @@ const style = {
   justifyContent: "space-between",
 };
 
-const AnnouncementPostModal = ({ isOpen, onClose}) => {
+const AnnouncementPostModal = ({ isOpen, onClose, revalidator }) => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
 
@@ -38,6 +38,7 @@ const AnnouncementPostModal = ({ isOpen, onClose}) => {
         body: body,
       });
 
+      revalidator();
       handleClose();
     } catch (error) {
       console.log(error);

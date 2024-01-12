@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useRevalidator } from "react-router-dom";
 
 import { Fab, Typography } from "@mui/material";
 
@@ -19,6 +19,8 @@ const titleBackground = {
 };
 
 const Announcements = () => {
+  let revalidator = useRevalidator();
+
   const { count, announcements } = useLoaderData();
   const pages = Math.ceil(count / 10);
 
@@ -48,7 +50,11 @@ const Announcements = () => {
       <Fab
         variant="primary"
         style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
-        onClick={() => openModal(AnnouncementPostModal, {})}
+        onClick={() =>
+          openModal(AnnouncementPostModal, {
+            revalidator: revalidator.revalidate,
+          })
+        }
       >
         <AddIcon />
       </Fab>
