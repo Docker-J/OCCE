@@ -143,62 +143,77 @@ const router = createBrowserRouter([
         element: <NewComers />,
       },
       {
-        path: "/community/smallgroup",
-        element: <SmallGroup />,
+        path: "/community",
+        children: [
+          {
+            path: "smallgroup",
+            element: <SmallGroup />,
+          },
+          {
+            path: "ministry",
+            element: <Ministry />,
+          },
+        ],
       },
       {
-        path: "/community/ministry",
-        element: <Ministry />,
+        path: "/online",
+        children: [
+          {
+            path: "sundayservice",
+            element: <SundayService />,
+          },
+          {
+            path: "sermon",
+            element: <Sermon />,
+          },
+          {
+            path: "worship",
+            element: <Worship />,
+          },
+          {
+            path: "dawnQT",
+            element: <DawnQT />,
+          },
+          {
+            path: "prayON",
+            element: <PrayON />,
+          },
+          // {
+          //   path: "/online/meditationON",
+          //   element: <MeditationON />,
+          // },
+          {
+            path: "meditationON/:postID",
+            element: <MeditationONPost />,
+            loader: MeditationONPostLoader,
+          },
+          {
+            path: "bible291",
+            element: <Bible291 />,
+            loader: Bible291Loader,
+          },
+        ],
       },
       {
-        path: "/online/sundayservice",
-        element: <SundayService />,
-      },
-      {
-        path: "/online/sermon",
-        element: <Sermon />,
-      },
-      {
-        path: "/online/worship",
-        element: <Worship />,
-      },
-      {
-        path: "/online/dawnQT",
-        element: <DawnQT />,
-      },
-      {
-        path: "/online/prayON",
-        element: <PrayON />,
-      },
-      // {
-      //   path: "/online/meditationON",
-      //   element: <MeditationON />,
-      // },
-      {
-        path: "/online/meditationON/:postID",
-        element: <MeditationONPost />,
-        loader: MeditationONPostLoader,
-      },
-      {
-        path: "/online/bible291",
-        element: <Bible291 />,
-        loader: Bible291Loader,
-      },
-      {
-        path: "/nextgen/preschool",
-        element: <Preschool />,
-      },
-      {
-        path: "/nextgen/elementary",
-        element: <Elementary />,
-      },
-      {
-        path: "/nextgen/youth",
-        element: <Youth />,
-      },
-      {
-        path: "/nextgen/youngadult",
-        element: <YoungAdult />,
+        path: "/nextgen",
+        children: [
+          {
+            path: "preschool",
+            element: <Preschool />,
+          },
+          {
+            path: "elementary",
+            element: <Elementary />,
+          },
+          {
+            path: "youth",
+            element: <Youth />,
+          },
+          {
+            path: "youngadult",
+            element: <YoungAdult />,
+          },
+        ],
       },
     ],
   },
