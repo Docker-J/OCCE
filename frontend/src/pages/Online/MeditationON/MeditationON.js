@@ -18,6 +18,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import "../../NextGen/NextGen.css";
 import AdminComponent from "../../../common/AdminComponent";
 import Footer from "../../../header/Footer";
+import useModals from "../../../util/useModal";
 
 const PAGE_SIZE = 12;
 const titleBackground = {
@@ -27,6 +28,8 @@ const titleBackground = {
 
 const MeditationON = () => {
   const matches = useMediaQuery("(min-width:1200px)");
+
+  const { openModal } = useModals();
 
   const [posts, setPosts] = useState([]);
   const [end, setEnd] = useState(false);
@@ -82,11 +85,6 @@ const MeditationON = () => {
     };
   });
 
-  const [openModal, setOpenModal] = useState(false);
-
-  const handleOpen = () => {
-    setOpenModal(true);
-  };
   const scrollRef = useRef();
 
   useEffect(() => {
@@ -108,8 +106,6 @@ const MeditationON = () => {
 
     // re-run effect when items change
   }, [posts]);
-
-  console.log(end);
 
   return (
     <>
@@ -157,12 +153,10 @@ const MeditationON = () => {
         <Fab
           variant="primary"
           style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
-          onClick={handleOpen}
+          onClick={() => openModal(MeditationONModal, {})}
         >
           <AddIcon />
         </Fab>
-
-        <MeditationONModal openModal={openModal} setOpenModal={setOpenModal} />
       </AdminComponent>
 
       {end && <Footer />}

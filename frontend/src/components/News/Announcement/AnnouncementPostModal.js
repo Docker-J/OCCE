@@ -1,9 +1,9 @@
-import { Box, Button, Modal, TextField } from "@mui/material";
+import { Box, Button, CircularProgress, Modal, TextField } from "@mui/material";
 import TextEditor from "./TextEditor";
 import { useState } from "react";
 
-import { useEffect } from "react";
 import axios from "axios";
+import useSnackbar from "../../../util/useSnackbar";
 
 const style = {
   position: "absolute",
@@ -24,6 +24,9 @@ const style = {
 };
 
 const AnnouncementPostModal = ({ isOpen, onClose, revalidator }) => {
+  const { openSnackbar } = useSnackbar();
+
+  const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
 
@@ -32,6 +35,7 @@ const AnnouncementPostModal = ({ isOpen, onClose, revalidator }) => {
   };
 
   const postAnnouncement = async () => {
+    setLoading(true);
     try {
       const result = await axios.put("/api/Announcements/postAnnouncement", {
         title: title,
@@ -39,9 +43,16 @@ const AnnouncementPostModal = ({ isOpen, onClose, revalidator }) => {
       });
 
       revalidator();
+      openSnackbar("success", "The announcement is successfully posted!");
       handleClose();
     } catch (error) {
       console.log(error);
+      openSnackbar(
+        "error",
+        "Error Occured. Please contact to the administrator."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,27 +63,34 @@ const AnnouncementPostModal = ({ isOpen, onClose, revalidator }) => {
   return (
     <Modal open={isOpen} onClose={handleClose}>
       <Box sx={style} bgcolor="white">
-        <TextField
-          id="filled-basic"
-          label="Title"
-          variant="outlined"
-          sx={{ width: "100%" }}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <TextEditor body={body} getBody={getBody} />
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <>
+            <TextField
+              id="filled-basic"
+              label="Title"
+              variant="outlined"
+              sx={{ width: "100%" }}
+              onChange={(e) => setTitle(e.target.value)}
+            />
 
-        <div>
-          <Button
-            variant="outlined"
-            disabled={title.trim() === "" || body.trim() === ""}
-            onClick={postAnnouncement}
-          >
-            Post
-          </Button>
-          <Button variant="outlined" onClick={handleClose}>
-            Cancel
-          </Button>
-        </div>
+            <TextEditor body={body} getBody={getBody} />
+
+            <div>
+              <Button
+                variant="outlined"
+                disabled={title.trim() === "" || body.trim() === ""}
+                onClick={postAnnouncement}
+              >
+                Post
+              </Button>
+              <Button variant="outlined" onClick={handleClose}>
+                Cancel
+              </Button>
+            </div>
+          </>
+        )}
       </Box>
     </Modal>
   );

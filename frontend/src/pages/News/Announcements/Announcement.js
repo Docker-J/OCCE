@@ -14,6 +14,7 @@ import { format } from "date-fns";
 
 import "../../NextGen/NextGen.css";
 import axios from "axios";
+import useSnackbar from "../../../util/useSnackbar";
 
 const titleBackground = {
   backgroundImage:
@@ -21,8 +22,9 @@ const titleBackground = {
 };
 
 const Announcement = () => {
-  const navigate = useNavigate();
   let revalidator = useRevalidator();
+  const navigate = useNavigate();
+  const { openSnackbar } = useSnackbar();
   const { id, title, body, timestamp, pin } = useLoaderData();
 
   const pinAnnouncement = async () => {
@@ -33,6 +35,7 @@ const Announcement = () => {
       });
 
       revalidator.revalidate();
+      openSnackbar("success", "The announcement is successfully pinned!");
     } catch (error) {
       console.log(error);
     }
@@ -44,6 +47,7 @@ const Announcement = () => {
         `/api/Announcements/deleteAnnouncement?id=${id}`
       );
 
+      openSnackbar("success", "The announcement is successfully deleted!");
       navigate("/announcements");
     } catch (error) {
       console.log(error);

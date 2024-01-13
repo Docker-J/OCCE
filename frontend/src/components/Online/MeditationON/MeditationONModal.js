@@ -36,12 +36,12 @@ const style = {
   justifyContent: "center",
 };
 
-const MeditationONModal = ({ openModal, setOpenModal }) => {
+const MeditationONModal = ({ isOpen, onClose }) => {
   const { openSnackbar } = useSnackbar();
 
   const handleClose = () => {
     removeAllImage();
-    setOpenModal(false);
+    onClose();
   };
 
   const [filesToUpload, setFilesToUpload] = useState([]);
@@ -151,7 +151,7 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
 
   return (
     <Modal
-      open={openModal}
+      open={isOpen}
       onClose={handleClose}
       // aria-labelledby="modal-modal-title"
       // aria-describedby="modal-modal-description"
