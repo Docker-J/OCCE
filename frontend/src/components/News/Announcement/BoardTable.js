@@ -1,5 +1,6 @@
 import {
   Paper,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -8,6 +9,8 @@ import {
 } from "@mui/material";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
+
+import PushPinIcon from "@mui/icons-material/PushPin";
 
 const BoardTable = ({ announcements }) => {
   return (
@@ -29,13 +32,17 @@ const BoardTable = ({ announcements }) => {
                   <h3
                     style={{
                       display: "block",
-                      maxWidth: "300px",
+                      width: "70%",
+                      maxWidth: "1000px",
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                     }}
                   >
-                    {announcement.title}
+                    <Stack direction="row" alignItems="center">
+                      {announcement.pin ? <PushPinIcon sx={{ mr: 1 }} /> : null}
+                      {announcement.title}
+                    </Stack>
                   </h3>
                   <p>
                     {format(new Date(announcement.timestamp), "yyyy/MM/dd")}
