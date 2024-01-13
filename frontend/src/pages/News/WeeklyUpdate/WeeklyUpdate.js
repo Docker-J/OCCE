@@ -113,10 +113,6 @@ const WeeklyUpdate = () => {
     });
   };
 
-  const refresh = () => {
-    revalidator.revalidate();
-  };
-
   useEffect(() => {
     window.addEventListener("resize", detectSize);
 
@@ -191,7 +187,6 @@ const WeeklyUpdate = () => {
           onClick={() =>
             openModal(WeeklyUpdatePostModal, {
               setParentDate: setSelectedDate,
-              onSubmit: refresh,
             })
           }
         >
