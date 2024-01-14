@@ -3,7 +3,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import imageCompression from "browser-image-compression";
 
-const MeditationONModal = ({ openModal, setOpenModal }) => {
+const PhotosUploadModal = ({ isOpen, onClose }) => {
   const style = {
     position: "absolute",
     top: "50%",
@@ -18,7 +18,7 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
   };
 
   const handleClose = () => {
-    setOpenModal(false);
+    onClose();
   };
 
   const [albumURL, setAlbumURL] = useState("");
@@ -31,7 +31,7 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
 
   return (
     <Modal
-      open={openModal}
+      open={isOpen}
       onClose={handleClose}
       // aria-labelledby="modal-modal-title"
       // aria-describedby="modal-modal-description"
@@ -51,4 +51,4 @@ const MeditationONModal = ({ openModal, setOpenModal }) => {
   );
 };
 
-export default MeditationONModal;
+export default PhotosUploadModal;

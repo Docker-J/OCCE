@@ -129,10 +129,10 @@ const router = createBrowserRouter([
         loader: WeeklyUpdateLoader,
         shouldRevalidate: () => false,
       },
-      {
-        path: "/photos",
-        element: <Photos />,
-      },
+      // {
+      //   path: "/photos",
+      //   element: <Photos />,
+      // },
       {
         path: "/photos/:albumID",
         element: <AlbumPhotos />,
@@ -220,6 +220,10 @@ const router = createBrowserRouter([
   {
     element: <HeaderWrapper />,
     children: [
+      {
+        path: "/photos",
+        element: <Photos />,
+      },
       {
         path: "/online/meditationON",
         element: <MeditationON />,
