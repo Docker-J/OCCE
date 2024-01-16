@@ -11,7 +11,7 @@ import { isMobile } from "react-device-detect";
 import ButtonDatePicker from "../../../components/News/WeeklyUpdate/ButtonDatePicker";
 import PDFReader from "../../../components/News/WeeklyUpdate/PDFReader";
 
-import { useLoaderData, useNavigate, useRevalidator } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import AdminComponent from "../../../common/AdminComponent";
 import {
   addDays,
@@ -36,7 +36,6 @@ const titleBackground = {
 };
 
 const WeeklyUpdate = () => {
-  let revalidator = useRevalidator();
   const { openModal } = useModals();
   const navigate = useNavigate();
 
@@ -136,7 +135,10 @@ const WeeklyUpdate = () => {
       </div>
 
       <div className="container-wrapper">
-        <div className="container" style={{ textAlign: "center" }}>
+        <div
+          className="container"
+          style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0 }}
+        >
           <>
             <IconButton
               id="previousBulletin"
