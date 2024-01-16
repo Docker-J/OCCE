@@ -1,61 +1,111 @@
-import {
-  Paper,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-} from "@mui/material";
+import { Box, Card, Divider, Stack, TableRow, Typography } from "@mui/material";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
 
 import PushPinIcon from "@mui/icons-material/PushPin";
 
 const BoardTable = ({ announcements }) => {
+  function getText(html) {
+    let doc = new DOMParser().parseFromString(html, "text/html");
+    let allTextNodes = Array.from(doc.body.childNodes).filter(
+      (node) =>
+        node.nodeType === Node.TEXT_NODE || node.nodeType === Node.ELEMENT_NODE
+    );
+    return allTextNodes.map((node) => node.textContent.trim()).join(" ");
+  }
+
   return (
-    <TableContainer className="table" component={Paper}>
-      <Table>
-        <TableBody>
-          {announcements ? (
-            announcements.map((announcement) => (
-              <TableRow
-                component={Link}
-                to={announcement.id}
-                key={announcement.id}
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {announcements ? (
+        announcements.map((announcement, index) => (
+          <div key={announcement.id}>
+            <Card
+              component={Link}
+              to={announcement.id}
+              color="black"
+              sx={{
+                display: "flex",
+                textDecoration: "none",
+                backgroundColor: announcement.pin ? "lightgrey" : null,
+                boxSizing: "border-box",
+                px: 2,
+                py: 1.5,
+                my: 2.5,
+              }}
+            >
+              <Stack
+                direction="column"
+                alignItems="left"
+                sx={{ justifyContent: "center" }}
+              >
+                <Typography variant="body2" whiteSpace="nowrap">
+                  {format(new Date(announcement.timestamp), "MMM dd")}
+                </Typography>
+                <Typography variant="body2">
+                  {format(new Date(announcement.timestamp), "yyyy")}
+                </Typography>
+              </Stack>
+
+              <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
+
+              <Box
                 sx={{
-                  textDecoration: "none",
-                  backgroundColor: announcement.pin ? "lightgrey" : null,
+                  p: 1,
+                  flexGrow: 1,
+                  overflow: "hidden",
                 }}
               >
-                <TableCell sx={{ px: 2, py: 1 }}>
-                  <h3
-                    style={{
+                <Stack direction="row" alignItems="center">
+                  {announcement.pin ? (
+                    <PushPinIcon fontSize="small" sx={{ mr: 1 }} />
+                  ) : null}
+                  <Typography
+                    variant="h6"
+                    sx={{
                       display: "block",
-                      width: "70%",
-                      maxWidth: "1000px",
+                      width: "100%",
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                     }}
                   >
-                    <Stack direction="row" alignItems="center">
-                      {announcement.pin ? <PushPinIcon sx={{ mr: 1 }} /> : null}
-                      {announcement.title}
-                    </Stack>
-                  </h3>
-                  <p>
-                    {format(new Date(announcement.timestamp), "yyyy/MM/dd")}
-                  </p>
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>게시물이 존재하지 않습니다.</TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+                    {announcement.title}
+                  </Typography>
+                </Stack>
+                <p
+                  style={{
+                    fontSize: "0.9em",
+                    lineHeight: "1.2em",
+                    height: "2.4em",
+                    margin: 0,
+                    marginTop: 12,
+                    display: "-webkit-box",
+                    WebkitBoxOrient: "vertical",
+                    WebkitLineClamp: "2",
+                    width: "100%",
+                    wordBreak: "break-all",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {getText(announcement.body)}
+                </p>
+              </Box>
+            </Card>
+            {index !== announcements.length - 1 && (
+              <Divider light variant="middle" />
+            )}
+          </div>
+        ))
+      ) : (
+        <TableRow>게시물이 존재하지 않습니다.</TableRow>
+      )}
+    </div>
   );
 };
 

@@ -1,8 +1,8 @@
 import {
+  Divider,
   SpeedDial,
   SpeedDialAction,
   SpeedDialIcon,
-  Stack,
   Typography,
 } from "@mui/material";
 import { useLoaderData, useNavigate, useRevalidator } from "react-router-dom";
@@ -79,25 +79,26 @@ const Announcement = () => {
       </div>
 
       <div className="container-wrapper">
-        <div className="container">
-          <h1 style={{ textAlign: "left", wordWrap: "break-word" }}>
-            <Stack direction="row" alignItems="center">
-              <PushPinIcon sx={{ opacity: pin ? 1 : 0, mr: 2 }} />
-              {title}
-            </Stack>
-          </h1>
+        <div
+          className="container"
+          style={{ display: "flex", flexDirection: "column" }}
+        >
+          {pin === 1 && <PushPinIcon sx={{ opacity: pin ? 1 : 0, mr: 2 }} />}
+
+          <h1 style={{ textAlign: "left", wordBreak: "break-all" }}>{title}</h1>
 
           <p style={{ textAlign: "right" }}>
             {format(new Date(timestamp), "yyyy/MM/dd")}
           </p>
 
-          <hr />
+          <Divider />
 
           <div
             className="content"
             dangerouslySetInnerHTML={{
               __html: body,
             }}
+            style={{ wordBreak: "break-word" }}
           />
 
           <SpeedDial

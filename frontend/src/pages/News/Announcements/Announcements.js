@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useLoaderData, useRevalidator } from "react-router-dom";
 
 import { Fab, Typography } from "@mui/material";
@@ -41,7 +40,7 @@ const Announcements = () => {
       </div>
 
       <div className="container-wrapper">
-        <div className="container">
+        <div className="container" style={{ maxWidth: "1200px" }}>
           <BoardTable announcements={announcements} />
           <BoardPagination pages={pages} />
         </div>
