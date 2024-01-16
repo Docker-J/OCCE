@@ -4,6 +4,7 @@ import {
   CircularProgress,
   Fab,
   ImageList,
+  Stack,
   Typography,
   useMediaQuery,
 } from "@mui/material";
@@ -128,7 +129,11 @@ const MeditationON = () => {
             padding: "0em 0.2em",
           }}
         >
-          {posts.length > 0 ? (
+          {posts.length <= 0 ? (
+            <Stack alignItems="center">
+              <CircularProgress />
+            </Stack>
+          ) : (
             <InfiniteScroll
               dataLength={posts.length}
               next={getPosts}
@@ -143,8 +148,6 @@ const MeditationON = () => {
                 </ImageList>
               }
             </InfiniteScroll>
-          ) : (
-            <CircularProgress />
           )}
         </div>
       </div>

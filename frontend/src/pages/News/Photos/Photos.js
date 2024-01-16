@@ -4,6 +4,7 @@ import {
   CircularProgress,
   Fab,
   ImageList,
+  Stack,
   Typography,
   useMediaQuery,
 } from "@mui/material";
@@ -123,14 +124,11 @@ const Photos = () => {
       </div>
 
       <div className="container-wrapper">
-        <div
-          className="container"
-          style={{
-            padding: "0em 0.2em",
-          }}
-        >
+        <div className="container">
           {photos.length === 0 ? (
-            <CircularProgress />
+            <Stack alignItems="center">
+              <CircularProgress />
+            </Stack>
           ) : (
             <InfiniteScroll
               dataLength={photos.length}
