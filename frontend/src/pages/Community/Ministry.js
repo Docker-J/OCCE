@@ -1,7 +1,21 @@
-import { List, ListItem, Typography } from "@mui/material";
+import {
+  List,
+  ListItem,
+  Paper,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
 import "../NextGen/NextGen.css";
 import { Link } from "react-router-dom";
 import { MinistryList } from "./MinistryList";
+
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 const titleBackground = {
   backgroundImage:
@@ -46,30 +60,58 @@ const Ministry = () => {
             주의 몸 된 교회를 함께 세우고, 온 맘과 온 힘을 다해 하나님과 이웃을
             사랑하는 공동체가 되길 소망합니다. 아래의 사역 분야를 참고해 주시고,
             온라인 링크를 통하여 지원해 주시면 감사하겠습니다.
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                flexWrap: "wrap",
-                flex: 1,
-              }}
-            >
-              {MinistryList.map((ministry) => (
-                <List>
-                  <ListItem>{ministry.title}</ListItem>
-                  <List>
-                    {ministry.types.map((type) => (
-                      <ListItem>{type}</ListItem>
+          </Typography>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              flexWrap: "wrap",
+              flex: 1,
+            }}
+          >
+            <TableContainer component={Paper} sx={{ my: 4 }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    {MinistryList.map((ministry) => (
+                      <TableCell>{ministry.title}</TableCell>
                     ))}
-                  </List>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {[
+                    ...Array(
+                      Math.max(...MinistryList.map((item) => item.types.length))
+                    ),
+                  ].map((_, index) => (
+                    <TableRow>
+                      {MinistryList.map((item) => (
+                        <TableCell>{item.types[index]}</TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            {/* {MinistryList.map((ministry) => (
+              <List>
+                <ListItem>{ministry.title}</ListItem>
+                <List>
+                  {ministry.types.map((type) => (
+                    <ListItem>{type}</ListItem>
+                  ))}
                 </List>
-              ))}
-            </div>
-            <br />
+              </List>
+            ))} */}
+          </div>
+          <Stack direction="row">
             <a target="__blank" href="https://forms.gle/5kGFLfA5fhfotVTW6">
               사역 지원하기
             </a>
-          </Typography>
+            <OpenInNewIcon />
+          </Stack>
         </div>
       </div>
     </>

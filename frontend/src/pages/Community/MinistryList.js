@@ -1,7 +1,7 @@
 export const MinistryList = [
   {
     title: "교육부서 Staff",
-    types: ["유아유치부", "유초등부", "중고등부", "중보기도팀"],
+    types: ["유아유치부", "유초등부", "중고등부"],
   },
   {
     title: "찬양팀",
