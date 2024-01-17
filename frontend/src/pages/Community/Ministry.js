@@ -60,50 +60,31 @@ const Ministry = () => {
             온라인 링크를 통하여 지원해 주시면 감사하겠습니다.
           </Typography>
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              flexWrap: "wrap",
-              flex: 1,
-            }}
-          >
-            <TableContainer component={Paper} sx={{ my: 4 }}>
-              <Table>
-                <TableHead>
+          <TableContainer component={Paper} sx={{ my: 4 }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  {MinistryList.map((ministry) => (
+                    <TableCell>{ministry.title}</TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {[
+                  ...Array(
+                    Math.max(...MinistryList.map((item) => item.types.length))
+                  ),
+                ].map((_, index) => (
                   <TableRow>
-                    {MinistryList.map((ministry) => (
-                      <TableCell>{ministry.title}</TableCell>
+                    {MinistryList.map((item) => (
+                      <TableCell>{item.types[index]}</TableCell>
                     ))}
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {[
-                    ...Array(
-                      Math.max(...MinistryList.map((item) => item.types.length))
-                    ),
-                  ].map((_, index) => (
-                    <TableRow>
-                      {MinistryList.map((item) => (
-                        <TableCell>{item.types[index]}</TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-            {/* {MinistryList.map((ministry) => (
-              <List>
-                <ListItem>{ministry.title}</ListItem>
-                <List>
-                  {ministry.types.map((type) => (
-                    <ListItem>{type}</ListItem>
-                  ))}
-                </List>
-              </List>
-            ))} */}
-          </div>
           <Stack
             component="a"
             target="__blank"
