@@ -35,13 +35,13 @@ export const ServiceAndGatheringInfo = [
     place: "Sunday School Room",
   },
   {
-    title: "청년부 주일 Brunch Club",
-    time: "오전 11시 30분",
-    place: "문의 : 안주영 목사",
+    title: "청년부 주일 모임",
+    time: "오후 4시",
+    place: "Youth Room/Small Group Rooms",
   },
   {
     title: "중보기도 모임",
-    time: "월 오전 10시, 금 저녁 7시",
+    time: " 주일 오후 1시 50분, 월 오전 10시",
     place: "문의 : 주미옥 장로",
   },
 ];
