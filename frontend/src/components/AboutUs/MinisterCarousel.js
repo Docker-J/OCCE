@@ -34,7 +34,7 @@ const slides = [
         imagen="img/About/KimYoojeong.jpg"
         imageOffset={{ left: "-52%" }}
         title="김유정 전도사"
-        position="유치부"
+        position="유아유치부"
       />
     ),
   },
@@ -45,7 +45,7 @@ const slides = [
         imagen="img/About/LeeSooyeon.jpg"
         imageOffset={{ left: "-52%" }}
         title="이수연 전도사"
-        position="초등부"
+        position="유초등부"
       />
     ),
   },
