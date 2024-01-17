@@ -41,7 +41,10 @@ const BoardTable = ({ announcements }) => {
               <Stack
                 direction="column"
                 alignItems="left"
-                sx={{ justifyContent: "center" }}
+                sx={{
+                  justifyContent: "center",
+                  width: "45px",
+                }}
               >
                 <Typography variant="body2" whiteSpace="nowrap">
                   {format(new Date(announcement.timestamp), "MMM dd")}
