@@ -1,6 +1,4 @@
 import {
-  List,
-  ListItem,
   Paper,
   Stack,
   Table,
@@ -106,10 +104,13 @@ const Ministry = () => {
               </List>
             ))} */}
           </div>
-          <Stack direction="row">
-            <a target="__blank" href="https://forms.gle/5kGFLfA5fhfotVTW6">
-              사역 지원하기
-            </a>
+          <Stack
+            component="a"
+            target="__blank"
+            href="https://forms.gle/5kGFLfA5fhfotVTW6"
+            direction="row"
+          >
+            <Typography>사역 지원하기</Typography>
             <OpenInNewIcon />
           </Stack>
         </div>
