@@ -1,8 +1,6 @@
-import FacebookIcon from "@mui/icons-material/Facebook";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import YouTubeIcon from "@mui/icons-material/YouTube";
-import { Avatar, Divider, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import GoogleMap from "./GoogleMap";
+import SocialIconsBar from "./SocialIconsBar";
 
 const Footer = () => {
   return (
@@ -65,22 +63,8 @@ const Footer = () => {
         <div style={{ display: "flex" }}>
           <div>
             <Typography>Follow Us ON</Typography>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              <Avatar sx={{ bgcolor: "black" }}>
-                <YouTubeIcon />
-              </Avatar>
-              <Avatar sx={{ bgcolor: "black", mx: 1 }}>
-                <FacebookIcon />
-              </Avatar>
-              <Avatar sx={{ bgcolor: "black" }}>
-                <InstagramIcon />
-              </Avatar>
-            </div>
+
+            <SocialIconsBar />
           </div>
         </div>
       </div>
