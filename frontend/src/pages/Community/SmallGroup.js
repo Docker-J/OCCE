@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import "../NextGen/NextGen.css";
 
 const titleBackground = {
@@ -33,9 +33,9 @@ const SmallGroup = () => {
       <div className="container-wrapper">
         <div className="container">
           <Typography className="explain" sx={{ fontSize: "1.1em" }}>
-            <Box component="span" fontWeight="bold" fontSize="2em">
+            <Typography display="inline" fontWeight="bold" fontSize="2em">
               '정원'
-            </Box>
+            </Typography>
             은 하나님께서 태초에 사람에게 허락하신 에덴의 모형입니다. '정원'의
             주인은 하나님이시고, '정원사'는 예수 그리스도이십니다. '정원지기'는
             주께서 허락하신 공동체 내 영적 리더들로 주께서 기르시고 꽃피우시는
