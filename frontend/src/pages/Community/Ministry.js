@@ -65,7 +65,9 @@ const Ministry = () => {
               <TableHead>
                 <TableRow>
                   {MinistryList.map((ministry) => (
-                    <TableCell>{ministry.title}</TableCell>
+                    <TableCell>
+                      <Typography fontWeight={650}>{ministry.title}</Typography>
+                    </TableCell>
                   ))}
                 </TableRow>
               </TableHead>
