@@ -138,7 +138,11 @@ const MeditationON = () => {
               dataLength={posts.length}
               next={getPosts}
               hasMore={!end}
-              loader={<CircularProgress />}
+              loader={
+                <Stack alignItems="center">
+                  <CircularProgress />
+                </Stack>
+              }
               scrollThreshold={1}
               style={{ overflowY: "hidden" }}
             >
