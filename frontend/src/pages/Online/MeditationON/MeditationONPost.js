@@ -40,8 +40,6 @@ const MeditationONPost = () => {
               maxWidth: "800px",
               left: "50%",
               transform: "translateX(-50%)",
-              marginTop: "30px",
-              marginBottom: "30px",
             }}
           >
             <CustomCarousel>
