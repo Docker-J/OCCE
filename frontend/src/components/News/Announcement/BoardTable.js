@@ -34,8 +34,8 @@ const BoardTable = ({ announcements }) => {
                 backgroundColor: announcement.pin ? "lightgrey" : null,
                 boxSizing: "border-box",
                 px: 2,
-                py: 1.5,
-                my: 2.5,
+                py: 0,
+                my: 1.8,
               }}
             >
               <Stack
@@ -100,9 +100,7 @@ const BoardTable = ({ announcements }) => {
                 </p>
               </Box>
             </Card>
-            {index !== announcements.length - 1 && (
-              <Divider light variant="middle" />
-            )}
+            {index !== announcements.length - 1 && <Divider variant="middle" />}
           </div>
         ))
       ) : (
