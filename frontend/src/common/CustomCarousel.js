@@ -6,12 +6,21 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
 import styles from "react-responsive-carousel/lib/styles/carousel.min.css";
 
-const indicatorStyles = {
-  background: "#808080",
-  width: 8,
-  height: 8,
-  display: "inline-block",
-  margin: "0 8px",
+const Indicator = ({ isSelected, clickHandler }) => {
+  return (
+    <span
+      onClick={isSelected ? null : clickHandler}
+      style={{
+        width: "8px",
+        height: "8px",
+        margin: "0 7px",
+        borderRadius: "50%",
+        cursor: isSelected ? null : "pointer",
+        background: isSelected ? "#f57c00" : "#808080",
+        display: "inline-block",
+      }}
+    />
+  );
 };
 
 const CustomCarousel = (props) => {
@@ -66,18 +75,8 @@ const CustomCarousel = (props) => {
         )
       }
       renderIndicator={(clickHandler, isSelected, index) => {
-        if (isSelected) {
-          return <li style={{ ...indicatorStyles, background: "#f57c00" }} />;
-        }
         return (
-          <li
-            style={indicatorStyles}
-            onClick={clickHandler}
-            value={index}
-            key={index}
-            // role="button"
-            tabIndex={0}
-          />
+          <Indicator isSelected={isSelected} clickHandler={clickHandler} />
         );
       }}
       styles={styles}

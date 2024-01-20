@@ -31,6 +31,15 @@ const theme = createTheme({
   typography: {
     fontFamily: "NanumSquareNeoVariable",
   },
+  components: {
+    MuiPickersDay: {
+      styleOverrides: {
+        selected: {
+          color: "#f57c00",
+        },
+      },
+    },
+  },
 });
 
 root.render(
