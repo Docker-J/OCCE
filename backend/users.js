@@ -39,13 +39,15 @@ router.post("/signIn", async (req, res) => {
       params: { email: req.body.email },
     });
 
+    console.log(response);
+
     res.send({
       accessToken: accessToken,
       refreshToken: refreshToken,
       group: group.data,
     });
   } catch (error) {
-    res.send(error);
+    res.send(403);
   }
 });
 
