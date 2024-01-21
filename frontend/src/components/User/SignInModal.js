@@ -46,8 +46,12 @@ const SignInModal = ({ isOpen, onClose }) => {
     handleClose();
   };
 
+  const signInFail = () => {
+    openSnackbar("error", "Wrong User Credentials");
+  };
+
   const handleSignIn = () => {
-    signIn(email, password, signInSuccess);
+    signIn(email, password, signInSuccess, signInFail);
   };
 
   const handleClose = () => {

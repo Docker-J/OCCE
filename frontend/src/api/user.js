@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const signIn = async (email, password, success) => {
+export const signIn = async (email, password, success, fail) => {
   try {
     const res = await axios.post("/api/User/signIn", {
       email: email,
@@ -10,6 +10,7 @@ export const signIn = async (email, password, success) => {
     success(res.data);
   } catch (error) {
     console.log(error);
+    fail();
   }
 };
 
