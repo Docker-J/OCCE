@@ -47,7 +47,7 @@ router.post("/signIn", async (req, res) => {
       group: group.data,
     });
   } catch (error) {
-    res.send(403);
+    res.sendStatus(403);
   }
 });
 
