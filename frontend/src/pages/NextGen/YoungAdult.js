@@ -19,19 +19,15 @@ const YoungAdult = () => {
             청년부
           </Typography>
           <Typography variant="h5" fontWeight={700} sx={{ color: "white" }}>
-            YOUNG ADULTS ON Maeum
+            Heart ON God YOUNG ADULTS
           </Typography>
 
           <br />
           <Typography variant="body1" sx={{ color: "white" }}>
-            대답하여 이르되 네 마음을 다하며 목숨을 다하며 힘을 다하며 뜻을
-            다하여 주 너의 하나님을 사랑하고 또한 네 이웃을 네 자신 같이
-            사랑하라 하였나이다
+            하늘에 있는 것에 마음을 두십시오.
             <br />
-            He answered, "'Love the Lord your God with all your heart and with
-            all your soul and with all your strength and with all your mind';
-            and,'Love your neighbor as yourself.'""
-            <br />- 누가복음 Luke 10:27 -
+            Set your hearts on things above.
+            <br />- 골로새서 Colossians 3:1b -
           </Typography>
         </div>
       </div>
@@ -42,10 +38,11 @@ const YoungAdult = () => {
             모임
           </Typography>
           <Typography className="subjectContent" sx={{ fontSize: "1.1em" }}>
-            Brunch Club: 주일 오전 11시 30분 <br />
-            성경 공부: 주일 오후 4시 <br />※ 문의: 안주영 목사 <br />
+            시간: 주일 오후 4시 <br />
+            장소: Youth Room/Small Group Rooms <br />※ 문의: 김휘경 전도사
+            <br />
           </Typography>
-          <br />
+          {/* <br />
           <Typography variant="h5" fontWeight={800}>
             Brunch Club
           </Typography>
@@ -58,7 +55,7 @@ const YoungAdult = () => {
             속에서 하나님의 은혜를 찾기 위해 경청하는 시간입니다.
             <br />- 이를 통해 사랑과 감사를 나누고 그리스도의 몸 된 공동체로
             세워져 가는 청년 공동체가 됩니다.
-          </Typography>
+          </Typography> */}
         </div>
       </div>
     </>
