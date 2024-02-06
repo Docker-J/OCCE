@@ -51,10 +51,10 @@ const Bible291 = () => {
             </Typography>
           )}
 
-          <img style={{ maxWidth: "100%" }} src="/img/Online/291Bible/1.jpg" />
-          <img style={{ maxWidth: "100%" }} src="/img/Online/291Bible/2.jpg" />
-          <img style={{ maxWidth: "100%" }} src="/img/Online/291Bible/3.jpg" />
-          <img style={{ maxWidth: "100%" }} src="/img/Online/291Bible/4.jpg" />
+          <img style={{ maxWidth: "100%" }} src="/img/Online/291Bible/1.webp" />
+          <img style={{ maxWidth: "100%" }} src="/img/Online/291Bible/2.webp" />
+          <img style={{ maxWidth: "100%" }} src="/img/Online/291Bible/3.webp" />
+          <img style={{ maxWidth: "100%" }} src="/img/Online/291Bible/4.webp" />
         </div>
       </div>
     </>
