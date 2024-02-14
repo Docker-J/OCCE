@@ -1,4 +1,5 @@
 import {
+  CircularProgress,
   Divider,
   SpeedDial,
   SpeedDialAction,
@@ -15,6 +16,7 @@ import { format } from "date-fns";
 import "../../NextGen/NextGen.css";
 import axios from "axios";
 import useSnackbar from "../../../util/useSnackbar";
+import { useState } from "react";
 
 const titleBackground = {
   backgroundImage:
@@ -27,30 +29,47 @@ const Announcement = () => {
   const { openSnackbar } = useSnackbar();
   const { id, title, body, timestamp, pin } = useLoaderData();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const pinAnnouncement = async () => {
+    setIsLoading(true);
+
     try {
-      const result = await axios.put("/api/Announcements/pinAnnouncement", {
+      await axios.put("/api/Announcements/pinAnnouncement", {
         id: id,
         pin: pin ? 0 : 1,
       });
 
       revalidator.revalidate();
-      openSnackbar("success", "The announcement is successfully pinned!");
+      openSnackbar(
+        "success",
+        `The announcement is successfully ${pin ? "unpinned" : "pinned"}`
+      );
     } catch (error) {
-      console.log(error);
+      openSnackbar(
+        "error",
+        "Error Occured. Please contact to the administrator."
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const deleteAnnouncement = async () => {
+    setIsLoading(true);
+
     try {
-      const result = await axios.delete(
-        `/api/Announcements/deleteAnnouncement?id=${id}`
-      );
+      await axios.delete(`/api/Announcements/deleteAnnouncement?id=${id}`);
 
       openSnackbar("success", "The announcement is successfully deleted!");
       navigate("/announcements");
     } catch (error) {
-      console.log(error);
+      openSnackbar(
+        "error",
+        "Error Occured. Please contact to the administrator."
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -66,6 +85,27 @@ const Announcement = () => {
 
   return (
     <>
+      {isLoading && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            // background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+            zIndex: 100,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            height: "100%",
+            widht: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <CircularProgress />
+        </div>
+      )}
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
