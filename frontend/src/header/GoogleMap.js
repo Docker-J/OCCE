@@ -33,8 +33,8 @@ const GoogleMap = memo(() => {
         <Map
           // styles={mapStyle}
           ref={markerRef}
-          center={center}
-          zoom={14}
+          defaultCenter={center}
+          defaultZoom={14}
           disableDefaultUI={true}
           mapId="96730a2a3f5e9934"
         >
