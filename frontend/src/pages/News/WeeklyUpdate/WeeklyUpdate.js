@@ -57,8 +57,7 @@ const WeeklyUpdate = () => {
         },
       });
 
-      const byteArray = new Uint8Array(Object.values(result.data));
-      const pdf = new Blob([byteArray.buffer], { type: "application/pdf" });
+      const pdf = new Uint8Array(Object.values(result.data)).buffer;
 
       setBulletin(pdf);
     } catch (err) {
