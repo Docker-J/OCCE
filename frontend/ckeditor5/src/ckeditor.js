@@ -27,6 +27,7 @@ import PasteFromOffice from "@ckeditor/ckeditor5-paste-from-office/src/pastefrom
 import Table from "@ckeditor/ckeditor5-table/src/table.js";
 import TableToolbar from "@ckeditor/ckeditor5-table/src/tabletoolbar.js";
 import TextTransformation from "@ckeditor/ckeditor5-typing/src/texttransformation.js";
+import Underline from "@ckeditor/ckeditor5-basic-styles/src/underline.js";
 
 class Editor extends ClassicEditor {}
 
@@ -56,6 +57,7 @@ Editor.builtinPlugins = [
   Table,
   TableToolbar,
   TextTransformation,
+  Underline,
 ];
 
 // Editor configuration.
@@ -66,8 +68,8 @@ Editor.defaultConfig = {
       "|",
       "bold",
       "italic",
+      "underline",
       "fontSize",
-      "fontFamily",
       "fontColor",
       "fontBackgroundColor",
       "|",
@@ -92,10 +94,14 @@ Editor.defaultConfig = {
   image: {
     toolbar: [
       "toggleImageCaption",
+      "|",
       "imageStyle:inline",
       "imageStyle:block",
       "imageStyle:side",
     ],
+    insert: {
+      type: "auto",
+    },
   },
   table: {
     contentToolbar: ["tableColumn", "tableRow", "mergeTableCells"],
