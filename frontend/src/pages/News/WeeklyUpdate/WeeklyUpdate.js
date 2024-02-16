@@ -32,7 +32,7 @@ import WeeklyUpdatePostModal from "../../../components/News/WeeklyUpdate/WeeklyU
 
 const titleBackground = {
   backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)), url("/img/WeeklyUpdate.jpg")',
+    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)), url("/img/News/WeeklyUpdate/WeeklyUpdate.webp")',
 };
 
 const WeeklyUpdate = () => {

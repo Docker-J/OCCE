@@ -9,7 +9,7 @@ const slides = [
     key: uuidv4(),
     content: (
       <Card
-        imagen="img/About/ChinSeongIn.jpg"
+        imagen="img/About/ChinSeongIn.webp"
         imageOffset={{ left: "-53%" }}
         title="진성인 목사"
         position="담임 목사"
@@ -20,8 +20,8 @@ const slides = [
     key: uuidv4(),
     content: (
       <Card
-        // imagen="img/About/AhnJooyoung.jpg"
-        // imageOffset={{ left: "-49%" }}
+        imagen="img/About/KimTaeyoung.webp"
+        imageOffset={{ left: "-53%" }}
         title="김태영 목사"
         position="행정"
       />
@@ -31,7 +31,7 @@ const slides = [
     key: uuidv4(),
     content: (
       <Card
-        imagen="img/About/KimYoojeong.jpg"
+        imagen="img/About/KimYoojeong.webp"
         imageOffset={{ left: "-52%" }}
         title="김유정 전도사"
         position="유아유치부"
@@ -42,7 +42,7 @@ const slides = [
     key: uuidv4(),
     content: (
       <Card
-        imagen="img/About/LeeSooyeon.jpg"
+        imagen="img/About/LeeSooyeon.webp"
         imageOffset={{ left: "-52%" }}
         title="이수연 전도사"
         position="유초등부"
