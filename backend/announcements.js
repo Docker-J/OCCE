@@ -2,6 +2,8 @@ import express from "express";
 import { fcm } from "./api/firebase.js";
 import axios from "axios";
 import { v4 as uuid } from "uuid";
+import FormData from "form-data";
+import { upload } from "./middleware/multer.js";
 
 const router = express.Router();
 
@@ -10,10 +12,6 @@ const CLOUDFLARE_DATABASE_ID = "1de4220d-820c-4074-ae4f-b4aabeacf83e";
 const CLOUDFLARE_API_KEY = process.env.CLOUDFLARE_API_KEY;
 
 const URL = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${CLOUDFLARE_DATABASE_ID}/query`;
-const HEADERS = {
-  "Content-Type": "application/json",
-  Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
-};
 const TABLENAME = "Announcements";
 const PAGE_SIZE = 10;
 
@@ -22,7 +20,7 @@ var PINNED_ANNOUNCEMENTS;
 
 const getAnnouncementsCount = async () => {
   const data = {
-    sql: `SELECT COUNT(*) AS count FROM ${TABLENAME} WHERE pin = 0`,
+    sql: `SELECT COUNT(id) AS count FROM ${TABLENAME} WHERE pin = 0`,
   };
   try {
     const result = await axios.post(URL, data, {
@@ -72,7 +70,7 @@ router.get("/getAnnouncements", async (req, res) => {
 
   const data = {
     params: [0],
-    sql: `SELECT * FROM ${TABLENAME} WHERE pin = ? ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
+    sql: `SELECT id, title, body, timestamp FROM ${TABLENAME} WHERE pin = ? ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
       page ? (page - 1) * PAGE_SIZE : 0
     }`,
   };
@@ -102,7 +100,7 @@ router.get("/getAnnouncements", async (req, res) => {
 router.get("/getAnnouncement", async (req, res) => {
   const data = {
     params: [req.query.id],
-    sql: `SELECT * FROM ${TABLENAME} WHERE id = ?`,
+    sql: `SELECT id, title, body, timestamp, pin FROM ${TABLENAME} WHERE id = ?`,
   };
   try {
     const result = await axios.post(URL, data, {
@@ -113,16 +111,21 @@ router.get("/getAnnouncement", async (req, res) => {
     });
     res.send(result.data.result[0].results[0]);
   } catch (error) {
-    console.log(error);
-    res.send(error);
+    res.sendStatus(404);
   }
 });
 
 router.put("/postAnnouncement", async (req, res) => {
   console.log(req.body);
   const data = {
-    params: [uuid(), req.body.title, req.body.body, new Date()],
-    sql: `INSERT INTO ${TABLENAME} (id, title, body, timestamp) VALUES (?, ?, ?, ?)`,
+    params: [
+      uuid(),
+      req.body.title,
+      req.body.body,
+      req.body.images.length > 0 ? req.body.images : null,
+      new Date(),
+    ],
+    sql: `INSERT INTO ${TABLENAME} (id, title, body, images, timestamp) VALUES (?, ?, ?, ?, ?)`,
   };
 
   try {
@@ -148,7 +151,7 @@ router.put("/pinAnnouncement", async (req, res) => {
   };
 
   try {
-    const result = await axios.post(URL, data, {
+    await axios.post(URL, data, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
@@ -165,23 +168,77 @@ router.put("/pinAnnouncement", async (req, res) => {
 });
 
 router.delete("/deleteAnnouncement", async (req, res) => {
-  const data = {
+  const deleteAnnouncementQuery = {
     params: [req.query.id],
     sql: `DELETE FROM ${TABLENAME} WHERE id = ?`,
   };
 
+  const getAnnouncementQuery = {
+    params: [req.query.id],
+    sql: `SELECT images FROM ${TABLENAME} WHERE id = ?`,
+  };
+
   try {
-    const result = await axios.post(URL, data, {
+    const result = await axios.post(URL, getAnnouncementQuery, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
       },
     });
 
+    const images = result.data.result[0].results[0].images
+      ? result.data.result[0].results[0].images.split(",")
+      : [];
+
+    images.forEach(async (image) => {
+      await axios.delete(
+        `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1/${image}`,
+        {
+          headers: {
+            Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
+          },
+        }
+      );
+    });
+
+    await axios.post(URL, deleteAnnouncementQuery, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
+      },
+    });
+
+    getAnnouncementsCount();
+    getPINNED_ANNOUNCEMENTS();
+
     res.sendStatus(200);
   } catch (error) {
+    res.sendStatus(500);
+  }
+});
+
+router.post("/uploadImage", upload.single("image"), async (req, res) => {
+  const image = req.file;
+
+  try {
+    const formData = new FormData();
+    formData.append("file", image.buffer, image.originalname);
+
+    const result = await axios.post(
+      `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1`,
+      formData,
+      {
+        headers: {
+          "Content-Type": `multipart/form-data; boundary=${formData._boundary}`,
+          Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
+        },
+      }
+    );
+
+    res.send(result.data.result.id);
+  } catch (error) {
+    res.sendStatus(500);
     console.log(error);
-    res.send(error);
   }
 });
 
