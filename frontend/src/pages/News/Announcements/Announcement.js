@@ -20,6 +20,8 @@ import FullScreenLoading from "../../../common/FullScreenLoading";
 import "../../NextGen/NextGen.css";
 import "./content-styles.css";
 import AdminComponent from "../../../common/AdminComponent";
+import useModals from "../../../util/useModal";
+import AnnouncementPostModal from "../../../components/News/Announcement/AnnouncementPostModal";
 
 const titleBackground = {
   backgroundImage:
@@ -29,6 +31,7 @@ const titleBackground = {
 const Announcement = () => {
   let revalidator = useRevalidator();
   const navigate = useNavigate();
+  const { openModal } = useModals();
   const { openSnackbar } = useSnackbar();
   const { id, title, body, timestamp, pin } = useLoaderData();
 
@@ -77,7 +80,17 @@ const Announcement = () => {
   };
 
   const actions = [
-    { icon: <EditNoteIcon />, name: "Edit" },
+    {
+      icon: <EditNoteIcon />,
+      name: "Edit",
+      onClick: () =>
+        openModal(AnnouncementPostModal, {
+          revalidator: revalidator.revalidate,
+          id: id,
+          origTitle: title,
+          origBody: body,
+        }),
+    },
     {
       icon: pin ? <PushPinIcon /> : <PushPinOutlinedIcon />,
       name: pin ? "Unpin" : "Pin",

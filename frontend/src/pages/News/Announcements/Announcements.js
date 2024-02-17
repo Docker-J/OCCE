@@ -1,6 +1,12 @@
-import { useLoaderData, useRevalidator } from "react-router-dom";
+import {
+  Await,
+  useLoaderData,
+  useNavigation,
+  useRevalidator,
+  useSearchParams,
+} from "react-router-dom";
 
-import { Fab, Typography } from "@mui/material";
+import { CircularProgress, Fab, Typography } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 
@@ -12,6 +18,8 @@ import "../../NextGen/NextGen.css";
 import BoardPagination from "../../../components/News/Announcement/BoardPagination";
 import useModals from "../../../util/useModal";
 import AdminComponent from "../../../common/AdminComponent";
+import { Suspense } from "react";
+import FullScreenLoading from "../../../common/FullScreenLoading";
 
 const titleBackground = {
   backgroundImage:
@@ -21,8 +29,10 @@ const titleBackground = {
 const Announcements = () => {
   let revalidator = useRevalidator();
 
-  const { count, announcements } = useLoaderData();
-  const pages = Math.ceil(count / 10);
+  const data = useLoaderData();
+  const { state } = useNavigation();
+  const [searchParams] = useSearchParams();
+  const page = searchParams.get("page");
 
   const { openModal } = useModals();
 
@@ -42,13 +52,39 @@ const Announcements = () => {
 
       <div className="container-wrapper">
         <div className="container" style={{ maxWidth: "1200px" }}>
-          {announcements.length === 0 ? (
-            <Typography align="center">게시물이 존재하지 않습니다.</Typography>
+          {state === "loading" ? (
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <CircularProgress />
+            </div>
           ) : (
-            <>
-              <BoardTable announcements={announcements} />
-              <BoardPagination pages={pages} />
-            </>
+            <Suspense
+              fallback={
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <CircularProgress />
+                </div>
+              }
+            >
+              <Await
+                resolve={data.announcementsData}
+                errorElement={<p>Error loading package location!</p>}
+              >
+                {({ data }) => {
+                  return data.announcements.length === 0 ? (
+                    <Typography align="center">
+                      게시물이 존재하지 않습니다.
+                    </Typography>
+                  ) : (
+                    <>
+                      <BoardTable announcements={data.announcements} />
+                      <BoardPagination
+                        pages={Math.ceil(data.count / 10)}
+                        currentPage={page}
+                      />
+                    </>
+                  );
+                }}
+              </Await>
+            </Suspense>
           )}
         </div>
       </div>
@@ -60,6 +96,8 @@ const Announcements = () => {
           onClick={() =>
             openModal(AnnouncementPostModal, {
               revalidator: revalidator.revalidate,
+              origTitle: "",
+              origBody: "",
             })
           }
         >

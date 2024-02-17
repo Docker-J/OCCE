@@ -3,10 +3,11 @@ import { CKEditor } from "@ckeditor/ckeditor5-react";
 
 import "./TextEditor.css";
 
-const TextEditor = ({ getBody }) => {
+const TextEditor = ({ body, getBody }) => {
   return (
     <CKEditor
       editor={Editor}
+      data={body}
       onChange={(_, editor) => {
         const data = editor.getData();
         getBody(data);

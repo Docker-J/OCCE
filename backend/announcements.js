@@ -116,7 +116,6 @@ router.get("/getAnnouncement", async (req, res) => {
 });
 
 router.put("/postAnnouncement", async (req, res) => {
-  console.log(req.body);
   const data = {
     params: [
       uuid(),
@@ -137,6 +136,65 @@ router.put("/postAnnouncement", async (req, res) => {
     });
 
     ANNOUNCEMENTS_COUNT += 1;
+    res.send(result.data);
+  } catch (error) {
+    console.log(error);
+    res.send(error);
+  }
+});
+
+router.put("/editAnnouncement", async (req, res) => {
+  const getAnnouncementQuery = {
+    params: [req.body.id],
+    sql: `SELECT images FROM ${TABLENAME} WHERE id = ?`,
+  };
+
+  try {
+    const result = await axios.post(URL, getAnnouncementQuery, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
+      },
+    });
+
+    const images = result.data.result[0].results[0].images
+      ? result.data.result[0].results[0].images.split(",")
+      : [];
+
+    const missingImages = images.filter(
+      (item) => !req.body.images.includes(item)
+    );
+
+    missingImages.forEach(async (image) => {
+      await axios.delete(
+        `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1/${image}`,
+        {
+          headers: {
+            Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
+          },
+        }
+      );
+    });
+  } catch {}
+
+  const data = {
+    params: [
+      req.body.title,
+      req.body.body,
+      req.body.images.length > 0 ? req.body.images : null,
+      req.body.id,
+    ],
+    sql: `UPDATE ${TABLENAME} SET title = ?, body = ?, images = ? WHERE id = ?`,
+  };
+
+  try {
+    const result = await axios.post(URL, data, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
+      },
+    });
+
     res.send(result.data);
   } catch (error) {
     console.log(error);

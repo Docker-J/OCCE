@@ -23,12 +23,19 @@ const style = {
   justifyContent: "space-between",
 };
 
-const AnnouncementPostModal = ({ isOpen, onClose, revalidator }) => {
+const AnnouncementPostModal = ({
+  isOpen,
+  onClose,
+  revalidator,
+  id,
+  origTitle,
+  origBody,
+}) => {
   const { openSnackbar } = useSnackbar();
 
   const [loading, setLoading] = useState(false);
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
+  const [title, setTitle] = useState(origTitle);
+  const [body, setBody] = useState(origBody);
 
   function dataURLtoBlob(dataurl) {
     var arr = dataurl.split(","),
@@ -56,10 +63,6 @@ const AnnouncementPostModal = ({ isOpen, onClose, revalidator }) => {
     return result.data;
   };
 
-  const getBody = (body) => {
-    setBody(body);
-  };
-
   const postAnnouncement = async () => {
     setLoading(true);
     try {
@@ -78,11 +81,17 @@ const AnnouncementPostModal = ({ isOpen, onClose, revalidator }) => {
         );
       }
 
-      await axios.put("/api/Announcements/postAnnouncement", {
-        title: title,
-        body: modifiedBody,
-        images: images,
-      });
+      await axios.put(
+        id
+          ? "/api/Announcements/editAnnouncement"
+          : "/api/Announcements/postAnnouncement",
+        {
+          id: id ? id : null,
+          title: title,
+          body: modifiedBody,
+          images: images,
+        }
+      );
 
       revalidator();
       openSnackbar("success", "The announcement is successfully posted!");
@@ -114,13 +123,14 @@ const AnnouncementPostModal = ({ isOpen, onClose, revalidator }) => {
                 id="filled-basic"
                 label="Title"
                 variant="outlined"
+                defaultValue={origTitle}
                 sx={{ width: "100%" }}
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
 
             <div style={{ height: "85%", width: "100%" }}>
-              <TextEditor body={body} getBody={getBody} />
+              <TextEditor body={origBody} getBody={setBody} />
             </div>
 
             <div>
