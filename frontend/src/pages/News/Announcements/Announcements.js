@@ -11,6 +11,7 @@ import BoardTable from "../../../components/News/Announcement/BoardTable";
 import "../../NextGen/NextGen.css";
 import BoardPagination from "../../../components/News/Announcement/BoardPagination";
 import useModals from "../../../util/useModal";
+import AdminComponent from "../../../common/AdminComponent";
 
 const titleBackground = {
   backgroundImage:
@@ -52,17 +53,19 @@ const Announcements = () => {
         </div>
       </div>
 
-      <Fab
-        variant="primary"
-        style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
-        onClick={() =>
-          openModal(AnnouncementPostModal, {
-            revalidator: revalidator.revalidate,
-          })
-        }
-      >
-        <AddIcon />
-      </Fab>
+      <AdminComponent>
+        <Fab
+          variant="primary"
+          style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
+          onClick={() =>
+            openModal(AnnouncementPostModal, {
+              revalidator: revalidator.revalidate,
+            })
+          }
+        >
+          <AddIcon />
+        </Fab>
+      </AdminComponent>
     </>
   );
 };

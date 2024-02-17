@@ -19,6 +19,7 @@ import FullScreenLoading from "../../../common/FullScreenLoading";
 
 import "../../NextGen/NextGen.css";
 import "./content-styles.css";
+import AdminComponent from "../../../common/AdminComponent";
 
 const titleBackground = {
   backgroundImage:
@@ -124,20 +125,22 @@ const Announcement = () => {
             style={{ wordBreak: "break-word" }}
           />
 
-          <SpeedDial
-            ariaLabel="SpeedDial basic example"
-            sx={{ position: "fixed", bottom: 16, right: 16 }}
-            icon={<SpeedDialIcon />}
-          >
-            {actions.map((action) => (
-              <SpeedDialAction
-                key={action.name}
-                icon={action.icon}
-                tooltipTitle={action.name}
-                onClick={action.onClick}
-              />
-            ))}
-          </SpeedDial>
+          <AdminComponent>
+            <SpeedDial
+              ariaLabel="SpeedDial basic example"
+              sx={{ position: "fixed", bottom: 16, right: 16 }}
+              icon={<SpeedDialIcon />}
+            >
+              {actions.map((action) => (
+                <SpeedDialAction
+                  key={action.name}
+                  icon={action.icon}
+                  tooltipTitle={action.name}
+                  onClick={action.onClick}
+                />
+              ))}
+            </SpeedDial>
+          </AdminComponent>
         </div>
       </div>
     </>
