@@ -40,7 +40,7 @@ const getAnnouncementsCount = async () => {
 const getPINNED_ANNOUNCEMENTS = async () => {
   const data = {
     params: [1],
-    sql: `SELECT * FROM ${TABLENAME} WHERE pin = ?`,
+    sql: `SELECT id, title, body, timestamp, pin FROM ${TABLENAME} WHERE pin = ? ORDER BY timestamp DESC`,
   };
   try {
     const result = await axios.post(URL, data, {
@@ -56,14 +56,14 @@ const getPINNED_ANNOUNCEMENTS = async () => {
   }
 };
 
-router.get("/getAnnouncementsCount", async (req, res) => {
-  if (!ANNOUNCEMENTS_COUNT) {
-    await getAnnouncementsCount();
-  }
+// router.get("/getAnnouncementsCount", async (req, res) => {
+//   if (!ANNOUNCEMENTS_COUNT) {
+//     await getAnnouncementsCount();
+//   }
 
-  const data = { count: ANNOUNCEMENTS_COUNT };
-  res.send(data);
-});
+//   const data = { count: ANNOUNCEMENTS_COUNT };
+//   res.send(data);
+// });
 
 router.get("/getAnnouncements", async (req, res) => {
   const page = req.query.page;
@@ -90,7 +90,7 @@ router.get("/getAnnouncements", async (req, res) => {
       result.data.result[0].results
     );
 
-    res.send(annoucements);
+    res.send({ count: ANNOUNCEMENTS_COUNT, announcements: annoucements });
   } catch (error) {
     console.log(error);
     res.send(error);
