@@ -42,7 +42,7 @@ const WeeklyUpdate = () => {
   const { maxDate, queryDate } = useLoaderData();
   const minDate = new Date("2022/04/03");
 
-  const [bulletin, setBulletin] = useState(null);
+  const [bulletin, setBulletin] = useState({ data: null });
   const [selectedDate, setSelectedDate] = useState(queryDate);
 
   const [loading, setLoading] = useState(true);
@@ -55,11 +55,12 @@ const WeeklyUpdate = () => {
         params: {
           date: format(selectedDate, "yyyyMMdd"),
         },
+        responseType: "arraybuffer",
       });
 
-      const pdf = new Uint8Array(Object.values(result.data)).buffer;
+      const pdf = new Uint8Array(result.data);
 
-      setBulletin(pdf);
+      setBulletin({ data: pdf });
     } catch (err) {
       console.log(err);
       setBulletin(null);
