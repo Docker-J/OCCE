@@ -81,6 +81,8 @@ const HeaderFooterWrapper = () => {
         <ResponsiveAppBar />
         <div
           style={{
+            display: "flex",
+            flexDirection: "column",
             flexGrow: 1,
           }}
         >
