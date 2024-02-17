@@ -24,16 +24,16 @@ const SocialIconsBar = () => {
 
       <Avatar
         component="a"
-        href="https://www.youtube.com/@oncce"
+        href="mailto:office@oncce.ca"
         target="_blank"
         sx={{ bgcolor: "black", mx: 1 }}
       >
         <EmailIcon />
       </Avatar>
 
-      <Avatar sx={{ bgcolor: "black" }}>
+      {/* <Avatar sx={{ bgcolor: "black" }}>
         <InstagramIcon />
-      </Avatar>
+      </Avatar> */}
     </div>
   );
 };

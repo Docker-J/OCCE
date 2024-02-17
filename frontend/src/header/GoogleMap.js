@@ -39,11 +39,15 @@ const GoogleMap = memo(() => {
           mapId="96730a2a3f5e9934"
         >
           <AdvancedMarker position={center} onClick={toggleInfoWindow}>
-            <img height={30} src="/img/OCCE_logo_circle_rim_color.png"></img>
+            <img
+              alt="OCCE Circle Logo"
+              height={30}
+              src="/img/OCCE_logo_circle_rim_color.png"
+            ></img>
           </AdvancedMarker>
 
           {infowindowShown && (
-            <InfoWindow anchor={marker}>
+            <InfoWindow anchor={marker} onCloseClick={closeInfoWindow}>
               <h2>Hello everyone!</h2>
               <p>This is an Info Window</p>
             </InfoWindow>

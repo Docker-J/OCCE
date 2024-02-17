@@ -14,7 +14,6 @@ const Footer = () => {
         bottom: 0,
         display: "flex",
         justifyContent: "center",
-        // borderRadius: "1.5em 1.5em 0px 0px",
       }}
     >
       <div
@@ -23,7 +22,7 @@ const Footer = () => {
           height: "100%",
           maxWidth: "1536px",
           paddingTop: 30,
-          paddingBottom: 30,
+          paddingBottom: 10,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
@@ -32,7 +31,7 @@ const Footer = () => {
       >
         <div>
           <img
-            alt="Header Logo"
+            alt="Footer Logo"
             src={"/img/HeaderLogoBW.png"}
             style={{ height: "40px" }}
           />
@@ -42,32 +41,12 @@ const Footer = () => {
           <Typography>온 힘 다해 이웃을 사랑하는 교회</Typography>
         </div>
       </div>
-      <GoogleMap />
 
-      <div
-        style={{
-          width: "98%",
-          height: "100%",
-          maxWidth: "1536px",
-          paddingTop: 30,
-
-          paddingBottom: 30,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexDirection: "column",
-        }}
-      >
-        {/* <p>office@oncce.ca</p> */}
-        <div style={{ width: "100%" }}></div>
-        <div style={{ display: "flex" }}>
-          <div>
-            <Typography>Follow Us ON</Typography>
-
-            <SocialIconsBar />
-          </div>
-        </div>
+      <div style={{ paddingBottom: 30 }}>
+        <SocialIconsBar />
       </div>
+
+      <GoogleMap />
     </div>
   );
 };
