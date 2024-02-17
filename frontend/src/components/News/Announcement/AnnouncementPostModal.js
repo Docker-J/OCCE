@@ -30,6 +30,32 @@ const AnnouncementPostModal = ({ isOpen, onClose, revalidator }) => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
 
+  function dataURLtoBlob(dataurl) {
+    var arr = dataurl.split(","),
+      mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[1]),
+      n = bstr.length,
+      u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+  }
+
+  const uploadImage = async (file) => {
+    var blob = dataURLtoBlob(file);
+    const form = new FormData();
+    form.append("image", blob, "image.jpg");
+
+    const result = await axios.post("/api/Announcements/uploadImage", form, {
+      headers: {
+        "Content-Type": `multipart/form-data`,
+      },
+    });
+
+    return result.data;
+  };
+
   const getBody = (body) => {
     setBody(body);
   };
@@ -37,9 +63,25 @@ const AnnouncementPostModal = ({ isOpen, onClose, revalidator }) => {
   const postAnnouncement = async () => {
     setLoading(true);
     try {
-      const result = await axios.put("/api/Announcements/postAnnouncement", {
+      let modifiedBody = body;
+      const regex = /(<img[^>]+src=")([^">]+)"/g;
+
+      let match;
+      const images = [];
+      while ((match = regex.exec(body)) !== null) {
+        const imageID = await uploadImage(match[2]);
+        images.push(imageID);
+
+        modifiedBody = modifiedBody.replace(
+          match[0],
+          `${match[1]}https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${imageID}/Announcements"`
+        );
+      }
+
+      await axios.put("/api/Announcements/postAnnouncement", {
         title: title,
-        body: body,
+        body: modifiedBody,
+        images: images,
       });
 
       revalidator();
@@ -61,21 +103,25 @@ const AnnouncementPostModal = ({ isOpen, onClose, revalidator }) => {
   };
 
   return (
-    <Modal open={isOpen} onClose={handleClose}>
+    <Modal open={isOpen} onClose={handleClose} disableEnforceFocus={true}>
       <Box sx={style} bgcolor="white">
         {loading ? (
           <CircularProgress />
         ) : (
           <>
-            <TextField
-              id="filled-basic"
-              label="Title"
-              variant="outlined"
-              sx={{ width: "100%" }}
-              onChange={(e) => setTitle(e.target.value)}
-            />
+            <div style={{ height: "7%", width: "100%" }}>
+              <TextField
+                id="filled-basic"
+                label="Title"
+                variant="outlined"
+                sx={{ width: "100%" }}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
 
-            <TextEditor body={body} getBody={getBody} />
+            <div style={{ height: "85%", width: "100%" }}>
+              <TextEditor body={body} getBody={getBody} />
+            </div>
 
             <div>
               <Button

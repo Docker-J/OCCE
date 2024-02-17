@@ -1,5 +1,4 @@
 import {
-  CircularProgress,
   Divider,
   SpeedDial,
   SpeedDialAction,
@@ -13,14 +12,17 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { format } from "date-fns";
 
-import "../../NextGen/NextGen.css";
 import axios from "axios";
 import useSnackbar from "../../../util/useSnackbar";
 import { useState } from "react";
+import FullScreenLoading from "../../../common/FullScreenLoading";
+
+import "../../NextGen/NextGen.css";
+import "./content-styles.css";
 
 const titleBackground = {
   backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)), url("/img/Announcements.jpg")',
+    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)), url("/img/News/Announcements/Announcements.jpg")',
 };
 
 const Announcement = () => {
@@ -85,27 +87,8 @@ const Announcement = () => {
 
   return (
     <>
-      {isLoading && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            // background-color: rgba(0,0,0,0.5); /* Black background with opacity */
-            zIndex: 100,
-            backgroundColor: "rgba(0,0,0,0.5)",
-            height: "100%",
-            widht: "100%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <CircularProgress />
-        </div>
-      )}
+      {isLoading && <FullScreenLoading />}
+
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
@@ -134,7 +117,7 @@ const Announcement = () => {
           <Divider />
 
           <div
-            className="content"
+            className="ck-content"
             dangerouslySetInnerHTML={{
               __html: body,
             }}

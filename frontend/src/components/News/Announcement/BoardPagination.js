@@ -7,11 +7,11 @@ const BoardPagination = ({ pages }) => {
   return (
     <Pagination
       className="pagination"
-      count={pages}
+      count={pages === 0 ? 1 : pages}
       variant="outlined"
       color="primary"
       // hideNextButton={pages === 1}
-      // hidePrevButton={pages === numberOfAnnouncements}\
+      // hidePrevButton={pages === numberOfAnnouncements}
       sx={{
         margin: "auto",
         my: 4,

@@ -14,7 +14,7 @@ import useModals from "../../../util/useModal";
 
 const titleBackground = {
   backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)), url("/img/Announcements.jpg")',
+    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)),  url("/img/News/Announcements/Announcements.webp")',
 };
 
 const Announcements = () => {
@@ -41,8 +41,14 @@ const Announcements = () => {
 
       <div className="container-wrapper">
         <div className="container" style={{ maxWidth: "1200px" }}>
-          <BoardTable announcements={announcements} />
-          <BoardPagination pages={pages} />
+          {announcements.length === 0 ? (
+            <Typography align="center">게시물이 존재하지 않습니다.</Typography>
+          ) : (
+            <>
+              <BoardTable announcements={announcements} />
+              <BoardPagination pages={pages} />
+            </>
+          )}
         </div>
       </div>
 
