@@ -70,9 +70,8 @@ router.get("/GetBulletin", async (req, res) => {
 
     const result = await R2.send(command);
 
-    const pdf = await result.Body.transformToByteArray();
-
-    res.send(pdf);
+    res.setHeader("Content-Type", "application/pdf");
+    result.Body.pipe(res);
   } catch (error) {
     console.log(error);
     res.sendStatus(404);
