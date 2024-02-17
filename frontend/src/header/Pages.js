@@ -113,10 +113,10 @@ if (process.env.NODE_ENV === "development") {
       title: "교회소식",
       popupId: "newsPopupState",
       subpages: [
-        // {
-        //   title: "공지사항",
-        //   to: "announcements",
-        // },
+        {
+          title: "공지사항",
+          to: "announcements",
+        },
         {
           title: "주보",
           to: "weeklyupdate",
@@ -199,10 +199,10 @@ if (process.env.NODE_ENV === "development") {
           title: "중고등부",
           to: "nextgen/youth",
         },
-        {
-          title: "청년부",
-          to: "nextgen/youngadult",
-        },
+        // {
+        //   title: "청년부",
+        //   to: "nextgen/youngadult",
+        // },
       ],
     },
   ];
