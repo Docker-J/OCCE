@@ -7,13 +7,13 @@ export async function loader({ request }) {
     return redirect("?page=1");
   }
 
-  const getCount = await axios.get("/api/Announcements/getAnnouncementsCount");
+  // const getCount = await axios.get("/api/Announcements/getAnnouncementsCount");
   const getAnnouncements = await axios.get(
     `/api/Announcements/getAnnouncements?page=${page}`
   );
 
-  const count = getCount.data.count;
-  const announcements = getAnnouncements.data;
+  const count = getAnnouncements.data.count;
+  const announcements = getAnnouncements.data.announcements;
 
   return { count, announcements };
 }
