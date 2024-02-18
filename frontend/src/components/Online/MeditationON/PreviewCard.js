@@ -1,4 +1,4 @@
-import { IconButton } from "@mui/material";
+import { Avatar } from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
 import { useRef } from "react";
 
@@ -89,24 +89,25 @@ const PreviewCard = ({ id, image, index, movePhoto, removeImage }) => {
         src={image}
         alt="preview"
         style={{
-          display: "block",
           width: "auto",
           height: "100%",
         }}
       />
-      <IconButton
+      <Avatar
         sx={{
           position: "absolute",
-          display: "block",
           zIndex: 99,
-          top: 0,
-          right: 0,
-          backgroundColor: "orange",
+          top: 4,
+          right: 4,
+          backgroundColor: "#f57c00",
+          cursor: "pointer",
+          width: 30,
+          height: 30,
         }}
         onClick={() => removeImage(index)}
       >
-        <ClearIcon sx={{ color: "black" }} />
-      </IconButton>
+        <ClearIcon sx={{ color: "white" }} />
+      </Avatar>
     </div>
   );
 };
