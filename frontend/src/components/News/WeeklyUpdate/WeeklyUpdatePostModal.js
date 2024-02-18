@@ -11,8 +11,8 @@ import { useDropzone } from "react-dropzone";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Document, Page } from "react-pdf";
 import { add, endOfWeek, format } from "date-fns";
-import axios from "axios";
 import useSnackbar from "../../../util/useSnackbar";
+import { uploadWeeklyUpdate } from "../../../api/weeklyupdate";
 
 const style = {
   position: "absolute",
@@ -79,11 +79,8 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
       const date = format(selectedDate, "yyyyMMdd");
       form.append("images", fileToUpload);
       form.append("date", date);
-      await axios.put("/api/WeeklyUpdate/PostBulletin/", form, {
-        headers: {
-          "Content-Type": `multipart/form-data`,
-        },
-      });
+
+      await uploadWeeklyUpdate(form);
 
       openSnackbar("success", "Uploaded Succesfully!");
       setParentDate(selectedDate);

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
 
 import { CircularProgress, Fab, IconButton, Typography } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
@@ -29,6 +28,7 @@ import "./WeeklyUpdate.css";
 import "../../NextGen/NextGen.css";
 import useModals from "../../../util/useModal";
 import WeeklyUpdatePostModal from "../../../components/News/WeeklyUpdate/WeeklyUpdatePostModal";
+import { getWeeklyUpdate } from "../../../api/weeklyupdate";
 
 const titleBackground = {
   backgroundImage:
@@ -51,12 +51,7 @@ const WeeklyUpdate = () => {
   const loadFile = useCallback(async () => {
     setLoading(true);
     try {
-      const result = await axios.get("/api/WeeklyUpdate/GetBulletin", {
-        params: {
-          date: format(selectedDate, "yyyyMMdd"),
-        },
-        responseType: "arraybuffer",
-      });
+      const result = await getWeeklyUpdate(selectedDate);
 
       setBulletin(result.data);
     } catch (err) {
@@ -183,15 +178,13 @@ const WeeklyUpdate = () => {
       <AdminComponent>
         <Fab
           id="uploadBulletinButton"
-          variant="extended"
           onClick={() =>
             openModal(WeeklyUpdatePostModal, {
               setParentDate: setSelectedDate,
             })
           }
         >
-          <UploadIcon sx={{ mr: 1 }} />
-          Upload
+          <UploadIcon />
         </Fab>
       </AdminComponent>
     </>
