@@ -5,7 +5,6 @@ import {
   Modal,
   Typography,
 } from "@mui/material";
-import axios from "axios";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import update from "immutability-helper";
@@ -67,11 +66,7 @@ const MeditationONModal = ({ isOpen, onClose }) => {
     try {
       setLoading(true);
 
-      const result = await axios.post("/api/meditationON/uploadImage", form, {
-        headers: {
-          "Content-Type": `multipart/form-data`,
-        },
-      });
+      await uploadImages(form);
 
       openSnackbar("success", "Uploaded Succesfully!");
       handleClose();
@@ -156,7 +151,7 @@ const MeditationONModal = ({ isOpen, onClose }) => {
       // aria-labelledby="modal-modal-title"
       // aria-describedby="modal-modal-description"
     >
-      <Box sx={style} bgcolor="white">
+      <Box sx={style}>
         {loading ? (
           <CircularProgress />
         ) : (

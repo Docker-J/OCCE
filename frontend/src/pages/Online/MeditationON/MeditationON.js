@@ -11,7 +11,6 @@ import {
 
 import AddIcon from "@mui/icons-material/Add";
 
-import axios from "axios";
 import { MemoizedMeditationONComp } from "../../../components/Online/MeditationON/MeditationONImageListItem";
 import MeditationONModal from "../../../components/Online/MeditationON/MeditationONModal";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -20,6 +19,7 @@ import "../../NextGen/NextGen.css";
 import AdminComponent from "../../../common/AdminComponent";
 import Footer from "../../../header/Footer";
 import useModals from "../../../util/useModal";
+import { getPosts } from "../../../api/meditationon";
 
 const PAGE_SIZE = 12;
 const titleBackground = {
@@ -36,18 +36,10 @@ const MeditationON = () => {
   const [end, setEnd] = useState(false);
   const [restored, setRestored] = useState(null);
 
-  const getPosts = async () => {
+  const onLoad = async () => {
     console.log("test getPosts");
 
-    const result = await axios.get(
-      `/api/MeditationON/getPosts${
-        posts.length === 0
-          ? ""
-          : `?lastVisible=${posts.at(-1).ID}&timeStamp=${
-              posts.at(-1).Timestamp
-            }`
-      }`
-    );
+    const result = await getPosts(posts);
 
     if (result.data.length > 0) {
       setPosts((prev) => [...prev, ...result.data]);
@@ -76,7 +68,7 @@ const MeditationON = () => {
 
   useEffect(() => {
     if (restored !== null && !restored) {
-      getPosts();
+      onLoad();
     }
   }, [restored]);
 
@@ -99,7 +91,7 @@ const MeditationON = () => {
           console.log("test screen", screenHeight);
 
           if (contentHeight > 100 && contentHeight < screenHeight) {
-            getPosts();
+            onLoad();
           }
         } catch (error) {}
       }, 500);
@@ -136,7 +128,7 @@ const MeditationON = () => {
           ) : (
             <InfiniteScroll
               dataLength={posts.length}
-              next={getPosts}
+              next={onLoad}
               hasMore={!end}
               loader={
                 <Stack alignItems="center">
