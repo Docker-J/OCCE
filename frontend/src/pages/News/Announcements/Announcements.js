@@ -90,7 +90,6 @@ const Announcements = () => {
 
       <AdminComponent>
         <Fab
-          variant="primary"
           style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
           onClick={() =>
             openModal(AnnouncementPostModal, {
