@@ -19,7 +19,6 @@ import BoardPagination from "../../../components/News/Announcement/BoardPaginati
 import useModals from "../../../util/useModal";
 import AdminComponent from "../../../common/AdminComponent";
 import { Suspense } from "react";
-import FullScreenLoading from "../../../common/FullScreenLoading";
 
 const titleBackground = {
   backgroundImage:

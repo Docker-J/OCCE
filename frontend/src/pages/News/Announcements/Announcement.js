@@ -12,7 +12,6 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { format } from "date-fns";
 
-import axios from "axios";
 import useSnackbar from "../../../util/useSnackbar";
 import { useState } from "react";
 import FullScreenLoading from "../../../common/FullScreenLoading";
@@ -22,6 +21,10 @@ import "./content-styles.css";
 import AdminComponent from "../../../common/AdminComponent";
 import useModals from "../../../util/useModal";
 import AnnouncementPostModal from "../../../components/News/Announcement/AnnouncementPostModal";
+import {
+  deleteAnnouncement,
+  pinAnnouncement,
+} from "../../../api/announcements";
 
 const titleBackground = {
   backgroundImage:
@@ -37,14 +40,11 @@ const Announcement = () => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const pinAnnouncement = async () => {
+  const onPin = async () => {
     setIsLoading(true);
 
     try {
-      await axios.put("/api/Announcements/pinAnnouncement", {
-        id: id,
-        pin: pin ? 0 : 1,
-      });
+      await pinAnnouncement(id, pin);
 
       revalidator.revalidate();
       openSnackbar(
@@ -61,15 +61,15 @@ const Announcement = () => {
     }
   };
 
-  const deleteAnnouncement = async () => {
+  const onDelete = async () => {
     setIsLoading(true);
 
     try {
-      await axios.delete(`/api/Announcements/deleteAnnouncement?id=${id}`);
+      await deleteAnnouncement(id);
 
       openSnackbar("success", "The announcement is successfully deleted!");
       navigate("/announcements");
-    } catch (error) {
+    } catch {
       openSnackbar(
         "error",
         "Error Occured. Please contact to the administrator."
@@ -94,9 +94,9 @@ const Announcement = () => {
     {
       icon: pin ? <PushPinIcon /> : <PushPinOutlinedIcon />,
       name: pin ? "Unpin" : "Pin",
-      onClick: pinAnnouncement,
+      onClick: onPin,
     },
-    { icon: <DeleteIcon />, name: "Delete", onClick: deleteAnnouncement },
+    { icon: <DeleteIcon />, name: "Delete", onClick: onDelete },
   ];
 
   return (

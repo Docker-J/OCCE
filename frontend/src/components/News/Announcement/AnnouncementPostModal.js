@@ -2,8 +2,8 @@ import { Box, Button, CircularProgress, Modal, TextField } from "@mui/material";
 import TextEditor from "./TextEditor";
 import { useState } from "react";
 
-import axios from "axios";
 import useSnackbar from "../../../util/useSnackbar";
+import { postAnnouncement } from "../../../api/announcements";
 
 const style = {
   position: "absolute",
@@ -37,61 +37,10 @@ const AnnouncementPostModal = ({
   const [title, setTitle] = useState(origTitle);
   const [body, setBody] = useState(origBody);
 
-  function dataURLtoBlob(dataurl) {
-    var arr = dataurl.split(","),
-      mime = arr[0].match(/:(.*?);/)[1],
-      bstr = atob(arr[1]),
-      n = bstr.length,
-      u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new Blob([u8arr], { type: mime });
-  }
-
-  const uploadImage = async (file) => {
-    var blob = dataURLtoBlob(file);
-    const form = new FormData();
-    form.append("image", blob, "image.jpg");
-
-    const result = await axios.post("/api/Announcements/uploadImage", form, {
-      headers: {
-        "Content-Type": `multipart/form-data`,
-      },
-    });
-
-    return result.data;
-  };
-
-  const postAnnouncement = async () => {
+  const onSubmit = async () => {
     setLoading(true);
     try {
-      let modifiedBody = body;
-      const regex = /(<img[^>]+src=")([^">]+)"/g;
-
-      let match;
-      const images = [];
-      while ((match = regex.exec(body)) !== null) {
-        const imageID = await uploadImage(match[2]);
-        images.push(imageID);
-
-        modifiedBody = modifiedBody.replace(
-          match[0],
-          `${match[1]}https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${imageID}/Announcements"`
-        );
-      }
-
-      await axios.put(
-        id
-          ? "/api/Announcements/editAnnouncement"
-          : "/api/Announcements/postAnnouncement",
-        {
-          id: id ? id : null,
-          title: title,
-          body: modifiedBody,
-          images: images,
-        }
-      );
+      await postAnnouncement(id, title, body);
 
       revalidator();
       openSnackbar("success", "The announcement is successfully posted!");
@@ -113,7 +62,7 @@ const AnnouncementPostModal = ({
 
   return (
     <Modal open={isOpen} onClose={handleClose} disableEnforceFocus={true}>
-      <Box sx={style} bgcolor="white">
+      <Box sx={style}>
         {loading ? (
           <CircularProgress />
         ) : (
@@ -137,7 +86,7 @@ const AnnouncementPostModal = ({
               <Button
                 variant="outlined"
                 disabled={title.trim() === "" || body.trim() === ""}
-                onClick={postAnnouncement}
+                onClick={onSubmit}
               >
                 Post
               </Button>

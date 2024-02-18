@@ -56,6 +56,22 @@ const getPINNED_ANNOUNCEMENTS = async () => {
   }
 };
 
+const deleteImage = async (images) => {
+  try {
+    images.forEach(
+      async (image) =>
+        await axios.delete(
+          `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1/${image}`,
+          {
+            headers: {
+              Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
+            },
+          }
+        )
+    );
+  } catch {}
+};
+
 // router.get("/getAnnouncementsCount", async (req, res) => {
 //   if (!ANNOUNCEMENTS_COUNT) {
 //     await getAnnouncementsCount();
@@ -165,16 +181,7 @@ router.put("/editAnnouncement", async (req, res) => {
       (item) => !req.body.images.includes(item)
     );
 
-    missingImages.forEach(async (image) => {
-      await axios.delete(
-        `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1/${image}`,
-        {
-          headers: {
-            Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
-          },
-        }
-      );
-    });
+    await deleteImage(missingImages);
   } catch {}
 
   const data = {
@@ -248,16 +255,7 @@ router.delete("/deleteAnnouncement", async (req, res) => {
       ? result.data.result[0].results[0].images.split(",")
       : [];
 
-    images.forEach(async (image) => {
-      await axios.delete(
-        `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1/${image}`,
-        {
-          headers: {
-            Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
-          },
-        }
-      );
-    });
+    await deleteImage(images);
 
     await axios.post(URL, deleteAnnouncementQuery, {
       headers: {
