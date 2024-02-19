@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
-import { format, isSunday } from "date-fns";
+import { format } from "date-fns";
 
 const ButtonField = (props) => {
   const {
@@ -31,6 +31,7 @@ const ButtonField = (props) => {
 
 const ButtonDatePicker = (props) => {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const { disableDate, ...restProps } = props;
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -40,10 +41,10 @@ const ButtonDatePicker = (props) => {
           field: { setIsDatePickerOpen },
           popper: { placement: "bottom" },
         }}
-        {...props}
+        {...restProps}
         open={isDatePickerOpen}
         onClose={() => setIsDatePickerOpen(false)}
-        shouldDisableDate={(date) => !isSunday(date)}
+        shouldDisableDate={(date) => disableDate && disableDate(date)}
         disableHighlightToday
       />
     </LocalizationProvider>

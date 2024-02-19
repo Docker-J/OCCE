@@ -6,11 +6,11 @@ import {
   Modal,
   Typography,
 } from "@mui/material";
-import ButtonDatePicker from "./ButtonDatePicker";
+import ButtonDatePicker from "../../../common/ButtonDatePicker";
 import { useDropzone } from "react-dropzone";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Document, Page } from "react-pdf";
-import { add, endOfWeek, format } from "date-fns";
+import { add, endOfWeek, format, isSunday } from "date-fns";
 import useSnackbar from "../../../util/useSnackbar";
 import { uploadWeeklyUpdate } from "../../../api/weeklyupdate";
 
@@ -111,6 +111,7 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
               value={selectedDate}
               minDate={new Date(MIN_DATE)}
               onChange={setSelectedDate}
+              disableDate={(date) => !isSunday(date)}
             />
 
             <div ref={test} style={{ height: "60%" }}>

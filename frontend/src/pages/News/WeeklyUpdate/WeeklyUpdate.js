@@ -7,7 +7,7 @@ import UploadIcon from "@mui/icons-material/Upload";
 
 import { isMobile } from "react-device-detect";
 
-import ButtonDatePicker from "../../../components/News/WeeklyUpdate/ButtonDatePicker";
+import ButtonDatePicker from "../../../common/ButtonDatePicker";
 import PDFReader from "../../../components/News/WeeklyUpdate/PDFReader";
 
 import { useLoaderData, useNavigate } from "react-router-dom";
@@ -150,6 +150,7 @@ const WeeklyUpdate = () => {
               minDate={minDate}
               maxDate={maxDate}
               onChange={setSelectedDate}
+              disableDate={(date) => !isSunday(date)}
             />
 
             <IconButton
