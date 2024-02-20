@@ -63,7 +63,6 @@ router.get("/getPostDetail", async (req, res) => {
   try {
     const scanParam = {
       TableName: TABLENAME,
-      Limit: PAGE_SIZE,
       ProjectionExpression: "Images",
       KeyConditionExpression: "ID = :postID",
       ExpressionAttributeValues: {
