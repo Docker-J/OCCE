@@ -11,63 +11,55 @@ import {
 
 import AddIcon from "@mui/icons-material/Add";
 
-import axios from "axios";
-import { MemoizedMeditationONComp } from "./MeditationONComp";
-
 import InfiniteScroll from "react-infinite-scroll-component";
 import useModals from "../../../util/useModal";
 import AdminComponent from "../../../common/AdminComponent";
 import Footer from "../../../header/Footer";
 
 import "../../NextGen/NextGen.css";
-import PhotosUploadModal from "./PhotosUploadModal";
+import { getAlbums } from "../../../api/albums";
+import AlbumUploadModal from "./AlbumUploadModal";
+
+import { MemoizedMeditationONComp } from "./MeditationONImageListItem";
+import ButtonYearPicker from "../../../common/ButtonYearPicker";
 
 const PAGE_SIZE = 12;
 
 const titleBackground = {
   backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)), url("/img/WeeklyUpdate.jpg")',
+    'linear-gradient(rgba(0, 0, 0, 0.40), rgba(0, 0, 0, 0.40)), url("/img/News/Albums/Albums.jpg")',
 };
 
-const Photos = () => {
+const Albums = () => {
   const matches = useMediaQuery("(min-width:1200px)");
   const { openModal } = useModals();
 
-  const [photos, setPhotos] = useState([]);
+  const [selectedYear, setSelectedYear] = useState(null);
+  const [albums, setAlbums] = useState([]);
   const [end, setEnd] = useState(false);
   const [restored, setRestored] = useState(true);
 
   const getPhotos = async () => {
-    console.log("test getPosts");
-
-    const result = await axios.get(
-      `/api/photos/getPhotos${
-        photos.length === 0
-          ? ""
-          : `?lastVisible=${photos.at(-1).id}&timeStamp=${
-              photos.at(-1).Timestamp
-            }`
-      }`
-    );
+    const result = await getAlbums(albums);
 
     if (result.data.length > 0) {
-      setPhotos((prev) => [...prev, ...result.data]);
+      setAlbums((prev) => [...prev, ...result.data]);
     } else {
       setEnd(true);
     }
   };
 
   useEffect(() => {
-    if (photos.length % PAGE_SIZE !== 0) {
+    if (albums.length % PAGE_SIZE !== 0) {
       setEnd(true);
     }
-  }, [photos]);
+  }, [albums]);
 
   useEffect(() => {
     window.onpopstate = () => {
       setRestored(true);
       console.log("test restore");
-      setPhotos(JSON.parse(sessionStorage.getItem("posts")));
+      setAlbums(JSON.parse(sessionStorage.getItem("albums")));
     };
     setRestored(false);
     return () => {
@@ -83,14 +75,14 @@ const Photos = () => {
 
   useEffect(() => {
     return () => {
-      sessionStorage.setItem("photos", JSON.stringify(photos));
+      sessionStorage.setItem("albums", JSON.stringify(albums));
     };
   });
 
   const scrollRef = useRef();
 
   useEffect(() => {
-    if (scrollRef.current && !end && photos.length >= 12) {
+    if (scrollRef.current && !end && albums.length >= 12) {
       setTimeout(() => {
         try {
           const contentHeight = scrollRef.current.clientHeight;
@@ -107,7 +99,7 @@ const Photos = () => {
     }
 
     // re-run effect when items change
-  }, [photos]);
+  }, [albums]);
 
   return (
     <>
@@ -120,27 +112,41 @@ const Photos = () => {
           >
             교회사진
           </Typography>
+          <ButtonYearPicker
+            sx={{ mt: 2 }}
+            value={selectedYear}
+            minDate={new Date("2022/04/03")}
+            maxDate={new Date()}
+            onChange={setSelectedYear}
+          />
         </div>
       </div>
 
       <div className="container-wrapper">
         <div className="container">
-          {photos.length === 0 ? (
+          {albums.length <= 0 ? (
             <Stack alignItems="center">
               <CircularProgress />
             </Stack>
           ) : (
             <InfiniteScroll
-              dataLength={photos.length}
+              dataLength={albums.length}
               next={getPhotos}
               hasMore={!end}
-              loader={<CircularProgress />}
+              loader={
+                <Stack alignItems="center">
+                  <CircularProgress />
+                </Stack>
+              }
               scrollThreshold={1}
               style={{ overflowY: "hidden" }}
             >
               {
                 <ImageList ref={scrollRef} cols={matches ? 4 : 3} gap={2.5}>
-                  <MemoizedMeditationONComp photos={photos} />
+                  <MemoizedMeditationONComp
+                    posts={albums}
+                    cols={matches ? 4 : 3}
+                  />
                 </ImageList>
               }
             </InfiniteScroll>
@@ -148,19 +154,17 @@ const Photos = () => {
         </div>
       </div>
 
-      <AdminComponent>
-        <Fab
-          variant="primary"
-          style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
-          onClick={() => openModal(PhotosUploadModal, {})}
-        >
-          <AddIcon />
-        </Fab>
-      </AdminComponent>
+      <Fab
+        variant="primary"
+        style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
+        onClick={() => openModal(AlbumUploadModal, {})}
+      >
+        <AddIcon />
+      </Fab>
 
       {end && <Footer />}
     </>
   );
 };
 
-export default Photos;
+export default Albums;

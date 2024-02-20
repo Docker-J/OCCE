@@ -32,13 +32,16 @@ const GoogleMap = memo(() => {
       <APIProvider apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
         <Map
           // styles={mapStyle}
-          ref={markerRef}
           defaultCenter={center}
           defaultZoom={14}
           disableDefaultUI={true}
           mapId="96730a2a3f5e9934"
         >
-          <AdvancedMarker position={center} onClick={toggleInfoWindow}>
+          <AdvancedMarker
+            ref={markerRef}
+            position={center}
+            onClick={toggleInfoWindow}
+          >
             <img
               alt="OCCE Circle Logo"
               height={30}

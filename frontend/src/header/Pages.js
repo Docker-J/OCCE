@@ -24,7 +24,7 @@ if (process.env.NODE_ENV === "development") {
         },
         {
           title: "교회사진",
-          to: "photos",
+          to: "albums",
         },
         // {
         //   title: "교회영상",

@@ -40,8 +40,8 @@ const WeeklyUpdate = lazy(() =>
   import("./pages/News/WeeklyUpdate/WeeklyUpdate")
 );
 const NewComers = lazy(() => import("./pages/News/NewComers/NewComers"));
-const Photos = lazy(() => import("./pages/News/Photos/Photos"));
-const AlbumPhotos = lazy(() => import("./pages/News/Photos/AlbumPhotos"));
+const Albums = lazy(() => import("./pages/News/Albums/Albums"));
+const AlbumPhotos = lazy(() => import("./pages/News/Albums/AlbumPhotos"));
 
 // Online
 const SundayService = lazy(() => import("./pages/Online/SundayService"));
@@ -132,11 +132,11 @@ const router = createBrowserRouter([
         shouldRevalidate: () => false,
       },
       // {
-      //   path: "/photos",
-      //   element: <Photos />,
+      //   path: "/albums",
+      //   element: <Albums />,
       // },
       {
-        path: "/photos/:albumID",
+        path: "/albums/:albumID",
         element: <AlbumPhotos />,
         loader: AlbumPhotosLoader,
       },
@@ -223,8 +223,8 @@ const router = createBrowserRouter([
     element: <HeaderWrapper />,
     children: [
       {
-        path: "/photos",
-        element: <Photos />,
+        path: "/albums",
+        element: <Albums />,
       },
       {
         path: "/online/meditationON",

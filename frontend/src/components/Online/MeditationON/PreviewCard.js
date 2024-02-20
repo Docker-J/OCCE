@@ -4,7 +4,15 @@ import { useRef } from "react";
 
 import { useDrag, useDrop } from "react-dnd";
 
-const PreviewCard = ({ id, image, index, movePhoto, removeImage }) => {
+const PreviewCard = ({
+  id,
+  image,
+  index,
+  cover,
+  setCoverImage,
+  movePhoto,
+  removeImage,
+}) => {
   const ref = useRef(null);
 
   const [{ isDragging }, drag] = useDrag({
@@ -57,6 +65,7 @@ const PreviewCard = ({ id, image, index, movePhoto, removeImage }) => {
       }
       // Time to actually perform the action
       movePhoto(dragIndex, hoverIndex);
+      setCoverImage(hoverIndex);
       // Note: we're mutating the monitor item here!
       // Generally it's better to avoid mutations,
       // but it's good here for the sake of performance
@@ -72,18 +81,18 @@ const PreviewCard = ({ id, image, index, movePhoto, removeImage }) => {
       ref={ref}
       style={{
         position: "relative",
-        display: "inline-flex",
         borderRadius: 2,
-        border: "1px solid #eaeaea",
+        border: cover ? "5px solid #4bb543" : "1px solid #eaeaea",
         marginBottom: 8,
-        marginRight: 8,
-        width: "calc(90%/3)",
+        marginRight: index % 3 !== 2 ? "calc(2%/2)" : 0,
+        width: "calc(97%/3)",
         aspectRatio: "1/1",
         boxSizing: "border-box",
         cursor: "move",
         opacity,
         overflow: "hidden",
       }}
+      onClick={() => setCoverImage(index)}
     >
       <img
         src={image}
@@ -91,6 +100,7 @@ const PreviewCard = ({ id, image, index, movePhoto, removeImage }) => {
         style={{
           width: "auto",
           height: "100%",
+          objectFit: "cover",
         }}
       />
       <Avatar
