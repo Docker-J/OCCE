@@ -21,7 +21,6 @@
     "axios": "^1.6.7",
     "browser-image-compression": "^2.0.2",
     "ckeditor5-custom-build": "file:ckeditor5",
-    "ckeditor5-image-remove-event-callback-plugin": "^1.2.0",
     "date-fns": "^3.3.1",
     "dotenv": "^16.4.1",
     "file": "^0.2.2",
