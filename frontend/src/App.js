@@ -86,7 +86,9 @@ const HeaderFooterWrapper = () => {
             flexGrow: 1,
           }}
         >
-          <Outlet />
+          <Suspense>
+            <Outlet />
+          </Suspense>
         </div>
         <Footer />
       </div>

@@ -3,6 +3,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { ListItemIcon, Menu, MenuItem, Typography } from "@mui/material";
 import HoverMenu from "material-ui-popup-state/HoverMenu";
 import {
+  bindFocus,
   bindHover,
   bindMenu,
   usePopupState,
@@ -20,7 +21,7 @@ export const CascadingMenu = ({ popupState, ...props }) => {
   const context = useMemo(
     () => ({
       rootPopupState: rootPopupState || popupState,
-      parentPopupState: popupState,
+      popupState: popupState,
     }),
     [rootPopupState, popupState]
   );
@@ -49,43 +50,42 @@ export const CascadingHoverMenu = ({ popupState, ...props }) => {
   );
 };
 
-export const CascadingMenuItem = ({ onClick, ...props }) => {
-  const { rootPopupState, parentPopupState } = useContext(CascadingContext);
+export const CascadingMenuItem = (props) => {
+  const { rootPopupState } = useContext(CascadingContext);
   if (!rootPopupState) throw new Error("must be used inside a CascadingMenu");
   const handleClick = useCallback(
     (event) => {
-      parentPopupState.close(event);
       rootPopupState.close(event);
-      if (onClick) onClick(event);
     },
-    [rootPopupState, parentPopupState, onClick]
+    [rootPopupState]
   );
 
   return (
     <MenuItem
       {...props}
       sx={{ py: 1.8 }}
-      component={props.page.to && Link}
+      component={Link}
       to={props.page.to}
+      // onBlur={handleClick}
       onClick={handleClick}
     />
   );
 };
 
 export const CascadingSubmenu = ({ title, popupId, ...props }) => {
-  //   const classes = useCascadingMenuStyles()
   const { parentPopupState } = useContext(CascadingContext);
   const popupState = usePopupState({
     popupId: props.page.popupId,
     variant: "popover",
     parentPopupState,
   });
+
   return (
     <>
       <MenuItem
         sx={{ py: 1.8 }}
-        onBlur={popupState.close}
         {...bindHover(popupState)}
+        {...bindFocus(popupState)}
       >
         <Typography sx={{ fontSize: "13pt" }}>{props.page.title}</Typography>
         <ListItemIcon>
@@ -97,7 +97,7 @@ export const CascadingSubmenu = ({ title, popupId, ...props }) => {
             ))}
         </ListItemIcon>
       </MenuItem>
-      <CascadingHoverMenu
+      <CascadingMenu
         {...props}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "left" }}

@@ -66,7 +66,7 @@ const ResponsiveAppBar = () => {
 
   const popupState = usePopupState({
     variant: "popover",
-    popupId: "menu",
+    popupId: "menuPopupState",
   });
 
   const userPopupState = usePopupState({
@@ -190,8 +190,6 @@ const ResponsiveAppBar = () => {
               sx={{
                 display: { xs: "block", md: "none" },
               }}
-              disableScrollLock
-              keepMounted
             >
               {pages.map((page) => (
                 <SubmenuMobile key={page.title} page={page} />
@@ -245,7 +243,6 @@ const ResponsiveAppBar = () => {
                 vertical: "top",
                 horizontal: "right",
               }}
-              keepMounted
               transformOrigin={{
                 vertical: "top",
                 horizontal: "right",
