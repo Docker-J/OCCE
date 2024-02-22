@@ -29,43 +29,112 @@ import Footer from "./header/Footer";
 // const Main = lazy(() => import("./pages/Main/Main"));
 // const About = lazy(() => import("./pages/About/About"));
 
+// a function to retry loading a chunk to avoid chunk load error for out of date code
+const lazyRetry = function(componentImport, name) {
+  return new Promise((resolve, reject) => {
+    // check if the window has already been refreshed
+    const hasRefreshed = JSON.parse(
+      window.sessionStorage.getItem(`retry-${name}-refreshed`) || "false"
+    );
+    // try to import the component
+    componentImport()
+      .then((component) => {
+        window.sessionStorage.setItem(`retry-${name}-refreshed`, "false"); // success so reset the refresh
+        resolve(component);
+      })
+      .catch((error) => {
+        if (!hasRefreshed) {
+          // not been refreshed yet
+          window.sessionStorage.setItem(`retry-${name}-refreshed`, "true"); // we are now going to refresh
+          return window.location.reload(); // refresh the page
+        }
+        reject(error); // Default error behaviour as already tried refresh
+      });
+  });
+};
+
 // News
 const Announcements = lazy(() =>
-  import("./pages/News/Announcements/Announcements")
+  lazyRetry(
+    () => import("./pages/News/Announcements/Announcements"),
+    "Announcements"
+  )
 );
 const Announcement = lazy(() =>
-  import("./pages/News/Announcements/Announcement")
+  lazyRetry(
+    () => import("./pages/News/Announcements/Announcement"),
+    "Announcement"
+  )
 );
 const WeeklyUpdate = lazy(() =>
-  import("./pages/News/WeeklyUpdate/WeeklyUpdate")
+  lazyRetry(
+    () => import("./pages/News/WeeklyUpdate/WeeklyUpdate"),
+    "WeeklyUpdate"
+  )
 );
-const NewComers = lazy(() => import("./pages/News/NewComers/NewComers"));
-const Albums = lazy(() => import("./pages/News/Albums/Albums"));
-const AlbumPhotos = lazy(() => import("./pages/News/Albums/AlbumPhotos"));
+const NewComers = lazy(() =>
+  lazyRetry(() => import("./pages/News/NewComers/NewComers"), "NewComers")
+);
+const Albums = lazy(() =>
+  lazyRetry(() => import("./pages/News/Albums/Albums"), "Albums")
+);
+const AlbumPhotos = lazy(() =>
+  lazyRetry(() => import("./pages/News/Albums/AlbumPhotos"), "AlbumPhotos")
+);
 
 // Online
-const SundayService = lazy(() => import("./pages/Online/SundayService"));
-const Sermon = lazy(() => import("./pages/Online/Sermon"));
-const Worship = lazy(() => import("./pages/Online/Worship"));
-const DawnQT = lazy(() => import("./pages/Online/DawnQT"));
-const PrayON = lazy(() => import("./pages/Online/PrayON"));
+const SundayService = lazy(() =>
+  lazyRetry(() => import("./pages/Online/SundayService"), "SundayService")
+);
+const Sermon = lazy(() =>
+  lazyRetry(() => import("./pages/Online/Sermon"), "Sermon")
+);
+const Worship = lazy(() =>
+  lazyRetry(() => import("./pages/Online/Worship"), "Worship")
+);
+const DawnQT = lazy(() =>
+  lazyRetry(() => import("./pages/Online/DawnQT"), "DawnQT")
+);
+const PrayON = lazy(() =>
+  lazyRetry(() => import("./pages/Online/PrayON"), "PrayON")
+);
 const MeditationON = lazy(() =>
-  import("./pages/Online/MeditationON/MeditationON")
+  lazyRetry(
+    () => import("./pages/Online/MeditationON/MeditationON"),
+    "MeditationON"
+  )
 );
 const MeditationONPost = lazy(() =>
-  import("./pages/Online/MeditationON/MeditationONPost")
+  lazyRetry(
+    () => import("./pages/Online/MeditationON/MeditationONPost"),
+    "MeditationONPost"
+  )
 );
-const Bible291 = lazy(() => import("./pages/Online/Bible291"));
+const Bible291 = lazy(() =>
+  lazyRetry(() => import("./pages/Online/Bible291"), "Bible291")
+);
 
 // Community
-const SmallGroup = lazy(() => import("./pages/Community/SmallGroup"));
-const Ministry = lazy(() => import("./pages/Community/Ministry"));
+const SmallGroup = lazy(() =>
+  lazyRetry(() => import("./pages/Community/SmallGroup"), "SmallGroup")
+);
+const Ministry = lazy(() =>
+  lazyRetry(() => import("./pages/Community/Ministry"), "Ministry")
+);
 
 // NextGen
-const Preschool = lazy(() => import("./pages/NextGen/Preschool"));
-const Elementary = lazy(() => import("./pages/NextGen/Elementary"));
-const Youth = lazy(() => import("./pages/NextGen/Youth/Youth"));
-const YoungAdult = lazy(() => import("./pages/NextGen/YoungAdult"));
+const Preschool = lazy(() =>
+  lazyRetry(() => import("./pages/NextGen/Preschool"), "Preschool")
+);
+const Elementary = lazy(() =>
+  lazyRetry(() => import("./pages/NextGen/Elementary"), "Elementary")
+);
+const Youth = lazy(() =>
+  lazyRetry(() => import("./pages/NextGen/Youth/Youth"), "Youth")
+);
+const YoungAdult = lazy(() =>
+  lazyRetry(() => import("./pages/NextGen/YoungAdult"), "YoungAdult")
+);
 
 const HeaderFooterWrapper = () => {
   return (
