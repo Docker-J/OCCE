@@ -51,40 +51,40 @@ const Announcements = () => {
 
       <div className="container-wrapper">
         <div className="container" style={{ maxWidth: "1200px" }}>
-          {state === "loading" ? (
+          {state === "loading" && (
             <div style={{ display: "flex", justifyContent: "center" }}>
               <CircularProgress />
             </div>
-          ) : (
-            <Suspense
-              fallback={
-                <div style={{ display: "flex", justifyContent: "center" }}>
-                  <CircularProgress />
-                </div>
-              }
-            >
-              <Await
-                resolve={data.announcementsData}
-                errorElement={<p>Error loading package location!</p>}
-              >
-                {({ data }) => {
-                  return data.announcements.length === 0 ? (
-                    <Typography align="center">
-                      게시물이 존재하지 않습니다.
-                    </Typography>
-                  ) : (
-                    <>
-                      <BoardTable announcements={data.announcements} />
-                      <BoardPagination
-                        pages={Math.ceil(data.count / 10)}
-                        currentPage={page}
-                      />
-                    </>
-                  );
-                }}
-              </Await>
-            </Suspense>
           )}
+
+          <Suspense
+            fallback={
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <CircularProgress />
+              </div>
+            }
+          >
+            <Await
+              resolve={data.announcementsData}
+              errorElement={<p>Error loading package location!</p>}
+            >
+              {({ data }) => {
+                return data.announcements.length === 0 ? (
+                  <Typography align="center">
+                    게시물이 존재하지 않습니다.
+                  </Typography>
+                ) : (
+                  <>
+                    <BoardTable announcements={data.announcements} />
+                    <BoardPagination
+                      pages={Math.ceil(data.count / 10)}
+                      currentPage={page}
+                    />
+                  </>
+                );
+              }}
+            </Await>
+          </Suspense>
         </div>
       </div>
 
