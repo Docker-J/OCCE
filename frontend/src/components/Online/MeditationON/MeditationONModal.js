@@ -15,6 +15,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 
 import PreviewCard from "./PreviewCard";
 import useSnackbar from "../../../util/useSnackbar";
+import { uploadImages } from "../../../api/meditationon";
 
 const style = {
   position: "absolute",
@@ -56,7 +57,7 @@ const MeditationONModal = ({ isOpen, onClose }) => {
     });
   };
 
-  const uploadImages = async () => {
+  const onSubmit = async () => {
     const form = new FormData();
 
     filesToUpload.forEach((image) => {
@@ -210,7 +211,7 @@ const MeditationONModal = ({ isOpen, onClose }) => {
               <Button
                 variant="outlined"
                 disabled={filesToUpload.length <= 0}
-                onClick={uploadImages}
+                onClick={onSubmit}
               >
                 Submit
               </Button>
