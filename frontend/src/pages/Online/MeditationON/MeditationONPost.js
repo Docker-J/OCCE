@@ -1,6 +1,6 @@
 import { useLoaderData } from "react-router-dom";
 
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 import CustomCarousel from "../../../common/CustomCarousel";
 import "../../NextGen/NextGen.css";
@@ -28,7 +28,12 @@ const MeditationONPost = () => {
       </div>
 
       <div className="container-wrapper">
-        <div className="container">
+        <Box
+          className="container"
+          sx={{
+            p: { xs: "0 !important", md: "1.5em !important" },
+          }}
+        >
           <div
             className="carousel-container"
             style={{
@@ -36,8 +41,8 @@ const MeditationONPost = () => {
               // flexDirection: "row",
               // alignItems: "center",
               position: "relative",
-              width: "95%",
-              maxWidth: "800px",
+              maxWidth: "900px",
+              width: "100%",
               left: "50%",
               transform: "translateX(-50%)",
             }}
@@ -62,7 +67,7 @@ const MeditationONPost = () => {
               })}
             </CustomCarousel>
           </div>
-        </div>
+        </Box>
       </div>
     </>
   );

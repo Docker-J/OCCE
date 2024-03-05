@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 import {
+  Box,
   CircularProgress,
   Fab,
   ImageList,
@@ -115,10 +116,14 @@ const MeditationON = () => {
       </div>
 
       <div className="container-wrapper">
-        <div
+        <Box
           className="container"
-          style={{
-            padding: "0em 0.2em",
+          // style={{
+          //   padding: "0em 0.2em",
+          // }}
+          sx={{
+            px: { xs: "0 !important", md: "1.5em !important" },
+            py: "0 !important",
           }}
         >
           {posts.length <= 0 ? (
@@ -139,13 +144,13 @@ const MeditationON = () => {
               style={{ overflowY: "hidden" }}
             >
               {
-                <ImageList ref={scrollRef} cols={matches ? 4 : 3} gap={2.5}>
+                <ImageList ref={scrollRef} cols={matches ? 4 : 3} gap={3}>
                   <MemoizedMeditationONComp posts={posts} />
                 </ImageList>
               }
             </InfiniteScroll>
           )}
-        </div>
+        </Box>
       </div>
 
       <AdminComponent>

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const getAlbums = async (albums) => {
+export const getAlbums = async (albums, year) => {
   try {
     return await axios.get(
       `/api/albums/getAlbums${

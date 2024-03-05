@@ -22,6 +22,7 @@ import AlbumUploadModal from "./AlbumUploadModal";
 
 import { MemoizedMeditationONComp } from "./MeditationONImageListItem";
 import ButtonYearPicker from "../../../common/ButtonYearPicker";
+import { useNavigate } from "react-router-dom";
 
 const PAGE_SIZE = 12;
 
@@ -32,12 +33,19 @@ const titleBackground = {
 
 const Albums = () => {
   const matches = useMediaQuery("(min-width:1200px)");
+  const navigate = useNavigate();
   const { openModal } = useModals();
 
   const [selectedYear, setSelectedYear] = useState(null);
   const [albums, setAlbums] = useState([]);
   const [end, setEnd] = useState(false);
   const [restored, setRestored] = useState(true);
+
+  useEffect(() => {
+    selectedYear
+      ? navigate(`?year=${selectedYear.getFullYear()}`)
+      : navigate("");
+  }, [selectedYear]);
 
   const getPhotos = async () => {
     const result = await getAlbums(albums);
