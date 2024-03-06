@@ -32,7 +32,7 @@ export const ServiceAndGatheringInfo = [
   {
     title: "중고등부 주일활동",
     time: "오후 4시",
-    place: "Sunday School Room",
+    place: "Fireside Room",
   },
   {
     title: "청년부 주일 모임",
