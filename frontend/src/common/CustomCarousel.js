@@ -5,6 +5,7 @@ import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
 import styles from "react-responsive-carousel/lib/styles/carousel.min.css";
+import "./CustomCarousel.css";
 import { memo } from "react";
 
 const Indicator = ({ isSelected, clickHandler }) => {

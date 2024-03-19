@@ -1,10 +1,33 @@
 import { Typography } from "@mui/material";
 import "./NextGen.css";
+import InfoCard from "../../components/NextGen/InfoCard";
+import MinistriesCards from "../../components/NextGen/MinistriesCards";
 
 const titleBackground = {
   backgroundImage:
     'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/NextGen/KidsOntheTree.webp")',
 };
+
+const imgs = [
+  { src: "/img/NextGen/Elementary/1.jpg" },
+  { src: "/img/NextGen/Elementary/2.jpg" },
+  { src: "/img/NextGen/Elementary/3.jpg" },
+  { src: "/img/NextGen/Elementary/4.jpg" },
+  { src: "/img/NextGen/Elementary/5.jpg" },
+  { src: "/img/NextGen/Elementary/6.jpg" },
+];
+
+const ministries = [
+  { title: "예배(Worship)", content: "주일 예배 | 2:30 PM (본당)" },
+  {
+    title: "큐티 말씀 묵상/토론/크래프트/게임/찬양과 율동",
+    content: "유초등부 모임 | 4 PM (Sunday School Room)",
+  },
+  {
+    title: "매일 묵상 및 291일 성경통독 Bible Reading",
+    content: "저학년 매일성경, 고학년 매일성경, 공동체 성경읽기 | 월-토요일",
+  },
+];
 
 const Elementary = () => {
   return (
@@ -41,27 +64,30 @@ const Elementary = () => {
 
       <div className="container-wrapper">
         <div className="container">
-          <Typography variant="h5" fontWeight={800}>
-            모임
-          </Typography>
-          <Typography className="subjectContent" sx={{ fontSize: "1.1em" }}>
-            나이: 1~6학년
-            <br />
-            시간: 주일 오후 4시
-            <br />
-            장소: Sunday School Room
-            <br />※ 문의: 이수연 전도사
-          </Typography>
+          <div
+            style={{ width: "100%", display: "flex", justifyContent: "center" }}
+          >
+            <InfoCard
+              age="1~6학년"
+              time="주일 오후 4시"
+              place="Sunday School Room"
+              ask="이수연 전도사"
+              imgs={imgs}
+            />
+          </div>
+
           <br />
           <Typography
             sx={{ fontSize: "1.1em", color: "black" }}
             // style={{ textAlign: "center", maxWidth: "1536px" }}
           >
-            에드먼턴 온교회 유초등부(KIDS ON the Tree)는, 초등학교 1학년에서
-            6학년 연령의 다음 세대 자녀들이, 누가복음 19장 2-10절에 나오는 말씀
-            속에서 예수님을 보기 위해 나무 위에 올랐던 삭개오처럼 예수님을 찾고
-            구하며 죄를 회개하고 구원받는 예수님의 사람이 되길 소원하여 지어진
-            이름입니다.
+            <Typography component="span" fontWeight="bold" fontSize="1.5em">
+              에드먼턴 온교회 유초등부(KIDS ON the Tree)는
+            </Typography>
+            , 초등학교 1학년에서 6학년 연령의 다음 세대 자녀들이, 누가복음 19장
+            2-10절에 나오는 말씀 속에서 예수님을 보기 위해 나무 위에 올랐던
+            삭개오처럼 예수님을 찾고 구하며 죄를 회개하고 구원받는 예수님의
+            사람이 되길 소원하여 지어진 이름입니다.
             <br />
             <br />
             유초등부(KIDS ON the Tree)는 예수님을 알고 싶어하고(눅 19:3),
@@ -84,16 +110,9 @@ const Elementary = () => {
             교사 스태프, 교회 가족들과 함께 어우러져 천국의 기쁨을 누릴 뿐
             아니라, 부르신 삶의 자리에서 하나님의 자녀요 예수 그리스도의
             자녀로서 받은 사랑을 나누고 실천하도록 지도합니다.
-            <br />
-            예배 Worship 주일 예배 | 2:30 PM (본당)
-            <br />
-            큐티 말씀 묵상/토론/크래프트/게임/찬양과 율동 유초등부 모임 | 4 PM
-            (Sunday School Room)
-            <br />
-            매일 묵상 및 291일 성경통독 Bible Reading
-            <br />
-            월-토요일 | 저학년 매일성경, 고학년 매일성경, 공동체 성경읽기
           </Typography>
+
+          <MinistriesCards ministries={ministries} />
         </div>
       </div>
     </>

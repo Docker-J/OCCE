@@ -27,9 +27,9 @@ const NewComers = () => {
       <div className="container-wrapper">
         <div className="container">
           <Typography sx={{ fontSize: "1.1em", color: "black" }}>
-            <Box component="span" fontWeight="bold" fontSize="2em">
+            <Typography component="span" fontWeight="bold" fontSize="2em">
               온 교회
-            </Box>
+            </Typography>
             에 오신 여러분을 환영합니다. 교회에 처음 오신 분들과 개인 사정으로
             이주해 오신 분들, 신앙의 회복을 위해 새로이 나아 오신 분들 모두를
             환영합니다. 새 공동체의 울타리 안에서 새로운 시작을 하시는 모든

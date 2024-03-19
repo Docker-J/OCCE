@@ -38,7 +38,7 @@ const Bible291 = () => {
               <Typography variant="h5" fontWeight={830}>
                 오늘의 1독 말씀은 "{`${match.read}`}" 입니다.
               </Typography>
-
+              <br />
               <YoutubePlaylist
                 src={`https://www.youtube.com/embed/videoseries?list=PL-${
                   match.link.split("PL-")[1]
@@ -50,6 +50,8 @@ const Bible291 = () => {
               오늘은 성경 1독을 쉬어가는 날입니다
             </Typography>
           )}
+
+          <br />
 
           <img style={{ maxWidth: "100%" }} src="/img/Online/291Bible/1.webp" />
           <img style={{ maxWidth: "100%" }} src="/img/Online/291Bible/2.webp" />

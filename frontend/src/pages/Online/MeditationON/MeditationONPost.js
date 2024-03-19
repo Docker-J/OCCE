@@ -41,7 +41,7 @@ const MeditationONPost = () => {
               // flexDirection: "row",
               // alignItems: "center",
               position: "relative",
-              maxWidth: "900px",
+              maxWidth: "75vh",
               width: "100%",
               left: "50%",
               transform: "translateX(-50%)",

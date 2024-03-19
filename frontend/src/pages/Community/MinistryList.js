@@ -2,14 +2,14 @@ export const MinistryList = [
   {
     title: "교육부서 Staff",
     types: [
-      "유아유치부 (최은비)",
-      "유초등부 (김종옥)",
-      "중고등부 (전우식)",
-      "청년부 섬김 (윤승만)",
+      "유아유치부(최은비)",
+      "유초등부(김종옥)",
+      "중고등부(전우식)",
+      "청년부 섬김(윤승만)",
     ],
   },
   {
-    title: "찬양/미디어팀 (조명호)",
+    title: "찬양/미디어팀(조명호)",
     types: [
       "찬양인도 보컬",
       "피아노 키보드",
@@ -26,7 +26,7 @@ export const MinistryList = [
     ],
   },
   {
-    title: "관리팀 (김일주)",
+    title: "관리팀(김일주)",
     types: ["교회 물품 및 스토리지 관리"],
   },
   {
@@ -40,11 +40,11 @@ export const MinistryList = [
     ],
   },
   {
-    title: "선교팀 (박준천)",
+    title: "선교팀(박준천)",
     types: ["단기 선교 및 정원 별 후원 선교 사역 지원"],
   },
   {
-    title: "예배준비팀 (최광현)",
+    title: "예배준비팀(최광현)",
     types: [
       "주일예배 준비",
       "헌금함 준비",
@@ -56,7 +56,7 @@ export const MinistryList = [
     ],
   },
   {
-    title: "장년양육팀 (이창근)",
+    title: "장년양육팀(이창근)",
     types: [
       "장년 수련회 준비",
       "장년 프로그램 등록 안내",
@@ -65,7 +65,7 @@ export const MinistryList = [
     ],
   },
   {
-    title: "재정팀 (이석로)",
+    title: "재정팀(이석로)",
     types: [
       "교회 재정 관련 모든 업무",
       "교회 렌탈 계약 및 보험",
@@ -73,7 +73,7 @@ export const MinistryList = [
     ],
   },
   {
-    title: "중보기도팀 (주미옥)",
+    title: "중보기도팀(주미옥)",
     types: [
       "교회 공동체를 위한 중보기도",
       "주일 예배를 위한 중보기도",
@@ -81,7 +81,7 @@ export const MinistryList = [
     ],
   },
   {
-    title: "친교팀 (김은숙)",
+    title: "친교팀(김은숙)",
     types: ["교회 내 각종 친교 및 경조사 관련 사역"],
   },
 ];

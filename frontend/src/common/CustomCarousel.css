@@ -1,0 +1,9 @@
+.carousel > .control-dots {
+  background-color: white;
+  width: auto;
+  white-space: nowrap;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 0.5em;
+}

@@ -44,7 +44,7 @@ const Ministry = () => {
           </Typography>
           <Typography className="subjectContent" sx={{ fontSize: "1.1em" }}>
             주일 안내팀과 친교팀은 각 팀 staff의 안내에 따라 매달 순서를 맡은
-            소그룹 <Link to="/community/smallgroup">'정원' </Link>이 순환하여
+            소그룹 <Link to="/community/smallgroup">'정원'</Link>이 순환하여
             섬깁니다.
           </Typography>
 
@@ -59,6 +59,16 @@ const Ministry = () => {
             사랑하는 공동체가 되길 소망합니다. 아래의 사역 분야를 참고해 주시고,
             온라인 링크를 통하여 지원해 주시면 감사하겠습니다.
           </Typography>
+          <br />
+          <Stack
+            component="a"
+            target="__blank"
+            href="https://forms.gle/5kGFLfA5fhfotVTW6"
+            direction="row"
+          >
+            <Typography>사역 지원하기</Typography>
+            <OpenInNewIcon />
+          </Stack>
 
           <TableContainer component={Paper} sx={{ my: 4 }}>
             <Table>
@@ -66,7 +76,9 @@ const Ministry = () => {
                 <TableRow>
                   {MinistryList.map((ministry) => (
                     <TableCell key={ministry.title}>
-                      <Typography fontWeight={650}>{ministry.title}</Typography>
+                      <Typography noWrap fontWeight={650}>
+                        {ministry.title}
+                      </Typography>
                     </TableCell>
                   ))}
                 </TableRow>
@@ -88,16 +100,6 @@ const Ministry = () => {
               </TableBody>
             </Table>
           </TableContainer>
-
-          <Stack
-            component="a"
-            target="__blank"
-            href="https://forms.gle/5kGFLfA5fhfotVTW6"
-            direction="row"
-          >
-            <Typography>사역 지원하기</Typography>
-            <OpenInNewIcon />
-          </Stack>
         </div>
       </div>
     </>

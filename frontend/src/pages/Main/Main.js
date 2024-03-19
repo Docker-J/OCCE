@@ -13,6 +13,15 @@ import styles from "react-responsive-carousel/lib/styles/carousel.min.css";
 import test from "./MainCarousel.module.css";
 import CustomCarousel from "../../common/CustomCarousel";
 
+const MainImage = ({ backgroundImage }) => {
+  return (
+    <div className="main-image-wrapper">
+      <div className="blur-bg" style={{ backgroundImage: backgroundImage }} />
+      <div className="image-bg" style={{ backgroundImage: backgroundImage }} />
+    </div>
+  );
+};
+
 const Main = () => {
   return (
     <>
@@ -20,6 +29,7 @@ const Main = () => {
         className={test.carousel}
         showThumbs={false}
         showStatus={false}
+        showArrows={false}
         // showIndicators={false}
         infiniteLoop
         styles={styles}
@@ -42,7 +52,17 @@ const Main = () => {
             온 교회 이야기
           </Button>
         </div>
-        {/* <img src="https://picsum.photos/seed/picsum/200" /> */}
+
+        <div className="churchName">
+          <img
+            src="/img/Main/1.jpg"
+            style={{ height: "70%", maxWidth: "1000px", borderRadius: "2em" }}
+          />
+        </div>
+
+        <MainImage backgroundImage={"url(/img/Main/1.jpg)"} />
+        <MainImage backgroundImage={"url(/img/Main/img2.jpg)"} />
+        <MainImage backgroundImage={"url(/img/Main/img3.jpg)"} />
       </CustomCarousel>
 
       <div style={{ display: "flex", justifyContent: "center" }}>
