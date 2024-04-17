@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Card,
   CardContent,
@@ -13,17 +14,102 @@ import PlaceIcon from "@mui/icons-material/Place";
 import ContactSupportIcon from "@mui/icons-material/ContactSupport";
 import CustomCarousel from "../../common/CustomCarousel";
 
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
+import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+
 import "./InfoCard.css";
+import { memo } from "react";
+import Slider from "react-slick";
+
+const PrevArrow = memo(({ onClick }) => {
+  return (
+    <Avatar
+      component={Paper}
+      elevation={5}
+      sx={{
+        position: "absolute",
+        top: "50%",
+        left: 10,
+        opacity: 0.7,
+        zIndex: 2,
+        backgroundColor: "white",
+        color: "black",
+      }}
+      onClick={onClick}
+    >
+      <NavigateBeforeIcon
+        sx={{
+          width: 32,
+          height: 32,
+        }}
+      />
+    </Avatar>
+  );
+});
+
+const NextArrow = memo(({ onClick }) => {
+  return (
+    <Avatar
+      component={Paper}
+      elevation={5}
+      sx={{
+        position: "absolute",
+        top: "50%",
+        right: 10,
+        opacity: 0.7,
+        zIndex: 2,
+        backgroundColor: "white",
+        color: "black",
+      }}
+      onClick={onClick}
+    >
+      <NavigateNextIcon
+        sx={{
+          width: 32,
+          height: 32,
+        }}
+      />
+    </Avatar>
+  );
+});
 
 const InfoCard = ({ age, time, place, ask, imgs }) => {
+  const settings = {
+    customPaging: (i) => (
+      <a>
+        <span
+          style={{
+            width: "8px",
+            height: "8px",
+            borderRadius: "50%",
+            // cursor: isSelected ? null : "pointer",
+            background: "#808080",
+            display: "inline-block",
+          }}
+        />
+      </a>
+    ),
+    dotsClass: "slick-dots slick-default-dots",
+    dots: true,
+    infinite: true,
+    lazyLoad: true,
+    speed: 300,
+    autoplay: true,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    // nextArrow: <NextArrow />,
+    // prevArrow: <PrevArrow />,
+  };
+
   return (
     <Card
       elevation={5}
       sx={{
         width: "100%",
-        maxWidth: { xs: "none", md: "750px" },
-        // ml: { xs: "none", md: "-15%" },
-
+        maxWidth: { xs: "none", md: "800px" },
         borderRadius: "1em",
         overflow: "visible",
       }}
@@ -70,10 +156,9 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
             elevation={10}
             sx={{
               width: "100%",
-              maxWidth: { xs: "none", md: "600px" },
+              maxWidth: { xs: "none", md: "550px" },
               borderRadius: "1em",
-              mr: { xs: 0, md: "-25%" },
-              //   mb: { xs: "-35%", md: "0%" },
+              mr: { xs: 0, md: "-36px" },
             }}
           >
             <Box
@@ -85,17 +170,13 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
               }}
             >
               <div className="box-content">
-                <CustomCarousel
-                  autoPlay
-                  infiniteLoop
-                  showArrows={false}
-                  showIndicators={true}
-                  swipeable={false}
-                >
+                <Slider {...settings}>
                   {imgs.map((img) => (
-                    <img src={img.src} />
+                    <div className="img-container">
+                      <img src={img.src} />
+                    </div>
                   ))}
-                </CustomCarousel>
+                </Slider>
               </div>
             </Box>
           </Box>

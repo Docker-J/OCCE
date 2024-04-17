@@ -68,7 +68,7 @@ const Youth = () => {
 
           <Typography sx={{ fontSize: "1.1em", color: "black" }}>
             <Typography component="span" fontWeight="bold" fontSize="1.5em">
-              에드먼턴 온교회 Youth는
+              온교회 중고등부는
             </Typography>
             , 마태복음 7장 24절을 주제 말씀으로 하여, 말씀이신 그리스도의 "반석
             위에" 집을 짓고, "하나님 앞에서 지혜로운 사람"으로 함께 세워져

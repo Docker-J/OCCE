@@ -63,25 +63,25 @@ const YoungAdult = () => {
           <br />
           <Typography sx={{ fontSize: "1.1em", color: "black" }}>
             <Typography component="span" fontWeight="bold" fontSize="1.5em">
-              온교회 청년부는
+              온교회 청년부
             </Typography>
             {/* <br /> */}
             {/* 목적 */}
             {/* <br /> */}
-            &nbsp;예수 그리스도의 이름으로 모여, 하나님의 성령으로 한 마음을
-            품고, 하나님과 이웃에 대한 사랑이 점점 커져가며, 그 사랑으로
-            세상에서 하나님 나라의 공의와 정의를 이뤄가는 청년 공동체를
-            세워갑니다.
+            는 예수 그리스도의 이름으로 모여, 하나님의 성령으로 한 마음을 품고,
+            하나님과 이웃에 대한 사랑이 점점 커져가며, 그 사랑으로 세상에서
+            하나님 나라의 공의와 정의를 이뤄가는 청년 공동체를 세워갑니다.
             <br />
             <br />
             주제 말씀: 에스겔 Ezekiel 11:19-20 <br />
             내가 그들에게 한 마음을 주고 그 속에 새 영을 주며 그 몸에서 돌 같은
             마음을 제거하고 살처럼 부드러운 마음을 주어 내 율례를 따르며 내
             규례를 지켜 행하게 하리니 그들은 내 백성이 되고 나는 그들의 하나님이
-            되리라 I will give them an undivided heart and put a new spirit in
-            them; I will remove from them their heart of stone and give them a
-            heart of flesh. Then they will follow my decrees and be careful to
-            keep my laws. They will be my people, and I will be their God.
+            되리라 <br />I will give them an undivided heart and put a new
+            spirit in them; I will remove from them their heart of stone and
+            give them a heart of flesh. Then they will follow my decrees and be
+            careful to keep my laws. They will be my people, and I will be their
+            God.
             <br />
             <br />
             모임 및 사역 안내 <br />

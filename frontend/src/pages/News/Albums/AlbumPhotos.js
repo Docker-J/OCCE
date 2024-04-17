@@ -3,6 +3,8 @@ import { useLoaderData } from "react-router-dom";
 import { ImageList, ImageListItem, Typography } from "@mui/material";
 
 import "../../NextGen/NextGen.css";
+import useModals from "../../../util/useModal";
+import PhotoViewModal from "./PhotoViewModal";
 
 const titleBackground = {
   backgroundImage:
@@ -10,6 +12,7 @@ const titleBackground = {
 };
 
 const AlbumPhotos = () => {
+  const { openModal } = useModals();
   const { title, images } = useLoaderData();
 
   return (
@@ -30,10 +33,17 @@ const AlbumPhotos = () => {
         <div className="container">
           <ImageList variant="masonry" cols={3} gap={8}>
             {Object.values(images).map((image, index) => (
-              <ImageListItem key={image.uid}>
+              <ImageListItem
+                key={image}
+                onClick={() =>
+                  openModal(PhotoViewModal, {
+                    photos: images,
+                    initialIndex: index,
+                  })
+                }
+              >
                 <img
                   style={{ objectFit: "contain" }}
-                  key={index}
                   src={`https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${image}/MeditationON`}
                   alt="test"
                   loading="lazy"

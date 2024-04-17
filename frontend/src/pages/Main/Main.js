@@ -42,7 +42,7 @@ const Main = () => {
             component={Link}
             to="/aboutus#churchname"
             variant="outlined"
-            size="medium"
+            size="small"
             sx={{
               color: "white",
               borderColor: "white",
@@ -54,10 +54,16 @@ const Main = () => {
         </div>
 
         <div className="churchName">
-          <img
-            src="/img/Main/1.jpg"
-            style={{ height: "70%", maxWidth: "1000px", borderRadius: "2em" }}
-          />
+          <div className="nameExplanationContainer">
+            <img
+              src="/img/Main/1.jpg"
+              style={{
+                height: "70%",
+                maxWidth: "900px",
+                borderRadius: "1em",
+              }}
+            />
+          </div>
         </div>
 
         <MainImage backgroundImage={"url(/img/Main/1.jpg)"} />

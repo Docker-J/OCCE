@@ -26,11 +26,11 @@ export const MinistryList = [
     ],
   },
   {
-    title: "관리팀(김일주)",
+    title: "관리팀",
     types: ["교회 물품 및 스토리지 관리"],
   },
   {
-    title: "새가족/안내팀 (장은정)",
+    title: "새가족/안내팀(장은정)",
     types: [
       "방문등록카드 준비 및 작성 안내",
       "새가족 사진촬영 및 전달",
@@ -65,7 +65,7 @@ export const MinistryList = [
     ],
   },
   {
-    title: "재정팀(이석로)",
+    title: "재정팀",
     types: [
       "교회 재정 관련 모든 업무",
       "교회 렌탈 계약 및 보험",

@@ -92,7 +92,9 @@ const Ministry = () => {
                   <TableRow>
                     {MinistryList.map((item) => (
                       <TableCell key={item.types[index]}>
-                        {item.types[index]}
+                        <Typography fontSize="1em" noWrap>
+                          {item.types[index]}
+                        </Typography>
                       </TableCell>
                     ))}
                   </TableRow>

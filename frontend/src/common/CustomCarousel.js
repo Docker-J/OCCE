@@ -1,4 +1,4 @@
-import { Avatar } from "@mui/material";
+import { Avatar, Paper } from "@mui/material";
 import { Carousel } from "react-responsive-carousel";
 
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
@@ -28,17 +28,18 @@ const Indicator = ({ isSelected, clickHandler }) => {
 const PrevArrow = memo(({ clickHandler, hasPrev }) => {
   return (
     <Avatar
+      component={Paper}
+      elevation={5}
       sx={{
         position: "absolute",
         top: "50%",
         left: 10,
-        opacity: 0.5,
+        opacity: 0.7,
         zIndex: 2,
-        backgroundColor: "grey",
+        backgroundColor: "white",
         color: "black",
       }}
       onClick={clickHandler}
-      disabled={!hasPrev}
     >
       <NavigateBeforeIcon
         sx={{
@@ -53,17 +54,18 @@ const PrevArrow = memo(({ clickHandler, hasPrev }) => {
 const NextArrow = memo(({ clickHandler, hasNext }) => {
   return (
     <Avatar
+      component={Paper}
+      elevation={5}
       sx={{
         position: "absolute",
         top: "50%",
         right: 10,
-        opacity: 0.5,
+        opacity: 0.7,
         zIndex: 2,
-        backgroundColor: "grey",
+        backgroundColor: "white",
         color: "black",
       }}
       onClick={clickHandler}
-      disabled={!hasNext}
     >
       <NavigateNextIcon
         sx={{
@@ -79,10 +81,10 @@ const CustomCarousel = (props) => {
   return (
     <Carousel
       renderArrowPrev={(clickHandler, hasPrev) =>
-        hasPrev && <PrevArrow clickHandler={clickHandler} hasPrev={hasPrev} />
+        hasPrev && <PrevArrow clickHandler={clickHandler} />
       }
       renderArrowNext={(clickHandler, hasNext) =>
-        hasNext && <NextArrow clickHandler={clickHandler} hasPrev={hasNext} />
+        hasNext && <NextArrow clickHandler={clickHandler} />
       }
       renderIndicator={(clickHandler, isSelected, index) => {
         return (

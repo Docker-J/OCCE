@@ -1,15 +1,3 @@
-/* .carousel .slide img {
-  height: 100%;
-  width: auto;
-} */
-
-.box-content,
-.carousel,
-.carousel > .slider-wrapper,
-.carousel > .slider-wrapper > .slider {
-  height: 100%;
-}
-
 .box-content {
   position: absolute;
   top: 0;
@@ -17,7 +5,48 @@
   width: 100%;
   height: 100%;
 }
+.img-container {
+  position: relative;
+  padding-bottom: 75%;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
 
-.box-content img {
-  object-fit: cover;
+.slick-slide img {
+  position: absolute;
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* @media only screen and (min-width: 900px) {
+  .slick-slide img {
+    max-height: 412.5px;
+  }
+} */
+
+.slick-initialized .slick-track {
+  display: flex;
+  align-items: center;
+}
+
+.slick-default-dots {
+  background-color: #ffffffe3;
+  width: auto;
+  white-space: nowrap;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 0.5em;
+  bottom: 3%;
+}
+
+.slick-default-dots li {
+  margin: 0 1.5px;
+}
+
+.slick-default-dots li.slick-active span {
+  background-color: #f57c00 !important;
 }

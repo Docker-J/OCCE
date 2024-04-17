@@ -9,9 +9,9 @@ const titleBackground = {
 
 const imgs = [
   { src: "/img/NextGen/Preschool/1.jpg" },
-  // { src: "/img/NextGen/Preschool/2.jpg" },
-  // { src: "/img/NextGen/Preschool/3.jpg" },
-  // { src: "/img/NextGen/Preschool/4.jpg" },
+  { src: "/img/NextGen/Preschool/2.jpg" },
+  { src: "/img/NextGen/Preschool/3.jpg" },
+  { src: "/img/NextGen/Preschool/4.jpg" },
   { src: "/img/NextGen/Preschool/5.jpg" },
 ];
 
@@ -44,21 +44,25 @@ const Preschool = () => {
 
       <div className="container-wrapper">
         <div className="container">
-          <InfoCard
-            age="만 5세(kindergarten)까지"
-            time="주일 오후 4시"
-            place="Preschool Room"
-            ask="김유정 전도사"
-            imgs={imgs}
-          />
+          <div
+            style={{ width: "100%", display: "flex", justifyContent: "center" }}
+          >
+            <InfoCard
+              age="1~6학년"
+              time="주일 오후 4시"
+              place="Sunday School Room"
+              ask="이수연 전도사"
+              imgs={imgs}
+            />
+          </div>
 
           <br />
 
           <Typography sx={{ fontSize: "1.1em", color: "black" }}>
             <Typography component="span" fontWeight="bold" fontSize="1.5em">
-              온교회 유아유치부는
+              온교회 유아유치부
             </Typography>
-            &nbsp;성령으로 인하여 부드러운 마음을 가진 우리 어린이들이 말씀을
+            는 성령으로 인하여 부드러운 마음을 가진 우리 어린이들이 말씀을
             배우며 아브라함의 하나님, 이삭의 하나님, 야곱의 하나님을 넘어 "나의
             하나님"을 인정하고 순종함으로 나아갈 수 있는 기초를 다지는
             시기입니다. 성부 하나님, 성자 예수님, 성령님과 교회 및 기본 교리

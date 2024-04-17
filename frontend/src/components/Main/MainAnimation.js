@@ -7,7 +7,7 @@ import {
   useChain,
 } from "@react-spring/web";
 
-import "./MainNameAnimation.css";
+import "./MainAnimation.css";
 import { useState } from "react";
 
 const MainAnimation = () => {
@@ -79,7 +79,6 @@ const MainAnimation = () => {
     ref: fadeOut2Ref,
     from: { opacity: 1 },
     to: { opacity: 0 },
-    // delay: 2000,
     reset: true,
     config: {
       duration: 4000,
@@ -91,10 +90,9 @@ const MainAnimation = () => {
     ref: fadeInRef,
     from: { opacity: 0 },
     to: [{ opacity: 1 }, { opacity: 0 }],
-    // delay: 6000,
     reset: true,
     config: {
-      duration: 3500,
+      duration: 4000,
       easing: easings.easeInOutSine,
     },
   });
@@ -127,8 +125,7 @@ const MainAnimation = () => {
     to: [{ transform: "translateX(-30%)" }, { transform: "translateX(-65%)" }],
     reset: true,
     config: {
-      duration: 4000,
-      easing: easings.easeInOutSine,
+      duration: 3700,
     },
   });
 
@@ -139,7 +136,6 @@ const MainAnimation = () => {
     reset: true,
     config: {
       duration: 3700,
-      easing: easings.easeInOutSine,
     },
   });
 
@@ -149,8 +145,7 @@ const MainAnimation = () => {
     to: { opacity: 1 },
     reset: true,
     config: {
-      duration: 4000,
-      easing: easings.easeInOutSine,
+      duration: 3700,
     },
   });
 
@@ -160,7 +155,7 @@ const MainAnimation = () => {
     to: { transform: "rotate(-90deg) scale(1.4)" },
     reset: true,
     config: {
-      duration: 6000,
+      duration: 5800,
       easing: easings.easeOutBack,
     },
     onRest: () =>
@@ -192,7 +187,7 @@ const MainAnimation = () => {
           maxWidth: "400px",
           width: "21vmax",
           height: "auto",
-          padding: "4vh 0",
+          padding: "4svh 0",
           ...spin,
           ...fadeOut,
         }}
@@ -205,7 +200,7 @@ const MainAnimation = () => {
           className="old"
           variant="h5"
           fontWeight="530"
-          fontSize={"min(5vw, 36px)"}
+          fontSize={"min(5.5vw, 36px)"}
           style={{ color: "#f1cdb0" }}
         >
           Based ON the OLD truth
@@ -225,7 +220,7 @@ const MainAnimation = () => {
         <Typography
           variant="h5"
           fontWeight="530"
-          fontSize={"min(5vw, 36px)"}
+          fontSize={"min(5.5vw, 36px)"}
           style={{ color: "#f1cdb0" }}
         >
           온 맘 다해 하나님을 사랑하고
@@ -247,7 +242,7 @@ const MainAnimation = () => {
             className="edmonton"
             variant="h5"
             fontWeight="530"
-            fontSize={"3.4vmax"}
+            fontSize={"min(3.5svmax, 75px)"}
             style={{ color: "#f1cdb0" }}
           >
             에드먼턴
@@ -259,7 +254,7 @@ const MainAnimation = () => {
             className="church"
             variant="h5"
             fontWeight="530"
-            fontSize={"3.4vmax"}
+            fontSize={"min(3.5svmax, 75px)"}
             color="white"
           >
             교회

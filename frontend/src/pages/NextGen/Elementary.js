@@ -82,9 +82,9 @@ const Elementary = () => {
             // style={{ textAlign: "center", maxWidth: "1536px" }}
           >
             <Typography component="span" fontWeight="bold" fontSize="1.5em">
-              에드먼턴 온교회 유초등부(KIDS ON the Tree)는
+              온교회 유초등부
             </Typography>
-            , 초등학교 1학년에서 6학년 연령의 다음 세대 자녀들이, 누가복음 19장
+            는 초등학교 1학년에서 6학년 연령의 다음 세대 자녀들이, 누가복음 19장
             2-10절에 나오는 말씀 속에서 예수님을 보기 위해 나무 위에 올랐던
             삭개오처럼 예수님을 찾고 구하며 죄를 회개하고 구원받는 예수님의
             사람이 되길 소원하여 지어진 이름입니다.
