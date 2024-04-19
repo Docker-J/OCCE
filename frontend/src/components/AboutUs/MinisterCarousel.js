@@ -53,7 +53,7 @@ const slides = [
     key: uuidv4(),
     content: (
       <Card
-        imagen="img/About/KimHwikyung.jpg"
+        imagen="img/About/KimHwikyung.webp"
         imageOffset={{ left: "-55%" }}
         title="김휘경 전도사"
         position="중고등부/청년부/찬양"
