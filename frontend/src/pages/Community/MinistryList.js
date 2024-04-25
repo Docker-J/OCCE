@@ -40,7 +40,7 @@ export const MinistryList = [
     ],
   },
   {
-    title: "선교팀(박준천)",
+    title: "선교팀",
     types: ["단기 선교 및 정원 별 후원 선교 사역 지원"],
   },
   {
