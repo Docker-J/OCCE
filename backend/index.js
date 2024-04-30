@@ -10,6 +10,7 @@ import albums from "./albums.js";
 import meditationon from "./meditationon.js";
 
 import { fcm } from "./api/firebase.js";
+import authStaff from "./middleware/auth.js";
 
 const app = express();
 const PORT = process.env.port || 3001;
@@ -22,6 +23,11 @@ app.use("/api/Announcements", announcements);
 app.use("/api/WeeklyUpdate", weeklyupdate);
 app.use("/api/albums", albums);
 app.use("/api/MeditationON", meditationon);
+
+// app.get("/api/test", authStaff, async (req, res) => {
+//   console.log("get");
+//   res.send(200);
+// });
 
 app.post("/api/test", async (req, res) => {
   const message = {
@@ -37,11 +43,10 @@ app.post("/api/test", async (req, res) => {
       },
       notification: {},
     },
-    token:
-      "c9I3zDFcSyYMFOWT7sv2VP:APA91bH1lSQ8VzbdSE45kve1bWeRUnHdBxYsv48SPvaSSM4ro4G7CJHhciVLZv_oT1QdoZIVkHjZtYuG5oLrlO7xMJTuWvu1vV5nncEkC2Err7Lwqf0TwnTvJl7wgx9eZdNASVWocNzr",
+    topic: "update",
   };
   try {
-    await fcm.send(message);
+    await fcm.sendEach(message);
     console.log("Success");
     res.sendStatus(200);
   } catch (err) {
