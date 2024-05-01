@@ -30,8 +30,6 @@ import {
   usePopupState,
 } from "material-ui-popup-state/hooks";
 import { CascadingMenu } from "../components/Header/CascadingMenus";
-// import { messaging } from "../api/firebase";
-// import { getToken } from "firebase/messaging";
 
 import pages from "./Pages.js";
 import useModals from "../util/useModal.js";
@@ -42,27 +40,6 @@ const ResponsiveAppBar = () => {
   const { openModal } = useModals();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.authToken);
-
-  // const requestWebPushPermission = async () => {
-  //   console.log("권한 요청 중...");
-  //   try {
-  //     const permission = await Notification.requestPermission();
-  //     if (permission === "granted") {
-  //       getToken(messaging, {
-  //         vapidKey:
-  //           "BOLDzFLzljc4HkyVktgjo4-_QoXFxx__XZS6xBmGouvsisXHHe--2dSUUJtQ2cerl3v7ONBhrAPM661xRbpQcqo",
-  //       }).then((token) => {
-  //         console.log(token);
-  //       });
-  //     }
-  //   } catch {}
-  // };
-
-  // useEffect(() => {
-  //   requestWebPushPermission();
-  // }, []);
-
-  // console.log(token);
 
   const popupState = usePopupState({
     variant: "popover",

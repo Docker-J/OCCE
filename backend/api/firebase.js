@@ -1,12 +1,10 @@
 import { initializeApp, applicationDefault } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
-import messaging from "firebase-admin";
+import { getMessaging } from "firebase-admin/messaging";
 
 initializeApp({
   credential: applicationDefault(),
 });
-export const db = getFirestore();
-export const fcm = messaging;
 
-// Initialize Firebase
-// module.exports = { db, fcm };
+export const db = getFirestore();
+export const fcm = getMessaging();
