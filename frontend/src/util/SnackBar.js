@@ -10,8 +10,7 @@ const SnackBar = () => {
   const openedSnackBar = useContext(SnackBarStateContext);
   const { close } = useContext(SnackBarDispatchContext);
 
-  const { severity, message, isOpen } = openedSnackBar;
-  // const { severity, message } = props;
+  const { severity, message, action, isOpen } = openedSnackBar;
 
   const onClose = (_, reason) => {
     if (reason === "clickaway") {
@@ -28,7 +27,7 @@ const SnackBar = () => {
       autoHideDuration={8000}
       onClose={onClose}
     >
-      <Alert severity={severity} onClose={onClose}>
+      <Alert severity={severity} onClose={onClose} action={action}>
         {message}
       </Alert>
     </Snackbar>

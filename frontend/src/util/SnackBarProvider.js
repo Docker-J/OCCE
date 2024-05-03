@@ -6,8 +6,8 @@ import {
 
 const SnackbarProvider = ({ children }) => {
   const [openedSnackBar, setOpenedSnackBar] = useState({});
-  const open = (severity, message) => {
-    setOpenedSnackBar({ severity, message, isOpen: true });
+  const open = (severity, message, action) => {
+    setOpenedSnackBar({ severity, message, action, isOpen: true });
   };
 
   const close = () => {
