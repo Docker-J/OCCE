@@ -11,6 +11,7 @@ import meditationon from "./meditationon.js";
 import notification from "./notification.js";
 
 import authStaff from "./middleware/auth.js";
+import sendNotification from "./api/sendNotification.js";
 
 const app = express();
 const PORT = process.env.port || 3001;
@@ -29,6 +30,11 @@ app.use("/api/notification", notification);
 //   console.log("get");
 //   res.send(200);
 // });
+
+app.post("/api/test", async (req, res) => {
+  await sendNotification("test", "1111", "https://oncce.ca/weeklyupdate");
+  res.send(200);
+});
 
 app.listen(PORT, () => {
   console.log(`running on port ${PORT}`);

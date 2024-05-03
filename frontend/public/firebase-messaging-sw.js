@@ -23,12 +23,6 @@ const firebaseConfig = {
 const app = firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging(app);
 
-// messaging.addEventListener("notificationclick", (event) => {
-//   // event.notification.close();
-//   // const urlToOpen = event.data.url;
-//   // // event.waitUntil(clients.openWindow(urlToOpen));
-// });
-
 messaging.onBackgroundMessage((payload) => {
   console.log("you received a message when you haven't the app active");
   console.log(payload);

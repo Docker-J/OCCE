@@ -1,4 +1,4 @@
-import { fcm } from "./firebase";
+import { fcm } from "./firebase.js";
 
 const sendNotification = async (title, body, url) => {
   const message = {
@@ -15,11 +15,11 @@ const sendNotification = async (title, body, url) => {
       notification: {},
     },
     token:
-      "fB6wQpJqzOOHbZHoNzFTSk:APA91bH9WKvUpZblMlVE5YXuVfK1KIYYoO5Yqp_H4l6fABSvo5ClhHWdiDqQkBPo2GfeCjmctyY4X3OySVkGj3SHleDxkqQon6WXCkNT7m2k3OE9eENredCiGnInuRbuJG4F-N2_8SPb",
+      "fB6wQpJqzOOHbZHoNzFTSk:APA91bFnufSilf5cojprGfrcaIjFN4hXi_lEcAg0TSwGHNZt_hOPcQcKXzjY8Zi__n2-4RrRQr4f6Uq72uPtq_BR1TZ4BCMQbYs0Bu3diXh0EGClIA2D1M4nm5vIZlT-F2h9INbT8PQ6",
   };
 
   try {
-    await fcm.send([message]);
+    await fcm.send(message);
     console.log("Success");
   } catch (err) {
     console.log(err);

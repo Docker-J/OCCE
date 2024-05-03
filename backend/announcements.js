@@ -1,5 +1,4 @@
 import express from "express";
-import { fcm } from "./api/firebase.js";
 import axios from "axios";
 import { v4 as uuid } from "uuid";
 import FormData from "form-data";

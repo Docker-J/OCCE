@@ -13,7 +13,6 @@ import ModalsProvider from "./util/ModalsProvider";
 import Modals from "./util/Modals";
 import SnackbarProvider from "./util/SnackBarProvider";
 import SnackBar from "./util/SnackBar";
-import FCMProvider from "./util/FCMProvider";
 
 const container = document.getElementById("root");
 const root = createRoot(container);
@@ -42,7 +41,6 @@ root.render(
       <ThemeProvider theme={theme}>
         <SnackbarProvider>
           <ModalsProvider>
-            <FCMProvider />
             <App />
             <Modals />
           </ModalsProvider>

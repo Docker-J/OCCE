@@ -1,6 +1,4 @@
 import express from "express";
-const router = express.Router();
-import { fcm } from "./api/firebase.js";
 
 import {
   S3Client,
@@ -11,6 +9,8 @@ import {
 import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import docClient from "./api/dynamodb.js";
 import { upload } from "./middleware/multer.js";
+
+const router = express.Router();
 
 const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
 const BUCKET = "weeklyupdate";

@@ -15,6 +15,7 @@ import { loader as MeditationONPostLoader } from "./route/MeditationONPostLoader
 import { loader as Bible291Loader } from "./route/Bible291Loader";
 import { loader as AlbumPhotosLoader } from "./route/AlbumPhotosLoader";
 import Footer from "./header/Footer";
+import NotificationProvider from "./util/NotificationProvider";
 
 // import NewComers from "./pages/NewComers";
 
@@ -139,6 +140,7 @@ const YoungAdult = lazy(() =>
 const HeaderFooterWrapper = () => {
   return (
     <>
+      <NotificationProvider />
       <div
         style={{
           display: "flex",
@@ -168,6 +170,7 @@ const HeaderFooterWrapper = () => {
 const HeaderWrapper = () => {
   return (
     <>
+      <NotificationProvider />
       <ResponsiveAppBar />
       <Outlet />
     </>

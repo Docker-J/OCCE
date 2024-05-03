@@ -7,7 +7,7 @@ const router = express.Router();
 
 const TABLENAME = "FCMToken";
 
-router.put("/fcmToken", async (req, res) => {
+router.put("/register", async (req, res) => {
   const command = new PutCommand({
     TableName: TABLENAME,
     Item: {

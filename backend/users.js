@@ -1,6 +1,4 @@
 import express from "express";
-const router = express.Router();
-import { db, fcm } from "./api/firebase.js";
 import axios from "axios";
 
 import {
@@ -12,6 +10,8 @@ import {
   ResendConfirmationCodeCommand,
   GlobalSignOutCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
+
+const router = express.Router();
 
 const cognitoClient = new CognitoIdentityProviderClient({
   region: "us-west-2",
