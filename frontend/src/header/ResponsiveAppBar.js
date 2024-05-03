@@ -10,12 +10,7 @@ import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
 import PersonIcon from "@mui/icons-material/Person";
-
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-// import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 
 import Submenu from "../components/Header/Submenu";
@@ -35,9 +30,12 @@ import pages from "./Pages.js";
 import useModals from "../util/useModal.js";
 import SignInModal from "./../components/User/SignInModal";
 import SignUpModal from "./../components/User/SignUpModal";
+import useSnackbar from "../util/useSnackbar.js";
 
 const ResponsiveAppBar = () => {
   const { openModal } = useModals();
+  const { openSnackbar } = useSnackbar();
+
   const dispatch = useDispatch();
   const user = useSelector((state) => state.authToken);
 
@@ -50,9 +48,6 @@ const ResponsiveAppBar = () => {
     variant: "popover",
     popupId: "user",
   });
-
-  // const currentPage = useLocation().pathname;
-  // const currnetHash = useLocation().hash;
 
   const settings_signed = [
     {
@@ -74,44 +69,15 @@ const ResponsiveAppBar = () => {
 
   const signOutSuccess = () => {
     dispatch(DELETE_TOKEN());
+    openSnackbar("success", "Successfully Signed Out");
     removeCookieToken();
   };
 
   const appBarPosition = "absolute";
-  // currentPage === "/" ||
-  // currentPage === "/aboutus" ||
-  // currentPage.includes("/announcements") ||
-  // currentPage.includes("/weeklyupdate") ||
-  // currentPage.includes("/newcomers") ||
-  // currentPage.includes("/nextgen/") ||
-  // currentPage.includes("/community/") ||
-  // currentPage.includes("/online/")
-  //   ? "absolute"
-  //   : "static";
 
   const appBarColor = "white";
-  // currentPage === "/" ||
-  // currentPage === "/aboutus" ||
-  // currentPage.includes("/announcements") ||
-  // currentPage.includes("/weeklyupdate") ||
-  // currentPage.includes("/newcomers") ||
-  // currentPage.includes("/nextgen/") ||
-  // currentPage.includes("/community/") ||
-  // currentPage.includes("/online/")
-  //   ? "white"
-  //   : "black";
 
   const logoColor = "/img/HeaderLogoColor.png";
-  // currentPage === "/" ||
-  // currentPage === "/aboutus" ||
-  // currentPage.includes("/announcements") ||
-  // currentPage.includes("/weeklyupdate") ||
-  // currentPage.includes("/newcomers") ||
-  // currentPage.includes("/nextgen/") ||
-  // currentPage.includes("/community/") ||
-  // currentPage.includes("/online/")
-  // ? "/img/HeaderLogoColor.png"
-  // : "/img/HeaderLogoBW.png";
 
   return (
     <AppBar
@@ -202,16 +168,14 @@ const ResponsiveAppBar = () => {
           </Box>
 
           <Box sx={{ ml: "15pt", flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton
-                size="large"
-                color="inherit"
-                sx={{ pl: 0 }}
-                {...bindTrigger(userPopupState)}
-              >
-                <PersonIcon fontSize="large" />
-              </IconButton>
-            </Tooltip>
+            <IconButton
+              size="large"
+              color="inherit"
+              sx={{ pl: 0 }}
+              {...bindTrigger(userPopupState)}
+            >
+              <PersonIcon fontSize="large" />
+            </IconButton>
 
             <Menu
               sx={{ mt: "45px" }}
