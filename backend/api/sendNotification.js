@@ -1,28 +1,55 @@
+import { ScanCommand } from "@aws-sdk/client-dynamodb";
 import { fcm } from "./firebase.js";
+import docClient from "./dynamodb.js";
 
-const sendNotification = async (title, body, url) => {
+const TABLENAME = "FCMToken";
+
+const sendNotification = async (title, body, pathname) => {
+  const scanParam = {
+    TableName: TABLENAME,
+    ProjectionExpression: "#tkn",
+    ExpressionAttributeNames: { "#tkn": "token" },
+    Limit: 1,
+  };
+
   const message = {
     notification: {},
     data: {
       title: title,
       body: body,
-      click_action: url,
+      click_action: `https://oncce.ca/${pathname}`,
     },
     webpush: {
       fcm_options: {
-        link: "https://oncce.ca",
+        link: `https://oncce.ca/${pathname}`,
       },
       notification: {},
     },
-    token:
-      "fB6wQpJqzOOHbZHoNzFTSk:APA91bFnufSilf5cojprGfrcaIjFN4hXi_lEcAg0TSwGHNZt_hOPcQcKXzjY8Zi__n2-4RrRQr4f6Uq72uPtq_BR1TZ4BCMQbYs0Bu3diXh0EGClIA2D1M4nm5vIZlT-F2h9INbT8PQ6",
   };
 
-  try {
-    await fcm.send(message);
-    console.log("Success");
-  } catch (err) {
-    console.log(err);
+  await sendMessages();
+
+  async function sendMessages() {
+    try {
+      const command = new ScanCommand(scanParam);
+      const result = await docClient.send(command);
+      const tokens = result.Items.map((item) => item.token.S);
+
+      if (tokens.length <= 0) {
+        return;
+      }
+
+      message.tokens = tokens;
+
+      await fcm.sendEachForMulticast(message);
+
+      if (typeof result.LastEvaluatedKey !== "undefined") {
+        scanParam.ExclusiveStartKey = result.LastEvaluatedKey;
+        await sendMessages(); // Recursive call
+      }
+    } catch (err) {
+      console.log(err);
+    }
   }
 };
 

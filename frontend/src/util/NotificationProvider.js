@@ -3,7 +3,7 @@ import { messaging } from "../api/firebase";
 import { getToken, onMessage } from "firebase/messaging";
 import { registerToken } from "../api/notification";
 import useSnackbar from "./useSnackbar";
-import { Button, IconButton } from "@mui/material";
+import { IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 import LaunchIcon from "@mui/icons-material/Launch";

@@ -4,11 +4,11 @@ import {
   S3Client,
   PutObjectCommand,
   GetObjectCommand,
-  ListObjectsV2Command,
 } from "@aws-sdk/client-s3";
 import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import docClient from "./api/dynamodb.js";
 import { upload } from "./middleware/multer.js";
+import sendNotification from "./api/sendNotification.js";
 
 const router = express.Router();
 
@@ -104,6 +104,12 @@ router.put("/PostBulletin", upload.single("images"), async (req, res) => {
     await docClient.send(dbCommand);
 
     res.send(req.body.date);
+
+    sendNotification(
+      "새로운 주보가 업로드 되었습니다",
+      req.body.date,
+      `weeklyupdate/${req.body.date}`
+    );
   } catch (error) {
     console.log(error);
     res.sendStatus(500);

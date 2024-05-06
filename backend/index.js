@@ -32,8 +32,8 @@ app.use("/api/notification", notification);
 // });
 
 app.post("/api/test", async (req, res) => {
-  await sendNotification("test", "1111", "https://oncce.ca/weeklyupdate");
   res.send(200);
+  await sendNotification("test", "1111", "https://oncce.ca/weeklyupdate");
 });
 
 app.listen(PORT, () => {
