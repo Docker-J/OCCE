@@ -5,24 +5,9 @@ import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineDot from "@mui/lab/TimelineDot";
 
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import { useState } from "react";
-import { Popover, Stack, Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 
 const YouthTimeline = () => {
-  const [anchorEl, setAnchorEl] = useState({ anchor: null, popoverID: null });
-
-  const handlePopoverOpen = (event, popoverID) => {
-    setAnchorEl({ anchor: event.currentTarget, popoverID: popoverID });
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl({ anchor: null, popoverID: null });
-  };
-
-  const openRegister = anchorEl.popoverID === 1 && anchorEl.anchor;
-  const openDiscipline = anchorEl.popoverID === 2 && anchorEl.anchor;
-
   return (
     <Stack
       direction="row"
