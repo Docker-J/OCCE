@@ -14,6 +14,7 @@ import {
 const router = express.Router();
 
 const AWS_COGNITO_CLIENT_ID = process.env.AWS_COGNITO_CLIENT_ID;
+const AWS_COGNITO_USER_POOL_ID = process.env.AWS_COGNITO_USER_POOL_ID;
 
 const cognitoClient = new CognitoIdentityProviderClient({
   region: "us-west-2",
@@ -66,7 +67,7 @@ router.get("/getGroup", async (req, res) => {
   const input = {
     // AdminListGroupsForUserRequest
     Username: req.query.email, // required
-    UserPoolId: "us-west-2_v1MWWI1Vn", // required
+    UserPoolId: AWS_COGNITO_USER_POOL_ID, // required
   };
 
   const command = new AdminListGroupsForUserCommand(input);
