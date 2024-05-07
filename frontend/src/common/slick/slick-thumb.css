@@ -1,0 +1,21 @@
+.slick-thumb {
+  position: fixed;
+  left: 0;
+  bottom: 10px;
+}
+
+.slick-thumb li {
+  height: 45px;
+  width: 60px;
+}
+
+.slick-thumb li img {
+  height: 45px;
+  width: 60px;
+  object-fit: scale-down;
+  filter: grayscale(1);
+}
+
+.slick-thumb li.slick-active img {
+  filter: grayscale(0);
+}

@@ -9,6 +9,8 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+
+import "../../../common/slick/slick-thumb.css";
 import "./PhotoViewModal.css";
 
 const style = {
@@ -25,7 +27,6 @@ const style = {
   py: 5,
   display: "flex",
   flexDirection: "column",
-  // alignItems: "center",
   justifyContent: "center",
 };
 
@@ -91,14 +92,12 @@ const PhotoViewModal = ({ isOpen, onClose, photos, initialIndex }) => {
   const settings = {
     customPaging: (i) => {
       return (
-        <a>
-          <img
-            alt=""
-            src={`https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${
-              Object.values(photos)[i]
-            }/MeditationON`}
-          />
-        </a>
+        <img
+          alt=""
+          src={`https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${
+            Object.values(photos)[i]
+          }/MeditationON`}
+        />
       );
     },
     dots: true,

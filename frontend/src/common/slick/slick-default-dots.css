@@ -1,0 +1,18 @@
+.slick-default-dots {
+  background-color: #ffffffe3;
+  width: auto;
+  white-space: nowrap;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 0.5em;
+  bottom: 3%;
+}
+
+.slick-default-dots li {
+  margin: 0 1.5px;
+}
+
+.slick-default-dots li.slick-active span {
+  background-color: #f57c00 !important;
+}

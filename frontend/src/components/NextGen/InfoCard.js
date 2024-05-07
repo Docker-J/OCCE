@@ -16,7 +16,8 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-import "./InfoCard.css";
+import "../../common/slick/slick-default-dots.css";
+import Styles from "./InfoCard.module.css";
 
 const InfoCard = ({ age, time, place, ask, imgs }) => {
   const settings = {
@@ -32,6 +33,7 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
         }}
       />
     ),
+    className: Styles["slick-slide"],
     dotsClass: "slick-dots slick-default-dots",
     dots: true,
     infinite: true,
@@ -107,10 +109,10 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
                 borderRadius: "1em",
               }}
             >
-              <div className="box-content">
+              <div className={Styles.boxContent}>
                 <Slider {...settings}>
                   {imgs.map((img) => (
-                    <div className="img-container">
+                    <div className={Styles["img-container"]}>
                       <img src={img.src} />
                     </div>
                   ))}
