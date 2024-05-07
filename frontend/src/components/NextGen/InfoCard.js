@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Box,
   Card,
   CardContent,
@@ -12,85 +11,26 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PlaceIcon from "@mui/icons-material/Place";
 import ContactSupportIcon from "@mui/icons-material/ContactSupport";
-import CustomCarousel from "../../common/CustomCarousel";
 
+import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-
 import "./InfoCard.css";
-import { memo } from "react";
-import Slider from "react-slick";
-
-const PrevArrow = memo(({ onClick }) => {
-  return (
-    <Avatar
-      component={Paper}
-      elevation={5}
-      sx={{
-        position: "absolute",
-        top: "50%",
-        left: 10,
-        opacity: 0.7,
-        zIndex: 2,
-        backgroundColor: "white",
-        color: "black",
-      }}
-      onClick={onClick}
-    >
-      <NavigateBeforeIcon
-        sx={{
-          width: 32,
-          height: 32,
-        }}
-      />
-    </Avatar>
-  );
-});
-
-const NextArrow = memo(({ onClick }) => {
-  return (
-    <Avatar
-      component={Paper}
-      elevation={5}
-      sx={{
-        position: "absolute",
-        top: "50%",
-        right: 10,
-        opacity: 0.7,
-        zIndex: 2,
-        backgroundColor: "white",
-        color: "black",
-      }}
-      onClick={onClick}
-    >
-      <NavigateNextIcon
-        sx={{
-          width: 32,
-          height: 32,
-        }}
-      />
-    </Avatar>
-  );
-});
 
 const InfoCard = ({ age, time, place, ask, imgs }) => {
   const settings = {
     customPaging: (i) => (
-      <a>
-        <span
-          style={{
-            width: "8px",
-            height: "8px",
-            borderRadius: "50%",
-            // cursor: isSelected ? null : "pointer",
-            background: "#808080",
-            display: "inline-block",
-          }}
-        />
-      </a>
+      <span
+        style={{
+          width: "8px",
+          height: "8px",
+          borderRadius: "50%",
+          // cursor: isSelected ? null : "pointer",
+          background: "#808080",
+          display: "inline-block",
+        }}
+      />
     ),
     dotsClass: "slick-dots slick-default-dots",
     dots: true,
@@ -100,8 +40,6 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
     autoplay: true,
     slidesToShow: 1,
     slidesToScroll: 1,
-    // nextArrow: <NextArrow />,
-    // prevArrow: <PrevArrow />,
   };
 
   return (
