@@ -13,18 +13,29 @@ import {
 
 const router = express.Router();
 
+const AWS_COGNITO_CLIENT_ID = process.env.AWS_COGNITO_CLIENT_ID;
+
 const cognitoClient = new CognitoIdentityProviderClient({
   region: "us-west-2",
 });
 
 router.post("/signIn", async (req, res) => {
+  const auth = new Buffer.from(
+    req.header("Authorization").split(" ")[1],
+    "base64"
+  )
+    .toString()
+    .split(":");
+  const email = auth[0];
+  const password = auth[1];
+
   console.log("Sign In requested");
   const params = {
     AuthFlow: "USER_PASSWORD_AUTH",
-    ClientId: "78vu8v6fh72mhjetdmsh2vvaad",
+    ClientId: AWS_COGNITO_CLIENT_ID,
     AuthParameters: {
-      USERNAME: req.body.email,
-      PASSWORD: req.body.password,
+      USERNAME: email,
+      PASSWORD: password,
     },
   };
 
@@ -36,7 +47,7 @@ router.post("/signIn", async (req, res) => {
     const refreshToken = response.AuthenticationResult.RefreshToken;
 
     const group = await axios.get("http://localhost:3001/api/User/getGroup", {
-      params: { email: req.body.email },
+      params: { email: email },
     });
 
     console.log(response);
@@ -72,7 +83,7 @@ router.get("/getGroup", async (req, res) => {
 router.get("/refreshAccessToken", async (req, res) => {
   const params = {
     AuthFlow: "REFRESH_TOKEN_AUTH",
-    ClientId: "78vu8v6fh72mhjetdmsh2vvaad",
+    ClientId: AWS_COGNITO_CLIENT_ID,
     AuthParameters: {
       REFRESH_TOKEN: req.query.refreshToken,
     },
@@ -95,7 +106,7 @@ router.get("/refreshAccessToken", async (req, res) => {
 
 router.post("/signUp", async (req, res) => {
   const params = {
-    ClientId: "78vu8v6fh72mhjetdmsh2vvaad",
+    ClientId: AWS_COGNITO_CLIENT_ID,
     Username: req.body.email, // required
     Password: req.body.password, // required
     UserAttributes: [
@@ -122,7 +133,7 @@ router.post("/signUp", async (req, res) => {
 router.post("/confirm", async (req, res) => {
   const input = {
     // ConfirmSignUpRequest
-    ClientId: "78vu8v6fh72mhjetdmsh2vvaad",
+    ClientId: AWS_COGNITO_CLIENT_ID,
     Username: req.body.email, // required
     ConfirmationCode: req.body.confirm_code, // required
   };
@@ -140,7 +151,7 @@ router.post("/confirm", async (req, res) => {
 router.get("/resendConfirm", async (req, res) => {
   const input = {
     // ResendConfirmationCodeRequest
-    ClientId: "78vu8v6fh72mhjetdmsh2vvaad",
+    ClientId: AWS_COGNITO_CLIENT_ID,
     Username: req.query.email, // required
   };
   const command = new ResendConfirmationCodeCommand(input);

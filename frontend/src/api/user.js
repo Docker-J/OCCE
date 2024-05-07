@@ -2,10 +2,16 @@ import axios from "axios";
 
 export const signIn = async (email, password, success, fail) => {
   try {
-    const res = await axios.post("/api/User/signIn", {
-      email: email,
-      password: password,
-    });
+    const res = await axios.post(
+      "/api/User/signIn",
+      {},
+      {
+        auth: {
+          username: email,
+          password: password,
+        },
+      }
+    );
 
     success(res.data);
   } catch (error) {
