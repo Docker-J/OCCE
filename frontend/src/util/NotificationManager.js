@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 import LaunchIcon from "@mui/icons-material/Launch";
 
-const NotificationProvider = () => {
+const NotificationManager = () => {
   const navigate = useNavigate();
   const { openSnackbar, closeSnackbar } = useSnackbar();
 
@@ -59,4 +59,4 @@ const NotificationProvider = () => {
   }, []);
 };
 
-export default NotificationProvider;
+export default NotificationManager;
