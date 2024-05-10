@@ -1,6 +1,6 @@
 import express from "express";
 
-import docClient from "./api/dynamodb.js";
+import docClient from "../api/dynamodb.js";
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
 
 const router = express.Router();

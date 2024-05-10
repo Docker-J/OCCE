@@ -4,8 +4,8 @@ import FormData from "form-data";
 import { v4 as uuid } from "uuid";
 
 import { QueryCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
-import docClient from "./api/dynamodb.js";
-import { upload } from "./middleware/multer.js";
+import docClient from "../api/dynamodb.js";
+import { upload } from "../middleware/multer.js";
 
 const router = express.Router();
 

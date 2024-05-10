@@ -2,7 +2,7 @@ import express from "express";
 import axios from "axios";
 import { v4 as uuid } from "uuid";
 import FormData from "form-data";
-import { upload } from "./middleware/multer.js";
+import { upload } from "../middleware/multer.js";
 
 const router = express.Router();
 

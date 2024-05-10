@@ -1,15 +1,14 @@
 import express from "express";
-import axios from "axios";
 
 import {
   CognitoIdentityProviderClient,
   InitiateAuthCommand,
-  AdminListGroupsForUserCommand,
   SignUpCommand,
   ConfirmSignUpCommand,
   ResendConfirmationCodeCommand,
   GlobalSignOutCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
+import { signInController } from "../controller/user.controller.js";
 
 const router = express.Router();
 
@@ -20,66 +19,7 @@ const cognitoClient = new CognitoIdentityProviderClient({
   region: "us-west-2",
 });
 
-router.post("/signIn", async (req, res) => {
-  const auth = new Buffer.from(
-    req.header("Authorization").split(" ")[1],
-    "base64"
-  )
-    .toString()
-    .split(":");
-  const email = auth[0];
-  const password = auth[1];
-
-  console.log("Sign In requested");
-  const params = {
-    AuthFlow: "USER_PASSWORD_AUTH",
-    ClientId: AWS_COGNITO_CLIENT_ID,
-    AuthParameters: {
-      USERNAME: email,
-      PASSWORD: password,
-    },
-  };
-
-  const command = new InitiateAuthCommand(params);
-
-  try {
-    const response = await cognitoClient.send(command);
-    const accessToken = response.AuthenticationResult.AccessToken;
-    const refreshToken = response.AuthenticationResult.RefreshToken;
-
-    const group = await axios.get("http://localhost:3001/api/User/getGroup", {
-      params: { email: email },
-    });
-
-    console.log(response);
-
-    res.send({
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-      group: group.data,
-    });
-  } catch (error) {
-    res.sendStatus(403);
-  }
-});
-
-router.get("/getGroup", async (req, res) => {
-  const input = {
-    // AdminListGroupsForUserRequest
-    Username: req.query.email, // required
-    UserPoolId: AWS_COGNITO_USER_POOL_ID, // required
-  };
-
-  const command = new AdminListGroupsForUserCommand(input);
-
-  try {
-    const response = await cognitoClient.send(command);
-
-    res.send(response.Groups[0].GroupName);
-  } catch (error) {
-    res.send(error);
-  }
-});
+router.post("/signIn", signInController);
 
 router.get("/refreshAccessToken", async (req, res) => {
   const params = {

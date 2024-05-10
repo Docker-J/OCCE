@@ -6,9 +6,9 @@ import {
   GetObjectCommand,
 } from "@aws-sdk/client-s3";
 import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
-import docClient from "./api/dynamodb.js";
-import { upload } from "./middleware/multer.js";
-import sendNotification from "./api/sendNotification.js";
+import docClient from "../api/dynamodb.js";
+import { upload } from "../middleware/multer.js";
+import sendNotification from "../api/sendNotification.js";
 
 const router = express.Router();
 
