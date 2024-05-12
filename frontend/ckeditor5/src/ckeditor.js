@@ -103,6 +103,9 @@ Editor.defaultConfig = {
       type: "auto",
     },
   },
+  mediaEmbed: {
+    previewsInData: true,
+  },
   table: {
     contentToolbar: ["tableColumn", "tableRow", "mergeTableCells"],
   },
