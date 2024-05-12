@@ -6,6 +6,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { v4 as uuidv4 } from "uuid";
 
 import GroupsIcon from "@mui/icons-material/Groups";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -112,7 +113,7 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
               <div className={Styles.boxContent}>
                 <Slider {...settings}>
                   {imgs.map((img) => (
-                    <div className={Styles["img-container"]}>
+                    <div className={Styles["img-container"]} key={uuidv4}>
                       <img src={img.src} />
                     </div>
                   ))}
