@@ -15,7 +15,8 @@ import { loader as MeditationONPostLoader } from "./route/MeditationONPostLoader
 import { loader as Bible291Loader } from "./route/Bible291Loader";
 import { loader as AlbumPhotosLoader } from "./route/AlbumPhotosLoader";
 import Footer from "./header/Footer";
-import NotificationManager from "./util/NotificationManager";
+import NotificationManager from "./manager/NotificationManager";
+import UserManager from "./manager/UserManager";
 
 // import NewComers from "./pages/NewComers";
 
@@ -137,10 +138,19 @@ const YoungAdult = lazy(() =>
   lazyRetry(() => import("./pages/NextGen/YoungAdult"), "YoungAdult")
 );
 
+const Managers = () => {
+  return (
+    <>
+      <UserManager />
+      <NotificationManager />
+    </>
+  );
+};
+
 const HeaderFooterWrapper = () => {
   return (
     <>
-      <NotificationManager />
+      <Managers />
       <div
         style={{
           display: "flex",
@@ -170,9 +180,11 @@ const HeaderFooterWrapper = () => {
 const HeaderWrapper = () => {
   return (
     <>
-      <NotificationManager />
+      <Managers />
       <ResponsiveAppBar />
-      <Outlet />
+      <Suspense>
+        <Outlet />
+      </Suspense>
     </>
   );
 };

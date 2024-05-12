@@ -3,7 +3,7 @@ import axios from "axios";
 export const signIn = async (email, password, success, fail) => {
   try {
     const res = await axios.post(
-      "/api/User/signIn",
+      "/api/user/signIn",
       {},
       {
         auth: {
@@ -20,21 +20,17 @@ export const signIn = async (email, password, success, fail) => {
   }
 };
 
-export const signOut = async (accessToken, success) => {
+export const refreshTokenSignIn = async (refreshToken, success) => {
   try {
-    await axios.post("/api/user/signout", {
-      accessToken: accessToken,
-    });
+    const res = await axios.post(`/api/user/refreshSignIn/${refreshToken}`);
 
-    success();
+    success(res.data);
   } catch (error) {}
 };
 
-export const renewAccessToken = async (refreshToken, success) => {
+export const signOut = async (accessToken, success) => {
   try {
-    await axios.get("/api/user/signout", {
-      refreshToken: refreshToken,
-    });
+    await axios.post(`/api/user/signout/${accessToken}`);
 
     success();
   } catch (error) {}

@@ -1,10 +1,11 @@
 import axios from "axios";
 import { format } from "date-fns";
 
-export const uploadWeeklyUpdate = async (form) => {
+export const uploadWeeklyUpdate = async (token, form) => {
   try {
-    await axios.put("/api/WeeklyUpdate/PostBulletin/", form, {
+    await axios.put("/api/WeeklyUpdate/", form, {
       headers: {
+        Authentication: `Bearer ${token}`,
         "Content-Type": `multipart/form-data`,
       },
     });
@@ -15,12 +16,12 @@ export const uploadWeeklyUpdate = async (form) => {
 
 export const getWeeklyUpdate = async (selectedDate) => {
   try {
-    return await axios.get("/api/WeeklyUpdate/GetBulletin", {
-      params: {
-        date: format(selectedDate, "yyyyMMdd"),
-      },
-      responseType: "arraybuffer",
-    });
+    return await axios.get(
+      `/api/WeeklyUpdate/${format(selectedDate, "yyyyMMdd")}`,
+      {
+        responseType: "arraybuffer",
+      }
+    );
   } catch {
     throw new Error();
   }

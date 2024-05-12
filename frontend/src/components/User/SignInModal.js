@@ -1,9 +1,15 @@
 import React, { useState } from "react";
-import { Box, Button, Modal, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Modal,
+  TextField,
+} from "@mui/material";
 import { signIn } from "../../api/user";
 import { useDispatch } from "react-redux";
 import { SET_TOKEN } from "../../store/Auth";
-import { setRefreshToken } from "../../storage/Cookie";
 import useSnackbar from "../../util/useSnackbar";
 
 const style = {
@@ -32,16 +38,17 @@ const SignInModal = ({ isOpen, onClose }) => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(false);
 
   const signInSuccess = (result) => {
     const data = {
       accessToken: result.accessToken,
       groups: [result.group],
-      // groups: result.getIdToken().payload["cognito:groups"],
     };
 
     dispatch(SET_TOKEN(data));
-    setRefreshToken(result.refreshToken);
+    localStorage.setItem("refreshToken", result.refreshToken);
+    remember && localStorage.setItem("remember", true);
     openSnackbar("success", "Signed In Succesfully!");
     handleClose();
   };
@@ -57,6 +64,7 @@ const SignInModal = ({ isOpen, onClose }) => {
   const handleClose = () => {
     setEmail("");
     setPassword("");
+    setRemember(false);
     onClose();
   };
 
@@ -81,7 +89,12 @@ const SignInModal = ({ isOpen, onClose }) => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-
+          <FormControlLabel
+            sx={{ mt: "1em", right: 0 }}
+            onChange={setRemember}
+            control={<Checkbox />}
+            label="로그인 유지"
+          />
           <Button
             sx={{ width: "90%", mt: "1.5em" }}
             variant="outlined"
@@ -89,7 +102,6 @@ const SignInModal = ({ isOpen, onClose }) => {
           >
             Sign In
           </Button>
-          {/* <Button onClick={handleClose}>Close</Button> */}
         </Box>
       </Modal>
     </>

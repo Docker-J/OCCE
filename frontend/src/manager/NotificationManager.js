@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { messaging } from "../api/firebase";
 import { getToken, onMessage } from "firebase/messaging";
 import { registerToken } from "../api/notification";
-import useSnackbar from "./useSnackbar";
+import useSnackbar from "../util/useSnackbar";
 import { IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 

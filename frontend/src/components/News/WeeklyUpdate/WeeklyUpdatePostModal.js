@@ -13,6 +13,7 @@ import { Document, Page } from "react-pdf";
 import { add, endOfWeek, format, isSunday } from "date-fns";
 import useSnackbar from "../../../util/useSnackbar";
 import { uploadWeeklyUpdate } from "../../../api/weeklyupdate";
+import { useSelector } from "react-redux";
 
 const style = {
   position: "absolute",
@@ -37,6 +38,7 @@ const MIN_DATE = "2022/04/03";
 
 const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
   const { openSnackbar } = useSnackbar();
+  const user = useSelector((state) => state.authToken);
 
   const [selectedDate, setSelectedDate] = useState(
     add(endOfWeek(new Date()), { days: 1 })
@@ -80,7 +82,7 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
       form.append("images", fileToUpload);
       form.append("date", date);
 
-      await uploadWeeklyUpdate(form);
+      await uploadWeeklyUpdate(user.accessToken, form);
 
       openSnackbar("success", "Uploaded Succesfully!");
       setParentDate(selectedDate);

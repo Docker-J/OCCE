@@ -17,7 +17,6 @@ import Submenu from "../components/Header/Submenu";
 import SubmenuMobile from "../components/Header/SubmenuMobile";
 import { signOut } from "../api/user";
 import { useDispatch, useSelector } from "react-redux";
-import { removeCookieToken } from "../storage/Cookie";
 import { DELETE_TOKEN } from "../store/Auth";
 import {
   bindMenu,
@@ -69,14 +68,13 @@ const ResponsiveAppBar = () => {
 
   const signOutSuccess = () => {
     dispatch(DELETE_TOKEN());
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("remember");
     openSnackbar("success", "Successfully Signed Out");
-    removeCookieToken();
   };
 
   const appBarPosition = "absolute";
-
   const appBarColor = "white";
-
   const logoColor = "/img/HeaderLogoColor.png";
 
   return (
