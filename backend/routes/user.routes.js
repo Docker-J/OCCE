@@ -2,18 +2,19 @@ import express from "express";
 
 import {
   CognitoIdentityProviderClient,
-  InitiateAuthCommand,
   SignUpCommand,
   ConfirmSignUpCommand,
   ResendConfirmationCodeCommand,
-  GlobalSignOutCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
-import { signInController } from "../controller/user.controller.js";
+import {
+  refreshSignInController,
+  signInController,
+  signOutController,
+} from "../controller/user.controller.js";
 
 const router = express.Router();
 
 const AWS_COGNITO_CLIENT_ID = process.env.AWS_COGNITO_CLIENT_ID;
-const AWS_COGNITO_USER_POOL_ID = process.env.AWS_COGNITO_USER_POOL_ID;
 
 const cognitoClient = new CognitoIdentityProviderClient({
   region: "us-west-2",
@@ -21,29 +22,7 @@ const cognitoClient = new CognitoIdentityProviderClient({
 
 router.post("/signIn", signInController);
 
-router.get("/refreshAccessToken", async (req, res) => {
-  const params = {
-    AuthFlow: "REFRESH_TOKEN_AUTH",
-    ClientId: AWS_COGNITO_CLIENT_ID,
-    AuthParameters: {
-      REFRESH_TOKEN: req.query.refreshToken,
-    },
-  };
-
-  const command = new InitiateAuthCommand(params);
-
-  try {
-    const response = await cognitoClient.send(command);
-    console.log(response);
-    const accessToken = response.AuthenticationResult.AccessToken;
-    const newRefreshToken = response.AuthenticationResult.RefreshToken;
-
-    console.log("Access Token", accessToken);
-    res.send(accessToken);
-  } catch (error) {
-    res.send(error);
-  }
-});
+router.post("/refreshSignIn/:refreshToken", refreshSignInController);
 
 router.post("/signUp", async (req, res) => {
   const params = {
@@ -106,18 +85,6 @@ router.get("/resendConfirm", async (req, res) => {
   }
 });
 
-router.post("/signOut", async (req, res) => {
-  const command = new GlobalSignOutCommand({
-    AccessToken: req.body.accessToken,
-  });
-  try {
-    const response = await cognitoClient.send(command);
-    res.send(response);
-  } catch (error) {
-    // res.sendStatus(401);
-    console.log(error);
-    res.send(error);
-  }
-});
+router.post("/signOut/:accessToken", signOutController);
 
 export default router;

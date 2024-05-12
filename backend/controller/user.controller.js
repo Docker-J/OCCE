@@ -1,5 +1,6 @@
 import {
   CognitoIdentityProviderClient,
+  GlobalSignOutCommand,
   InitiateAuthCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 
@@ -48,5 +49,52 @@ export const signInController = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.sendStatus(403);
+  }
+};
+
+export const refreshSignInController = async (req, res) => {
+  console.log("Sign In requested");
+
+  const params = {
+    AuthFlow: "REFRESH_TOKEN_AUTH",
+    ClientId: AWS_COGNITO_CLIENT_ID,
+    AuthParameters: {
+      REFRESH_TOKEN: req.params.refreshToken,
+    },
+  };
+
+  const command = new InitiateAuthCommand(params);
+
+  try {
+    const response = await cognitoClient.send(command);
+    const accessToken = response.AuthenticationResult.AccessToken;
+    const newRefreshToken = response.AuthenticationResult.RefreshToken;
+    const group = JSON.parse(Buffer.from(accessToken.split(".")[1], "base64"))[
+      "cognito:groups"
+    ][0];
+
+    res.send({
+      accessToken: accessToken,
+      refreshToken: newRefreshToken,
+      group: group,
+    });
+  } catch (error) {
+    res.send(error);
+    res.sendStatus(403);
+  }
+};
+
+export const signOutController = async (req, res) => {
+  const command = new GlobalSignOutCommand({
+    AccessToken: req.params.accessToken,
+  });
+
+  try {
+    await cognitoClient.send(command);
+    res.sendStatus(200);
+  } catch (error) {
+    // res.sendStatus(401);
+    console.log(error);
+    res.send(error);
   }
 };

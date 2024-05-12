@@ -12,6 +12,7 @@ import notification from "./routes/notification.routes.js";
 
 import authStaff from "./middleware/auth.js";
 import sendNotification from "./api/sendNotification.js";
+import { getRecentWeelyUpdateDate } from "./controller/weeklyupdate.controller.js";
 
 const app = express();
 const PORT = process.env.port || 3001;
@@ -36,6 +37,9 @@ app.post("/api/test", async (req, res) => {
   await sendNotification("test", "1111", "https://oncce.ca/weeklyupdate");
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+  // PreFetch
+  await getRecentWeelyUpdateDate();
+
   console.log(`running on port ${PORT}`);
 });
