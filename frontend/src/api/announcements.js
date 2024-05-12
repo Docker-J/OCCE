@@ -76,7 +76,7 @@ export const pinAnnouncement = async (id, pin) => {
   try {
     await axios.put("/api/Announcements/pinAnnouncement", {
       id: id,
-      pin: !pin,
+      pin: !pin ? 1 : 0,
     });
   } catch {
     throw new Error();
