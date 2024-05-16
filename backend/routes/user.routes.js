@@ -2,7 +2,6 @@ import express from "express";
 
 import {
   CognitoIdentityProviderClient,
-  SignUpCommand,
   ConfirmSignUpCommand,
   ResendConfirmationCodeCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
@@ -10,6 +9,7 @@ import {
   refreshSignInController,
   signInController,
   signOutController,
+  signUpController,
 } from "../controller/user.controller.js";
 
 const router = express.Router();
@@ -24,31 +24,7 @@ router.post("/signIn", signInController);
 
 router.post("/refreshSignIn/:refreshToken", refreshSignInController);
 
-router.post("/signUp", async (req, res) => {
-  const params = {
-    ClientId: AWS_COGNITO_CLIENT_ID,
-    Username: req.body.email, // required
-    Password: req.body.password, // required
-    UserAttributes: [
-      // AttributeListType
-      {
-        // AttributeType
-        Name: "name",
-        Value: req.body.name,
-      },
-    ],
-  };
-
-  const command = new SignUpCommand(params);
-  try {
-    const response = await cognitoClient.send(command);
-    console.log(response);
-    res.send(response);
-  } catch (error) {
-    console.log(error);
-    res.send(error);
-  }
-});
+router.post("/signUp", signUpController);
 
 router.post("/confirm", async (req, res) => {
   const input = {

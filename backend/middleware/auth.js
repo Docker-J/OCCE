@@ -13,10 +13,10 @@ const userVerfier = CognitoJwtVerifier.create({
   clientId: process.env.AWS_COGNITO_CLIENT_ID,
 });
 
-const authStaff = async (req, _, next) => {
-  // 바로
+const authStaff = async (req, res, next) => {
   try {
     const token = req.header("Authorization").split(" ")[1];
+    console.log(req.header("Authorization"));
     const payload = await staffVerifier.verify(token);
     console.log("Token is valid. Payload:", payload);
 
@@ -24,12 +24,11 @@ const authStaff = async (req, _, next) => {
   } catch (err) {
     console.log("Token not valid!");
 
-    next(err);
+    res.sendStatus(401);
   }
 };
 
 const authUser = async (req, _, next) => {
-  // 바로
   try {
     const token = req.header("Authorization").split(" ")[1];
     const payload = await userVerfier.verify(token);

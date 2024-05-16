@@ -93,11 +93,11 @@ export const uploadWeeklyUpdateController = async (req, res) => {
 
     res.send(req.body.date);
 
-    sendNotification(
-      "새로운 주보가 업로드 되었습니다",
-      req.body.date,
-      `weeklyupdate/${req.body.date}`
-    );
+    // sendNotification(
+    //   "새로운 주보가 업로드 되었습니다",
+    //   req.body.date,
+    //   `weeklyupdate/${req.body.date}`
+    // );
   } catch (error) {
     console.log(error);
     res.sendStatus(500);

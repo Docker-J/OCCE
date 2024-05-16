@@ -2,10 +2,11 @@ import {
   CognitoIdentityProviderClient,
   GlobalSignOutCommand,
   InitiateAuthCommand,
+  SignUpCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 
 const AWS_COGNITO_CLIENT_ID = process.env.AWS_COGNITO_CLIENT_ID;
-const AWS_COGNITO_USER_POOL_ID = process.env.AWS_COGNITO_USER_POOL_ID;
+// const AWS_COGNITO_USER_POOL_ID = process.env.AWS_COGNITO_USER_POOL_ID;
 
 const cognitoClient = new CognitoIdentityProviderClient({
   region: "us-west-2",
@@ -81,6 +82,30 @@ export const refreshSignInController = async (req, res) => {
   } catch (error) {
     res.send(error);
     res.sendStatus(403);
+  }
+};
+
+export const signUpController = async (req, res) => {
+  const params = {
+    ClientId: AWS_COGNITO_CLIENT_ID,
+    Username: req.body.email,
+    Password: req.body.password,
+    UserAttributes: [
+      {
+        Name: "name",
+        Value: req.body.name,
+      },
+    ],
+  };
+
+  const command = new SignUpCommand(params);
+  try {
+    const response = await cognitoClient.send(command);
+    console.log(response);
+    res.send(response);
+  } catch (error) {
+    console.log(error);
+    res.send(error);
   }
 };
 

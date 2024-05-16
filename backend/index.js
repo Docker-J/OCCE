@@ -9,10 +9,14 @@ import weeklyupdate from "./routes/weeklyupdate.routes.js";
 import albums from "./routes/albums.routes.js";
 import meditationon from "./routes/meditationon.routes.js";
 import notification from "./routes/notification.routes.js";
+import images from "./routes/images.routes.js";
 
-import authStaff from "./middleware/auth.js";
 import sendNotification from "./api/sendNotification.js";
 import { getRecentWeelyUpdateDate } from "./controller/weeklyupdate.controller.js";
+import {
+  getAnnouncementsCount,
+  getPinnedAnnouncements,
+} from "./controller/announcements.controller.js";
 
 const app = express();
 const PORT = process.env.port || 3001;
@@ -27,19 +31,15 @@ app.use("/api/albums", albums);
 app.use("/api/meditationon", meditationon);
 app.use("/api/notification", notification);
 
-// app.get("/api/test", authStaff, async (req, res) => {
-//   console.log("get");
-//   res.send(200);
-// });
-
-app.post("/api/test", async (req, res) => {
-  res.send(200);
-  await sendNotification("test", "1111", "https://oncce.ca/weeklyupdate");
-});
+app.use("/api/images", images);
 
 app.listen(PORT, async () => {
   // PreFetch
-  await getRecentWeelyUpdateDate();
+  await Promise.all([
+    getRecentWeelyUpdateDate(),
+    getAnnouncementsCount(),
+    getPinnedAnnouncements(),
+  ]);
 
   console.log(`running on port ${PORT}`);
 });
