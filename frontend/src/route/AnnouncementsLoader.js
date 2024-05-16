@@ -7,9 +7,7 @@ export async function loader({ request }) {
     return redirect("?page=1");
   }
 
-  const getAnnouncements = axios.get(
-    `/api/Announcements/getAnnouncements?page=${page}`
-  );
+  const getAnnouncements = axios.get(`/api/announcements?page=${page}`);
 
   return defer({ announcementsData: getAnnouncements });
 }

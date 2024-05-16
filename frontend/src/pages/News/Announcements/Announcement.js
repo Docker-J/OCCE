@@ -16,8 +16,6 @@ import useSnackbar from "../../../util/useSnackbar";
 import { useState } from "react";
 import FullScreenLoading from "../../../common/FullScreenLoading";
 
-import "../../NextGen/NextGen.css";
-import "./content-styles.css";
 import AdminComponent from "../../../common/AdminComponent";
 import useModals from "../../../util/useModal";
 import AnnouncementPostModal from "../../../components/News/Announcement/AnnouncementPostModal";
@@ -25,6 +23,9 @@ import {
   deleteAnnouncement,
   pinAnnouncement,
 } from "../../../api/announcements";
+
+import "../../NextGen/NextGen.css";
+import "./content-styles.css";
 
 const titleBackground = {
   backgroundImage:

@@ -1,11 +1,7 @@
-import axios from "axios";
+import { getPost } from "../api/meditationon";
 
 export async function loader({ params }) {
-  const result = await axios.get("/api/MeditationON/getPostDetail", {
-    params: {
-      id: params.postID,
-    },
-  });
+  const result = await getPost(params.postID);
 
   return result.data;
 }

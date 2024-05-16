@@ -1,11 +1,10 @@
 import axios from "axios";
 import { format } from "date-fns";
 
-export const uploadWeeklyUpdate = async (token, form) => {
+export const uploadWeeklyUpdate = async (form) => {
   try {
     await axios.put("/api/WeeklyUpdate/", form, {
       headers: {
-        Authentication: `Bearer ${token}`,
         "Content-Type": `multipart/form-data`,
       },
     });

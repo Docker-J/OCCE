@@ -3,7 +3,7 @@ import axios from "axios";
 export const getPosts = async (posts) => {
   try {
     return await axios.get(
-      `/api/MeditationON/getPosts${
+      `/api/meditationon${
         posts.length === 0
           ? ""
           : `?lastVisible=${posts.at(-1).ID}&timeStamp=${
@@ -16,9 +16,17 @@ export const getPosts = async (posts) => {
   }
 };
 
+export const getPost = async (id) => {
+  try {
+    return await axios.get(`/api/meditationon/post/${id}`);
+  } catch {
+    throw new Error();
+  }
+};
+
 export const uploadImages = async (form) => {
   try {
-    await axios.post("/api/meditationON/uploadImage", form, {
+    await axios.post("/api/meditationon", form, {
       headers: {
         "Content-Type": `multipart/form-data`,
       },

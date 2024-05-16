@@ -1,62 +1,43 @@
 import axios from "axios";
-
-function dataURLtoBlob(dataurl) {
-  var arr = dataurl.split(","),
-    mime = arr[0].match(/:(.*?);/)[1],
-    bstr = atob(arr[1]),
-    n = bstr.length,
-    u8arr = new Uint8Array(n);
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-  return new Blob([u8arr], { type: mime });
-}
-
-const uploadImage = async (file) => {
-  var blob = dataURLtoBlob(file);
-  const form = new FormData();
-  form.append("image", blob, "image.jpg");
-
-  const result = await axios.post("/api/Announcements/uploadImage", form, {
-    headers: {
-      "Content-Type": `multipart/form-data`,
-    },
-  });
-
-  return result.data;
-};
+import { uploadImage } from "./images";
 
 export const postAnnouncement = async (id, title, body) => {
-  let modifiedBody = body;
   const regex = /(<img[^>]+src=")([^">]+)"/g;
+  const matches = Array.from(body.matchAll(regex));
 
-  let match;
-  const images = [];
-  while ((match = regex.exec(body)) !== null) {
+  const uploadPromises = matches.map(async (match) => {
+    // Collect promises
     const src = match[2];
-    if (src.startsWith("https://")) {
-      images.push(src.split("/").at(-2));
+    if (!src.startsWith("https://")) {
+      return uploadImage(src); // Return the promise directly
     } else {
-      const imageID = await uploadImage(src);
-      images.push(imageID);
-
-      modifiedBody = modifiedBody.replace(
-        match[0],
-        `${match[1]}https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${imageID}/Announcements"`
-      );
+      return src.split("/").at(-2); // Return existing ID immediately
     }
+  });
+
+  const imageIDs = await Promise.all(uploadPromises); // Wait for all uploads
+
+  const replacements = matches.map((match, index) => {
+    const imageID = imageIDs[index];
+    const replacement = `https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${imageID}/Announcements`;
+    return { original: match[0], replacement: `${match[1]}${replacement}"` };
+  });
+
+  let modifiedBody = body;
+
+  for (const { original, replacement } of replacements) {
+    modifiedBody = modifiedBody.replace(original, replacement);
   }
 
   try {
     await axios.put(
       id
-        ? "/api/Announcements/editAnnouncement"
-        : "/api/Announcements/postAnnouncement",
+        ? `/api/announcements/announcement${id}`
+        : "/api/announcements/announcement",
       {
-        id: id ? id : null,
         title: title,
         body: modifiedBody,
-        images: images,
+        images: imageIDs,
       }
     );
   } catch {
@@ -66,7 +47,7 @@ export const postAnnouncement = async (id, title, body) => {
 
 export const deleteAnnouncement = async (id) => {
   try {
-    await axios.delete(`/api/Announcements/deleteAnnouncement?id=${id}`);
+    await axios.delete(`/api/announcements/announcement/${id}`);
   } catch {
     throw new Error();
   }
@@ -74,8 +55,7 @@ export const deleteAnnouncement = async (id) => {
 
 export const pinAnnouncement = async (id, pin) => {
   try {
-    await axios.put("/api/Announcements/pinAnnouncement", {
-      id: id,
+    await axios.put(`/api/announcements/announcement/${id}/pin`, {
       pin: !pin ? 1 : 0,
     });
   } catch {

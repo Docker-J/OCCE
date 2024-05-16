@@ -162,13 +162,15 @@ const Albums = () => {
         </div>
       </div>
 
-      <Fab
-        variant="primary"
-        style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
-        onClick={() => openModal(AlbumUploadModal, {})}
-      >
-        <AddIcon />
-      </Fab>
+      <AdminComponent>
+        <Fab
+          variant="primary"
+          style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
+          onClick={() => openModal(AlbumUploadModal, {})}
+        >
+          <AddIcon />
+        </Fab>
+      </AdminComponent>
 
       {end && <Footer />}
     </>

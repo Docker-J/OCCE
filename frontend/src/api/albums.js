@@ -3,7 +3,7 @@ import axios from "axios";
 export const getAlbums = async (albums, year) => {
   try {
     return await axios.get(
-      `/api/albums/getAlbums${
+      `/api/albums/${
         albums.length === 0
           ? ""
           : `?lastVisible=${albums.at(-1).ID}&timeStamp=${
@@ -18,7 +18,7 @@ export const getAlbums = async (albums, year) => {
 
 export const uploadAlbum = async (form) => {
   try {
-    await axios.post("/api/albums/uploadAlbum", form, {
+    await axios.post("/api/albums", form, {
       headers: {
         "Content-Type": `multipart/form-data`,
       },
