@@ -7,8 +7,9 @@ const RequestManager = () => {
 
   useEffect(() => {
     const requestInterceptor = axios.interceptors.request.use((request) => {
-      request.headers.Authorization = `Bearer ${accessToken}`;
-      console.log(request.headers.Authorization);
+      if (accessToken) {
+        request.headers.Authorization = `Bearer ${accessToken}`;
+      }
 
       return request;
     });

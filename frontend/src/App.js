@@ -17,6 +17,7 @@ import { loader as AlbumPhotosLoader } from "./route/AlbumPhotosLoader";
 import Footer from "./header/Footer";
 import NotificationManager from "./manager/NotificationManager";
 import UserManager from "./manager/UserManager";
+import RequestManager from "./manager/RequestManager";
 
 // import NewComers from "./pages/NewComers";
 
@@ -143,6 +144,7 @@ const Managers = () => {
     <>
       <UserManager />
       <NotificationManager />
+      <RequestManager />
     </>
   );
 };
