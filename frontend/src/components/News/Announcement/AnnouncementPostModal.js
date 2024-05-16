@@ -1,6 +1,6 @@
 import { Box, Button, CircularProgress, Modal, TextField } from "@mui/material";
 import TextEditor from "./TextEditor";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import useSnackbar from "../../../util/useSnackbar";
 import { postAnnouncement } from "../../../api/announcements";
@@ -56,7 +56,14 @@ const AnnouncementPostModal = ({
     }
   };
 
+  useEffect(() => {
+    setTitle(origTitle);
+    setBody(origBody);
+  }, [origTitle, origBody]);
+
   const handleClose = () => {
+    setTitle(origTitle);
+    setBody(origBody);
     onClose();
   };
 
@@ -72,14 +79,14 @@ const AnnouncementPostModal = ({
                 id="filled-basic"
                 label="Title"
                 variant="outlined"
-                defaultValue={origTitle}
+                value={title}
                 sx={{ width: "100%" }}
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
 
             <div style={{ height: "85%", width: "100%" }}>
-              <TextEditor body={origBody} getBody={setBody} />
+              <TextEditor body={body} getBody={setBody} />
             </div>
 
             <div>
