@@ -1,7 +1,9 @@
 import {
   CognitoIdentityProviderClient,
+  ConfirmSignUpCommand,
   GlobalSignOutCommand,
   InitiateAuthCommand,
+  ResendConfirmationCodeCommand,
   SignUpCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 
@@ -109,9 +111,44 @@ export const signUpController = async (req, res) => {
   }
 };
 
+export const confimrSignUpController = async (req, res) => {
+  const input = {
+    // ConfirmSignUpRequest
+    ClientId: AWS_COGNITO_CLIENT_ID,
+    Username: req.body.email, // required
+    ConfirmationCode: req.body.confirm_code, // required
+  };
+  const command = new ConfirmSignUpCommand(input);
+
+  try {
+    const response = await cognitoClient.send(command);
+    res.send(response);
+  } catch (error) {
+    console.log(error);
+    res.send(error);
+  }
+};
+
+export const requestConfirmController = async (req, res) => {
+  const input = {
+    // ResendConfirmationCodeRequest
+    ClientId: AWS_COGNITO_CLIENT_ID,
+    Username: req.query.email, // required
+  };
+  const command = new ResendConfirmationCodeCommand(input);
+
+  try {
+    const response = await cognitoClient.send(command);
+    res.send(response);
+  } catch (error) {
+    console.log(error);
+    res.send(error);
+  }
+};
+
 export const signOutController = async (req, res) => {
   const command = new GlobalSignOutCommand({
-    AccessToken: req.params.accessToken,
+    AccessToken: req.header("Authorization").split(" ")[1],
   });
 
   try {

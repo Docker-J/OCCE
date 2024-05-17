@@ -11,7 +11,6 @@ import meditationon from "./routes/meditationon.routes.js";
 import notification from "./routes/notification.routes.js";
 import images from "./routes/images.routes.js";
 
-import sendNotification from "./api/sendNotification.js";
 import { getRecentWeelyUpdateDate } from "./controller/weeklyupdate.controller.js";
 import {
   getAnnouncementsCount,

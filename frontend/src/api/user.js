@@ -28,9 +28,39 @@ export const refreshTokenSignIn = async (refreshToken, success) => {
   } catch (error) {}
 };
 
-export const signOut = async (accessToken, success) => {
+export const signUp = async (name, email, password, success, fail) => {
   try {
-    await axios.post(`/api/user/signout/${accessToken}`);
+    const res = await axios.post("/api/user/singup");
+
+    success(res.data);
+  } catch (error) {
+    fail();
+  }
+};
+
+export const confirmSignUp = async (email, confirmCode, success, fail) => {
+  try {
+    const res = await axios.post("/api/user/confirm");
+
+    success();
+  } catch (error) {
+    fail();
+  }
+};
+
+export const resendSignUpConfirm = async (email, success, fail) => {
+  try {
+    const res = await axios.get("/api/user/resendConfirm");
+
+    success();
+  } catch {
+    fail();
+  }
+};
+
+export const signOut = async (success) => {
+  try {
+    await axios.post("/api/user/signout");
 
     success();
   } catch (error) {}

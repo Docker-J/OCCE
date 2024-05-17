@@ -36,7 +36,7 @@ const ResponsiveAppBar = () => {
   const { openSnackbar } = useSnackbar();
 
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.authToken);
+  const authenticated = useSelector((state) => state.authToken?.authenticated);
 
   const popupState = usePopupState({
     variant: "popover",
@@ -50,18 +50,18 @@ const ResponsiveAppBar = () => {
 
   const settings_signed = [
     {
-      title: "Sign Out",
-      onClick: () => signOut(user.accessToken, signOutSuccess),
+      title: "로그아웃",
+      onClick: () => signOut(signOutSuccess),
     },
   ];
 
   const settings_not_signed = [
     {
-      title: "Sign In",
+      title: "로그인",
       onClick: () => openModal(SignInModal, {}),
     },
     {
-      title: "Sign Up",
+      title: "회원가입",
       onClick: () => openModal(SignUpModal, {}),
     },
   ];
@@ -188,7 +188,7 @@ const ResponsiveAppBar = () => {
               }}
               {...bindMenu(userPopupState)}
             >
-              {(user.authenticated ? settings_signed : settings_not_signed).map(
+              {(authenticated ? settings_signed : settings_not_signed).map(
                 (setting) => (
                   <MenuItem key={setting.title} onClick={userPopupState.close}>
                     <Typography
