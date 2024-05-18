@@ -1,11 +1,12 @@
-import axios from "axios";
 import { parse } from "date-fns";
+import { getRecentWeelyUpdateDate } from "../api/weeklyupdate";
 
 const DATE_FORMAT = "yyyyMMdd";
 
 export async function loader({ params }) {
   console.log("test");
-  const result = await axios.get("/api/WeeklyUpdate/RecentDate");
+  const result = await getRecentWeelyUpdateDate();
+
   const date = JSON.stringify(result.data);
 
   const maxDate = parse(date, DATE_FORMAT, new Date());

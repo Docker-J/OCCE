@@ -13,6 +13,12 @@ export const uploadWeeklyUpdate = async (form) => {
   }
 };
 
+export const getRecentWeelyUpdateDate = async () => {
+  try {
+    return await axios.get("/api/WeeklyUpdate/RecentDate");
+  } catch {}
+};
+
 export const getWeeklyUpdate = async (selectedDate) => {
   try {
     return await axios.get(
