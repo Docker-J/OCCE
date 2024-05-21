@@ -68,6 +68,7 @@ const ResponsiveAppBar = () => {
 
   const signOutSuccess = () => {
     dispatch(DELETE_TOKEN());
+    sessionStorage.removeItem("refreshToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("remember");
     openSnackbar("success", "Successfully Signed Out");

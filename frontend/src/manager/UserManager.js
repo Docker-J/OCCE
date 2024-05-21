@@ -19,17 +19,21 @@ const UserManager = () => {
   );
 
   useEffect(() => {
-    const refreshToken = localStorage.getItem("refreshToken");
+    const refreshToken =
+      localStorage.getItem("refreshToken") ||
+      sessionStorage.getItem("refreshToken");
     const remember = localStorage.getItem("remember");
 
     if (!refreshToken) {
       return;
     }
 
-    if (remember && refreshToken) {
-      refreshTokenSignIn(refreshToken, signInSuccess);
+    if (remember && localStorage.getItem("refreshToken")) {
+      refreshTokenSignIn(localStorage.getItem("refreshToken"), signInSuccess);
+    } else if (sessionStorage.getItem("refreshToken")) {
+      refreshTokenSignIn(sessionStorage.getItem("refreshToken"), signInSuccess);
     }
-  }, []);
+  }, [signInSuccess]);
 };
 
 export default UserManager;

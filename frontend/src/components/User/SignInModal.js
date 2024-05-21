@@ -11,6 +11,7 @@ import { signIn } from "../../api/user";
 import { useDispatch } from "react-redux";
 import { SET_TOKEN } from "../../store/Auth";
 import useSnackbar from "../../util/useSnackbar";
+import { useForm } from "react-hook-form";
 
 const style = {
   position: "absolute",
@@ -20,12 +21,10 @@ const style = {
   width: "80vw",
   maxWidth: "400px",
   bgcolor: "#ffffff",
-  // border: "1pt solid #f57c00",
   boxShadow: 24,
   borderRadius: "0.5em",
   p: 1,
-  pt: 5,
-  pb: 5,
+  py: 5,
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
@@ -34,10 +33,9 @@ const style = {
 
 const SignInModal = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
+  const { register, getValues, handleSubmit, resetField } = useForm();
   const { openSnackbar } = useSnackbar();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
 
   const signInSuccess = (result) => {
@@ -47,8 +45,13 @@ const SignInModal = ({ isOpen, onClose }) => {
     };
 
     dispatch(SET_TOKEN(data));
-    localStorage.setItem("refreshToken", result.refreshToken);
-    remember && localStorage.setItem("remember", true);
+
+    if (remember) {
+      localStorage.setItem("refreshToken", result.refreshToken);
+      localStorage.setItem("remember", true);
+    } else {
+      sessionStorage.setItem("refreshToken", result.refreshToken);
+    }
     openSnackbar("success", "Signed In Succesfully!");
     handleClose();
   };
@@ -58,12 +61,17 @@ const SignInModal = ({ isOpen, onClose }) => {
   };
 
   const handleSignIn = () => {
-    signIn(email, password, signInSuccess, signInFail);
+    signIn(
+      getValues("email"),
+      getValues("password"),
+      signInSuccess,
+      signInFail
+    );
   };
 
   const handleClose = () => {
-    setEmail("");
-    setPassword("");
+    resetField("email");
+    resetField("password");
     setRemember(false);
     onClose();
   };
@@ -72,36 +80,43 @@ const SignInModal = ({ isOpen, onClose }) => {
     <>
       <Modal open={isOpen} onClose={onClose}>
         <Box sx={style} bgcolor="white">
-          <h1 style={{ marginTop: 0 }}>Sign In</h1>
-          <TextField
-            sx={{ width: "90%", mt: "1.5em" }}
-            label="Email"
-            value={email}
-            type="email"
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <TextField
-            sx={{ width: "90%", mt: "1em" }}
-            label="Password"
-            value={password}
-            type="password"
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <FormControlLabel
-            sx={{ mt: "1em", right: 0 }}
-            onChange={setRemember}
-            control={<Checkbox />}
-            label="로그인 유지"
-          />
-          <Button
-            sx={{ width: "90%", mt: "1.5em" }}
-            variant="outlined"
-            onClick={handleSignIn}
-          >
-            Sign In
-          </Button>
+          <h1 style={{ marginTop: 0 }}>로그인</h1>
+
+          <form style={{ width: "90%" }} onSubmit={handleSubmit(handleSignIn)}>
+            <TextField
+              sx={{ width: "100%", mt: "1.5em" }}
+              label="이메일"
+              type="email"
+              {...register("email", {
+                required: true,
+                pattern: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+              })}
+            />
+            <TextField
+              sx={{ width: "100%", mt: "1em" }}
+              label="비밀번호"
+              type="password"
+              {...register("password", {
+                required: true,
+                // minLength: 8,
+                // maxLength: 24,
+                // pattern: /^(?=.*[\d])(?=.*[!@#$%^&*])[\w!@#$%^&*]/,
+              })}
+            />
+            <FormControlLabel
+              sx={{ mt: "1em", marginLeft: "auto", mr: "1.4em" }}
+              onChange={setRemember}
+              control={<Checkbox />}
+              label="로그인 유지"
+            />
+            <Button
+              sx={{ width: "100%", mt: "1em" }}
+              variant="outlined"
+              type="submit"
+            >
+              로그인
+            </Button>
+          </form>
         </Box>
       </Modal>
     </>
