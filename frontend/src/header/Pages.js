@@ -199,10 +199,10 @@ if (process.env.NODE_ENV === "development") {
           title: "중고등부",
           to: "nextgen/youth",
         },
-        // {
-        //   title: "청년부",
-        //   to: "nextgen/youngadult",
-        // },
+        {
+          title: "청년부",
+          to: "nextgen/youngadult",
+        },
       ],
     },
   ];
