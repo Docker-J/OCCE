@@ -29,6 +29,7 @@ import "../../NextGen/NextGen.css";
 import useModals from "../../../util/useModal";
 import WeeklyUpdatePostModal from "../../../components/News/WeeklyUpdate/WeeklyUpdatePostModal";
 import { getWeeklyUpdate } from "../../../api/weeklyupdate";
+import { useSelector } from "react-redux";
 
 const titleBackground = {
   backgroundImage:
@@ -38,6 +39,7 @@ const titleBackground = {
 const WeeklyUpdate = () => {
   const { openModal } = useModals();
   const navigate = useNavigate();
+  const authenticated = useSelector((state) => state.authToken.authenticated);
 
   const { maxDate, queryDate } = useLoaderData();
   const minDate = new Date("2022/04/03");
@@ -77,7 +79,7 @@ const WeeklyUpdate = () => {
   useEffect(() => {
     loadFile();
     navigate("/weeklyupdate/" + format(selectedDate, "yyyyMMdd"));
-  }, [selectedDate, loadFile, navigate]);
+  }, [selectedDate, authenticated, loadFile, navigate]);
 
   const width = isMobile
     ? document.documentElement.clientWidth
