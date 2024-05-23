@@ -1,6 +1,7 @@
 import express from "express";
+
 import { upload } from "../middleware/multer.js";
-import authStaff from "../middleware/auth.js";
+import { authStaff } from "../middleware/auth.js";
 
 import {
   getAlbumController,

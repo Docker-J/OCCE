@@ -1,12 +1,13 @@
 import express from "express";
 
 import { upload } from "../middleware/multer.js";
+import { authStaff } from "../middleware/auth.js";
+
 import {
   getMeditationONController,
   getMeditationONsController,
   postMeditationONController,
 } from "../controller/meditationon.controller.js";
-import authStaff from "../middleware/auth.js";
 
 const router = express.Router();
 
