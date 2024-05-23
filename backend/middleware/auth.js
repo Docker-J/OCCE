@@ -13,7 +13,7 @@ const userVerfier = CognitoJwtVerifier.create({
   clientId: process.env.AWS_COGNITO_CLIENT_ID,
 });
 
-const authStaff = async (req, res, next) => {
+export const authStaff = async (req, res, next) => {
   try {
     const token = req.header("Authorization").split(" ")[1];
     console.log(req.header("Authorization"));
@@ -28,18 +28,16 @@ const authStaff = async (req, res, next) => {
   }
 };
 
-const authUser = async (req, _, next) => {
+export const authUser = async (req, res, next) => {
   try {
     const token = req.header("Authorization").split(" ")[1];
     const payload = await userVerfier.verify(token);
     console.log("Token is valid. Payload:", payload);
 
-    next();
+    res.locals.authenticated = true;
   } catch (err) {
-    console.log("Token not valid!");
-
-    next(err);
+    res.locals.authenticated = false;
+  } finally {
+    next();
   }
 };
-
-export default authStaff;
