@@ -61,7 +61,8 @@ export const resendSignUpConfirm = async (email, success, fail) => {
 export const signOut = async (success) => {
   try {
     await axios.post("/api/user/signout");
-
+  } catch {
+  } finally {
     success();
-  } catch (error) {}
+  }
 };
