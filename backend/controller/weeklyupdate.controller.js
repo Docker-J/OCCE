@@ -54,7 +54,7 @@ export const getWeeklyUpdateController = async (req, res) => {
   try {
     const command = new GetObjectCommand({
       Bucket: BUCKET,
-      Key: req.params.date,
+      Key: `${req.params.date}${res.locals.authenticated ? "_member" : ""}`,
     });
 
     const result = await R2.send(command);
