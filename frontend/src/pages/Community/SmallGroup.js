@@ -33,7 +33,7 @@ const SmallGroup = () => {
       <div className="container-wrapper">
         <div className="container">
           <Typography className="explain" sx={{ fontSize: "1.1em" }}>
-            <Typography display="inline" fontWeight="bold" fontSize="2em">
+            <Typography component="span" fontWeight="bold" fontSize="2em">
               '정원'
             </Typography>
             은 하나님께서 태초에 사람에게 허락하신 에덴의 모형입니다. '정원'의
