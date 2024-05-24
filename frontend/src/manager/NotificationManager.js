@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { memo, useEffect } from "react";
 import { messaging } from "../api/firebase";
 import { getToken, onMessage } from "firebase/messaging";
 import { registerToken } from "../api/notification";
@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 import LaunchIcon from "@mui/icons-material/Launch";
 
-const NotificationManager = () => {
+const NotificationManager = memo(() => {
   const navigate = useNavigate();
   const { openSnackbar, closeSnackbar } = useSnackbar();
 
@@ -57,6 +57,6 @@ const NotificationManager = () => {
   useEffect(() => {
     requestWebPushPermission();
   }, []);
-};
+});
 
 export default NotificationManager;

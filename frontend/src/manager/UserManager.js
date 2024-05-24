@@ -1,9 +1,9 @@
-import { useCallback, useEffect } from "react";
+import { memo, useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { refreshTokenSignIn } from "../api/user";
 import { SET_TOKEN } from "../store/Auth";
 
-const UserManager = () => {
+const UserManager = memo(() => {
   const dispatch = useDispatch();
 
   const signInSuccess = useCallback(
@@ -34,6 +34,6 @@ const UserManager = () => {
       refreshTokenSignIn(sessionStorage.getItem("refreshToken"), signInSuccess);
     }
   }, [signInSuccess]);
-};
+});
 
 export default UserManager;
