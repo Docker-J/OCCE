@@ -125,7 +125,7 @@ const PhotoViewModal = ({ isOpen, onClose, photos, initialIndex }) => {
         <div>
           <Slider {...settings}>
             {Object.values(photos).map((photo) => (
-              <div className="img-container">
+              <div className="img-container" key={photo}>
                 <img
                   style={{ objectFit: "contain !important" }}
                   alt="church"
