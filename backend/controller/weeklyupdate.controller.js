@@ -50,20 +50,36 @@ export const getRecentWeeklyUpdateDateController = async (_, res) => {
 };
 
 export const getWeeklyUpdateController = async (req, res) => {
-  console.log("get");
+  const key = `${req.params.date}${res.locals.authenticated ? "_member" : ""}`;
+
   try {
     const command = new GetObjectCommand({
       Bucket: BUCKET,
-      Key: `${req.params.date}${res.locals.authenticated ? "_member" : ""}`,
+      Key: key,
     });
-
     const result = await R2.send(command);
 
-    res.setHeader("Content-Type", "application/pdf");
-    result.Body.pipe(res);
+    result.Body.pipe(res); // Stream the data directly to the response
   } catch (error) {
-    console.log(error);
-    res.sendStatus(404);
+    if (res.locals.authenticated) {
+      // Retry without "_member" for authenticated users
+      try {
+        const retryCommand = new GetObjectCommand({
+          Bucket: BUCKET,
+          Key: req.params.date,
+        });
+        const retryResult = await R2.send(retryCommand);
+        retryResult.Body.pipe(res);
+      } catch (retryError) {
+        // Second attempt failed for authenticated user, send 404
+        console.error(retryError);
+        res.sendStatus(404);
+      }
+    } else {
+      // First attempt failed for unauthenticated user, send 404
+      console.error(error);
+      res.sendStatus(404);
+    }
   }
 };
 
