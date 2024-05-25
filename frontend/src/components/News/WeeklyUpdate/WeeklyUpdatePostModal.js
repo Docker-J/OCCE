@@ -13,6 +13,7 @@ import { Document, Page } from "react-pdf";
 import { add, endOfWeek, format, isSunday } from "date-fns";
 import useSnackbar from "../../../util/useSnackbar";
 import { uploadWeeklyUpdate } from "../../../api/weeklyupdate";
+import { MIN_DATE } from "../../../constants/WeeklyUpdate";
 
 const style = {
   position: "absolute",
@@ -32,8 +33,6 @@ const style = {
   alignItems: "center",
   justifyContent: "center",
 };
-
-const MIN_DATE = "2022/04/03";
 
 const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
   const { openSnackbar } = useSnackbar();
@@ -100,7 +99,7 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
 
   return (
     <Modal open={isOpen} onClose={onClose}>
-      <Box sx={style} bgcolor="white">
+      <Box sx={style}>
         {loading ? (
           <CircularProgress />
         ) : (
@@ -109,7 +108,7 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
 
             <ButtonDatePicker
               value={selectedDate}
-              minDate={new Date(MIN_DATE)}
+              minDate={MIN_DATE}
               onChange={setSelectedDate}
               disableDate={(date) => !isSunday(date)}
             />

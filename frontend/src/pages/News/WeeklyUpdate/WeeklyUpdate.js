@@ -30,6 +30,7 @@ import useModals from "../../../util/useModal";
 import WeeklyUpdatePostModal from "../../../components/News/WeeklyUpdate/WeeklyUpdatePostModal";
 import { getWeeklyUpdate } from "../../../api/weeklyupdate";
 import { useSelector } from "react-redux";
+import { MIN_DATE } from "../../../constants/WeeklyUpdate";
 
 const titleBackground = {
   backgroundImage:
@@ -42,7 +43,6 @@ const WeeklyUpdate = () => {
   const authenticated = useSelector((state) => state.authToken.authenticated);
 
   const { maxDate, queryDate } = useLoaderData();
-  const minDate = new Date("2022/04/03");
 
   const [bulletin, setBulletin] = useState(null);
   const [selectedDate, setSelectedDate] = useState(queryDate);
@@ -139,8 +139,8 @@ const WeeklyUpdate = () => {
               id="previousBulletin"
               onClick={previousSunday}
               disabled={
-                isSameDay(selectedDate, minDate) ||
-                isBefore(selectedDate, minDate) ||
+                isSameDay(selectedDate, MIN_DATE) ||
+                isBefore(selectedDate, MIN_DATE) ||
                 loading
               }
             >
@@ -149,7 +149,7 @@ const WeeklyUpdate = () => {
 
             <ButtonDatePicker
               value={selectedDate}
-              minDate={minDate}
+              minDate={MIN_DATE}
               maxDate={maxDate}
               onChange={setSelectedDate}
               disableDate={(date) => !isSunday(date)}
