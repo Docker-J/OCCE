@@ -1,5 +1,5 @@
 import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
-import React, { lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import "./App.css";
 
 import ResponsiveAppBar from "./header/ResponsiveAppBar";
@@ -13,7 +13,7 @@ import { loader as WeeklyUpdateLoader } from "./route/WeeklyUpdateLoader";
 // import { loader as meditationONLoader } from "./route/MeditationONLoader";
 import { loader as MeditationONPostLoader } from "./route/MeditationONPostLoader";
 import { loader as Bible291Loader } from "./route/Bible291Loader";
-import { loader as AlbumPhotosLoader } from "./route/AlbumPhotosLoader";
+import { loader as AlbumLoader } from "./route/AlbumLoader";
 import Footer from "./header/Footer";
 import NotificationManager from "./manager/NotificationManager";
 import UserManager from "./manager/UserManager";
@@ -81,8 +81,8 @@ const NewComers = lazy(() =>
 const Albums = lazy(() =>
   lazyRetry(() => import("./pages/News/Albums/Albums"), "Albums")
 );
-const AlbumPhotos = lazy(() =>
-  lazyRetry(() => import("./pages/News/Albums/AlbumPhotos"), "AlbumPhotos")
+const Album = lazy(() =>
+  lazyRetry(() => import("./pages/News/Albums/Album"), "Album")
 );
 
 // Online
@@ -225,8 +225,8 @@ const router = createBrowserRouter([
       // },
       {
         path: "/albums/:albumID",
-        element: <AlbumPhotos />,
-        loader: AlbumPhotosLoader,
+        element: <Album />,
+        loader: AlbumLoader,
       },
       {
         path: "/newcomers",
