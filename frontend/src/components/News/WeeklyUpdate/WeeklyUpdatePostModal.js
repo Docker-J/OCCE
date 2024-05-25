@@ -76,7 +76,7 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
 
       const form = new FormData();
       const date = format(selectedDate, "yyyyMMdd");
-      form.append("images", fileToUpload);
+      form.append("pdfs", fileToUpload);
       form.append("date", date);
 
       await uploadWeeklyUpdate(form);

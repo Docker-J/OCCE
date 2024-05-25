@@ -17,7 +17,7 @@ router.get("/:date", authUser, getWeeklyUpdateController);
 
 router.put(
   "/",
-  upload.single("images"),
+  upload.array("pdfs", 2),
   authStaff,
   uploadWeeklyUpdateController
 );

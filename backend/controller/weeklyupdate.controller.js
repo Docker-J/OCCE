@@ -84,20 +84,24 @@ export const getWeeklyUpdateController = async (req, res) => {
 };
 
 export const uploadWeeklyUpdateController = async (req, res) => {
-  const data = req.file.buffer;
-
-  const command = new PutObjectCommand({
-    Bucket: BUCKET,
-    Key: req.body.date,
-    Body: data,
-    ContentType: "application/pdf",
-  });
+  const files = req.files;
 
   try {
-    await R2.send(command);
+    const promises = files.map((file, index) => {
+      const command = new PutObjectCommand({
+        Bucket: BUCKET,
+        Key: `${req.params.date}${index === 1 ? "_member" : ""}`,
+        Body: file.buffer,
+        ContentType: "application/pdf",
+      });
+      return R2.send(command);
+    });
+    await Promise.all(promises);
+
     if (req.body.date > RECENTDATE) {
       RECENTDATE = req.body.date;
     }
+
     const dbCommand = new PutCommand({
       TableName: TABLENAME,
       Item: {
