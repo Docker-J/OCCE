@@ -1,14 +1,12 @@
 import {
   GetObjectCommand,
+  ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
-import { QueryCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
-import docClient from "../api/dynamodb.js";
 
 const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
 const BUCKET = "weeklyupdate";
-const TABLENAME = "WeeklyUpdate";
 const R2 = new S3Client({
   region: "auto",
   endpoint: `https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
@@ -19,30 +17,42 @@ const R2 = new S3Client({
 });
 
 var RECENTDATE;
-export const getRecentWeelyUpdateDate = async () => {
-  const scanParam = {
-    TableName: TABLENAME,
-    IndexName: "SortDate",
-    Limit: 1,
-    ScanIndexForward: false,
-    KeyConditionExpression: "#sort = :sort",
-    ExpressionAttributeNames: {
-      "#sort": "sort",
-    },
-    ExpressionAttributeValues: {
-      ":sort": 0,
-    },
-  };
 
-  const command = new QueryCommand(scanParam);
+async function getMostRecentFile() {
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const previousYear = (currentYear - 1).toString();
+  const nextYear = (currentYear + 1).toString();
+
+  const prefixes = [previousYear, currentYear.toString(), nextYear];
+  const promises = prefixes.map((prefix) => {
+    const command = new ListObjectsV2Command({
+      Bucket: BUCKET,
+      Prefix: prefix,
+      Delimiter: "/",
+    });
+
+    return R2.send(command);
+  });
 
   try {
-    const result = await docClient.send(command);
+    const results = await Promise.all(promises);
 
-    RECENTDATE = result.Items[0].Date;
+    const allObjects = results
+      .flatMap((result) => result.Contents || []) // Flatten the Contents arrays
+      .map((obj) => obj.Key) // Extract the Key (file name)
+      .filter((key) => !key.includes("_member")); // Filter out _member files
+
+    allObjects.sort((a, b) => b.localeCompare(a)); // Reverse sort
+    return allObjects[0]; // Return the most recent file name
   } catch (error) {
-    console.log(error);
+    console.error("Error listing R2 objects:", error);
+    return null;
   }
+}
+
+export const getRecentWeelyUpdateDate = async () => {
+  RECENTDATE = await getMostRecentFile();
 };
 
 export const getRecentWeeklyUpdateDateController = async (_, res) => {
@@ -102,16 +112,8 @@ export const uploadWeeklyUpdateController = async (req, res) => {
       RECENTDATE = req.body.date;
     }
 
-    const dbCommand = new PutCommand({
-      TableName: TABLENAME,
-      Item: {
-        Date: req.body.date,
-        sort: 0,
-      },
-    });
-    await docClient.send(dbCommand);
-
     res.send(req.body.date);
+    d;
 
     // sendNotification(
     //   "새로운 주보가 업로드 되었습니다",
