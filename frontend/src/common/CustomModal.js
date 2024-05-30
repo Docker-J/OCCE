@@ -25,7 +25,7 @@ const CustomModal = ({ isOpen, onClose, height, maxWidth, children }) => {
       <Box sx={style} maxWidth={maxWidth} maxHeight={height}>
         <IconButton
           onClick={onClose}
-          sx={{ position: "absolute", top: 12, right: 12 }}
+          sx={{ position: "absolute", top: 8, right: 8 }}
         >
           <CloseIcon />
         </IconButton>
