@@ -55,11 +55,10 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
       setLoading(true);
 
       const form = new FormData();
-      form.append("date", format(selectedDate, "yyyyMMdd"));
       form.append("pdfs", weeklyUpdate);
       form.append("pdfs", memberWeeklyUpdate);
 
-      await uploadWeeklyUpdate(form);
+      await uploadWeeklyUpdate(format(selectedDate, "yyyyMMdd"), form);
 
       openSnackbar("success", "Uploaded Succesfully!");
       setParentDate(selectedDate);

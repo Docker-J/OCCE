@@ -1,9 +1,9 @@
 import axios from "axios";
 import { format } from "date-fns";
 
-export const uploadWeeklyUpdate = async (form) => {
+export const uploadWeeklyUpdate = async (date, form) => {
   try {
-    await axios.put("/api/WeeklyUpdate/", form, {
+    await axios.put(`/api/WeeklyUpdate/${date}`, form, {
       headers: {
         "Content-Type": `multipart/form-data`,
       },
