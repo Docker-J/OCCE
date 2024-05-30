@@ -154,7 +154,7 @@ export const editAnnouncementController = async (req, res) => {
       req.body.title,
       req.body.body,
       req.body.images.length > 0 ? req.body.images : null,
-      req.body.id,
+      req.params.id,
     ],
     sql: `UPDATE ${TABLENAME} SET title = ?, body = ?, images = ? WHERE id = ?`,
   };
@@ -166,6 +166,8 @@ export const editAnnouncementController = async (req, res) => {
         Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
       },
     });
+
+    console.log("test");
 
     res.send(result.data);
   } catch (error) {
