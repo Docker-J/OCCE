@@ -1,27 +1,10 @@
-import { Box, Button, CircularProgress, Modal, TextField } from "@mui/material";
+import { Button, CircularProgress, TextField } from "@mui/material";
 import TextEditor from "./TextEditor";
 import { useEffect, useState } from "react";
 
 import useSnackbar from "../../../util/useSnackbar";
 import { postAnnouncement } from "../../../api/announcements";
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "80vw",
-  height: "80vh",
-  maxWidth: "1300px",
-  bgcolor: "#ffffff",
-  boxShadow: 24,
-  borderRadius: "0.5em",
-  p: 5,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "space-between",
-};
+import CustomModal from "../../../common/CustomModal";
 
 const AnnouncementPostModal = ({
   isOpen,
@@ -68,43 +51,42 @@ const AnnouncementPostModal = ({
   };
 
   return (
-    <Modal open={isOpen} onClose={handleClose} disableEnforceFocus={true}>
-      <Box sx={style}>
-        {loading ? (
-          <CircularProgress />
-        ) : (
-          <>
-            <div style={{ height: "7%", width: "100%" }}>
-              <TextField
-                id="filled-basic"
-                label="Title"
-                variant="outlined"
-                value={title}
-                sx={{ width: "100%" }}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-            </div>
+    <CustomModal
+      isOpen={isOpen}
+      onClose={handleClose}
+      maxWidth="1300px"
+      maxHeight="90svh"
+    >
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <>
+          <TextField
+            id="filled-basic"
+            label="Title"
+            variant="outlined"
+            value={title}
+            fullWidth
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
 
-            <div style={{ height: "85%", width: "100%" }}>
-              <TextEditor body={body} getBody={setBody} />
-            </div>
+          <div style={{ height: "65svh", width: "100%", marginTop: "1em" }}>
+            <TextEditor body={body} getBody={setBody} />
+          </div>
 
-            <div>
-              <Button
-                variant="outlined"
-                disabled={title.trim() === "" || body.trim() === ""}
-                onClick={onSubmit}
-              >
-                Post
-              </Button>
-              <Button variant="outlined" onClick={handleClose}>
-                Cancel
-              </Button>
-            </div>
-          </>
-        )}
-      </Box>
-    </Modal>
+          <Button
+            variant="outlined"
+            disabled={title.trim() === "" || body.trim() === ""}
+            onClick={onSubmit}
+            fullWidth
+            sx={{ marginTop: "1.5em" }}
+          >
+            Post
+          </Button>
+        </>
+      )}
+    </CustomModal>
   );
 };
 
