@@ -34,7 +34,7 @@ export const getAnnouncementsCount = async () => {
 export const getPinnedAnnouncements = async () => {
   const data = {
     params: [1],
-    sql: `SELECT id, title, body, timestamp, pin FROM ${TABLENAME} WHERE pin = ? ORDER BY timestamp DESC`,
+    sql: `SELECT id, title, body, timestamp, pin, video FROM ${TABLENAME} WHERE pin = ? ORDER BY timestamp DESC`,
   };
   try {
     const result = await axios.post(URL, data, {
@@ -55,7 +55,7 @@ export const getAnnouncementsController = async (req, res) => {
 
   const data = {
     params: [0],
-    sql: `SELECT id, title, body, timestamp FROM ${TABLENAME} WHERE pin = ? ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
+    sql: `SELECT id, title, body, timestamp, video FROM ${TABLENAME} WHERE pin = ? ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
       page ? (page - 1) * PAGE_SIZE : 0
     }`,
   };
