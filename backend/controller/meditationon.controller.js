@@ -1,4 +1,5 @@
 import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { v4 as uuid } from "uuid";
 import docClient from "../api/dynamodb.js";
 import { uploadImage } from "./images.controller.js";
 
@@ -78,7 +79,7 @@ export const postMeditationONController = async (req, res) => {
     for (const [index, image] of images.entries()) {
       const result = await uploadImage(image);
 
-      ids[index] = result.data.result.id;
+      ids[index] = result;
     }
 
     const command = new PutCommand({
