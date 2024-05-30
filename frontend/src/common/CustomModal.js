@@ -19,10 +19,10 @@ const style = {
   justifyContent: "center",
 };
 
-const CustomModal = ({ isOpen, onClose, maxWidth, children }) => {
+const CustomModal = ({ isOpen, onClose, height, maxWidth, children }) => {
   return (
     <Modal open={isOpen} onClose={onClose}>
-      <Box sx={style} maxWidth={maxWidth}>
+      <Box sx={style} maxWidth={maxWidth} maxHeight={height}>
         <IconButton
           onClick={onClose}
           sx={{ position: "absolute", top: 12, right: 12 }}
