@@ -18,7 +18,7 @@ export const getPosts = async (posts) => {
 
 export const getPost = async (id) => {
   try {
-    return await axios.get(`/api/meditationon/post/${id}`);
+    return await axios.get(`/api/meditationon/${id}`);
   } catch {
     throw new Error();
   }

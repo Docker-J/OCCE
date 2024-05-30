@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.get("/", getMeditationONsController);
 
-router.get("/post/:id", getMeditationONController);
+router.get("/:id", getMeditationONController);
 
 router.post("/", upload.any("images"), authStaff, postMeditationONController);
 
