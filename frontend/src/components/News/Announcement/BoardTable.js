@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { Link } from "react-router-dom";
 
 import PushPinIcon from "@mui/icons-material/PushPin";
+import MovieIcon from "@mui/icons-material/Movie";
 
 const BoardTable = ({ announcements }) => {
   function getText(html) {
@@ -31,7 +32,6 @@ const BoardTable = ({ announcements }) => {
               display: "flex",
               textDecoration: "none",
               backgroundColor: announcement.pin ? "lightgrey" : null,
-              boxSizing: "border-box",
               px: 2,
               py: 0,
               my: 1.8,
@@ -39,10 +39,10 @@ const BoardTable = ({ announcements }) => {
           >
             <Stack
               direction="column"
-              alignItems="left"
               sx={{
                 justifyContent: "center",
-                width: "45px",
+                width: "40px",
+                minWidth: "40px",
               }}
             >
               <Typography variant="body2" whiteSpace="nowrap">
@@ -57,20 +57,18 @@ const BoardTable = ({ announcements }) => {
 
             <Box
               sx={{
-                p: 1,
+                py: 1.5,
                 flexGrow: 1,
                 overflow: "hidden",
               }}
             >
               <Stack direction="row" alignItems="center">
                 {announcement.pin ? (
-                  <PushPinIcon fontSize="small" sx={{ mr: 1 }} />
+                  <PushPinIcon fontSize="small" sx={{ m: 0 }} />
                 ) : null}
                 <Typography
                   variant="h6"
                   sx={{
-                    display: "block",
-                    width: "100%",
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -79,24 +77,27 @@ const BoardTable = ({ announcements }) => {
                   {announcement.title}
                 </Typography>
               </Stack>
-              <p
-                style={{
-                  fontSize: "0.9em",
-                  lineHeight: "1.2em",
-                  height: "2.4em",
-                  margin: 0,
-                  marginTop: 12,
-                  display: "-webkit-box",
-                  WebkitBoxOrient: "vertical",
-                  WebkitLineClamp: "2",
-                  width: "100%",
-                  wordBreak: "break-all",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                {getText(announcement.body)}
-              </p>
+              <Stack direction="row" alignItems="center">
+                <p
+                  style={{
+                    fontSize: "0.9em",
+                    lineHeight: "1.2em",
+                    height: "2.4em",
+                    margin: 0,
+                    marginTop: 12,
+                    display: "-webkit-box",
+                    WebkitBoxOrient: "vertical",
+                    WebkitLineClamp: "2",
+                    width: "100%",
+                    wordBreak: "break-all",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {getText(announcement.body)}
+                </p>
+                {announcement.video && <MovieIcon />}
+              </Stack>
             </Box>
           </Card>
           {index !== announcements.length - 1 && <Divider variant="middle" />}
