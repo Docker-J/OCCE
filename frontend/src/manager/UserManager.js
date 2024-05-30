@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { refreshTokenSignIn } from "../api/user";
-import { SET_TOKEN } from "../store/Auth";
+import { DELETE_TOKEN, SET_TOKEN } from "../store/Auth";
 
 const UserManager = memo(() => {
   const dispatch = useDispatch();
@@ -18,6 +18,13 @@ const UserManager = memo(() => {
     [dispatch]
   );
 
+  const signInfail = useCallback(() => {
+    dispatch(DELETE_TOKEN());
+    sessionStorage.removeItem("refreshToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("remember");
+  }, [dispatch]);
+
   useEffect(() => {
     const refreshToken =
       localStorage.getItem("refreshToken") ||
@@ -29,11 +36,19 @@ const UserManager = memo(() => {
     }
 
     if (remember && localStorage.getItem("refreshToken")) {
-      refreshTokenSignIn(localStorage.getItem("refreshToken"), signInSuccess);
+      refreshTokenSignIn(
+        localStorage.getItem("refreshToken"),
+        signInSuccess,
+        signInfail
+      );
     } else if (sessionStorage.getItem("refreshToken")) {
-      refreshTokenSignIn(sessionStorage.getItem("refreshToken"), signInSuccess);
+      refreshTokenSignIn(
+        sessionStorage.getItem("refreshToken"),
+        signInSuccess,
+        signInfail
+      );
     }
-  }, [signInSuccess]);
+  }, [signInSuccess, signInfail]);
 });
 
 export default UserManager;
