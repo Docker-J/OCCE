@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Box, Button, Modal, TextField } from "@mui/material";
 import useModals from "../../util/useModal";
 import useSnackbar from "../../util/useSnackbar";
@@ -37,6 +37,10 @@ const SignUpConfirmModal = ({ email, isOpen, onClose }) => {
     }
   };
 
+  const onResendRequest = () => {
+    resendSignUpConfirm(email, resendSuccess, resendFail);
+  };
+
   const confirmSuccess = () => {
     openModal(SignUpFinishedModal, {});
     handleClose();
@@ -59,18 +63,24 @@ const SignUpConfirmModal = ({ email, isOpen, onClose }) => {
   return (
     <Modal open={isOpen} onClose={onClose}>
       <Box sx={style} bgcolor="white">
-        <h1 style={{ marginBottom: 0 }}>이메일 인증</h1>
+        <h1 style={{ marginTop: 0 }}>이메일 인증</h1>
         <p>{email}로 발송된 인증번호를 입력해주세요.</p>
 
         <Button
-          sx={{ width: "90%", mt: "1em" }}
+          sx={{ width: "90%" }}
           variant="outlined"
-          onClick={() => resendSignUpConfirm(email, resendSuccess, resendFail)}
+          onClick={onResendRequest}
         >
           인증번호 재발송
         </Button>
 
-        <VerificationInput autoFocus placeholder="" onChange={setConfirmCode} />
+        <div style={{ marginTop: "1.5em" }}>
+          <VerificationInput
+            autoFocus
+            placeholder=""
+            onChange={setConfirmCode}
+          />
+        </div>
 
         <Button
           sx={{ width: "90%", mt: "1em" }}

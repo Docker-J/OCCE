@@ -1,26 +1,10 @@
-import React, { useState } from "react";
-import { Box, Button, Modal, TextField, Typography } from "@mui/material";
+import { useState } from "react";
+import { Button, TextField, Typography } from "@mui/material";
 import useModals from "../../util/useModal";
 import useSnackbar from "../../util/useSnackbar";
-import { confirmSignUp, resendSignUpConfirm } from "../../api/user";
+import { resendSignUpConfirm } from "../../api/user";
 import SignUpConfirmModal from "./SignUpConfirmModal";
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "80vw",
-  maxWidth: "400px",
-  bgcolor: "#ffffff",
-  boxShadow: 24,
-  borderRadius: "0.5em",
-  py: 5,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-};
+import CustomModal from "../../common/CustomModal";
 
 const SignUpRequestConfirmModal = ({ isOpen, onClose }) => {
   const { openModal } = useModals();
@@ -45,27 +29,24 @@ const SignUpRequestConfirmModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <Modal open={isOpen} onClose={onClose}>
-      <Box sx={style} bgcolor="white">
-        <h1 style={{ marginBottom: 0 }}>이메일 인증</h1>
-        <h5>{email}</h5>
-        <TextField
-          sx={{ width: "90%", mt: "1em" }}
-          label="Email"
-          type="email"
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+    <CustomModal isOpen={isOpen} onClose={onClose} maxWidth="400px">
+      <h1 style={{ marginTop: 0 }}>이메일 인증</h1>
+      <TextField
+        sx={{ width: "90%", mt: "1em" }}
+        label="이메일"
+        type="email"
+        onChange={(e) => setEmail(e.target.value)}
+        required
+      />
 
-        <Button
-          sx={{ width: "90%", mt: "1em" }}
-          variant="outlined"
-          onClick={handleSignUp}
-        >
-          Send
-        </Button>
-      </Box>
-    </Modal>
+      <Button
+        sx={{ width: "90%", mt: "1em" }}
+        variant="outlined"
+        onClick={handleSignUp}
+      >
+        Send
+      </Button>
+    </CustomModal>
   );
 };
 
