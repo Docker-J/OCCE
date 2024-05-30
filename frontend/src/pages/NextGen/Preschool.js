@@ -48,10 +48,10 @@ const Preschool = () => {
             style={{ width: "100%", display: "flex", justifyContent: "center" }}
           >
             <InfoCard
-              age="1~6학년"
+              age="만 5세(kindergarten)까지"
               time="주일 오후 4시"
-              place="Sunday School Room"
-              ask="이수연 전도사"
+              place="Preschool Room"
+              ask="김유정 전도사"
               imgs={imgs}
             />
           </div>
