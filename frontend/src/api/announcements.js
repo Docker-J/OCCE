@@ -32,7 +32,7 @@ export const postAnnouncement = async (id, title, body) => {
   try {
     await axios.put(
       id
-        ? `/api/announcements/announcement${id}`
+        ? `/api/announcements/announcement/${id}`
         : "/api/announcements/announcement",
       {
         title: title,
