@@ -65,7 +65,6 @@ const PreviewCard = ({
       }
       // Time to actually perform the action
       movePhoto(dragIndex, hoverIndex);
-      setCoverImage(hoverIndex);
       // Note: we're mutating the monitor item here!
       // Generally it's better to avoid mutations,
       // but it's good here for the sake of performance
@@ -92,7 +91,9 @@ const PreviewCard = ({
         opacity,
         overflow: "hidden",
       }}
-      onClick={() => setCoverImage(index)}
+      onClick={() => {
+        if (typeof setCoverImage === "function") setCoverImage(index);
+      }}
     >
       <img
         src={image}
