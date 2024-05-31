@@ -22,7 +22,7 @@ const style = {
 const CustomModal = ({ isOpen, onClose, children, ...props }) => {
   return (
     <Modal open={isOpen} onClose={onClose}>
-      <Box sx={style} {...props}>
+      <Box sx={{ ...style, ...props }}>
         <IconButton
           onClick={onClose}
           sx={{ position: "absolute", top: 8, right: 8 }}
