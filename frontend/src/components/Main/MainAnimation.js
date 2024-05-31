@@ -212,7 +212,7 @@ const MainAnimation = () => {
           fontSize={"min(5vw, 36px)"}
           color="white"
         >
-          Moving ON to the NEW standard
+          Moving ON to the NEW Calling
         </Typography>
       </animated.div>
 
