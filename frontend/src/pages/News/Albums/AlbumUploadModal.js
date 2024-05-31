@@ -1,42 +1,13 @@
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Modal,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { useCallback, useState } from "react";
-import { useDropzone } from "react-dropzone";
+import { Button, CircularProgress, TextField } from "@mui/material";
+import { useState } from "react";
 import update from "immutability-helper";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 
 import useSnackbar from "../../../util/useSnackbar";
-import PreviewCard from "../../../components/Online/MeditationON/PreviewCard";
 import { uploadAlbum } from "../../../api/albums";
 import ButtonDatePicker from "../../../common/ButtonDatePicker";
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "90vw",
-  height: "80vh",
-  maxWidth: "1300px",
-  bgcolor: "#ffffff",
-  boxShadow: 24,
-  borderRadius: "0.5em",
-  p: 1,
-  py: 5,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-};
+import ImagePreviews from "../../../common/ImagePreviews";
+import FileUploadComponent from "../../../common/FileUploadComponent";
+import CustomModal from "../../../common/CustomModal";
 
 const AlbumUploadModal = ({ isOpen, onClose }) => {
   const { openSnackbar } = useSnackbar();
@@ -60,7 +31,6 @@ const AlbumUploadModal = ({ isOpen, onClose }) => {
       setImagesPreview((prev) =>
         update(prev, { $push: [URL.createObjectURL(image)] })
       );
-      // setImagesPreview((prev) => [...prev, URL.createObjectURL(image)]);
     });
   };
 
@@ -94,172 +64,85 @@ const AlbumUploadModal = ({ isOpen, onClose }) => {
     }
   };
 
-  const removeImage = (i) => {
-    URL.revokeObjectURL(imagesPreview[i]);
-    setFilesToUpload((prev) =>
-      update(prev, {
-        $splice: [[i, 1]],
-      })
-    );
-    setImagesPreview((prev) =>
-      update(prev, {
-        $splice: [[i, 1]],
-      })
-    );
-  };
-
   const removeAllImage = () => {
     imagesPreview.forEach((preview) => URL.revokeObjectURL(preview));
     setFilesToUpload([]);
     setImagesPreview([]);
   };
 
-  const movePhoto = useCallback((dragIndex, hoverIndex) => {
-    setFilesToUpload((prev) =>
-      update(prev, {
-        $splice: [
-          [dragIndex, 1],
-          [hoverIndex, 0, prev[dragIndex]],
-        ],
-      })
-    );
-    setImagesPreview((prev) =>
-      update(prev, {
-        $splice: [
-          [dragIndex, 1],
-          [hoverIndex, 0, prev[dragIndex]],
-        ],
-      })
-    );
-  }, []);
-
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: {
-      "image/*": [],
-    },
-    onDrop: (acceptedFiles) => {
-      handleChangeFile(acceptedFiles);
-    },
-    noDragEventsBubbling: true,
-  });
-
-  const renderCard = useCallback(
-    (image, index) => {
-      return (
-        <PreviewCard
-          key={index}
-          index={index}
-          image={image}
-          cover={index === coverImage}
-          setCoverImage={setCoverImage}
-          movePhoto={movePhoto}
-          removeImage={removeImage}
-        />
-      );
-    },
-    [coverImage]
-  );
-
   const [loading, setLoading] = useState(false);
 
   return (
-    <Modal
-      open={isOpen}
+    <CustomModal
+      isOpen={isOpen}
       onClose={handleClose}
+      maxHeight="85vh"
+      maxWidth="1300px"
       // aria-labelledby="modal-modal-title"
       // aria-describedby="modal-modal-description"
     >
-      <Box sx={style}>
-        {loading ? (
-          <CircularProgress />
-        ) : (
-          <>
-            <div style={{ display: "flex", width: "95%" }}>
-              <ButtonDatePicker
-                value={date}
-                minDate={new Date("2022/04/03")}
-                maxDate={today}
-                onChange={setDate}
-              />
-              <TextField
-                id="filled-basic"
-                label="Album Title"
-                variant="outlined"
-                sx={{ flexGrow: 1, ml: 4 }}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-            </div>
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <>
+          <div style={{ display: "flex", width: "95%" }}>
+            <ButtonDatePicker
+              value={date}
+              minDate={new Date("2022/04/03")}
+              maxDate={today}
+              onChange={setDate}
+            />
+            <TextField
+              id="filled-basic"
+              label="Album Title"
+              variant="outlined"
+              sx={{ flexGrow: 1, ml: 4 }}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
 
-            <DndProvider backend={HTML5Backend}>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  alignContent: "flex-start",
-                  justifyContent: "space-between",
-                  width: "95%",
-                  height: "65%",
-                  overflowX: "auto",
-                }}
-              >
-                {imagesPreview.map((image, index) => renderCard(image, index))}
-              </div>
-            </DndProvider>
-            <div
-              style={{
-                width: "95%",
-                height: "20%",
-                border: "1pt dotted #f57c00",
-                borderRadius: "1em",
-                overflowY: "auto",
-              }}
-              {...getRootProps()}
+          <ImagePreviews
+            imagesPreview={imagesPreview}
+            setImagesPreview={setImagesPreview}
+            setFilesToUpload={setFilesToUpload}
+            cover={coverImage}
+            setCoverImage={setCoverImage}
+          />
+
+          <div
+            style={{
+              width: "100%",
+              height: "12.75svh",
+            }}
+          >
+            <FileUploadComponent
+              accept={{ "image/*": [] }}
+              handleChangeFile={handleChangeFile}
+              multiple={true}
+            />
+          </div>
+
+          <div style={{ display: "flex", marginTop: "1.5em", width: "100%" }}>
+            <Button
+              variant="outlined"
+              disabled={title.trim() === "" || filesToUpload.length <= 0}
+              onClick={uploadImages}
+              fullWidth
             >
-              <input {...getInputProps()} />
-              <Box
-                sx={{
-                  position: "relative",
-                  height: "100%",
-                  widht: "100%",
-                }}
-              >
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                  }}
-                >
-                  <AddCircleOutlineIcon fontSize="large" color="primary" />
-                  <Typography>Click or Drag Photos to here</Typography>
-                </div>
-              </Box>
-            </div>
-            <div style={{ display: "flex", marginTop: "2em" }}>
-              <Button
-                variant="outlined"
-                disabled={title.trim() === "" || filesToUpload.length <= 0}
-                onClick={uploadImages}
-              >
-                Submit
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={removeAllImage}
-                disabled={filesToUpload.length <= 0}
-              >
-                Clear All
-              </Button>
-              <Button variant="outlined" onClick={handleClose}>
-                Close
-              </Button>
-            </div>
-          </>
-        )}
-      </Box>
-    </Modal>
+              Submit
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={removeAllImage}
+              disabled={filesToUpload.length <= 0}
+              fullWidth
+            >
+              Clear All
+            </Button>
+          </div>
+        </>
+      )}
+    </CustomModal>
   );
 };
 
