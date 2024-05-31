@@ -6,7 +6,7 @@ import { add, endOfWeek, format, isSunday } from "date-fns";
 import useSnackbar from "../../../util/useSnackbar";
 import { uploadWeeklyUpdate } from "../../../api/weeklyupdate";
 import { MIN_DATE } from "../../../constants/WeeklyUpdate";
-import FileUploadComponent from "./FileUploadComponent";
+import FileUploadComponent from "../../../common/FileUploadComponent";
 import CustomModal from "../../../common/CustomModal";
 import { isMobile } from "react-device-detect";
 
@@ -122,10 +122,13 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
               </div>
               <div
                 style={{
-                  height: "15svh",
+                  height: "12.75svh",
                 }}
               >
-                <FileUploadComponent handleChangeFile={handleFileChange} />
+                <FileUploadComponent
+                  accept={{ "application/pdf": [] }}
+                  handleChangeFile={handleFileChange}
+                />
               </div>
             </div>
 
@@ -153,7 +156,7 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
 
               <div
                 style={{
-                  height: "15svh",
+                  height: "12.75svh",
                 }}
               >
                 <FileUploadComponent
