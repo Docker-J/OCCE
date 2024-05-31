@@ -1,5 +1,15 @@
 /* @import url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/nanumsquare.css); */
-@import url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquareNeo@1.0/nanumsquareneo.css);
+/* @import url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquareNeo@1.0/nanumsquareneo.css); */
+
+@font-face {
+  font-family: "NanumSquareNeoVariable";
+  /* src: url(NanumSquareNeo-Variable.eot); */
+  src: local("☺"),
+    /* url(NanumSquareNeo-Variable.eot?#iefix) format("embedded-opentype"), */
+      url(NanumSquareNeo-Variable.woff2) format("woff2"),
+    url(NanumSquareNeo-Variable.woff) format("woff"),
+    url(NanumSquareNeo-Variable.ttf) format("truetype");
+}
 
 body {
   word-break: keep-all;
