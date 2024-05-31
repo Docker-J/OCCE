@@ -4,7 +4,7 @@ import { useRef } from "react";
 
 import { useDrag, useDrop } from "react-dnd";
 
-const PreviewCard = ({
+const ImagePreviewCard = ({
   id,
   image,
   index,
@@ -123,4 +123,4 @@ const PreviewCard = ({
   );
 };
 
-export default PreviewCard;
+export default ImagePreviewCard;
