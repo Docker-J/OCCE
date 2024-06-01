@@ -97,7 +97,7 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
             elevation={10}
             sx={{
               width: "100%",
-              maxWidth: { xs: "none", md: "550px" },
+              maxWidth: { xs: "none", md: "520px" },
               borderRadius: "1em",
               mr: { xs: 0, md: "-36px" },
             }}
