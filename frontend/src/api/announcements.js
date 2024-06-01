@@ -29,6 +29,9 @@ export const postAnnouncement = async (id, title, body) => {
     modifiedBody = modifiedBody.replace(original, replacement);
   }
 
+  const iframeRegex = /<iframe\s+[^>]*>/i;
+  const hasVideo = iframeRegex.test(modifiedBody);
+
   try {
     await axios.put(
       id
@@ -38,6 +41,8 @@ export const postAnnouncement = async (id, title, body) => {
         title: title,
         body: modifiedBody,
         images: imageIDs,
+        // image: imageIDs.length > 0 ? true : false,
+        video: hasVideo ? 1 : 0,
       }
     );
   } catch {

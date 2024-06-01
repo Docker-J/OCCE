@@ -34,7 +34,7 @@ export const getAnnouncementsCount = async () => {
 export const getPinnedAnnouncements = async () => {
   const data = {
     params: [1],
-    sql: `SELECT id, title, body, timestamp, pin, video FROM ${TABLENAME} WHERE pin = ? ORDER BY timestamp DESC`,
+    sql: `SELECT * FROM ${TABLENAME} WHERE pin = ? ORDER BY timestamp DESC`,
   };
   try {
     const result = await axios.post(URL, data, {
@@ -55,7 +55,7 @@ export const getAnnouncementsController = async (req, res) => {
 
   const data = {
     params: [0],
-    sql: `SELECT id, title, body, timestamp, video FROM ${TABLENAME} WHERE pin = ? ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
+    sql: `SELECT * FROM ${TABLENAME} WHERE pin = ? ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
       page ? (page - 1) * PAGE_SIZE : 0
     }`,
   };
@@ -104,8 +104,9 @@ export const postAnnouncementController = async (req, res) => {
       req.body.body,
       req.body.images.length > 0 ? req.body.images : null,
       new Date(),
+      req.body.video,
     ],
-    sql: `INSERT INTO ${TABLENAME} (id, title, body, images, timestamp) VALUES (?, ?, ?, ?, ?)`,
+    sql: `INSERT INTO ${TABLENAME} (id, title, body, images, timestamp, video) VALUES (?, ?, ?, ?, ?, ?)`,
   };
 
   try {
@@ -154,9 +155,10 @@ export const editAnnouncementController = async (req, res) => {
       req.body.title,
       req.body.body,
       req.body.images.length > 0 ? req.body.images : null,
+      req.body.video,
       req.params.id,
     ],
-    sql: `UPDATE ${TABLENAME} SET title = ?, body = ?, images = ? WHERE id = ?`,
+    sql: `UPDATE ${TABLENAME} SET title = ?, body = ?, images = ?, video = ? WHERE id = ?`,
   };
 
   try {

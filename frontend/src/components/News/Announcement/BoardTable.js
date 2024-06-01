@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 
 import PushPinIcon from "@mui/icons-material/PushPin";
 import MovieIcon from "@mui/icons-material/Movie";
+import PhotoIcon from "@mui/icons-material/Photo";
 
 const BoardTable = ({ announcements }) => {
   function getText(html) {
@@ -96,7 +97,8 @@ const BoardTable = ({ announcements }) => {
                 >
                   {getText(announcement.body)}
                 </p>
-                {announcement.video && <MovieIcon />}
+                {announcement.images !== null ? <PhotoIcon /> : null}
+                {announcement.video ? <MovieIcon /> : null}
               </Stack>
             </Box>
           </Card>
