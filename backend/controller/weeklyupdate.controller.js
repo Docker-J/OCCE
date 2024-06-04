@@ -108,11 +108,11 @@ export const uploadWeeklyUpdateController = async (req, res) => {
     });
     await Promise.all(promises);
 
-    if (req.body.date > RECENTDATE) {
-      RECENTDATE = req.body.date;
+    if (req.params.date > RECENTDATE) {
+      RECENTDATE = req.params.date;
     }
 
-    res.send(req.body.date);
+    res.send(req.params.date);
 
     // sendNotification(
     //   "새로운 주보가 업로드 되었습니다",
