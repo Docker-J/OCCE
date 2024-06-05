@@ -30,7 +30,7 @@ const NewComersTimeline = () => {
   const openDiscipline = anchorEl.popoverID === 2 && anchorEl.anchor;
 
   return (
-    <Timeline position="alternate">
+    <Timeline position="alternate" sx={{ pb: 0, mb: 0 }}>
       <TimelineItem>
         <TimelineSeparator>
           <TimelineDot variant="outlined" color="primary">
