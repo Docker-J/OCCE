@@ -35,8 +35,8 @@ const Footer = () => {
             src={"/img/HeaderLogoBW.png"}
             style={{ height: "40px" }}
           />
-          <Typography>Based ON the OLD truth</Typography>
-          <Typography>Moving ON to the NEW standard</Typography>
+          <Typography>Based ON the OLD Truth</Typography>
+          <Typography>Moving ON to the NEW Calling</Typography>
           <Typography>온 맘 다해 하나님을 사랑하고</Typography>
           <Typography>온 힘 다해 이웃을 사랑하는 교회</Typography>
         </div>

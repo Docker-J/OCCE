@@ -203,7 +203,7 @@ const MainAnimation = () => {
           fontSize={"min(5.5vw, 36px)"}
           style={{ color: "#f1cdb0" }}
         >
-          Based ON the OLD truth
+          Based ON the OLD Truth
         </Typography>
         <Typography
           className="new"
