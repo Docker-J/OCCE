@@ -1,5 +1,5 @@
 import { Avatar, Paper } from "@mui/material";
-import { memo, useState } from "react";
+import { memo } from "react";
 
 import Slider from "react-slick";
 

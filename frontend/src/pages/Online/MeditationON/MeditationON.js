@@ -118,9 +118,6 @@ const MeditationON = () => {
       <div className="container-wrapper">
         <Box
           className="container"
-          // style={{
-          //   padding: "0em 0.2em",
-          // }}
           sx={{
             px: { xs: "0 !important", md: "1.5em !important" },
             py: "0 !important",

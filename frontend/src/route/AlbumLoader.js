@@ -1,7 +1,5 @@
-import axios from "axios";
+import { getAlbum } from "../api/albums";
 
-export async function loader({ params }) {
-  const result = await axios.get(`/api/albums/album/${params.albumID}`);
-
-  return result.data;
+export function loader({ params }) {
+  return getAlbum(params.albumID);
 }

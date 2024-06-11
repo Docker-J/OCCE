@@ -4,6 +4,7 @@ import { upload } from "../middleware/multer.js";
 import { authStaff } from "../middleware/auth.js";
 
 import {
+  deleteAlbumController,
   getAlbumController,
   getAlbumsController,
   postAlbumController,
@@ -13,8 +14,10 @@ const router = express.Router();
 
 router.get("/", getAlbumsController);
 
-router.get("/album/:id", getAlbumController);
+router.get("/:id", getAlbumController);
 
-router.post("/album", upload.any("images"), authStaff, postAlbumController);
+router.delete("/:id", authStaff, deleteAlbumController);
+
+router.post("/", upload.any("images"), authStaff, postAlbumController);
 
 export default router;

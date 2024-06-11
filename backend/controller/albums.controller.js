@@ -1,12 +1,13 @@
-import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { DeleteCommand, PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { v4 as uuid } from "uuid";
 import docClient from "../api/dynamodb.js";
-import { uploadImage } from "./images.controller.js";
+import { deleteImages, uploadImage } from "./images.controller.js";
 
 const TABLENAME = "Albums";
 const PAGE_SIZE = 12;
 
 export const getAlbumsController = async (req, res) => {
+  console.log(req.params.year);
   const lastVisibleID = req.query.lastVisible;
 
   const scanParam = {
@@ -71,25 +72,23 @@ export const getAlbumController = async (req, res) => {
 };
 
 export const postAlbumController = async (req, res) => {
-  const title = req.body.title;
   const ids = {};
   const images = req.files;
-  const cover = req.body.cover;
 
   try {
     for (const [index, image] of images.entries()) {
       const result = await uploadImage(image);
 
-      ids[index] = result.data.result.id;
+      ids[index] = result;
     }
 
     const command = new PutCommand({
       TableName: TABLENAME,
       Item: {
         ID: uuid(),
-        Title: title,
+        Title: req.body.title,
         Timestamp: req.body.date,
-        Cover: ids[cover],
+        Cover: ids[req.body.cover],
         Images: ids,
         sort: 0,
       },
@@ -101,5 +100,42 @@ export const postAlbumController = async (req, res) => {
     res.sendStatus(201);
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const deleteAlbumController = async (req, res) => {
+  const getAlbumCommand = new QueryCommand({
+    TableName: TABLENAME,
+    ProjectionExpression: "Images, #t",
+    KeyConditionExpression: "ID = :albumID",
+    ExpressionAttributeNames: {
+      "#t": "Timestamp",
+    },
+    ExpressionAttributeValues: {
+      ":albumID": req.params.id,
+    },
+  });
+
+  try {
+    const result = await docClient.send(getAlbumCommand);
+
+    const images = Object.values(result.Items[0].Images);
+
+    await deleteImages(images);
+
+    const deleteAlbumCommand = new DeleteCommand({
+      TableName: TABLENAME,
+      Key: {
+        ID: req.params.id,
+        Timestamp: result.Items[0].Timestamp,
+      },
+    });
+
+    await docClient.send(deleteAlbumCommand);
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
   }
 };

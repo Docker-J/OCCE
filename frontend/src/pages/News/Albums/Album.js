@@ -1,19 +1,34 @@
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useNavigate, useParams } from "react-router-dom";
 
-import { ImageList, ImageListItem, Typography } from "@mui/material";
+import { Fab, ImageList, ImageListItem, Typography } from "@mui/material";
 
 import "../../NextGen/NextGen.css";
 import useModals from "../../../util/useModal";
 import PhotoViewModal from "./PhotoViewModal";
+import AdminComponent from "../../../common/AdminComponent";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { deleteAlbum } from "../../../api/albums";
+import useSnackbar from "../../../util/useSnackbar";
 
 const titleBackground = {
   backgroundImage:
     'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Online/MeditationON.webp")',
 };
 
-const AlbumPhotos = () => {
+const Album = () => {
+  const navigate = useNavigate();
+  let { albumID } = useParams();
+
   const { openModal } = useModals();
+  const { openSnackbar } = useSnackbar();
   const { title, images } = useLoaderData();
+
+  const handleDeleteAlbum = async () => {
+    console.log("try delete");
+    await deleteAlbum(albumID);
+    openSnackbar("success", "The album deleted successfully");
+    navigate("/albums");
+  };
 
   return (
     <>
@@ -53,8 +68,18 @@ const AlbumPhotos = () => {
           </ImageList>
         </div>
       </div>
+
+      <AdminComponent>
+        <Fab
+          variant="primary"
+          style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
+          onClick={handleDeleteAlbum}
+        >
+          <DeleteIcon />
+        </Fab>
+      </AdminComponent>
     </>
   );
 };
 
-export default AlbumPhotos;
+export default Album;

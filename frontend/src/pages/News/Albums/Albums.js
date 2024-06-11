@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 import {
+  Box,
   CircularProgress,
   Fab,
   ImageList,
@@ -36,24 +37,35 @@ const Albums = () => {
   const navigate = useNavigate();
   const { openModal } = useModals();
 
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedYear, setSelectedYear] = useState(null);
   const [albums, setAlbums] = useState([]);
   const [end, setEnd] = useState(false);
-  const [restored, setRestored] = useState(true);
+  const [restored, setRestored] = useState(null);
 
   useEffect(() => {
     selectedYear
       ? navigate(`?year=${selectedYear.getFullYear()}`)
       : navigate("");
-  }, [selectedYear]);
+    setAlbums([]);
+    onLoad();
+  }, [selectedYear, navigate]);
 
-  const getPhotos = async () => {
-    const result = await getAlbums(albums);
+  const onLoad = async () => {
+    if (isLoading) return;
 
-    if (result.data.length > 0) {
-      setAlbums((prev) => [...prev, ...result.data]);
-    } else {
-      setEnd(true);
+    setIsLoading(true);
+
+    try {
+      const result = await getAlbums(albums, selectedYear?.getFullYear());
+
+      if (result.data.length > 0) {
+        setAlbums((prev) => [...prev, ...result.data]);
+      } else {
+        setEnd(true);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -77,7 +89,7 @@ const Albums = () => {
 
   useEffect(() => {
     if (restored !== null && !restored) {
-      getPhotos();
+      onLoad();
     }
   }, [restored]);
 
@@ -100,7 +112,7 @@ const Albums = () => {
           console.log("test screen", screenHeight);
 
           if (contentHeight > 100 && contentHeight < screenHeight) {
-            getPhotos();
+            onLoad();
           }
         } catch (error) {}
       }, 500);
@@ -131,7 +143,13 @@ const Albums = () => {
       </div>
 
       <div className="container-wrapper">
-        <div className="container">
+        <Box
+          className="container"
+          sx={{
+            px: { xs: "0 !important", md: "1.5em !important" },
+            py: "0 !important",
+          }}
+        >
           {albums.length <= 0 ? (
             <Stack alignItems="center">
               <CircularProgress />
@@ -139,7 +157,7 @@ const Albums = () => {
           ) : (
             <InfiniteScroll
               dataLength={albums.length}
-              next={getPhotos}
+              next={onLoad}
               hasMore={!end}
               loader={
                 <Stack alignItems="center">
@@ -150,7 +168,7 @@ const Albums = () => {
               style={{ overflowY: "hidden" }}
             >
               {
-                <ImageList ref={scrollRef} cols={matches ? 4 : 3} gap={2.5}>
+                <ImageList ref={scrollRef} cols={matches ? 4 : 3} gap={3}>
                   <MemoizedMeditationONComp
                     posts={albums}
                     cols={matches ? 4 : 3}
@@ -159,7 +177,7 @@ const Albums = () => {
               }
             </InfiniteScroll>
           )}
-        </div>
+        </Box>
       </div>
 
       <AdminComponent>
