@@ -82,7 +82,7 @@ export const refreshSignInController = async (req, res) => {
       group: group,
     });
   } catch (error) {
-    res.send(error);
+    console.log(error);
     res.sendStatus(403);
   }
 };
