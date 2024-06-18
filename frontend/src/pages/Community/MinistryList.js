@@ -1,15 +1,24 @@
+import SchoolIcon from "@mui/icons-material/School";
+import PianoIcon from "@mui/icons-material/Piano";
+import CameraIcon from "@mui/icons-material/Camera";
+import HomeRepairServiceIcon from "@mui/icons-material/HomeRepairService";
+import HandshakeIcon from "@mui/icons-material/Handshake";
+import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
+import ChurchIcon from "@mui/icons-material/Church";
+import GroupsIcon from "@mui/icons-material/Groups";
+import PaymentsIcon from "@mui/icons-material/Payments";
+import FoldedHandsIcon from "./folded_hands.svg";
+import RestaurantIcon from "@mui/icons-material/Restaurant";
+
 export const MinistryList = [
   {
     title: "교육부서 Staff",
-    types: [
-      "유아유치부(최은비)",
-      "유초등부(김종옥)",
-      "중고등부(전우식)",
-      "청년부 섬김(윤승만)",
-    ],
+    icon: <SchoolIcon />,
+    types: ["유아유치부", "유초등부", "중고등부", "청년부 섬김"],
   },
   {
-    title: "찬양/미디어팀(조명호)",
+    title: "찬양팀",
+    icon: <PianoIcon />,
     types: [
       "찬양인도 보컬",
       "피아노 키보드",
@@ -17,6 +26,12 @@ export const MinistryList = [
       "베이스기타 드럼",
       "바이올린 플룻",
       "Others",
+    ],
+  },
+  {
+    title: "미디어팀",
+    icon: <CameraIcon />,
+    types: [
       "사운드믹서 운용",
       "PPT/조명/비디오믹서 운용",
       "PPT 제작",
@@ -27,10 +42,12 @@ export const MinistryList = [
   },
   {
     title: "관리팀",
+    icon: <HomeRepairServiceIcon />,
     types: ["교회 물품 및 스토리지 관리"],
   },
   {
-    title: "새가족/안내팀(장은정)",
+    title: "새가족/안내팀",
+    icon: <HandshakeIcon />,
     types: [
       "방문등록카드 준비 및 작성 안내",
       "새가족 사진촬영 및 전달",
@@ -41,10 +58,12 @@ export const MinistryList = [
   },
   {
     title: "선교팀",
+    icon: <VolunteerActivismIcon />,
     types: ["단기 선교 및 정원 별 후원 선교 사역 지원"],
   },
   {
-    title: "예배준비팀(최광현)",
+    title: "예배준비팀",
+    icon: <ChurchIcon />,
     types: [
       "주일예배 준비",
       "헌금함 준비",
@@ -56,7 +75,8 @@ export const MinistryList = [
     ],
   },
   {
-    title: "장년양육팀(이창근)",
+    title: "장년양육팀",
+    icon: <GroupsIcon />,
     types: [
       "장년 수련회 준비",
       "장년 프로그램 등록 안내",
@@ -66,6 +86,7 @@ export const MinistryList = [
   },
   {
     title: "재정팀",
+    icon: <PaymentsIcon />,
     types: [
       "교회 재정 관련 모든 업무",
       "교회 렌탈 계약 및 보험",
@@ -73,7 +94,9 @@ export const MinistryList = [
     ],
   },
   {
-    title: "중보기도팀(주미옥)",
+    title: "중보기도팀",
+    icon: <img src={FoldedHandsIcon} />,
+
     types: [
       "교회 공동체를 위한 중보기도",
       "주일 예배를 위한 중보기도",
@@ -81,7 +104,8 @@ export const MinistryList = [
     ],
   },
   {
-    title: "친교팀(김은숙)",
+    title: "친교팀",
+    icon: <RestaurantIcon />,
     types: ["교회 내 각종 친교 및 경조사 관련 사역"],
   },
 ];

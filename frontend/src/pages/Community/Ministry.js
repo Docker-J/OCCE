@@ -1,12 +1,11 @@
 import {
-  Paper,
+  Collapse,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
 } from "@mui/material";
 import "../NextGen/NextGen.css";
@@ -14,6 +13,9 @@ import { Link } from "react-router-dom";
 import { MinistryList } from "./MinistryList";
 
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import { useState } from "react";
 
 const titleBackground = {
   backgroundImage:
@@ -23,6 +25,12 @@ const titleBackground = {
 };
 
 const Ministry = () => {
+  const [openCollapseId, setOpenCollapseId] = useState(null);
+
+  const handleClick = (index) => {
+    setOpenCollapseId((prev) => (prev === index ? null : index));
+  };
+
   return (
     <>
       <div className="title-wrapper" style={titleBackground}>
@@ -70,38 +78,57 @@ const Ministry = () => {
             <OpenInNewIcon />
           </Stack>
 
-          <TableContainer component={Paper} sx={{ my: 4 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  {MinistryList.map((ministry) => (
-                    <TableCell key={ministry.title}>
+          <List
+            sx={{
+              width: "100%",
+              display: "flex",
+              flexFlow: "row wrap",
+            }}
+          >
+            {MinistryList.map((ministry, index) => (
+              <div
+                key={index}
+                style={{
+                  width: "100%",
+                  maxWidth: 400,
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <ListItemButton
+                  onClick={() => handleClick(index)}
+                  sx={{
+                    alignItems: "start",
+                  }}
+                >
+                  <ListItemIcon>{ministry.icon}</ListItemIcon>
+                  <ListItemText
+                    primary={
                       <Typography noWrap fontWeight={650}>
                         {ministry.title}
                       </Typography>
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {[
-                  ...Array(
-                    Math.max(...MinistryList.map((item) => item.types.length))
-                  ),
-                ].map((_, index) => (
-                  <TableRow>
-                    {MinistryList.map((item) => (
-                      <TableCell key={item.types[index]}>
-                        <Typography fontSize="1em" noWrap>
-                          {item.types[index]}
-                        </Typography>
-                      </TableCell>
+                    }
+                  />
+                  {openCollapseId === index ? <ExpandLess /> : <ExpandMore />}
+                </ListItemButton>
+                <Collapse
+                  in={openCollapseId === index}
+                  timeout="auto"
+                  unmountOnExit
+                >
+                  <List component="div" disablePadding>
+                    {ministry.types.map((type) => (
+                      <ListItem sx={{ pl: 10 }}>
+                        <ListItemText
+                          primary={<Typography>{type}</Typography>}
+                        />
+                      </ListItem>
                     ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                  </List>
+                </Collapse>
+              </div>
+            ))}
+          </List>
         </div>
       </div>
     </>
