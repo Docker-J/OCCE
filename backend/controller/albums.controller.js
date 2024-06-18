@@ -7,34 +7,33 @@ const TABLENAME = "Albums";
 const PAGE_SIZE = 12;
 
 export const getAlbumsController = async (req, res) => {
-  console.log(req.params.year);
+  const year = parseInt(req.query.year, 10);
   const lastVisibleID = req.query.lastVisible;
+  const timeStamp = req.query.timeStamp;
 
-  const scanParam = {
+  const param = {
     TableName: TABLENAME,
-    IndexName: "SortTimestamp",
+    IndexName: year ? "yearTimeStamp" : "sortTimestamp",
     Limit: PAGE_SIZE,
     ProjectionExpression: "ID, Title, #t, Cover",
     ScanIndexForward: false,
-    KeyConditionExpression: "#sort = :sort",
+    KeyConditionExpression: year ? "#year = :year" : "#sort = :sort",
     ExpressionAttributeNames: {
       "#t": "Timestamp",
-      "#sort": "sort",
+      ...(year ? { "#year": "year" } : { "#sort": "sort" }),
     },
-    ExpressionAttributeValues: {
-      ":sort": 0,
-    },
+    ExpressionAttributeValues: year ? { ":year": year } : { ":sort": 0 },
   };
 
   if (lastVisibleID != null) {
-    scanParam.ExclusiveStartKey = {
+    param.ExclusiveStartKey = {
       ID: lastVisibleID,
-      Timestamp: req.query.timeStamp,
-      sort: 0,
+      Timestamp: timeStamp,
+      ...(year ? { year: year } : { sort: 0 }),
     };
   }
 
-  const command = new QueryCommand(scanParam);
+  const command = new QueryCommand(param);
 
   try {
     const result = await docClient.send(command);
@@ -52,7 +51,7 @@ export const getAlbumsController = async (req, res) => {
 
 export const getAlbumController = async (req, res) => {
   try {
-    const scanParam = {
+    const queryParam = {
       TableName: TABLENAME,
       ProjectionExpression: "Title, Images",
       KeyConditionExpression: "ID = :albumID",
@@ -61,7 +60,7 @@ export const getAlbumController = async (req, res) => {
       },
     };
 
-    const command = new QueryCommand(scanParam);
+    const command = new QueryCommand(queryParam);
 
     const result = await docClient.send(command);
 
@@ -90,6 +89,7 @@ export const postAlbumController = async (req, res) => {
         Timestamp: req.body.date,
         Cover: ids[req.body.cover],
         Images: ids,
+        year: new Date(req.body.date).getFullYear(),
         sort: 0,
       },
     });

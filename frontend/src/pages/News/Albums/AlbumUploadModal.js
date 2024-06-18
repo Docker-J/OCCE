@@ -76,8 +76,9 @@ const AlbumUploadModal = ({ isOpen, onClose }) => {
     <CustomModal
       isOpen={isOpen}
       onClose={handleClose}
-      maxHeight="85vh"
+      height="85vh"
       maxWidth="1300px"
+      loading={loading}
       // aria-labelledby="modal-modal-title"
       // aria-describedby="modal-modal-description"
     >

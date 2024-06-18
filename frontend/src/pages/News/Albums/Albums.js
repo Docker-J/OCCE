@@ -23,33 +23,42 @@ import AlbumUploadModal from "./AlbumUploadModal";
 
 import { MemoizedMeditationONComp } from "./MeditationONImageListItem";
 import ButtonYearPicker from "../../../common/ButtonYearPicker";
-import { useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 const PAGE_SIZE = 12;
 
 const titleBackground = {
   backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.40), rgba(0, 0, 0, 0.40)), url("/img/News/Albums/Albums.jpg")',
+    'linear-gradient(rgba(0, 0, 0, 0.40), rgba(0, 0, 0, 0.40)), url("/img/News/Albums/Albums.webp")',
 };
 
 const Albums = () => {
   const matches = useMediaQuery("(min-width:1200px)");
-  const navigate = useNavigate();
+  let [searchParams, setSearchParams] = useSearchParams();
   const { openModal } = useModals();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedYear, setSelectedYear] = useState(null);
+  const [selectedYear, setSelectedYear] = useState(
+    searchParams.has("year") ? new Date(searchParams.get("year"), 0, 1) : null
+  );
   const [albums, setAlbums] = useState([]);
   const [end, setEnd] = useState(false);
   const [restored, setRestored] = useState(null);
 
   useEffect(() => {
-    selectedYear
-      ? navigate(`?year=${selectedYear.getFullYear()}`)
-      : navigate("");
     setAlbums([]);
-    onLoad();
-  }, [selectedYear, navigate]);
+    setEnd(false);
+    console.log(selectedYear);
+    selectedYear
+      ? setSearchParams({ year: selectedYear.getFullYear() })
+      : setSearchParams((prev) => prev.delete("year"));
+  }, [selectedYear, setSearchParams]);
+
+  useEffect(() => {
+    if (restored !== null) {
+      onLoad();
+    }
+  }, [searchParams.get("year")]);
 
   const onLoad = async () => {
     if (isLoading) return;
@@ -151,8 +160,8 @@ const Albums = () => {
           }}
         >
           {albums.length <= 0 ? (
-            <Stack alignItems="center">
-              <CircularProgress />
+            <Stack alignItems="center" sx={{ py: 8 }}>
+              {isLoading ? <CircularProgress /> : "사진이 존재하지 않습니다"}
             </Stack>
           ) : (
             <InfiniteScroll

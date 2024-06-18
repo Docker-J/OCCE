@@ -10,19 +10,23 @@ import { format } from "date-fns";
 
 const MeditationONComp = ({ posts, cols }) => {
   const grouped = {};
-  for (let i = 0; i < posts.length; i++) {
-    let year = new Date(posts[i].Timestamp).getFullYear();
-    if (!grouped[year]) {
-      grouped[year] = [];
+  let currentYear = null;
+  for (let post of posts) {
+    const year = new Date(post.Timestamp).getFullYear();
+
+    if (year !== currentYear) {
+      currentYear = year;
+      grouped[year] = []; // Create a new array for the new year
     }
-    grouped[year].push(posts[i]);
+
+    grouped[year].push(post);
   }
 
   return Object.keys(grouped)
     .reverse()
     .map((year) => (
       <>
-        <ImageListItem key="Subheader" cols={cols}>
+        <ImageListItem key={year} cols={cols}>
           <ListSubheader component="div">{year}</ListSubheader>
         </ImageListItem>
         {grouped[year].map((post) => (

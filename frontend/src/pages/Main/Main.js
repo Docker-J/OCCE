@@ -53,19 +53,6 @@ const Main = () => {
           </Button>
         </div>
 
-        <div className="churchName">
-          <div className="nameExplanationContainer">
-            <img
-              src="/img/Main/1.jpg"
-              style={{
-                height: "70%",
-                maxWidth: "900px",
-                borderRadius: "1em",
-              }}
-            />
-          </div>
-        </div>
-
         <MainImage backgroundImage={"url(/img/Main/1.jpg)"} />
         <MainImage backgroundImage={"url(/img/Main/img2.jpg)"} />
         <MainImage backgroundImage={"url(/img/Main/img3.jpg)"} />

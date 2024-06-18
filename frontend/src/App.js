@@ -183,10 +183,27 @@ const HeaderWrapper = () => {
   return (
     <>
       <Managers />
-      <ResponsiveAppBar />
-      <Suspense>
-        <Outlet />
-      </Suspense>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          minHeight: "100vh",
+        }}
+      >
+        <ResponsiveAppBar />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            flexGrow: 1,
+          }}
+        >
+          <Suspense>
+            <Outlet />
+          </Suspense>
+        </div>
+      </div>
     </>
   );
 };

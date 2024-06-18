@@ -96,7 +96,7 @@ const YoungAdult = () => {
             }}
           >
             {ministries.map((ministry) => (
-              <Card sx={{ minWidth: "30%", margin: "12px" }}>
+              <Card sx={{ minWidth: "50%", m: "12px", ml: 1 }}>
                 <CardContent>
                   <CardHeader title={ministry.title} />
                   <Typography>{ministry.content}</Typography>

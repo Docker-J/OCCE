@@ -1,6 +1,8 @@
 import { Avatar, Paper } from "@mui/material";
 import { memo } from "react";
 
+import CustomModal from "../../../common/CustomModal";
+
 import Slider from "react-slick";
 
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
@@ -8,10 +10,9 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
 import "../../../common/slick/slick-thumb.css";
+
 import "./PhotoViewModal.css";
-import CustomModal from "../../../common/CustomModal";
 
 const PrevArrow = memo(({ onClick }) => {
   return (
@@ -83,17 +84,17 @@ const PhotoViewModal = ({ isOpen, onClose, photos, initialIndex }) => {
     },
     dots: true,
     dotsClass: "slick-dots slick-thumb",
-    infinite: true,
+    infinite: false,
     lazyLoad: true,
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
-    // centerMode: true,
-    // variableWidth: true,
     initialSlide: initialIndex,
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
   };
+
+  console.log(photos);
 
   return (
     <CustomModal
@@ -107,13 +108,11 @@ const PhotoViewModal = ({ isOpen, onClose, photos, initialIndex }) => {
     >
       <Slider {...settings}>
         {Object.values(photos).map((photo) => (
-          <div className="img-container" key={photo}>
-            <img
-              style={{ objectFit: "contain !important" }}
-              alt="church"
-              src={`https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${photo}/MeditationON`}
-            />
-          </div>
+          <img
+            key={photo}
+            alt="church"
+            src={`https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${photo}/MeditationON`}
+          />
         ))}
       </Slider>
     </CustomModal>

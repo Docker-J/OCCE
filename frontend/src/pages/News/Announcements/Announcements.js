@@ -19,6 +19,7 @@ import BoardPagination from "../../../components/News/Announcement/BoardPaginati
 import useModals from "../../../util/useModal";
 import AdminComponent from "../../../common/AdminComponent";
 import { Suspense } from "react";
+import FullScreenLoading from "../../../common/FullScreenLoading";
 
 const titleBackground = {
   backgroundImage:
@@ -53,7 +54,7 @@ const Announcements = () => {
         <div className="container" style={{ maxWidth: "1200px" }}>
           {state === "loading" && (
             <div style={{ display: "flex", justifyContent: "center" }}>
-              <CircularProgress />
+              <FullScreenLoading />
             </div>
           )}
 
@@ -66,7 +67,7 @@ const Announcements = () => {
           >
             <Await
               resolve={data.announcementsData}
-              errorElement={<p>Error loading package location!</p>}
+              errorElement={<p>Error loading!</p>}
             >
               {({ data }) => {
                 return data.announcements.length === 0 ? (
