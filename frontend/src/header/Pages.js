@@ -125,10 +125,10 @@ if (process.env.NODE_ENV === "development") {
           title: "새가족",
           to: "newcomers",
         },
-        // {
-        //   title: "교회사진",
-        //   to: "photos",
-        // },
+        {
+          title: "교회사진",
+          to: "albums",
+        },
         // {
         //   title: "교회영상",
         //   to: "videos",
