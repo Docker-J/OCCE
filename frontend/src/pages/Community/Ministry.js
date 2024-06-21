@@ -90,7 +90,7 @@ const Ministry = () => {
                 key={index}
                 style={{
                   width: "100%",
-                  maxWidth: 400,
+                  maxWidth: 350,
                   display: "flex",
                   flexDirection: "column",
                 }}
