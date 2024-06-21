@@ -8,6 +8,7 @@ import ButtonDatePicker from "../../../common/ButtonDatePicker";
 import ImagePreviews from "../../../common/ImagePreviews";
 import FileUploadComponent from "../../../common/FileUploadComponent";
 import CustomModal from "../../../common/CustomModal";
+import imageCompression from "browser-image-compression";
 
 const AlbumUploadModal = ({ isOpen, onClose }) => {
   const { openSnackbar } = useSnackbar();
@@ -40,8 +41,20 @@ const AlbumUploadModal = ({ isOpen, onClose }) => {
     form.append("title", title);
     form.append("date", date.toISOString());
 
-    filesToUpload.forEach((image) => {
-      form.append("images", image);
+    filesToUpload.forEach(async (image) => {
+      try {
+        const compressedImage =
+          image.size >= 10 * 1024 * 1024
+            ? await imageCompression(image, {
+                maxSizeMB: 10,
+                useWebWorker: true,
+              })
+            : image;
+
+        form.append("images", compressedImage);
+      } catch (error) {
+        console.error("Image compression failed:", error);
+      }
     });
 
     form.append("cover", coverImage);
