@@ -6,7 +6,6 @@ import reportWebVitals from "./reportWebVitals";
 
 import store from "./store";
 import { Provider } from "react-redux";
-import { CookiesProvider } from "react-cookie";
 import { createTheme, ThemeProvider } from "@mui/material";
 
 import ModalsProvider from "./util/ModalsProvider";
@@ -36,19 +35,17 @@ const theme = createTheme({
 
 root.render(
   // <React.StrictMode>
-  <CookiesProvider>
-    <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <SnackbarProvider>
-          <ModalsProvider>
-            <App />
-            <Modals />
-          </ModalsProvider>
-          <SnackBar />
-        </SnackbarProvider>
-      </ThemeProvider>
-    </Provider>
-  </CookiesProvider>
+  <Provider store={store}>
+    <ThemeProvider theme={theme}>
+      <SnackbarProvider>
+        <ModalsProvider>
+          <App />
+          <Modals />
+        </ModalsProvider>
+        <SnackBar />
+      </SnackbarProvider>
+    </ThemeProvider>
+  </Provider>
   // </React.StrictMode>
 );
 
