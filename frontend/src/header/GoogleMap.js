@@ -51,8 +51,14 @@ const GoogleMap = memo(() => {
 
           {infowindowShown && (
             <InfoWindow anchor={marker} onCloseClick={closeInfoWindow}>
-              <h2>Hello everyone!</h2>
-              <p>This is an Info Window</p>
+              <h3 style={{ marginTop: 0 }}> 에드먼턴 온 교회 </h3>
+              <a
+                href="https://goo.gl/maps/gqpiA88gJSvbjfDD9"
+                target="_blank"
+                rel="noreferrer"
+              >
+                9419 95 St, Edmonton, AB T6C 4K2
+              </a>
             </InfoWindow>
           )}
         </Map>
