@@ -1,8 +1,6 @@
-/* body {
-  color: white;
-} */
-
 #section1 {
+  display: flex;
+  justify-content: center;
   background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)),
     url("../../components/AboutUs/img/FirstStep.webp");
   background-repeat: no-repeat;
@@ -40,6 +38,15 @@
 #section4 {
   display: flex;
   justify-content: center;
+  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+    url("../../components/AboutUs/img/Servers.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+#section5 {
+  display: flex;
+  justify-content: center;
   background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
     url("../../components/AboutUs/img/AboutUs.webp");
   background-repeat: no-repeat;
@@ -48,28 +55,19 @@
   background-position-y: 85%;
 }
 
-#section5 {
-  display: flex;
-  justify-content: center;
-  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
-    url("../../components/AboutUs/img/Servers.jpg");
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
 .sectionBody {
   max-width: 1500px;
   margin: auto;
   padding: 0 5vw;
 }
 
-.section5Body {
+.section4Body {
   max-width: 1500px;
   height: 100vh;
   padding: 0;
 }
 
-.section4Body {
+.section5Body {
   margin: 0 1em;
   padding: 2.5em 0;
 }
