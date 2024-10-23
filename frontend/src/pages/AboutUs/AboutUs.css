@@ -28,7 +28,7 @@
   background-position: center;
 }
 
-@media (max-height: 800px) {
+@media (max-height: 915px) {
   .lovegod {
     height: max(33vh, 14em) !important;
     overflow-y: auto;

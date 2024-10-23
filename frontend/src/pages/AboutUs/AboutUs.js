@@ -47,7 +47,7 @@ const About = () => {
               <Arrow onClick={() => fullpageApi.moveSectionDown()} />
             </div>
 
-            <Section fullpageApi={fullpageApi} id="section5">
+            <Section fullpageApi={fullpageApi} id="section5" last={true}>
               <Section5 />
             </Section>
           </ReactFullpage.Wrapper>

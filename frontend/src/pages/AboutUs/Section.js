@@ -1,12 +1,12 @@
 import { Children, cloneElement } from "react";
 import Arrow from "../../components/AboutUs/Arrow";
 
-const Section = ({ id, fullpageApi, children }) => (
+const Section = ({ id, fullpageApi, children, last }) => (
   <div className="section" id={id}>
     {Children.map(children, (child) => {
       return cloneElement(child, { fullpageApi });
     })}
-    <Arrow onClick={() => fullpageApi.moveSectionDown()} />
+    {last || <Arrow onClick={() => fullpageApi.moveSectionDown()} />}
   </div>
 );
 
