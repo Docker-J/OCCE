@@ -1,0 +1,127 @@
+.box-wrapper {
+  position: relative;
+  width: clamp(220px, 40vw, 500px);
+  height: clamp(250px, 48vmin, 350px);
+  /* margin-top: clamp(250px, 75vh, 340px); */
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.flip-card-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  background-color: #fff !important;
+  box-shadow: 0px 2px 10px -1px #ffffffbf;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  /* position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  border-radius: 10px; */
+}
+
+.card-image {
+  position: relative;
+  border-radius: 50%;
+  top: min(-70px, -30%);
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(100px, 85%, 370px);
+  padding-bottom: clamp(100px, 85%, 370px);
+  overflow: hidden;
+}
+
+.card-image img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-image-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-back-title {
+  position: absolute;
+  width: 100%;
+  top: 25%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.card-title {
+  margin-top: max(-20%, -92px);
+}
+
+.flip-card-active {
+  transform: rotateY(180deg);
+}
+
+.card-item-details {
+  /* padding: 10px 15px; */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  row-gap: 10px;
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.flip-card-front {
+  color: black;
+  border-radius: 25px;
+}
+
+.flip-card-back {
+  border-radius: 25px;
+  transform: rotateY(180deg);
+}
+
+.flip-card-back-button {
+  position: absolute !important;
+  bottom: 0.5em;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.card-details {
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+}
