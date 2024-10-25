@@ -8,7 +8,7 @@ import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
 
 import "./MinisterCard.css";
 
-const MinisterCard = ({ imagen, imageOffset, title, position, details }) => {
+const MinisterCard = ({ image, imageOffset, title, position, details }) => {
   const [show, setShown] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
@@ -18,8 +18,6 @@ const MinisterCard = ({ imagen, imageOffset, title, position, details }) => {
       ? "0 20px 25px rgb(0 0 0 / 25%)"
       : "0 2px 10px rgb(0 0 0 / 8%)",
   });
-
-  console.log(showDetails);
 
   return (
     <div className="box-wrapper flip-card">
@@ -31,7 +29,7 @@ const MinisterCard = ({ imagen, imageOffset, title, position, details }) => {
       >
         <div className="card-item-info flip-card-front">
           <div className="card-image">
-            <img src={imagen} style={imageOffset} alt="" />
+            <img src={image} style={imageOffset} alt="" />
           </div>
 
           <div className="card-title">
@@ -44,7 +42,7 @@ const MinisterCard = ({ imagen, imageOffset, title, position, details }) => {
                 justifyContent: "center",
               }}
             >
-              <div></div>
+              <div />
               <Typography
                 className={Styles.title}
                 variant="h5"
@@ -82,13 +80,49 @@ const MinisterCard = ({ imagen, imageOffset, title, position, details }) => {
               </div>
             </div>
             <div className="card-details">
-              {Object.keys(details).map((e) => (
-                <Typography
-                  sx={{ fontSize: { xs: "0.85em", sm: "1em", md: "1.1em" } }}
-                >
-                  {e}
-                </Typography>
-              ))}
+              {Object.keys(details).map((key) => {
+                const values = Object.keys(details[key]);
+                return (
+                  <div key={key}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontSize: { xs: "0.8em", sm: "0.95em", md: "1.1em" },
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {key}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: { xs: "0.8em", sm: "0.95em", md: "1.1em" },
+                        }}
+                      >
+                        {values[0]}
+                      </Typography>
+                    </div>
+                    {values.slice(1).map((
+                      record // Render remaining values
+                    ) => (
+                      <Typography
+                        key={record}
+                        sx={{
+                          fontSize: { xs: "0.8em", sm: "1em", md: "1.1em" },
+                          display: "block",
+                        }}
+                        textAlign="right"
+                      >
+                        {record}
+                      </Typography>
+                    ))}
+                  </div>
+                );
+              })}
             </div>
 
             <IconButton

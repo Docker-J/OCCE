@@ -114,14 +114,17 @@
 
 .flip-card-back-button {
   position: absolute !important;
-  bottom: 0.5em;
+  bottom: 6px;
   left: 50%;
   transform: translateX(-50%);
 }
 
 .card-details {
   position: absolute;
-  width: 100%;
+  box-sizing: border-box;
+  width: clamp(210px, 40vw, 330px);
+  padding: 0 5px;
   top: 50%;
-  transform: translateY(-50%);
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
