@@ -20,14 +20,9 @@ export const MinistersList = [
     },
   },
   {
-    title: "김태영 목사",
-    position: "행정",
-    image: "img/About/KimTaeyoung.webp",
-  },
-  {
-    title: "김유정 전도사",
-    position: "유아유치부",
-    image: "img/About/KimYoojeong.webp",
+    title: "김휘경 전도사",
+    position: "중고등부/청년부/찬양",
+    image: "img/About/KimHwikyung.webp",
   },
   {
     title: "이수연 전도사",
@@ -35,8 +30,13 @@ export const MinistersList = [
     image: "img/About/LeeSooyeon.webp",
   },
   {
-    title: "김휘경 전도사",
-    position: "중고등부/청년부/찬양",
-    image: "img/About/KimHwikyung.webp",
+    title: "김유정 전도사",
+    position: "유아유치부",
+    image: "img/About/KimYoojeong.webp",
+  },
+  {
+    title: "김태영 목사",
+    position: "행정",
+    image: "img/About/KimTaeyoung.webp",
   },
 ];
