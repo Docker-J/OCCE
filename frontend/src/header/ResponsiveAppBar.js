@@ -60,10 +60,14 @@ const ResponsiveAppBar = () => {
       title: "로그인",
       onClick: () => openModal(SignInModal, {}),
     },
-    {
-      title: "회원가입",
-      onClick: () => openModal(SignUpModal, {}),
-    },
+    ...(process.env.NODE_ENV === "development"
+      ? [
+          {
+            title: "회원가입",
+            onClick: () => openModal(SignUpModal, {}),
+          },
+        ]
+      : []),
   ];
 
   const signOutSuccess = () => {
