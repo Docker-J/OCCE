@@ -30,6 +30,7 @@ const PAGE_SIZE = 12;
 const titleBackground = {
   backgroundImage:
     'linear-gradient(rgba(0, 0, 0, 0.40), rgba(0, 0, 0, 0.40)), url("/img/News/Albums/Albums.webp")',
+  backgroundPosition: "32% 22%",
 };
 
 const Albums = () => {

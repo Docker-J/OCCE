@@ -12,7 +12,8 @@ import useSnackbar from "../../../util/useSnackbar";
 
 const titleBackground = {
   backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Online/MeditationON.webp")',
+    'linear-gradient(rgba(0, 0, 0, 0.40), rgba(0, 0, 0, 0.40)), url("/img/News/Albums/Albums.webp")',
+  backgroundPosition: "32% 22%",
 };
 
 const Album = () => {
