@@ -5,7 +5,7 @@ import cors from "cors";
 
 import user from "./routes/user.routes.js";
 import announcements from "./routes/announcements.routes.js";
-import column from "./routes/column.routes.js";
+import column from "./routes/columns.routes.js";
 import weeklyupdate from "./routes/weeklyupdate.routes.js";
 import albums from "./routes/albums.routes.js";
 import meditationon from "./routes/meditationon.routes.js";
@@ -17,6 +17,7 @@ import {
   getAnnouncementsCount,
   getPinnedAnnouncements,
 } from "./controller/announcements.controller.js";
+import { getColumnsCount } from "./controller/columns.controller.js";
 
 const app = express();
 const PORT = process.env.port || 3001;
@@ -40,6 +41,7 @@ app.listen(PORT, async () => {
     getRecentWeelyUpdateDate(),
     getAnnouncementsCount(),
     getPinnedAnnouncements(),
+    getColumnsCount(),
   ]);
 
   console.log(`running on port ${PORT}`);

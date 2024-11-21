@@ -1,7 +1,7 @@
-import axios from "axios";
+import { getColumn } from "../api/columns";
 
 export async function loader({ params }) {
-  const result = await axios.get(`/api/columns/column/${params.columID}`);
+  const result = await getColumn(params.columnID);
 
-  return result.data;
+  return result;
 }

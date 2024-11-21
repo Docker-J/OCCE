@@ -8,7 +8,7 @@ import {
   getColumnController,
   getColumnsController,
   postColumnController,
-} from "../controller/column.controller.js";
+} from "../controller/columns.controller.js";
 
 const router = express.Router();
 

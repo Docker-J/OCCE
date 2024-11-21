@@ -1,9 +1,9 @@
 import axios from "axios";
 import { v4 as uuid } from "uuid";
-import { deleteImages } from "../controller/images.controller.js";
+import { deleteImages } from "./images.controller.js";
 
 const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
-const CLOUDFLARE_DATABASE_ID = "1de4220d-820c-4074-ae4f-b4aabeacf83e";
+const CLOUDFLARE_DATABASE_ID = process.env.CLOUDFLARE_D1_DATABASE_ID;
 const CLOUDFLARE_API_KEY = process.env.CLOUDFLARE_API_KEY;
 
 const URL = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${CLOUDFLARE_DATABASE_ID}/query`;
@@ -68,6 +68,7 @@ export const getColumnController = async (req, res) => {
         "Content-Type": "application/json",
       },
     });
+    console.log(result.data.result[0].results[0]);
     res.send(result.data.result[0].results[0]);
   } catch (error) {
     res.sendStatus(404);
@@ -81,10 +82,9 @@ export const postColumnController = async (req, res) => {
       req.body.title,
       req.body.body,
       req.body.images.length > 0 ? req.body.images : null,
-      new Date(),
-      req.body.video,
+      req.body.date,
     ],
-    sql: `INSERT INTO ${TABLENAME} (id, title, body, images, timestamp, video) VALUES (?, ?, ?, ?, ?, ?)`,
+    sql: `INSERT INTO ${TABLENAME} (id, title, body, images, timestamp) VALUES (?, ?, ?, ?, ?)`,
   };
 
   try {
@@ -133,10 +133,9 @@ export const editColumnController = async (req, res) => {
       req.body.title,
       req.body.body,
       req.body.images.length > 0 ? req.body.images : null,
-      req.body.video,
       req.params.id,
     ],
-    sql: `UPDATE ${TABLENAME} SET title = ?, body = ?, images = ?, video = ? WHERE id = ?`,
+    sql: `UPDATE ${TABLENAME} SET title = ?, body = ?, images = ? WHERE id = ?`,
   };
 
   try {
@@ -188,7 +187,7 @@ export const deleteColumnController = async (req, res) => {
       },
     });
 
-    getAnnouncementsCount();
+    getColumnsCount();
 
     res.sendStatus(200);
   } catch (error) {

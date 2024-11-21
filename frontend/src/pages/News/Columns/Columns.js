@@ -10,23 +10,25 @@ import { CircularProgress, Fab, Typography } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 
-import "./Announcements.css";
-import AnnouncementPostModal from "../../../components/News/Announcement/AnnouncementPostModal";
-import BoardTable from "../../../components/News/Announcement/BoardTable";
+import ColumnPostModal from "../../../components/News/Columns/ColumnPostModal";
+import BoardTable from "../../../components/News/Columns/BoardTable";
+import BoardPagination from "../../../components/News/Announcement/BoardPagination";
 
 import "../../NextGen/NextGen.css";
-import BoardPagination from "../../../components/News/Announcement/BoardPagination";
 import useModals from "../../../util/useModal";
 import AdminComponent from "../../../common/AdminComponent";
 import { Suspense } from "react";
 import FullScreenLoading from "../../../common/FullScreenLoading";
 
+import "./Announcements.css";
+
 const titleBackground = {
   backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)),  url("/img/News/Announcements/Announcements.webp")',
+    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)),  url("/img/News/Columns/Columns.jpg")',
+  backgroundPosition: "25% 65%",
 };
 
-const Announcements = () => {
+const Columns = () => {
   let revalidator = useRevalidator();
 
   const data = useLoaderData();
@@ -93,7 +95,7 @@ const Announcements = () => {
         <Fab
           style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
           onClick={() =>
-            openModal(AnnouncementPostModal, {
+            openModal(ColumnPostModal, {
               revalidator: revalidator.revalidate,
               origTitle: "",
               origBody: "",
@@ -107,4 +109,4 @@ const Announcements = () => {
   );
 };
 
-export default Announcements;
+export default Columns;

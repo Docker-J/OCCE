@@ -16,23 +16,26 @@ import FullScreenLoading from "../../../common/FullScreenLoading";
 
 import AdminComponent from "../../../common/AdminComponent";
 import useModals from "../../../util/useModal";
-import AnnouncementPostModal from "../../../components/News/Announcement/AnnouncementPostModal";
-import { deleteAnnouncement } from "../../../api/announcements";
 
 import "../../NextGen/NextGen.css";
 import "./content-styles.css";
+import { deleteColumn } from "../../../api/columns";
+import ColumnPostModal from "./../../../components/News/Columns/ColumnPostModal";
 
 const titleBackground = {
   backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)), url("/img/News/Announcements/Announcements.jpg")',
+    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)), url("/img/News/Columns/Columns.jpg")',
+  backgroundPosition: "25% 65%",
 };
 
-const Announcement = () => {
+const Column = () => {
   let revalidator = useRevalidator();
   const navigate = useNavigate();
   const { openModal } = useModals();
   const { openSnackbar } = useSnackbar();
   const { id, title, body, timestamp } = useLoaderData();
+
+  console.log(timestamp);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -40,10 +43,10 @@ const Announcement = () => {
     setIsLoading(true);
 
     try {
-      await deleteAnnouncement(id);
+      await deleteColumn(id);
 
-      openSnackbar("success", "The announcement is successfully deleted!");
-      navigate("/announcements");
+      openSnackbar("success", "The column is successfully deleted!");
+      navigate("/columns");
     } catch {
       openSnackbar(
         "error",
@@ -59,7 +62,7 @@ const Announcement = () => {
       icon: <EditNoteIcon />,
       name: "Edit",
       onClick: () =>
-        openModal(AnnouncementPostModal, {
+        openModal(ColumnPostModal, {
           revalidator: revalidator.revalidate,
           id: id,
           origTitle: title,
@@ -128,4 +131,4 @@ const Announcement = () => {
   );
 };
 
-export default Announcement;
+export default Column;

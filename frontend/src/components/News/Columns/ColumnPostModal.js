@@ -1,12 +1,13 @@
 import { Button, CircularProgress, TextField } from "@mui/material";
-import TextEditor from "./TextEditor";
+import TextEditor from "../Announcement/TextEditor";
 import { useEffect, useState } from "react";
 
+import { postColumn } from "../../../api/columns";
 import useSnackbar from "../../../util/useSnackbar";
-import { postAnnouncement } from "../../../api/announcements";
 import CustomModal from "../../../common/CustomModal";
+import ButtonDatePicker from "../../../common/ButtonDatePicker";
 
-const AnnouncementPostModal = ({
+const ColumnPostModal = ({
   isOpen,
   onClose,
   revalidator,
@@ -18,15 +19,16 @@ const AnnouncementPostModal = ({
 
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState(origTitle);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [body, setBody] = useState(origBody);
 
   const onSubmit = async () => {
     setLoading(true);
     try {
-      await postAnnouncement(id, title, body);
+      await postColumn(id, title, body, selectedDate);
 
       revalidator();
-      openSnackbar("success", "The announcement is successfully posted!");
+      openSnackbar("success", "The column is successfully posted!");
       handleClose();
     } catch (error) {
       console.log(error);
@@ -61,15 +63,23 @@ const AnnouncementPostModal = ({
         <CircularProgress />
       ) : (
         <>
-          <TextField
-            id="filled-basic"
-            label="Title"
-            variant="outlined"
-            value={title}
-            fullWidth
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
+          <div style={{ width: "100%" }}>
+            <TextField
+              id="filled-basic"
+              label="Title"
+              variant="outlined"
+              value={title}
+              sx={{ width: "85%" }}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+
+            <ButtonDatePicker
+              sx={{ width: "10%" }}
+              value={selectedDate}
+              onChange={setSelectedDate}
+            />
+          </div>
 
           <div style={{ height: "65svh", width: "100%", marginTop: "1em" }}>
             <TextEditor body={body} getBody={setBody} />
@@ -90,4 +100,4 @@ const AnnouncementPostModal = ({
   );
 };
 
-export default AnnouncementPostModal;
+export default ColumnPostModal;
