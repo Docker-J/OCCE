@@ -83,7 +83,7 @@ const Column = () => {
             fontWeight={830}
             sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
           >
-            공지사항
+            목회칼럼
           </Typography>
         </div>
       </div>
