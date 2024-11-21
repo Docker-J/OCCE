@@ -10,6 +10,8 @@ import About from "./pages/AboutUs/AboutUs";
 import { loader as AnnouncementsLoader } from "./route/AnnouncementsLoader";
 import { loader as AnnouncementLoader } from "./route/AnnouncementLoader";
 import { loader as WeeklyUpdateLoader } from "./route/WeeklyUpdateLoader";
+import { loader as ColumnsLoader } from "./route/ColumnsLoader";
+import { loader as ColumnLoader } from "./route/ColumnLoader";
 // import { loader as meditationONLoader } from "./route/MeditationONLoader";
 import { loader as MeditationONPostLoader } from "./route/MeditationONPostLoader";
 import { loader as Bible291Loader } from "./route/Bible291Loader";
@@ -74,6 +76,12 @@ const WeeklyUpdate = lazy(() =>
     () => import("./pages/News/WeeklyUpdate/WeeklyUpdate"),
     "WeeklyUpdate"
   )
+);
+const Columns = lazy(() =>
+  lazyRetry(() => import("./pages/News/Columns/Columns"), "Columns")
+);
+const Column = lazy(() =>
+  lazyRetry(() => import("./pages/News/Columns/Column"), "Column")
 );
 const NewComers = lazy(() =>
   lazyRetry(() => import("./pages/News/NewComers/NewComers"), "NewComers")
@@ -244,6 +252,16 @@ const router = createBrowserRouter([
         path: "/albums/:albumID",
         element: <Album />,
         loader: AlbumLoader,
+      },
+      {
+        path: "/columns",
+        element: <Columns />,
+        loader: ColumnsLoader,
+      },
+      {
+        path: "/columns/:columnID",
+        element: <Column />,
+        loader: ColumnLoader,
       },
       {
         path: "/newcomers",

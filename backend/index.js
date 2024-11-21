@@ -5,6 +5,7 @@ import cors from "cors";
 
 import user from "./routes/user.routes.js";
 import announcements from "./routes/announcements.routes.js";
+import column from "./routes/column.routes.js";
 import weeklyupdate from "./routes/weeklyupdate.routes.js";
 import albums from "./routes/albums.routes.js";
 import meditationon from "./routes/meditationon.routes.js";
@@ -25,6 +26,7 @@ app.use(express.json({ limit: "5mb" }));
 
 app.use("/api/user", user);
 app.use("/api/announcements", announcements);
+app.use("/api/columns", column);
 app.use("/api/weeklyupdate", weeklyupdate);
 app.use("/api/albums", albums);
 app.use("/api/meditationon", meditationon);

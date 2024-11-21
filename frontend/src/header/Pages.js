@@ -19,6 +19,10 @@ if (process.env.NODE_ENV === "development") {
           to: "weeklyupdate",
         },
         {
+          title: "목회칼럼",
+          to: "columns",
+        },
+        {
           title: "새가족",
           to: "newcomers",
         },
