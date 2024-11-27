@@ -118,7 +118,7 @@ const Ministry = () => {
                 >
                   <List component="div" disablePadding>
                     {ministry.types.map((type) => (
-                      <ListItem sx={{ pl: 10 }}>
+                      <ListItem key={type} sx={{ pl: 10 }}>
                         <ListItemText
                           primary={<Typography>{type}</Typography>}
                         />
