@@ -32,16 +32,15 @@ const BoardTable = ({ announcements }) => {
               display: "flex",
               textDecoration: "none",
               px: 2,
-              py: 0,
               my: 1.8,
             }}
+            elevation={3}
           >
             <Stack
               direction="column"
               sx={{
                 justifyContent: "center",
-                width: "40px",
-                minWidth: "40px",
+                width: "42px",
               }}
             >
               <Typography variant="body2" whiteSpace="nowrap">
@@ -52,18 +51,18 @@ const BoardTable = ({ announcements }) => {
               </Typography>
             </Stack>
 
-            <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
+            <Divider orientation="vertical" flexItem sx={{ mx: 2, my: 1 }} />
 
             <Box
               sx={{
-                py: 1.5,
-                flexGrow: 1,
+                py: 2,
                 overflow: "hidden",
               }}
             >
               <Stack direction="row" alignItems="center">
                 <Typography
                   variant="h6"
+                  fontWeight={1000}
                   sx={{
                     whiteSpace: "nowrap",
                     overflow: "hidden",
@@ -77,7 +76,7 @@ const BoardTable = ({ announcements }) => {
                 <p
                   style={{
                     fontSize: "0.9em",
-                    lineHeight: "1.2em",
+                    lineHeight: "1.2",
                     height: "2.4em",
                     margin: 0,
                     marginTop: 12,
