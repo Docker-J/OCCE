@@ -10,7 +10,7 @@ const MinistriesCards = ({ ministries }) => {
       }}
     >
       {ministries.map((ministry) => (
-        <Card sx={{ minWidth: "300px", margin: "12px" }}>
+        <Card key={ministry.title} sx={{ minWidth: "300px", margin: "12px" }}>
           <CardContent>
             <CardHeader title={ministry.title} />
             <Typography>{ministry.content}</Typography>
