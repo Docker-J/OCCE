@@ -94,11 +94,11 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
         {imgs && (
           <Box
             component={Paper}
-            elevation={10}
+            elevation={20}
             sx={{
               width: "100%",
               maxWidth: { xs: "none", md: "520px" },
-              borderRadius: "1em",
+              borderRadius: "0.5em",
               mr: { xs: 0, md: "-36px" },
             }}
           >
@@ -106,8 +106,8 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
               sx={{
                 pb: "75%",
                 position: "relative",
+                borderRadius: "0.5em",
                 overflow: "hidden",
-                borderRadius: "1em",
               }}
             >
               <div className={Styles.boxContent}>
