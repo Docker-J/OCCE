@@ -50,9 +50,9 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
       elevation={5}
       sx={{
         width: "100%",
-        maxWidth: { xs: "none", md: "800px" },
+        maxWidth: { xs: "none", md: "820px" },
         borderRadius: "1em",
-        overflow: "visible",
+        // overflow: "visible",
       }}
     >
       <CardContent
@@ -61,12 +61,16 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
           flexWrap: "wrap",
           justifyContent: "space-between",
           alignItems: "center",
+          p: "0 !important",
         }}
       >
         <Stack
           sx={{
             justifyContent: "space-between",
+            ml: 2,
+            mr: 1,
             mb: { xs: 1.5, md: 0 },
+            mt: { xs: 2, md: 0 },
           }}
           gap={0.5}
         >
@@ -94,19 +98,19 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
         {imgs && (
           <Box
             component={Paper}
-            elevation={20}
+            // elevation={20}
             sx={{
               width: "100%",
-              maxWidth: { xs: "none", md: "520px" },
-              borderRadius: "0.5em",
-              mr: { xs: 0, md: "-36px" },
+              maxWidth: { xs: "none", md: "64%" },
+              // borderRadius: "0.5em",
+              // mr: { xs: 0, md: "-36px" },
             }}
           >
             <Box
               sx={{
                 pb: "75%",
                 position: "relative",
-                borderRadius: "0.5em",
+                // borderRadius: "0.5em",
                 overflow: "hidden",
               }}
             >
