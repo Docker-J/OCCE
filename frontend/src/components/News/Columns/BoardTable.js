@@ -62,7 +62,7 @@ const BoardTable = ({ announcements }) => {
               <Stack direction="row" alignItems="center">
                 <Typography
                   variant="h6"
-                  fontWeight={1000}
+                  fontWeight={800}
                   sx={{
                     whiteSpace: "nowrap",
                     overflow: "hidden",
@@ -96,7 +96,7 @@ const BoardTable = ({ announcements }) => {
               </Stack>
             </Box>
           </Card>
-          {index !== announcements.length - 1 && <Divider variant="middle" />}
+          {/* {index !== announcements.length - 1 && <Divider variant="middle" />} */}
         </div>
       ))}
     </div>
