@@ -5,7 +5,7 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 
-import sendNotification from "./../api/sendNotification";
+import sendNotification from "./../api/sendNotification.js";
 
 const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
 const BUCKET = "weeklyupdate";
