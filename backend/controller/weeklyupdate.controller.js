@@ -5,6 +5,8 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 
+import sendNotification from "./../api/sendNotification";
+
 const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
 const BUCKET = "weeklyupdate";
 const R2 = new S3Client({
@@ -114,11 +116,11 @@ export const uploadWeeklyUpdateController = async (req, res) => {
 
     res.send(req.params.date);
 
-    // sendNotification(
-    //   "새로운 주보가 업로드 되었습니다",
-    //   req.body.date,
-    //   `weeklyupdate/${req.body.date}`
-    // );
+    sendNotification(
+      "새로운 주보가 업로드 되었습니다",
+      req.params.date,
+      `weeklyupdate/${req.params.date}`
+    );
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
