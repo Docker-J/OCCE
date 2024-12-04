@@ -12,7 +12,6 @@ import AddIcon from "@mui/icons-material/Add";
 
 import "./Announcements.css";
 import AnnouncementPostModal from "../../../components/News/Announcement/AnnouncementPostModal";
-import BoardTable from "../../../components/News/Announcement/BoardTable";
 
 import "../../NextGen/NextGen.css";
 import BoardPagination from "../../../components/News/Announcement/BoardPagination";
@@ -20,6 +19,7 @@ import useModals from "../../../util/useModal";
 import AdminComponent from "../../../common/AdminComponent";
 import { Suspense } from "react";
 import FullScreenLoading from "../../../common/FullScreenLoading";
+import ForumPostBoard from "../../../common/Forum/ForumPostBoard";
 
 const titleBackground = {
   backgroundImage:
@@ -76,7 +76,7 @@ const Announcements = () => {
                   </Typography>
                 ) : (
                   <>
-                    <BoardTable announcements={data.announcements} />
+                    <ForumPostBoard announcements={data.announcements} />
                     <BoardPagination
                       pages={Math.ceil(data.count / 10)}
                       currentPage={page}

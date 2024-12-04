@@ -11,7 +11,7 @@ import { CircularProgress, Fab, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
 import ColumnPostModal from "../../../components/News/Columns/ColumnPostModal";
-import BoardTable from "../../../components/News/Columns/BoardTable";
+import ForumPostBoard from "../../../common/Forum/ForumPostBoard";
 import BoardPagination from "../../../components/News/Announcement/BoardPagination";
 
 import "../../NextGen/NextGen.css";
@@ -78,7 +78,7 @@ const Columns = () => {
                   </Typography>
                 ) : (
                   <>
-                    <BoardTable announcements={data.announcements} />
+                    <ForumPostBoard announcements={data.announcements} />
                     <BoardPagination
                       pages={Math.ceil(data.count / 10)}
                       currentPage={page}
