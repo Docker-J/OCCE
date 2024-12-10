@@ -30,3 +30,9 @@
   right: 2vw;
   bottom: 3vh;
 }
+
+#deleteBulletinButton {
+  position: fixed;
+  left: 2vw;
+  bottom: 3vh;
+}

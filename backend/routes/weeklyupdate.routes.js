@@ -4,6 +4,7 @@ import { authStaff, authUser } from "./../middleware/auth.js";
 import { upload } from "../middleware/multer.js";
 
 import {
+  deleteWeeklyUpdateController,
   getRecentWeeklyUpdateDateController,
   getWeeklyUpdateController,
   uploadWeeklyUpdateController,
@@ -21,5 +22,7 @@ router.put(
   authStaff,
   uploadWeeklyUpdateController
 );
+
+router.delete("/:date", authStaff, deleteWeeklyUpdateController);
 
 export default router;

@@ -1,4 +1,5 @@
 import {
+  DeleteObjectsCommand,
   GetObjectCommand,
   ListObjectsV2Command,
   PutObjectCommand,
@@ -121,6 +122,33 @@ export const uploadWeeklyUpdateController = async (req, res) => {
       req.params.date,
       `weeklyupdate/${req.params.date}`
     );
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+};
+
+export const deleteWeeklyUpdateController = async (req, res) => {
+  const date = req.params.date;
+
+  try {
+    const command = new DeleteObjectsCommand({
+      Bucket: BUCKET,
+      Delete: {
+        Objects: [
+          {
+            Key: date,
+          },
+          {
+            Key: `${date}_member`,
+          },
+        ],
+      },
+    });
+
+    await R2.send(command);
+    await getRecentWeelyUpdateDate();
+    res.send(RECENTDATE);
   } catch (error) {
     console.log(error);
     res.sendStatus(500);

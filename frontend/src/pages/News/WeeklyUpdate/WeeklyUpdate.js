@@ -4,6 +4,7 @@ import { CircularProgress, Fab, IconButton, Typography } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import UploadIcon from "@mui/icons-material/Upload";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import { isMobile } from "react-device-detect";
 
@@ -20,6 +21,7 @@ import {
   isBefore,
   isSameDay,
   isSunday,
+  parse,
   startOfWeek,
   subDays,
 } from "date-fns";
@@ -28,7 +30,7 @@ import "./WeeklyUpdate.css";
 import "../../NextGen/NextGen.css";
 import useModals from "../../../util/useModal";
 import WeeklyUpdatePostModal from "../../../components/News/WeeklyUpdate/WeeklyUpdatePostModal";
-import { getWeeklyUpdate } from "../../../api/weeklyupdate";
+import { deleteWeeklyUpdate, getWeeklyUpdate } from "../../../api/weeklyupdate";
 import { useSelector } from "react-redux";
 import { MIN_DATE } from "../../../constants/WeeklyUpdate";
 
@@ -63,6 +65,11 @@ const WeeklyUpdate = () => {
       setLoading(false);
     }
   }, [selectedDate]);
+
+  const deleteFile = async () => {
+    const result = await deleteWeeklyUpdate(selectedDate);
+    setSelectedDate(parse(JSON.stringify(result.data), "yyyyMMdd", new Date()));
+  };
 
   const previousSunday = () => {
     setSelectedDate((prev) =>
@@ -183,6 +190,14 @@ const WeeklyUpdate = () => {
           }
         >
           <UploadIcon />
+        </Fab>
+
+        <Fab
+          id="deleteBulletinButton"
+          sx={{ backgroundColor: "red", color: "white" }}
+          onClick={deleteFile}
+        >
+          <DeleteIcon />
         </Fab>
       </AdminComponent>
     </>
