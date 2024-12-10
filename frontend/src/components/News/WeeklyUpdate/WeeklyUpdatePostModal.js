@@ -160,6 +160,7 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
                 }}
               >
                 <FileUploadComponent
+                  accept={{ "application/pdf": [] }}
                   handleChangeFile={handleMemberFileChange}
                 />
               </div>
