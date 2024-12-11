@@ -13,7 +13,6 @@ import AddIcon from "@mui/icons-material/Add";
 import "./Announcements.css";
 import AnnouncementPostModal from "../../../components/News/Announcement/AnnouncementPostModal";
 
-import "../../NextGen/NextGen.css";
 import BoardPagination from "../../../components/News/Announcement/BoardPagination";
 import useModals from "../../../util/useModal";
 import AdminComponent from "../../../common/AdminComponent";
@@ -22,8 +21,7 @@ import FullScreenLoading from "../../../common/FullScreenLoading";
 import ForumPostBoard from "../../../common/Forum/ForumPostBoard";
 
 const titleBackground = {
-  backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)),  url("/img/News/Announcements/Announcements.webp")',
+  backgroundImage: 'url("/img/News/Announcements/Announcements.webp")',
 };
 
 const Announcements = () => {

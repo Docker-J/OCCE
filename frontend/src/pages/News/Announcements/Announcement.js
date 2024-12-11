@@ -24,12 +24,10 @@ import {
   pinAnnouncement,
 } from "../../../api/announcements";
 
-import "../../NextGen/NextGen.css";
 import "./content-styles.css";
 
 const titleBackground = {
-  backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)), url("/img/News/Announcements/Announcements.jpg")',
+  backgroundImage: 'url("/img/News/Announcements/Announcements.jpg")',
 };
 
 const Announcement = () => {

@@ -2,8 +2,6 @@ import { Typography } from "@mui/material";
 import YoutubePlaylist from "./../../components/Online/YoutubePlaylist";
 import { useLoaderData } from "react-router-dom";
 
-import "../NextGen/NextGen.css";
-
 const titleBackground = {
   backgroundImage:
     'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Online/Sermon.webp")',

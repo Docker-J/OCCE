@@ -8,7 +8,6 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import "../NextGen/NextGen.css";
 import { Link } from "react-router-dom";
 import { MinistryList } from "./MinistryList";
 
@@ -18,8 +17,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import { useState } from "react";
 
 const titleBackground = {
-  backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("/img/Community/Ministry.webp")',
+  backgroundImage: 'url("/img/Community/Ministry.webp")',
   backgroundPositionX: "58%",
   backgroundPositionY: "56%",
 };

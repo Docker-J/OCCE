@@ -3,11 +3,9 @@ import { useLoaderData } from "react-router-dom";
 import { Box, Typography } from "@mui/material";
 
 import CustomCarousel from "../../../common/CustomCarousel";
-import "../../NextGen/NextGen.css";
 
 const titleBackground = {
-  backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Online/MeditationON.webp")',
+  backgroundImage: 'url("/img/Online/MeditationON.webp")',
 };
 
 const MeditationONPost = () => {

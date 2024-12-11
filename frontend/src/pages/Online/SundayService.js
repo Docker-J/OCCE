@@ -1,10 +1,8 @@
 import { Typography } from "@mui/material";
-import "../NextGen/NextGen.css";
 import YoutubePlaylist from "../../components/Online/YoutubePlaylist";
 
 const titleBackground = {
-  backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("/img/Online/SundayService.webp")',
+  backgroundImage: ' url("/img/Online/SundayService.webp")',
   backgroundPositionX: "50%",
   backgroundPositionY: "70%",
 };

@@ -1,10 +1,8 @@
 import { Typography } from "@mui/material";
-import "../NextGen/NextGen.css";
 import YoutubePlaylist from "../../components/Online/YoutubePlaylist";
 
 const titleBackground = {
-  backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)), url("/img/Online/DawnQT.webp")',
+  backgroundImage: 'url("/img/Online/DawnQT.webp")',
   // backgroundPositionX: "55%",
   backgroundPositionY: "15%",
 };

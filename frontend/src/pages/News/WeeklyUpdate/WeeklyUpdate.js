@@ -27,7 +27,6 @@ import {
 } from "date-fns";
 
 import "./WeeklyUpdate.css";
-import "../../NextGen/NextGen.css";
 import useModals from "../../../util/useModal";
 import WeeklyUpdatePostModal from "../../../components/News/WeeklyUpdate/WeeklyUpdatePostModal";
 import { deleteWeeklyUpdate, getWeeklyUpdate } from "../../../api/weeklyupdate";
@@ -36,8 +35,7 @@ import { MIN_DATE } from "../../../constants/WeeklyUpdate";
 import CustomConfirmDialog from "../../../common/CustomConfirmDialog";
 
 const titleBackground = {
-  backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)), url("/img/News/WeeklyUpdate/WeeklyUpdate.webp")',
+  backgroundImage: 'url("/img/News/WeeklyUpdate/WeeklyUpdate.webp")',
 };
 
 const WeeklyUpdate = () => {

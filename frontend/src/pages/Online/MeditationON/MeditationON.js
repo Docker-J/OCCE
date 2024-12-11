@@ -16,7 +16,6 @@ import { MemoizedMeditationONComp } from "../../../components/Online/MeditationO
 import MeditationONModal from "../../../components/Online/MeditationON/MeditationONModal";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-import "../../NextGen/NextGen.css";
 import AdminComponent from "../../../common/AdminComponent";
 import Footer from "../../../header/Footer";
 import useModals from "../../../util/useModal";
@@ -24,8 +23,7 @@ import { getPosts } from "../../../api/meditationon";
 
 const PAGE_SIZE = 12;
 const titleBackground = {
-  backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Online/MeditationON.webp")',
+  backgroundImage: 'url("/img/Online/MeditationON.webp")',
 };
 
 const MeditationON = () => {

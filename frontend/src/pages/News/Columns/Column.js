@@ -21,12 +21,10 @@ import { deleteColumn } from "../../../api/columns";
 import ColumnPostModal from "./../../../components/News/Columns/ColumnPostModal";
 import CustomConfirmDialog from "../../../common/CustomConfirmDialog";
 
-import "../../NextGen/NextGen.css";
 import "./content-styles.css";
 
 const titleBackground = {
-  backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)), url("/img/News/Columns/Columns.jpg")',
+  backgroundImage: 'url("/img/News/Columns/Columns.jpg")',
   backgroundPosition: "25% 65%",
 };
 

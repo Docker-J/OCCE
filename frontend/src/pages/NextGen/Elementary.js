@@ -1,11 +1,9 @@
 import { Typography } from "@mui/material";
-import "./NextGen.css";
 import InfoCard from "../../components/NextGen/InfoCard";
 import MinistriesCards from "../../components/NextGen/MinistriesCards";
 
 const titleBackground = {
-  backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/NextGen/KidsOntheTree.webp")',
+  backgroundImage: 'url("/img/NextGen/KidsOntheTree.webp")',
 };
 
 const imgs = [

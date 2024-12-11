@@ -14,7 +14,6 @@ import ColumnPostModal from "../../../components/News/Columns/ColumnPostModal";
 import ForumPostBoard from "../../../common/Forum/ForumPostBoard";
 import BoardPagination from "../../../components/News/Announcement/BoardPagination";
 
-import "../../NextGen/NextGen.css";
 import useModals from "../../../util/useModal";
 import AdminComponent from "../../../common/AdminComponent";
 import { Suspense } from "react";
@@ -23,8 +22,7 @@ import FullScreenLoading from "../../../common/FullScreenLoading";
 import "./Announcements.css";
 
 const titleBackground = {
-  backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)),  url("/img/News/Columns/Columns.jpg")',
+  backgroundImage: 'url("/img/News/Columns/Columns.jpg")',
   backgroundPosition: "25% 65%",
 };
 

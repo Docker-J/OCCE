@@ -1,10 +1,8 @@
 import { Card, CardContent, CardHeader, Typography } from "@mui/material";
-import "./NextGen.css";
 import InfoCard from "../../components/NextGen/InfoCard";
 
 const titleBackground = {
-  backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/NextGen/4.jpg")',
+  backgroundImage: 'url("/img/NextGen/4.jpg")',
 };
 
 const ministries = [

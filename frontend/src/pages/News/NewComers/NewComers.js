@@ -1,11 +1,9 @@
 import { Typography } from "@mui/material";
 
 import NewComersTimeline from "./NewComersTimeline";
-import "../../NextGen/NextGen.css";
 
 const titleBackground = {
-  backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.20), rgba(0, 0, 0, 0.20)), url("/img/NewComers/NewComers.webp")',
+  backgroundImage: 'url("/img/NewComers/NewComers.webp")',
 };
 
 const NewComers = () => {

@@ -2,7 +2,6 @@ import { useLoaderData, useNavigate, useParams } from "react-router-dom";
 
 import { Fab, ImageList, ImageListItem, Typography } from "@mui/material";
 
-import "../../NextGen/NextGen.css";
 import useModals from "../../../util/useModal";
 import PhotoViewModal from "./PhotoViewModal";
 import AdminComponent from "../../../common/AdminComponent";
@@ -11,8 +10,7 @@ import { deleteAlbum } from "../../../api/albums";
 import useSnackbar from "../../../util/useSnackbar";
 
 const titleBackground = {
-  backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.40), rgba(0, 0, 0, 0.40)), url("/img/News/Albums/Albums.webp")',
+  backgroundImage: 'url("/img/News/Albums/Albums.webp")',
   backgroundPosition: "32% 22%",
 };
 

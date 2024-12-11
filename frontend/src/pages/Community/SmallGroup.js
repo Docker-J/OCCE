@@ -1,9 +1,7 @@
 import { Typography } from "@mui/material";
-import "../NextGen/NextGen.css";
 
 const titleBackground = {
-  backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Community/SmallGroup.webp")',
+  backgroundImage: 'url("/img/Community/SmallGroup.webp")',
   backgroundPositionY: "58%",
 };
 
