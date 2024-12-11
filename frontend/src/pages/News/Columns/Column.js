@@ -17,10 +17,12 @@ import FullScreenLoading from "../../../common/FullScreenLoading";
 import AdminComponent from "../../../common/AdminComponent";
 import useModals from "../../../util/useModal";
 
-import "../../NextGen/NextGen.css";
-import "./content-styles.css";
 import { deleteColumn } from "../../../api/columns";
 import ColumnPostModal from "./../../../components/News/Columns/ColumnPostModal";
+import CustomConfirmDialog from "../../../common/CustomConfirmDialog";
+
+import "../../NextGen/NextGen.css";
+import "./content-styles.css";
 
 const titleBackground = {
   backgroundImage:
@@ -35,9 +37,9 @@ const Column = () => {
   const { openSnackbar } = useSnackbar();
   const { id, title, body, timestamp } = useLoaderData();
 
-  console.log(timestamp);
-
   const [isLoading, setIsLoading] = useState(false);
+
+  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState(false);
 
   const onDelete = async () => {
     setIsLoading(true);
@@ -54,6 +56,7 @@ const Column = () => {
       );
     } finally {
       setIsLoading(false);
+      setDeleteConfirmDialog(false);
     }
   };
 
@@ -69,7 +72,11 @@ const Column = () => {
           origBody: body,
         }),
     },
-    { icon: <DeleteIcon />, name: "Delete", onClick: onDelete },
+    {
+      icon: <DeleteIcon />,
+      name: "Delete",
+      onClick: () => setDeleteConfirmDialog(true),
+    },
   ];
 
   return (
@@ -124,6 +131,14 @@ const Column = () => {
                 />
               ))}
             </SpeedDial>
+
+            <CustomConfirmDialog
+              title="삭제하시겠습니까?"
+              body={`${title} 목회칼럼이 삭제됩니다`}
+              isOpen={deleteConfirmDialog}
+              onClose={() => setDeleteConfirmDialog(false)}
+              onConfirm={onDelete}
+            />
           </AdminComponent>
         </div>
       </div>
