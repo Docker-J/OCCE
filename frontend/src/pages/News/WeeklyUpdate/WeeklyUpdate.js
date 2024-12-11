@@ -33,6 +33,7 @@ import WeeklyUpdatePostModal from "../../../components/News/WeeklyUpdate/WeeklyU
 import { deleteWeeklyUpdate, getWeeklyUpdate } from "../../../api/weeklyupdate";
 import { useSelector } from "react-redux";
 import { MIN_DATE } from "../../../constants/WeeklyUpdate";
+import CustomConfirmDialog from "../../../common/CustomConfirmDialog";
 
 const titleBackground = {
   backgroundImage:
@@ -50,6 +51,8 @@ const WeeklyUpdate = () => {
   const [selectedDate, setSelectedDate] = useState(queryDate);
 
   const [loading, setLoading] = useState(true);
+
+  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState(false);
 
   // Get Bulletin from Firestore
   const loadFile = useCallback(async () => {
@@ -194,11 +197,23 @@ const WeeklyUpdate = () => {
 
         <Fab
           id="deleteBulletinButton"
-          sx={{ backgroundColor: "red", color: "white" }}
-          onClick={deleteFile}
+          sx={{
+            backgroundColor: "#d10000",
+            color: "white",
+            ":hover": { backgroundColor: "#ff0000" },
+          }}
+          onClick={() => setDeleteConfirmDialog(true)}
         >
           <DeleteIcon />
         </Fab>
+
+        <CustomConfirmDialog
+          title="삭제하시겠습니까?"
+          body={`${format(selectedDate, "yyyyMMdd")} 주보가 삭제됩니다`}
+          isOpen={deleteConfirmDialog}
+          onClose={() => setDeleteConfirmDialog(false)}
+          onConfirm={deleteFile}
+        />
       </AdminComponent>
     </>
   );
