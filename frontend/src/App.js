@@ -121,9 +121,9 @@ const MeditationONPost = lazy(() =>
     "MeditationONPost"
   )
 );
-const Bible291 = lazy(() =>
-  lazyRetry(() => import("./pages/Online/Bible291"), "Bible291")
-);
+// const Bible291 = lazy(() =>
+//   lazyRetry(() => import("./pages/Online/Bible291"), "Bible291")
+// );
 
 // Community
 const SmallGroup = lazy(() =>
@@ -312,11 +312,11 @@ const router = createBrowserRouter([
             element: <MeditationONPost />,
             loader: MeditationONPostLoader,
           },
-          {
-            path: "bible291",
-            element: <Bible291 />,
-            loader: Bible291Loader,
-          },
+          // {
+          //   path: "bible291",
+          //   element: <Bible291 />,
+          //   loader: Bible291Loader,
+          // },
         ],
       },
       {
