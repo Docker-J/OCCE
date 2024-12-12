@@ -5,8 +5,8 @@ const TABLENAME = "FCMToken";
 
 function getExpirationEpoch() {
   const now = new Date();
-  const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-  return Math.floor(nextMonth.getTime() / 1000);
+  now.setMonth(now.getMonth() + 1);
+  return Math.floor(now.getTime() / 1000);
 }
 
 export const registerController = async (req, res) => {
