@@ -2,21 +2,27 @@ import { Card, CardContent, CardHeader, Typography } from "@mui/material";
 import InfoCard from "../../components/NextGen/InfoCard";
 
 const titleBackground = {
-  backgroundImage: 'url("/img/NextGen/4.jpg")',
+  backgroundImage: 'url("/img/NextGen/YoungAdults.jpg")',
+  backgroundPositionY: "60%",
 };
 
+const imgs = [{ src: "/img/NextGen/Youngadult/1.jpg" }];
+
 const ministries = [
-  { title: "예배(worship)", content: "주일예배, 주중예배" },
+  { title: "예배(worship)", content: ["주일예배", "주중예배"] },
   {
     title: "교육(teaching)",
-    content: "입교/세례 교육, 성경공부, 제자훈련, 기도회, 수련회",
+    content: ["입교/세례 교육", "성경공부", "제자훈련", "기도회", "수련회"],
   },
   {
     title: "교제(fellowship)",
-    content: "정원모임, 친교(식사, 활동), 지역 청년들과의 교류/연합",
+    content: ["정원모임", "친교(식사, 활동)", "지역 청년들과의 교류/연합"],
   },
-  { title: "봉사(serving)", content: "교회사역, 봉사, 지역사회 봉사/구제" },
-  { title: "전도(preaching)", content: "선교지 후원, 단기선교 참여" },
+  {
+    title: "봉사(serving)",
+    content: ["교회사역", "봉사", "지역사회 봉사/구제"],
+  },
+  { title: "전도(preaching)", content: ["선교지 후원", "단기선교 참여"] },
 ];
 
 const YoungAdult = () => {
@@ -53,8 +59,9 @@ const YoungAdult = () => {
             <InfoCard
               age=""
               time="주일 오후 4시"
-              place="Youth Room, Small Group Rooms"
+              place="Youth Room"
               ask="김휘경 전도사"
+              imgs={imgs}
             />
           </div>
 
@@ -63,9 +70,6 @@ const YoungAdult = () => {
             <Typography component="span" fontWeight="bold" fontSize="1.5em">
               온교회 청년부
             </Typography>
-            {/* <br /> */}
-            {/* 목적 */}
-            {/* <br /> */}
             는 예수 그리스도의 이름으로 모여, 하나님의 성령으로 한 마음을 품고,
             하나님과 이웃에 대한 사랑이 점점 커져가며, 그 사랑으로 세상에서
             하나님 나라의 공의와 정의를 이뤄가는 청년 공동체를 세워갑니다.
@@ -82,7 +86,10 @@ const YoungAdult = () => {
             God.
             <br />
             <br />
-            모임 및 사역 안내 <br />
+          </Typography>
+
+          <Typography variant="h6" fontWeight={500}>
+            모임 및 사역 안내
           </Typography>
 
           <div
@@ -99,7 +106,9 @@ const YoungAdult = () => {
               >
                 <CardContent>
                   <CardHeader title={ministry.title} />
-                  <Typography>{ministry.content}</Typography>
+                  {ministry.content.map((item) => (
+                    <Typography key={item}>{item}</Typography>
+                  ))}
                 </CardContent>
               </Card>
             ))}

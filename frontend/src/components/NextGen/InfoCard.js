@@ -16,34 +16,46 @@ import ContactSupportIcon from "@mui/icons-material/ContactSupport";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
 import "../../common/slick/slick-default-dots.css";
+
 import Styles from "./InfoCard.module.css";
 
 const InfoCard = ({ age, time, place, ask, imgs }) => {
-  const settings = {
-    customPaging: (i) => (
-      <span
-        style={{
-          width: "8px",
-          height: "8px",
-          borderRadius: "50%",
-          // cursor: isSelected ? null : "pointer",
-          background: "#808080",
-          display: "inline-block",
-        }}
-      />
-    ),
-    className: Styles["slick-slide"],
-    dotsClass: "slick-dots slick-default-dots",
-    dots: true,
-    infinite: true,
-    lazyLoad: true,
-    speed: 300,
-    autoplay: true,
-    slidesToShow: 1,
-    slidesToScroll: 1,
+  const settings = () => {
+    const baseSettings = {
+      className: Styles["slick-slide"],
+      dots: true,
+      infinite: true,
+      lazyLoad: true,
+      speed: 300,
+      autoplay: true,
+      slidesToShow: 1,
+      slidesToScroll: 1,
+    };
+
+    if (imgs.length > 1) {
+      return {
+        ...baseSettings,
+        dotsClass: "slick-dots slick-default-dots",
+        customPaging: (i) => (
+          <span
+            style={{
+              width: "8px",
+              height: "8px",
+              borderRadius: "50%",
+              // cursor: isSelected ? null : "pointer",
+              background: "#808080",
+              display: "inline-block",
+            }}
+          />
+        ),
+      };
+    } else {
+      return baseSettings;
+    }
   };
+
+  console.log(settings);
 
   return (
     <Card
@@ -98,12 +110,9 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
         {imgs && (
           <Box
             component={Paper}
-            // elevation={20}
             sx={{
               width: "100%",
               maxWidth: { xs: "none", md: "64%" },
-              // borderRadius: "0.5em",
-              // mr: { xs: 0, md: "-36px" },
             }}
           >
             <Box
@@ -115,7 +124,7 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
               }}
             >
               <div className={Styles.boxContent}>
-                <Slider {...settings}>
+                <Slider {...settings()}>
                   {imgs.map((img) => (
                     <div className={Styles["img-container"]} key={uuidv4}>
                       <img src={img.src} />
