@@ -53,7 +53,7 @@ const Main = () => {
           </Button>
         </div>
 
-        <MainImage backgroundImage={"url(/img/Main/1.jpg)"} />
+        <MainImage backgroundImage={"url(/img/Main/img1.jpg)"} />
         <MainImage backgroundImage={"url(/img/Main/img2.jpg)"} />
         <MainImage backgroundImage={"url(/img/Main/img3.jpg)"} />
       </CustomCarousel>
