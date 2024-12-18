@@ -14,25 +14,11 @@ import { loader as ColumnsLoader } from "./route/ColumnsLoader";
 import { loader as ColumnLoader } from "./route/ColumnLoader";
 // import { loader as meditationONLoader } from "./route/MeditationONLoader";
 import { loader as MeditationONPostLoader } from "./route/MeditationONPostLoader";
-import { loader as Bible291Loader } from "./route/Bible291Loader";
 import { loader as AlbumLoader } from "./route/AlbumLoader";
 import Footer from "./header/Footer";
 import NotificationManager from "./manager/NotificationManager";
 import UserManager from "./manager/UserManager";
 import RequestManager from "./manager/RequestManager";
-
-// import NewComers from "./pages/NewComers";
-
-// import Community from "./pages/Community";
-// import MeditationON from "./pages/Online/MeditationON";
-// import MeditationONPost from "./pages/Online/MeditationONPost";
-// import PrayON from "./pages/Online/PrayON";
-// import Worship from "./pages/Online/Worship";
-// import SundayService from "./pages/Online/SundayService";
-// import Sermon from "./pages/Online/Sermon";
-
-// const Main = lazy(() => import("./pages/Main/Main"));
-// const About = lazy(() => import("./pages/About/About"));
 
 // a function to retry loading a chunk to avoid chunk load error for out of date code
 const lazyRetry = function(componentImport, name) {
@@ -121,9 +107,6 @@ const MeditationONPost = lazy(() =>
     "MeditationONPost"
   )
 );
-// const Bible291 = lazy(() =>
-//   lazyRetry(() => import("./pages/Online/Bible291"), "Bible291")
-// );
 
 // Community
 const SmallGroup = lazy(() =>
@@ -312,11 +295,6 @@ const router = createBrowserRouter([
             element: <MeditationONPost />,
             loader: MeditationONPostLoader,
           },
-          // {
-          //   path: "bible291",
-          //   element: <Bible291 />,
-          //   loader: Bible291Loader,
-          // },
         ],
       },
       {
