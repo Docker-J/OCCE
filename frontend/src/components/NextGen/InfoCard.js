@@ -31,9 +31,10 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
       autoplay: true,
       slidesToShow: 1,
       slidesToScroll: 1,
+      swipe: imgs?.length > 1 ? true : false,
     };
 
-    if (imgs.length > 1) {
+    if (imgs?.length > 1) {
       return {
         ...baseSettings,
         dotsClass: "slick-dots slick-default-dots",
