@@ -1,12 +1,11 @@
 import { Link } from "react-router-dom";
 
 import { Button } from "@mui/material";
-// import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
 
 import ButtonBases from "../../components/Main/MainButtonBanner";
 import "./Main.css";
-// import { useState } from "react";
-import CustomChatBot from "../../components/Main/CustomChatBot";
+
+// import CustomChatBot from "../../components/Main/CustomChatBot";
 import MainAnimation from "../../components/Main/MainAnimation";
 
 import styles from "react-responsive-carousel/lib/styles/carousel.min.css";
@@ -30,8 +29,6 @@ const Main = () => {
         showThumbs={false}
         showStatus={false}
         showArrows={false}
-        // showIndicators={false}
-        infiniteLoop
         styles={styles}
       >
         <div className="churchName">
@@ -40,7 +37,7 @@ const Main = () => {
           <Button
             className="learnMoreAbtChurch"
             component={Link}
-            to="/aboutus#churchname"
+            to="/aboutus#beginning"
             variant="outlined"
             size="small"
             sx={{
