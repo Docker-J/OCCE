@@ -7,7 +7,7 @@ const titleBackground = {
 };
 
 const imgs = [
-  { src: "/img/NextGen/Elementary/1.jpg" },
+  { src: "/img/NextGen/Elementary/1.webp" },
   { src: "/img/NextGen/Elementary/2.jpg" },
   { src: "/img/NextGen/Elementary/3.jpg" },
   { src: "/img/NextGen/Elementary/4.jpg" },

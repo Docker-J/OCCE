@@ -54,7 +54,7 @@ const Main = () => {
         </div>
 
         <MainImage backgroundImage={"url(/img/Main/img1.jpg)"} />
-        <MainImage backgroundImage={"url(/img/Main/img2.jpg)"} />
+        <MainImage backgroundImage={"url(/img/Main/img2.webp)"} />
         <MainImage backgroundImage={"url(/img/Main/img3.jpg)"} />
       </CustomCarousel>
 
