@@ -22,7 +22,7 @@ import FullScreenLoading from "../../../common/FullScreenLoading";
 import "./Announcements.css";
 
 const titleBackground = {
-  backgroundImage: 'url("/img/News/Columns/Columns.jpg")',
+  backgroundImage: 'url("/img/News/Columns/Columns.webp")',
   backgroundPosition: "25% 65%",
 };
 

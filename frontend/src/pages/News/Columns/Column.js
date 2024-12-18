@@ -24,7 +24,7 @@ import CustomConfirmDialog from "../../../common/CustomConfirmDialog";
 import "./content-styles.css";
 
 const titleBackground = {
-  backgroundImage: 'url("/img/News/Columns/Columns.jpg")',
+  backgroundImage: 'url("/img/News/Columns/Columns.webp")',
   backgroundPosition: "25% 65%",
 };
 
