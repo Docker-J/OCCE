@@ -9,33 +9,28 @@ const images = [
   {
     url: "img/Main/location.webp",
     title: "주일예배 장소",
-    width: "32%",
     link: "https://goo.gl/maps/gqpiA88gJSvbjfDD9",
     target: "_blank",
   },
   {
     url: "img/Main/time.webp",
     title: "예배 시간",
-    width: "32%",
     to: "/aboutus#aboutus",
   },
   {
     url: "img/Main/news.webp",
     title: "최신 주보 보기",
-    width: "32%",
     to: "/weeklyupdate",
   },
   {
     url: "img/Main/youtube.webp",
     title: "교회 유튜브 바로가기",
-    width: "32%",
     link: "https://www.youtube.com/c/oncce",
     target: "_blank",
   },
   {
     url: "img/Main/join.webp",
     title: "교인 등록하기",
-    width: "32%",
     link:
       "https://docs.google.com/forms/d/e/1FAIpQLSfYN9EECPuQ0e4TrPfok4UhMH3zKnvjUckKwGfe3SkQM-0O-A/viewform",
     target: "_blank",
@@ -43,13 +38,11 @@ const images = [
   {
     url: "img/Main/offering.webp",
     title: "헌금 안내",
-    width: "32%",
-    link: "aboutus#aboutus/offering",
+    to: "/aboutus#aboutus/offering",
   },
 ];
 
 const ImageButton = styled(ButtonBase)(({ theme }) => ({
-  position: "relative",
   height: 200,
   [theme.breakpoints.down("md")]: {
     width: "48% !important", // Overrides inline-style
@@ -130,9 +123,6 @@ export default function ButtonBases() {
   return (
     <Box
       sx={{
-        // position: "absolute",
-        // left: "50%",
-        // transform: "translateX(-50%)",
         maxWidth: "1536px",
         display: "flex",
         flexWrap: "wrap",
@@ -140,14 +130,13 @@ export default function ButtonBases() {
         justifyContent: "space-evenly",
         width: "100%",
         minWidth: "550",
-        mt: "0.5em",
-        pb: "0.5em",
+        my: "0.5em",
       }}
     >
       {images.map((image) => (
         <ImageButton
           component={image.to && Link}
-          sx={{ m: 0.5, width: image.width }}
+          sx={{ m: 0.5, width: "32%" }}
           key={image.title}
           href={image.link}
           target={image.target}
