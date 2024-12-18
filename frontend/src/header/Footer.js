@@ -1,6 +1,7 @@
 import { Typography } from "@mui/material";
 import GoogleMap from "./GoogleMap";
 import SocialIconsBar from "./SocialIconsBar";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -30,11 +31,13 @@ const Footer = () => {
         }}
       >
         <div>
-          <img
-            alt="Footer Logo"
-            src={"/img/HeaderLogoBW.png"}
-            style={{ height: "40px" }}
-          />
+          <Link to="/">
+            <img
+              alt="Footer Logo"
+              src={"/img/HeaderLogoBW.png"}
+              style={{ height: "40px" }}
+            />
+          </Link>
           <Typography>Based ON the OLD Truth</Typography>
           <Typography>Moving ON to the NEW Calling</Typography>
           <Typography>온 맘 다해 하나님을 사랑하고</Typography>
