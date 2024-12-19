@@ -38,7 +38,7 @@ const images = [
   {
     url: "img/Main/offering.webp",
     title: "헌금 안내",
-    to: "/aboutus#aboutus/offering",
+    link: "/aboutus#aboutus/offering",
   },
 ];
 
