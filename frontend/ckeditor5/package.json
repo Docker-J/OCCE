@@ -5,7 +5,19 @@
   "version": "0.0.1",
   "license": "SEE LICENSE IN LICENSE.md",
   "private": true,
-  "main": "./build/ckeditor.js",
+  "type": "module",
+  "main": "./build/ckeditor.cjs.js",
+  "module": "./build/ckeditor.esm.js",
+  "exports": {
+    ".": {
+      "import": "./build/ckeditor.esm.js",
+      "require": "./build/ckeditor.cjs.js"
+    },
+    "./build/ckeditor": {
+      "import": "./build/ckeditor.esm.js",
+      "require": "./build/ckeditor.js"
+    }
+  },
   "devDependencies": {
     "@ckeditor/ckeditor5-dev-translations": "^43.0.1",
     "@ckeditor/ckeditor5-dev-utils": "^43.0.1",
@@ -20,6 +32,7 @@
     "webpack-cli": "^5.1.4"
   },
   "scripts": {
-    "build": "webpack --mode production"
+    "build": "webpack --mode production --config webpack.config.cjs", 
+    "build:esm": "webpack --config webpack.config.esm.mjs --mode production" 
   }
 }
