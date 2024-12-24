@@ -8,7 +8,6 @@ import "./Main.css";
 // import CustomChatBot from "../../components/Main/CustomChatBot";
 import MainAnimation from "../../components/Main/MainAnimation";
 
-import styles from "react-responsive-carousel/lib/styles/carousel.min.css";
 import test from "./MainCarousel.module.css";
 import CustomCarousel from "../../common/CustomCarousel";
 
@@ -29,7 +28,6 @@ const Main = () => {
         showThumbs={false}
         showStatus={false}
         showArrows={false}
-        styles={styles}
       >
         <div className="churchName">
           <MainAnimation />

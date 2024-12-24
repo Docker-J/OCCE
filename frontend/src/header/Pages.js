@@ -1,6 +1,6 @@
 let pages;
 
-if (process.env.NODE_ENV === "development") {
+if (!import.meta.env.PROD) {
   pages = [
     {
       title: "교회소개",
@@ -107,7 +107,7 @@ if (process.env.NODE_ENV === "development") {
       ],
     },
   ];
-} else if (process.env.NODE_ENV === "production") {
+} else if (import.meta.env.PROD) {
   pages = [
     {
       title: "교회소개",

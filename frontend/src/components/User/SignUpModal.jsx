@@ -6,7 +6,7 @@ import SignUpConfirmModal from "./SignUpConfirmModal";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import SignUpRequestConfirmModal from "./SignUpRequestConfirmModal";
 
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import CustomModal from "../../common/CustomModal";
 
 const SignUpModal = ({ isOpen, onClose }) => {

@@ -4,7 +4,7 @@ import { Carousel } from "react-responsive-carousel";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
-import styles from "react-responsive-carousel/lib/styles/carousel.min.css";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 import "./CustomCarousel.css";
 import { memo } from "react";
 
@@ -91,7 +91,7 @@ const CustomCarousel = (props) => {
           <Indicator isSelected={isSelected} clickHandler={clickHandler} />
         );
       }}
-      styles={styles}
+      // styles={styles.carousel}
       showThumbs={false}
       showStatus={false}
       {...props}

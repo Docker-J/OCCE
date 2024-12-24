@@ -13,7 +13,7 @@
   display: flex;
   justify-content: center;
   height: 100%;
-  background-image: url("../../components/Main/background.svg");
+  background-image: url("img/Main/background.svg");
   background-repeat: no-repeat;
   background-size: cover;
 }

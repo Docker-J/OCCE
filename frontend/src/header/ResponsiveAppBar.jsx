@@ -15,20 +15,21 @@ import MenuItem from "@mui/material/MenuItem";
 
 import Submenu from "../components/Header/Submenu";
 import SubmenuMobile from "../components/Header/SubmenuMobile";
-import { signOut } from "../api/user";
+import { CascadingMenu } from "../components/Header/CascadingMenus";
+
+import { signOut } from "../api/user.js";
 import { useDispatch, useSelector } from "react-redux";
-import { DELETE_TOKEN } from "../store/Auth";
+import { DELETE_TOKEN } from "../store/Auth.js";
 import {
   bindMenu,
   bindTrigger,
   usePopupState,
 } from "material-ui-popup-state/hooks";
-import { CascadingMenu } from "../components/Header/CascadingMenus";
 
 import pages from "./Pages.js";
 import useModals from "../util/useModal.js";
-import SignInModal from "./../components/User/SignInModal";
-import SignUpModal from "./../components/User/SignUpModal";
+import SignInModal from "../components/User/SignInModal";
+import SignUpModal from "../components/User/SignUpModal";
 import useSnackbar from "../util/useSnackbar.js";
 
 const ResponsiveAppBar = () => {
@@ -60,7 +61,7 @@ const ResponsiveAppBar = () => {
       title: "로그인",
       onClick: () => openModal(SignInModal, {}),
     },
-    ...(process.env.NODE_ENV === "development"
+    ...(!import.meta.env.PROD
       ? [
           {
             title: "회원가입",

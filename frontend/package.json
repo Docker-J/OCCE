@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@ckeditor/ckeditor5-react": "^9.4.0",
+    "@emotion/babel-plugin": "^11.13.5",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@fullpage/react-fullpage": "^0.1.46",
@@ -41,7 +42,6 @@
     "react-redux": "^9.2.0",
     "react-responsive-carousel": "^3.2.23",
     "react-router": "^7.1.1",
-    "react-scripts": "5.0.1",
     "react-simple-chatbot": "^0.6.1",
     "react-slick": "^0.30.3",
     "react-spring": "^9.7.5",
@@ -49,15 +49,15 @@
     "react-verification-input": "^4.2.0",
     "redux": "^5.0.1",
     "slick-carousel": "^1.8.1",
+    "uuid": "^11.0.3",
+    "vite-jsconfig-paths": "^2.0.1",
     "web-vitals": "^4.2.4"
   },
   "scripts": {
-    "start": "set HTTPS=true&&set SSL_CRT_FILE=cert.pem&&set SSL_KEY_FILE=key.pem&& react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "set HTTPS=true&&set SSL_CRT_FILE=cert.pem&&set SSL_KEY_FILE=key.pem&& vite",
+    "build": "vite build",
+    "serve": "vite preview"
   },
-  "proxy": "http://localhost:3001",
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -75,5 +75,12 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "lightningcss": "^1.28.2",
+    "vite": "^6.0.5",
+    "vite-svg-loader": "^5.1.0"
+  },
+  "type": "module"
 }
