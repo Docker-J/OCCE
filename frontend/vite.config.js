@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import basicSsl from "@vitejs/plugin-basic-ssl";
 import jsconfigPaths from "vite-jsconfig-paths";
 import svgLoader from "vite-svg-loader";
 
@@ -12,8 +13,11 @@ export default defineConfig(() => {
     plugins: [
       react({
         jsxImportSource: "@emotion/react",
-        babel: { plugins: ["@emotion/babel-plugin"] },
+        babel: {
+          plugins: ["@emotion/babel-plugin"],
+        },
       }),
+      basicSsl(),
       jsconfigPaths(),
       svgLoader({
         defaultImport: "raw",
@@ -24,6 +28,7 @@ export default defineConfig(() => {
       proxy: {
         "/api": {
           target: "http://localhost:3001",
+          secure: false,
         },
       },
       port: 3000,
