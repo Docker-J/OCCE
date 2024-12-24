@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 
 import { Button, MenuItem } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -22,9 +22,9 @@ const Submenu = ({ page }) => {
   return (
     <>
       <Button
-        ref={anchorRef(popupState)}
-        component={page.to && NavLink}
-        to={page.to}
+        {...(!page.to && { ref: anchorRef(popupState) })}
+        component={page?.to && NavLink}
+        to={page?.to}
         key={page.title}
         sx={{
           my: 2,

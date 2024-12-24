@@ -5,7 +5,7 @@ import {
   SpeedDialIcon,
   Typography,
 } from "@mui/material";
-import { useLoaderData, useNavigate, useRevalidator } from "react-router-dom";
+import { useLoaderData, useNavigate, useRevalidator } from "react-router";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import EditNoteIcon from "@mui/icons-material/EditNote";

@@ -1,4 +1,4 @@
-import { useLoaderData, useNavigate, useParams } from "react-router-dom";
+import { useLoaderData, useNavigate, useParams } from "react-router";
 
 import { Fab, ImageList, ImageListItem, Typography } from "@mui/material";
 

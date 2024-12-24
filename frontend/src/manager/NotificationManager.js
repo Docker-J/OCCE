@@ -4,7 +4,7 @@ import { getToken, onMessage } from "firebase/messaging";
 import { registerToken } from "../api/notification";
 import useSnackbar from "../util/useSnackbar";
 import { IconButton } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 import LaunchIcon from "@mui/icons-material/Launch";
 

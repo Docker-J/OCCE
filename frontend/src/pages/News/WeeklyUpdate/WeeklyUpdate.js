@@ -11,7 +11,7 @@ import { isMobile } from "react-device-detect";
 import ButtonDatePicker from "../../../common/ButtonDatePicker";
 import PDFReader from "../../../components/News/WeeklyUpdate/PDFReader";
 
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router";
 import AdminComponent from "../../../common/AdminComponent";
 import {
   addDays,

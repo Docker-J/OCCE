@@ -4,7 +4,7 @@ import {
   useNavigation,
   useRevalidator,
   useSearchParams,
-} from "react-router-dom";
+} from "react-router";
 
 import { CircularProgress, Fab, Typography } from "@mui/material";
 

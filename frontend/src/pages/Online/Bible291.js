@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material";
 import YoutubePlaylist from "./../../components/Online/YoutubePlaylist";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData } from "react-router";
 
 const titleBackground = {
   backgroundImage:

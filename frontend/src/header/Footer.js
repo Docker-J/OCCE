@@ -1,7 +1,7 @@
 import { Typography } from "@mui/material";
 import GoogleMap from "./GoogleMap";
 import SocialIconsBar from "./SocialIconsBar";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 const Footer = () => {
   return (

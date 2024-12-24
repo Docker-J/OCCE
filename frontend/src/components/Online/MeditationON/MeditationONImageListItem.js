@@ -1,6 +1,6 @@
 import { ImageListItem } from "@mui/material";
 import { memo } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 const MeditationONComp = ({ posts }) => {
   return posts.map((post) => (

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { defer, redirect } from "react-router-dom";
+import { redirect } from "react-router";
 
 export async function loader({ request }) {
   const page = new URL(request.url).searchParams.get("page");
@@ -9,5 +9,5 @@ export async function loader({ request }) {
 
   const getAnnouncements = axios.get(`/api/announcements?page=${page}`);
 
-  return defer({ announcementsData: getAnnouncements });
+  return { announcementsData: getAnnouncements };
 }

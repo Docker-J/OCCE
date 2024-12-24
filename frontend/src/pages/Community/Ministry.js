@@ -8,7 +8,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { MinistryList } from "./MinistryList";
 
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";

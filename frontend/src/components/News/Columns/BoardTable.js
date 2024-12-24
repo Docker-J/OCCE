@@ -1,6 +1,6 @@
 import { Box, Card, Divider, Stack, Typography } from "@mui/material";
 import { format } from "date-fns";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 import MovieIcon from "@mui/icons-material/Movie";
 import PhotoIcon from "@mui/icons-material/Photo";

@@ -9,7 +9,7 @@ import {
   usePopupState,
 } from "material-ui-popup-state/hooks";
 import { createContext, useCallback, useContext, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 const CascadingContext = createContext({
   parentPopupState: null,

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import ChatBot from "react-simple-chatbot";
 import { ThemeProvider } from "styled-components";
 
