@@ -6,7 +6,6 @@ import "./App.css";
 import ResponsiveAppBar from "./header/ResponsiveAppBar";
 
 import Main from "./pages/Main/Main";
-import About from "./pages/AboutUs/AboutUs";
 
 import { loader as AnnouncementsLoader } from "./route/AnnouncementsLoader";
 import { loader as AnnouncementLoader } from "./route/AnnouncementLoader";
@@ -44,6 +43,10 @@ const lazyRetry = function(componentImport, name) {
       });
   });
 };
+
+const About = lazy(() =>
+  lazyRetry(() => import("./pages/AboutUs/AboutUs"), "About")
+);
 
 // News
 const Announcements = lazy(() =>
