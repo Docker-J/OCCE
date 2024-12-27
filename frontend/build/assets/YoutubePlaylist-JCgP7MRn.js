@@ -1,1 +1,0 @@
-import{e}from"./index-C7O2x3CB.js";const a=({src:r})=>e("div",{className:"video",children:e("div",{className:"video-container",children:e("iframe",{src:r,title:"YouTube video player",allow:"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",allowFullScreen:!0})})});export{a as Y};
