@@ -20,6 +20,7 @@ import AdminComponent from "../../../common/AdminComponent";
 import Footer from "../../../header/Footer";
 import useModals from "../../../util/useModal";
 import { getPosts } from "../../../api/meditationon";
+import { ScrollRestoration, useNavigationType } from "react-router";
 
 const PAGE_SIZE = 12;
 const titleBackground = {
@@ -28,12 +29,12 @@ const titleBackground = {
 
 const MeditationON = () => {
   const matches = useMediaQuery("(min-width:1200px)");
+  const navType = useNavigationType();
 
   const { openModal } = useModals();
 
   const [posts, setPosts] = useState([]);
   const [end, setEnd] = useState(false);
-  const [restored, setRestored] = useState(null);
 
   const onLoad = async () => {
     console.log("test getPosts");
@@ -54,22 +55,18 @@ const MeditationON = () => {
   }, [posts]);
 
   useEffect(() => {
-    window.onpopstate = () => {
-      setRestored(true);
-      console.log("test restore");
+    console.log(navType);
+    if (
+      navType === "POP" &&
+      JSON.parse(sessionStorage.getItem("posts")).length > 0
+    ) {
       setPosts(JSON.parse(sessionStorage.getItem("posts")));
-    };
-    setRestored(false);
-    return () => {
-      window.onpopstate = () => {};
-    };
-  }, []);
-
-  useEffect(() => {
-    if (restored !== null && !restored) {
+    } else {
+      // setRestored(false);
+      console.log("get");
       onLoad();
     }
-  }, [restored]);
+  }, []);
 
   useEffect(() => {
     return () => {
