@@ -95,8 +95,7 @@ export const MinistryList = [
   },
   {
     title: "중보기도팀",
-    icon: <img src={FoldedHandsIcon} />,
-
+    icon: <FoldedHandsIcon />,
     types: [
       "교회 공동체를 위한 중보기도",
       "주일 예배를 위한 중보기도",
