@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import jsconfigPaths from "vite-jsconfig-paths";
-import svgLoader from "vite-svg-loader";
+import svgr from "vite-plugin-svgr";
 
 export default defineConfig(() => {
   return {
@@ -14,8 +14,14 @@ export default defineConfig(() => {
       react(),
       basicSsl(),
       jsconfigPaths(),
-      svgLoader({
-        defaultImport: "raw",
+      svgr({
+        svgrOptions: {
+          exportType: "default",
+          ref: true,
+          svgo: false,
+          titleProp: true,
+        },
+        include: "**/*.svg",
       }),
     ],
 

@@ -81,7 +81,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "lightningcss": "^1.28.2",
     "vite": "^6.0.5",
-    "vite-svg-loader": "^5.1.0"
+    "vite-plugin-svgr": "^4.3.0"
   },
   "type": "module"
 }
