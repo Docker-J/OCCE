@@ -23,6 +23,10 @@ if (import.meta.env.DEV) {
           to: "columns",
         },
         {
+          title: "교회일정",
+          to: "schedule",
+        },
+        {
           title: "새가족",
           to: "newcomers",
         },

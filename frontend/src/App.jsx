@@ -12,6 +12,7 @@ import { loader as AnnouncementLoader } from "./route/AnnouncementLoader";
 import { loader as WeeklyUpdateLoader } from "./route/WeeklyUpdateLoader";
 import { loader as ColumnsLoader } from "./route/ColumnsLoader";
 import { loader as ColumnLoader } from "./route/ColumnLoader";
+import { loader as ScheduleLoader } from "./route/ScheduleLoader";
 // import { loader as meditationONLoader } from "./route/MeditationONLoader";
 import { loader as MeditationONPostLoader } from "./route/MeditationONPostLoader";
 import { loader as Bible291Loader } from "./route/Bible291Loader";
@@ -73,6 +74,9 @@ const Columns = lazy(() =>
 );
 const Column = lazy(() =>
   lazyRetry(() => import("./pages/News/Columns/Column"), "Column")
+);
+const Schedule = lazy(() =>
+  lazyRetry(() => import("./pages/News/Schedule/Schedule"), "Schedule")
 );
 const NewComers = lazy(() =>
   lazyRetry(() => import("./pages/News/NewComers/NewComers"), "NewComers")
@@ -253,6 +257,11 @@ const router = createBrowserRouter([
         path: "/columns/:columnID",
         element: <Column />,
         loader: ColumnLoader,
+      },
+      {
+        path: "/schedule",
+        element: <Schedule />,
+        loader: ScheduleLoader,
       },
       {
         path: "/newcomers",
