@@ -14,6 +14,7 @@ import { loader as ColumnsLoader } from "./route/ColumnsLoader";
 import { loader as ColumnLoader } from "./route/ColumnLoader";
 // import { loader as meditationONLoader } from "./route/MeditationONLoader";
 import { loader as MeditationONPostLoader } from "./route/MeditationONPostLoader";
+import { loader as Bible291Loader } from "./route/Bible291Loader";
 import { loader as AlbumLoader } from "./route/AlbumLoader";
 import Footer from "./header/Footer";
 import NotificationManager from "./manager/NotificationManager";
@@ -110,6 +111,9 @@ const MeditationONPost = lazy(() =>
     () => import("./pages/Online/MeditationON/MeditationONPost"),
     "MeditationONPost"
   )
+);
+const Bible291 = lazy(() =>
+  lazyRetry(() => import("./pages/Online/Bible291"), "Bible291")
 );
 
 // Community
@@ -298,6 +302,11 @@ const router = createBrowserRouter([
             path: "meditationON/:postID",
             element: <MeditationONPost />,
             loader: MeditationONPostLoader,
+          },
+          {
+            path: "bible291",
+            element: <Bible291 />,
+            loader: Bible291Loader,
           },
         ],
       },

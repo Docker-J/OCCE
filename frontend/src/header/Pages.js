@@ -1,6 +1,6 @@
 let pages;
 
-if (!import.meta.env.PROD) {
+if (import.meta.env.DEV) {
   pages = [
     {
       title: "교회소개",
@@ -30,10 +30,6 @@ if (!import.meta.env.PROD) {
           title: "교회사진",
           to: "albums",
         },
-        // {
-        //   title: "교회영상",
-        //   to: "videos",
-        // },
       ],
     },
     {
@@ -64,10 +60,10 @@ if (!import.meta.env.PROD) {
           title: "묵상ON",
           to: "online/meditationon",
         },
-        // {
-        //   title: "291일 성경1독",
-        //   to: "online/bible291",
-        // },
+        {
+          title: "291일 성경1독",
+          to: "online/bible291",
+        },
       ],
     },
     {
@@ -107,7 +103,7 @@ if (!import.meta.env.PROD) {
       ],
     },
   ];
-} else if (import.meta.env.PROD) {
+} else {
   pages = [
     {
       title: "교회소개",
@@ -137,10 +133,6 @@ if (!import.meta.env.PROD) {
           title: "교회사진",
           to: "albums",
         },
-        // {
-        //   title: "교회영상",
-        //   to: "videos",
-        // },
       ],
     },
     {
@@ -171,10 +163,10 @@ if (!import.meta.env.PROD) {
           title: "묵상ON",
           to: "online/meditationon",
         },
-        // {
-        //   title: "291일 성경1독",
-        //   to: "online/bible291",
-        // },
+        {
+          title: "291일 성경1독",
+          to: "online/bible291",
+        },
       ],
     },
     {
