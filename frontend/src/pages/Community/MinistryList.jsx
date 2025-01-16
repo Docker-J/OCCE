@@ -53,7 +53,7 @@ export const MinistryList = [
       "새가족 사진촬영 및 전달",
       "새가족 환영회",
       "출결 확인",
-      "예배 후 친교 장소 안내",
+      "예배 후 교제 장소 안내",
     ],
   },
   {
@@ -103,8 +103,8 @@ export const MinistryList = [
     ],
   },
   {
-    title: "친교팀",
+    title: "교제팀",
     icon: <RestaurantIcon />,
-    types: ["교회 내 각종 친교 및 경조사 관련 사역"],
+    types: ["교회 내 각종 교제 및 경조사 관련 사역"],
   },
 ];
