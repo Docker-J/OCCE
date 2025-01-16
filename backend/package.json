@@ -2,7 +2,7 @@
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.716.0",
     "@aws-sdk/client-dynamodb": "^3.716.0",
-    "@aws-sdk/client-s3": "^3.717.0",
+    "@aws-sdk/client-s3": "^3.729.0",
     "@aws-sdk/lib-dynamodb": "^3.716.0",
     "aws-jwt-verify": "^4.0.1",
     "axios": "^1.7.9",
