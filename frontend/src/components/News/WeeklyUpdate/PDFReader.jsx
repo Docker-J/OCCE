@@ -2,7 +2,7 @@ import { Button, ButtonGroup, CircularProgress } from "@mui/material";
 import { useState, useEffect } from "react";
 import { pdfjs, Page, Document } from "react-pdf";
 
-import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+import "react-pdf/dist/Page/AnnotationLayer.css";
 import "./PDFReader.css";
 
 // pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -60,6 +60,7 @@ function PDFReader({ file, documentDimension }) {
 
       <Document
         file={file}
+        externalLinkTarget="__blank"
         onLoadSuccess={onDocumentLoadSuccess}
         loading={
           <div
