@@ -24,7 +24,7 @@ if (import.meta.env.DEV) {
         },
         {
           title: "교회일정",
-          to: "schedule",
+          to: "schedules",
         },
         {
           title: "새가족",
