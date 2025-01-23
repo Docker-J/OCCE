@@ -9,6 +9,7 @@ import {
 } from "date-fns";
 
 import { Box, Paper, Typography } from "@mui/material";
+import ScheduleCard from "./ScheduleCard";
 
 const Schedule = ({ events }) => {
   function getEventsByMonthAndDate(schedules) {
@@ -24,6 +25,7 @@ const Schedule = ({ events }) => {
         event.allday = !!event.start.date;
 
         event.day = 0;
+        console.log(event);
 
         acc[month][dateKey].unshift(event);
 
@@ -47,13 +49,6 @@ const Schedule = ({ events }) => {
     }, {});
 
     return eventsByMonth;
-  }
-
-  function isSameDayEvent(start, end, endTime) {
-    return (
-      isSameDay(start, end) ||
-      (getDate(addDays(start, 1)) === getDate(end) && endTime === "00:00 AM")
-    );
   }
 
   return Object.entries(getEventsByMonthAndDate(events)).map(
@@ -110,78 +105,14 @@ const Schedule = ({ events }) => {
               flexDirection="column"
               justifyContent="center"
             >
-              {dateEvents.map((event, index) => {
-                const allday = event.allday;
-
-                const start = parseISO(
-                  allday ? event.start.date : event.start.dateTime
-                );
-                const end = parseISO(
-                  allday ? event.end.date : event.end.dateTime
-                );
-
-                const startDate = format(start, "dd");
-                const startTime = format(start, "HH:mm a");
-                const endDate = format(end, "dd");
-                const endTime = format(end, "HH:mm a");
-
-                const sameDay = isSameDayEvent(start, end, endTime);
-
-                function incrEventDay(event) {
-                  event.day += 1;
-                  return event.day;
-                }
-
-                return (
-                  <Box
-                    key={index}
-                    style={{
-                      marginBottom: index !== dateEvents.length - 1 && "12px",
-                    }}
-                  >
-                    {allday ? (
-                      <Typography
-                        fontWeight={700}
-                        color="primary"
-                        sx={{
-                          border: "1px solid #f57c00",
-                          p: 1,
-                          borderRadius: 1,
-                        }}
-                      >
-                        {event.summary}
-                        {!sameDay &&
-                          ` (Day ${incrEventDay(event)}/${event.alldaylength})`}
-                      </Typography>
-                    ) : (
-                      <Typography
-                        fontWeight={700}
-                        sx={{
-                          border: "1px solid #afafaf",
-                          p: 1.2,
-                          borderRadius: 1,
-                        }}
-                      >
-                        {event.summary}
-                      </Typography>
-                    )}
-
-                    <Typography variant="h5">
-                      {!allday &&
-                        !sameDay &&
-                        `${startDate} - ${getDate(endDate)}`}
-                    </Typography>
-                    <Typography>{event.description}</Typography>
-                    <Typography>
-                      {allday ? "" : startTime}
-                      {!allday &&
-                        (sameDay
-                          ? ` - ${endTime}`
-                          : ` - ${endDate} ${endTime} `)}
-                    </Typography>
-                  </Box>
-                );
-              })}
+              {dateEvents.map((event, index) => (
+                <ScheduleCard
+                  key={index}
+                  dateEvents={dateEvents}
+                  event={event}
+                  index={index}
+                />
+              ))}
             </Box>
           </Paper>
         ))}
