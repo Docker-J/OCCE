@@ -2,8 +2,6 @@ import {
   addDays,
   differenceInDays,
   format,
-  getDate,
-  isSameDay,
   isSunday,
   parseISO,
 } from "date-fns";
@@ -24,7 +22,6 @@ const Schedule = ({ events }) => {
       if (event.start.date) {
         event.allday = !!event.start.date;
 
-        event.day = 0;
         console.log(event);
 
         acc[month][dateKey].unshift(event);
@@ -57,65 +54,65 @@ const Schedule = ({ events }) => {
         <Typography variant="h5" fontWeight={500} sx={{ mb: "12px" }}>
           {month}
         </Typography>
-        {Object.entries(monthEvents).map(([date, dateEvents]) => (
-          <Paper
-            key={date}
-            elevation={4}
-            sx={{ p: 2, mb: 2, display: "flex", justifyContent: "center" }}
-          >
-            <div
-              style={{
-                borderLeft: isSunday(new Date(month + " " + date))
-                  ? "3px solid red"
-                  : "3px solid #f57c00",
-                height: "32px",
-                marginRight: "6px",
-              }}
-            />
-            <Box
-              sx={{
-                mr: "18px",
-              }}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
+
+        {Object.entries(monthEvents).map(([date, dateEvents]) => {
+          const eventDate = new Date(`${month} ${date}`);
+          const sunday = isSunday(eventDate);
+
+          return (
+            <Paper
+              key={date}
+              elevation={4}
+              sx={{ p: 2, mb: 2, display: "flex", justifyContent: "center" }}
             >
-              <Typography
-                variant="h5"
-                color={
-                  isSunday(new Date(month + " " + date)) ? "red" : "primary"
-                }
+              <div
+                style={{
+                  borderLeft: sunday ? "3px solid red" : "3px solid #f57c00",
+                  height: "32px",
+                  marginRight: "6px",
+                }}
+              />
+              <Box
+                sx={{
+                  mr: "18px",
+                }}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
               >
-                {date}
-              </Typography>
-              <Typography
-                variant="caption"
-                color={
-                  isSunday(new Date(month + " " + date)) ? "red" : "primary"
-                }
+                <Typography variant="h5" color={sunday ? "red" : "primary"}>
+                  {date}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color={sunday ? "red" : "primary"}
+                >
+                  {format(eventDate, "eee")}
+                </Typography>
+              </Box>
+
+              <Box
+                width="100%"
+                display="flex"
+                flexDirection="column"
+                justifyContent="center"
               >
-                {format(new Date(month + " " + date), "eee")}
-              </Typography>
-            </Box>
-            <Box
-              width="100%"
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-            >
-              {dateEvents.map((event, index) => (
-                <ScheduleCard
-                  key={index}
-                  dateEvents={dateEvents}
-                  event={event}
-                  index={index}
-                />
-              ))}
-            </Box>
-          </Paper>
-        ))}
+                {dateEvents.map((event, index) => (
+                  <ScheduleCard
+                    key={index}
+                    date={eventDate}
+                    event={event}
+                    sx={{
+                      marginBottom: index !== dateEvents.length - 1 && "12px",
+                    }}
+                  />
+                ))}
+              </Box>
+            </Paper>
+          );
+        })}
         <br />
       </div>
     )
