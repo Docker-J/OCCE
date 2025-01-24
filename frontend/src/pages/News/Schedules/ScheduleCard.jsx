@@ -9,6 +9,7 @@ import {
 } from "date-fns";
 
 import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
+import axios from "axios";
 
 function isSameDayEvent(start, end, endTime) {
   return (
@@ -29,50 +30,84 @@ const ScheduleCard = ({ date, event, sx }) => {
 
   const sameDay = isSameDayEvent(start, end, endTime);
 
+  // async function test(event) {
+  //   const request = {
+  //     query: "Museum of Contemporary Art Australia",
+  //     fields: ["place_id"],
+  //   };
+
+  //   const result = await axios.post(
+  //     "https://places.googleapis.com/v1/places:searchText",
+  //     {
+  //       textQuery: event.location,
+  //     },
+  //     {
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "X-Goog-Api-Key": import.meta.env.VITE_APP_GOOGLE_MAPS_API_KEY,
+  //         "X-Goog-FieldMask": "places.id",
+  //       },
+  //     }
+  //   );
+
+  //   console.log(result.data);
+  // }
+
   return (
-    <Box
-      sx={{
-        border: "1px solid ",
-        borderColor: allday ? "#f57c00" : "#afafaf",
-        p: 1,
-        borderRadius: 1,
-        ...sx,
-      }}
-    >
-      {allday ? (
-        <Typography fontWeight={700} color="primary">
-          {event.summary}
-          {!sameDay &&
-            ` (Day ${differenceInDays(date, start) + 1}/${event.alldaylength})`}
-        </Typography>
-      ) : (
-        <Typography fontWeight={700}>{event.summary}</Typography>
-      )}
-
-      {!allday && !sameDay && (
-        <Typography variant="h5">
-          {`${startDate} - ${getDate(endDate)}`}
-        </Typography>
-      )}
-
-      <Typography>{event.description}</Typography>
-
-      {!allday && (
-        <Typography>
-          {startTime}
-          {!allday && (sameDay ? ` - ${endTime}` : ` - ${endDate} ${endTime} `)}
-        </Typography>
-      )}
-
-      {event?.location && (
-        <Stack direction="row" spacing={0.5}>
-          <PlaceOutlinedIcon />
-          <Typography variant="body2">
-            {event.location.split(",")[0]}
+    <>
+      {/* {event.location && test(event)} */}
+      <Box
+        sx={{
+          border: "1px solid ",
+          borderColor: allday ? "#f57c00" : "#afafaf",
+          p: 1,
+          borderRadius: 1,
+          ...sx,
+        }}
+      >
+        {allday ? (
+          <Typography fontWeight={700} color="primary">
+            {event.summary}
+            {!sameDay &&
+              ` (Day ${differenceInDays(date, start) + 1}/${
+                event.alldaylength
+              })`}
           </Typography>
-        </Stack>
-      )}
-    </Box>
+        ) : (
+          <Typography fontWeight={700}>{event.summary}</Typography>
+        )}
+
+        {!allday && !sameDay && (
+          <Typography variant="h5">
+            {`${startDate} - ${getDate(endDate)}`}
+          </Typography>
+        )}
+
+        <Typography>{event.description}</Typography>
+
+        {!allday && (
+          <Typography>
+            {startTime}
+            {!allday &&
+              (sameDay ? ` - ${endTime}` : ` - ${endDate} ${endTime} `)}
+          </Typography>
+        )}
+
+        {event?.location && (
+          <Stack direction="row" spacing={0.5}>
+            <PlaceOutlinedIcon />
+            <Typography
+              component="a"
+              target="_blank"
+              href={`https://www.google.com/maps/search/?api=1&query=${event.location}`}
+              variant="body2"
+            >
+              {event.location.split(",")[0]}
+            </Typography>
+          </Stack>
+        )}
+      </Box>
+    </>
   );
 };
 
