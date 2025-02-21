@@ -20,8 +20,12 @@ const style = {
 };
 
 const CustomModal = ({ isOpen, onClose, children, ...props }) => {
+  const handleClose = (_, reason) => {
+    if (reason == "backdropClick") return;
+    onClose();
+  };
   return (
-    <Modal open={isOpen} onClose={onClose}>
+    <Modal open={isOpen} onClose={handleClose}>
       <Box sx={{ ...style, ...props }}>
         <IconButton
           onClick={onClose}
