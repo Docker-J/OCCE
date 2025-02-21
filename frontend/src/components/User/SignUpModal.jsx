@@ -48,6 +48,7 @@ const SignUpModal = ({ isOpen, onClose }) => {
   return (
     <CustomModal isOpen={isOpen} onClose={handleClose} maxWidth="400px">
       <h1 style={{ marginTop: 0 }}>회원가입 요청</h1>
+
       <form style={{ width: "90%" }} onSubmit={handleSubmit(handleSignUp)}>
         <TextField
           sx={{ width: "100%", mt: "1em" }}
@@ -113,12 +114,13 @@ const SignUpModal = ({ isOpen, onClose }) => {
         </Button>
       </form>
 
+      <Typography sx={{ mt: "1em" }}>이미 회원가입을 요청하셨나요?</Typography>
       <Stack
         onClick={() => {
           handleClose();
           openModal(SignUpRequestConfirmModal, {});
         }}
-        sx={{ mt: "1em", cursor: "pointer" }}
+        sx={{ cursor: "pointer" }}
         direction="row"
       >
         <Typography>이메일 인증하기</Typography>
