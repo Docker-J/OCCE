@@ -2,27 +2,27 @@ import { Card, CardContent, CardHeader, Typography } from "@mui/material";
 import InfoCard from "../../components/NextGen/InfoCard";
 
 const titleBackground = {
-  backgroundImage: 'url("/img/NextGen/YoungAdults.jpg")',
+  backgroundImage: 'url("/img/NextGen/YoungAdult/YoungAdults.webp")',
   backgroundPositionY: "60%",
 };
 
-const imgs = [{ src: "/img/NextGen/Youngadult/1.jpg" }];
+const imgs = [{ src: "/img/NextGen/YoungAdult/1.webp" }];
 
 const ministries = [
-  { title: "예배(worship)", content: ["주일예배", "주중예배"] },
+  { title: "예배 Worship", content: ["주일예배", "주중예배"] },
   {
-    title: "교육(teaching)",
+    title: "교육 Teaching",
     content: ["입교/세례 교육", "성경공부", "제자훈련", "기도회", "수련회"],
   },
   {
-    title: "교제(fellowship)",
+    title: "교제 Fellowship",
     content: ["정원모임", "친교(식사, 활동)", "지역 청년들과의 교류/연합"],
   },
   {
-    title: "봉사(serving)",
+    title: "봉사 Serving",
     content: ["교회사역", "봉사", "지역사회 봉사/구제"],
   },
-  { title: "전도(preaching)", content: ["선교지 후원", "단기선교 참여"] },
+  { title: "전도 Preaching", content: ["선교지 후원", "단기선교 참여"] },
 ];
 
 const YoungAdult = () => {
@@ -102,7 +102,13 @@ const YoungAdult = () => {
             {ministries.map((ministry) => (
               <Card
                 key={ministry.title}
-                sx={{ minWidth: "320px", m: "12px", ml: 1 }}
+                elevation={5}
+                sx={{
+                  minWidth: "320px",
+                  m: "12px",
+                  ml: 1,
+                  borderRadius: "1em",
+                }}
               >
                 <CardContent>
                   <CardHeader title={ministry.title} />
