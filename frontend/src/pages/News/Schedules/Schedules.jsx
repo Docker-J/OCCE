@@ -5,7 +5,9 @@ import { Await, useLoaderData } from "react-router";
 import Schedule from "./Schedule";
 
 const titleBackground = {
-  backgroundImage: 'url("/img/NewComers/NewComers.webp")',
+  backgroundImage: 'url("/img/News/Schedules/Schedules.jpg")',
+  backgroundPositionX: "0%",
+  backgroundPositionY: "60%",
 };
 
 // &timeMin=${new Date().toISOString()}

@@ -9,7 +9,6 @@ import {
 } from "date-fns";
 
 import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
-import axios from "axios";
 
 function isSameDayEvent(start, end, endTime) {
   return (
@@ -30,32 +29,8 @@ const ScheduleCard = ({ date, event, sx }) => {
 
   const sameDay = isSameDayEvent(start, end, endTime);
 
-  // async function test(event) {
-  //   const request = {
-  //     query: "Museum of Contemporary Art Australia",
-  //     fields: ["place_id"],
-  //   };
-
-  //   const result = await axios.post(
-  //     "https://places.googleapis.com/v1/places:searchText",
-  //     {
-  //       textQuery: event.location,
-  //     },
-  //     {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         "X-Goog-Api-Key": import.meta.env.VITE_APP_GOOGLE_MAPS_API_KEY,
-  //         "X-Goog-FieldMask": "places.id",
-  //       },
-  //     }
-  //   );
-
-  //   console.log(result.data);
-  // }
-
   return (
     <>
-      {/* {event.location && test(event)} */}
       <Box
         sx={{
           border: "1px solid ",
