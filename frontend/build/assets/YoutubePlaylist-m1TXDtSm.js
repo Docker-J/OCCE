@@ -1,0 +1,1 @@
+import{j as e}from"./index-DKCTCQLW.js";const o=({src:r})=>e.jsx("div",{className:"video",children:e.jsx("div",{className:"video-container",children:e.jsx("iframe",{src:r,title:"YouTube video player",allow:"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",allowFullScreen:!0})})});export{o as Y};
