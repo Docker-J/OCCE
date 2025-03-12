@@ -1,6 +1,7 @@
 import { Outlet, createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import { lazy, Suspense } from "react";
+
 import "./App.css";
 
 import ResponsiveAppBar from "./header/ResponsiveAppBar";
@@ -172,9 +173,7 @@ const HeaderFooterWrapper = () => {
             flexGrow: 1,
           }}
         >
-          <Suspense>
-            <Outlet />
-          </Suspense>
+          <Outlet />
         </div>
         <Footer />
       </div>
@@ -202,9 +201,7 @@ const HeaderWrapper = () => {
             flexGrow: 1,
           }}
         >
-          <Suspense>
-            <Outlet />
-          </Suspense>
+          <Outlet />
         </div>
       </div>
     </>
