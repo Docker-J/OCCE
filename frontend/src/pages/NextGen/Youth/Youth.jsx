@@ -9,9 +9,9 @@ const titleBackground = {
 };
 
 const imgs = [
-  { src: "/img/NextGen/Youth/1.jpg" },
-  { src: "/img/NextGen/Youth/2.jpg" },
-  { src: "/img/NextGen/Youth/3.jpg" },
+  { src: "/img/NextGen/Youth/1.webp" },
+  { src: "/img/NextGen/Youth/2.webp" },
+  { src: "/img/NextGen/Youth/3.webp" },
 ];
 
 const Youth = () => {
