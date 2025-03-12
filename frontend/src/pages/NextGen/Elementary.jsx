@@ -8,11 +8,11 @@ const titleBackground = {
 
 const imgs = [
   { src: "/img/NextGen/Elementary/1.webp" },
-  { src: "/img/NextGen/Elementary/2.jpg" },
-  { src: "/img/NextGen/Elementary/3.jpg" },
-  { src: "/img/NextGen/Elementary/4.jpg" },
-  { src: "/img/NextGen/Elementary/5.jpg" },
-  { src: "/img/NextGen/Elementary/6.jpg" },
+  { src: "/img/NextGen/Elementary/2.webp" },
+  { src: "/img/NextGen/Elementary/3.webp" },
+  { src: "/img/NextGen/Elementary/4.webp" },
+  { src: "/img/NextGen/Elementary/5.webp" },
+  { src: "/img/NextGen/Elementary/6.webp" },
 ];
 
 const ministries = [
