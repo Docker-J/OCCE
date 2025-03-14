@@ -62,8 +62,14 @@ const Schedule = ({ events }) => {
           return (
             <Paper
               key={date}
-              elevation={4}
-              sx={{ p: 2, mb: 2, display: "flex", justifyContent: "center" }}
+              elevation={3}
+              sx={{
+                p: 2,
+                mb: 2,
+                display: "flex",
+                justifyContent: "center",
+                borderRadius: 2,
+              }}
             >
               <div
                 style={{

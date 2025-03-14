@@ -93,18 +93,14 @@ function PDFReader({ file, documentDimension }) {
         />
       </Document>
 
-      <p style={{ color: "black" }}>
-        Page {pageNumber || (numPages ? 1 : "--")} of {numPages || "--"}
-      </p>
-
-      <ButtonGroup id="pageButton">
-        <Button
-          variant="outlined"
-          disabled={pageNumber <= 1}
-          onClick={previousPage}
-        >
-          Previous
+      <ButtonGroup sx={{ mt: "0.8em" }}>
+        <Button disabled={pageNumber <= 1} onClick={previousPage}>
+          Prev
         </Button>
+        <Button style={{ pointerEvents: "none" }}>
+          {pageNumber || (numPages ? 1 : "--")} / {numPages || "--"}
+        </Button>
+
         <Button
           variant="outlined"
           disabled={pageNumber >= numPages}

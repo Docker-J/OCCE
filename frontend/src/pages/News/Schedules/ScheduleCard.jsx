@@ -8,6 +8,7 @@ import {
   parseISO,
 } from "date-fns";
 
+import ScheduleIcon from "@mui/icons-material/Schedule";
 import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
 
 function isSameDayEvent(start, end, endTime) {
@@ -30,59 +31,62 @@ const ScheduleCard = ({ date, event, sx }) => {
   const sameDay = isSameDayEvent(start, end, endTime);
 
   return (
-    <>
-      <Box
-        sx={{
-          border: "1px solid ",
-          borderColor: allday ? "#f57c00" : "#afafaf",
-          p: 1,
-          borderRadius: 1,
-          ...sx,
-        }}
-      >
-        {allday ? (
-          <Typography fontWeight={700} color="primary">
-            {event.summary}
-            {!sameDay &&
-              ` (Day ${differenceInDays(date, start) + 1}/${
-                event.alldaylength
-              })`}
-          </Typography>
-        ) : (
-          <Typography fontWeight={700}>{event.summary}</Typography>
-        )}
+    <Box
+      sx={{
+        border: "1px solid ",
+        borderColor: allday ? "#f57c00" : "#afafaf",
+        p: 1,
+        borderRadius: 1,
+        ...sx,
+      }}
+    >
+      {allday ? (
+        <Typography fontWeight={700} color="primary">
+          {event.summary}
+          {!sameDay &&
+            ` (Day ${differenceInDays(date, start) + 1}/${event.alldaylength})`}
+        </Typography>
+      ) : (
+        <Typography fontSize="1.1em" fontWeight={700}>
+          {event.summary}
+        </Typography>
+      )}
 
-        {!allday && !sameDay && (
-          <Typography variant="h5">
-            {`${startDate} - ${getDate(endDate)}`}
-          </Typography>
-        )}
+      {!allday && !sameDay && (
+        <Typography variant="h5">
+          {`${startDate} - ${getDate(endDate)}`}
+        </Typography>
+      )}
 
-        <Typography>{event.description}</Typography>
+      <Typography>{event.description}</Typography>
 
-        {!allday && (
-          <Typography>
+      {!allday && (
+        <Stack direction="row" spacing={0.5} alignItems="flex-end">
+          <ScheduleIcon fontSize="small" />
+          <Typography variant="body2">
             {startTime}
             {!allday &&
-              (sameDay ? ` - ${endTime}` : ` - ${endDate} ${endTime} `)}
+              (sameDay ? ` - ${endTime}` : ` - ${endDate} ${endTime} `)}{" "}
           </Typography>
-        )}
+        </Stack>
+      )}
 
-        {event?.location && (
-          <Stack direction="row" spacing={0.5}>
-            <PlaceOutlinedIcon />
-            <Typography
-              component="a"
-              target="_blank"
-              href={`https://www.google.com/maps/search/?api=1&query=${event.location}`}
-              variant="body2"
-            >
-              {event.location.split(",")[0]}
-            </Typography>
-          </Stack>
-        )}
-      </Box>
-    </>
+      {event?.location && (
+        <Stack direction="row" spacing={0.5} alignItems="flex-end">
+          <PlaceOutlinedIcon color="orange" fontSize="small" />
+          <Typography
+            component="a"
+            target="_blank"
+            href={`https://www.google.com/maps/search/?api=1&query=${event.location}`}
+            variant="body2"
+            color="black"
+            sx={{ textDecoration: "none" }}
+          >
+            {event.location.split(",")[0]}
+          </Typography>
+        </Stack>
+      )}
+    </Box>
   );
 };
 
