@@ -19,8 +19,6 @@ import AdminComponent from "../../../common/AdminComponent";
 import { Suspense } from "react";
 import FullScreenLoading from "../../../common/FullScreenLoading";
 
-import "./Announcements.css";
-
 const titleBackground = {
   backgroundImage: 'url("/img/News/Columns/Columns.webp")',
   backgroundPosition: "25% 65%",
@@ -51,12 +49,14 @@ const Columns = () => {
       </div>
 
       <div className="container-wrapper">
-        <div className="container" style={{ maxWidth: "1200px" }}>
-          {state === "loading" && (
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <FullScreenLoading />
-            </div>
-          )}
+        <div
+          className="container"
+          style={{
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          {state === "loading" && <FullScreenLoading />}
 
           <Suspense
             fallback={
@@ -75,13 +75,20 @@ const Columns = () => {
                     게시물이 존재하지 않습니다.
                   </Typography>
                 ) : (
-                  <>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      width: "100%",
+                      maxWidth: "1000px",
+                    }}
+                  >
                     <ForumPostBoard announcements={data.announcements} />
                     <BoardPagination
                       pages={Math.ceil(data.count / 10)}
                       currentPage={page}
                     />
-                  </>
+                  </div>
                 );
               }}
             </Await>

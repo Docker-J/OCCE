@@ -10,7 +10,6 @@ import { CircularProgress, Fab, Typography } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 
-import "./Announcements.css";
 import AnnouncementPostModal from "../../../components/News/Announcement/AnnouncementPostModal";
 
 import BoardPagination from "../../../components/News/Announcement/BoardPagination";
@@ -49,20 +48,16 @@ const Announcements = () => {
       </div>
 
       <div className="container-wrapper">
-        <div className="container" style={{ maxWidth: "1200px" }}>
-          {state === "loading" && (
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <FullScreenLoading />
-            </div>
-          )}
+        <div
+          className="container"
+          style={{
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          {state === "loading" && <FullScreenLoading />}
 
-          <Suspense
-            fallback={
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <CircularProgress />
-              </div>
-            }
-          >
+          <Suspense fallback={<CircularProgress />}>
             <Await
               resolve={data.announcementsData}
               errorElement={<p>Error loading!</p>}
@@ -73,13 +68,21 @@ const Announcements = () => {
                     게시물이 존재하지 않습니다.
                   </Typography>
                 ) : (
-                  <>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      width: "100%",
+                      maxWidth: "1000px",
+                    }}
+                  >
                     <ForumPostBoard announcements={data.announcements} />
                     <BoardPagination
                       pages={Math.ceil(data.count / 10)}
                       currentPage={page}
                     />
-                  </>
+                  </div>
                 );
               }}
             </Await>

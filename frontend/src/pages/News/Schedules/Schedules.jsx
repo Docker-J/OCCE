@@ -36,13 +36,7 @@ const Schedules = () => {
           className="container"
           style={{ display: "flex", justifyContent: "center" }}
         >
-          <Suspense
-            fallback={
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <CircularProgress />
-              </div>
-            }
-          >
+          <Suspense fallback={<CircularProgress />}>
             <Await
               resolve={data.schedules}
               errorElement={<p>Error loading!</p>}
