@@ -59,7 +59,7 @@ export const MinistryList = [
   {
     title: "선교팀",
     icon: <VolunteerActivismIcon />,
-    types: ["단기 선교 및 정원 별 후원 선교 사역 지원"],
+    types: ["단기 선교", "정원별 후원 선교 사역 지원"],
   },
   {
     title: "예배준비팀",
@@ -105,6 +105,6 @@ export const MinistryList = [
   {
     title: "교제팀",
     icon: <RestaurantIcon />,
-    types: ["교회 내 각종 교제 및 경조사 관련 사역"],
+    types: ["교회 내 각종 교제", "경조사 관련 사역"],
   },
 ];
