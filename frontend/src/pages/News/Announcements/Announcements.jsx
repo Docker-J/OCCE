@@ -55,9 +55,7 @@ const Announcements = () => {
             justifyContent: "center",
           }}
         >
-          {state === "loading" && <FullScreenLoading />}
-
-          <Suspense fallback={<CircularProgress />}>
+          <Suspense key={page} fallback={<CircularProgress />}>
             <Await
               resolve={data.announcementsData}
               errorElement={<p>Error loading!</p>}
@@ -77,6 +75,8 @@ const Announcements = () => {
                       maxWidth: "1000px",
                     }}
                   >
+                    {state === "loading" && <FullScreenLoading />}
+
                     <ForumPostBoard announcements={data.announcements} />
                     <BoardPagination
                       pages={Math.ceil(data.count / 10)}
