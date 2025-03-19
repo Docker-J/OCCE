@@ -3,8 +3,7 @@ import YoutubePlaylist from "./../../components/Online/YoutubePlaylist";
 import { useLoaderData } from "react-router";
 
 const titleBackground = {
-  backgroundImage:
-    'linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("/img/Online/Sermon.webp")',
+  backgroundImage: 'url("/img/Online/Sermon.webp")',
   backgroundPositionX: "52%",
 };
 
