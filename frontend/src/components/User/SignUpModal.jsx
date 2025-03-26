@@ -57,6 +57,17 @@ const SignUpModal = ({ isOpen, onClose }) => {
           {...register("name", { required: true })}
         />
         <TextField
+          sx={{ width: "100%", mt: "1em" }}
+          label="전화번호"
+          type="tel"
+          {...register("phone", {
+            required: true,
+            length: 10,
+            valueAsNumber: true,
+            pattern: /^\d{10}$/,
+          })}
+        />
+        <TextField
           sx={{ width: "100%", mt: "1.5em" }}
           label="이메일"
           type="email"
