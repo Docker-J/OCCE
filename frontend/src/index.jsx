@@ -6,7 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 
 import store from "./store";
 import { Provider } from "react-redux";
-import { createTheme, ThemeProvider } from "@mui/material";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 import ModalsProvider from "./util/ModalsProvider";
 import Modals from "./util/Modals";
