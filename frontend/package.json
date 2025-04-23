@@ -80,6 +80,7 @@
     "@vitejs/plugin-basic-ssl": "^2.0.0",
     "@vitejs/plugin-react": "^4.4.0",
     "vite": "^6.2.6",
+    "vite-bundle-analyzer": "^0.18.1",
     "vite-plugin-svgr": "^4.3.0"
   },
   "type": "module"

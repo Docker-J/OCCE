@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import jsconfigPaths from "vite-jsconfig-paths";
 import svgr from "vite-plugin-svgr";
+import { analyzer } from "vite-bundle-analyzer";
 
 export default defineConfig(() => {
   return {
@@ -12,6 +13,7 @@ export default defineConfig(() => {
 
     plugins: [
       react(),
+      analyzer(),
       basicSsl(),
       jsconfigPaths(),
       svgr({
