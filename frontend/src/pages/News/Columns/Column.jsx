@@ -18,7 +18,6 @@ import AdminComponent from "../../../common/AdminComponent";
 import useModals from "../../../util/useModal";
 
 import { deleteColumn } from "../../../api/columns";
-import ColumnPostModal from "./../../../components/News/Columns/ColumnPostModal";
 import CustomConfirmDialog from "../../../common/CustomConfirmDialog";
 
 import "./content-styles.css";
@@ -62,13 +61,18 @@ const Column = () => {
     {
       icon: <EditNoteIcon />,
       name: "Edit",
-      onClick: () =>
-        openModal(ColumnPostModal, {
+      onClick: async () => {
+        const { default: ColumnPostModalComponent } = await import(
+          "../../../components/News/Columns/ColumnPostModal" // Use the correct path
+        );
+
+        openModal(ColumnPostModalComponent, {
           revalidator: revalidator.revalidate,
           id: id,
           origTitle: title,
           origBody: body,
-        }),
+        });
+      },
     },
     {
       icon: <DeleteIcon />,

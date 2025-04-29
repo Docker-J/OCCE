@@ -13,7 +13,6 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 
 import { MemoizedMeditationONComp } from "../../../components/Online/MeditationON/MeditationONImageListItem";
-import MeditationONModal from "../../../components/Online/MeditationON/MeditationONModal";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import AdminComponent from "../../../common/AdminComponent";
@@ -149,7 +148,13 @@ const MeditationON = () => {
         <Fab
           variant="primary"
           style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
-          onClick={() => openModal(MeditationONModal, {})}
+          onClick={async () => {
+            const { default: MeditationONModalComponent } = await import(
+              "../../../components/Online/MeditationON/MeditationONModal" // Use the correct path
+            );
+
+            openModal(MeditationONModalComponent, {});
+          }}
         >
           <AddIcon />
         </Fab>

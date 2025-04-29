@@ -18,7 +18,7 @@ import FullScreenLoading from "../../../common/FullScreenLoading";
 
 import AdminComponent from "../../../common/AdminComponent";
 import useModals from "../../../util/useModal";
-import AnnouncementPostModal from "../../../components/News/Announcement/AnnouncementPostModal";
+
 import {
   deleteAnnouncement,
   pinAnnouncement,
@@ -82,13 +82,18 @@ const Announcement = () => {
     {
       icon: <EditNoteIcon />,
       name: "Edit",
-      onClick: () =>
-        openModal(AnnouncementPostModal, {
+      onClick: async () => {
+        const { default: AnnouncementPostModalComponent } = await import(
+          "../../../components/News/Announcement/AnnouncementPostModal"
+        );
+
+        openModal(AnnouncementPostModalComponent, {
           revalidator: revalidator.revalidate,
           id: id,
           origTitle: title,
           origBody: body,
-        }),
+        });
+      },
     },
     {
       icon: pin ? <PushPinIcon /> : <PushPinOutlinedIcon />,

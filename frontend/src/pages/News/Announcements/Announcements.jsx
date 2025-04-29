@@ -10,8 +10,6 @@ import { CircularProgress, Fab, Typography } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 
-import AnnouncementPostModal from "../../../components/News/Announcement/AnnouncementPostModal";
-
 import BoardPagination from "../../../components/News/Announcement/BoardPagination";
 import useModals from "../../../util/useModal";
 import AdminComponent from "../../../common/AdminComponent";
@@ -93,13 +91,17 @@ const Announcements = () => {
       <AdminComponent>
         <Fab
           style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
-          onClick={() =>
-            openModal(AnnouncementPostModal, {
+          onClick={async () => {
+            const { default: AnnouncementPostModalComponent } = await import(
+              "../../../components/News/Announcement/AnnouncementPostModal" // Use the correct path
+            );
+
+            openModal(AnnouncementPostModalComponent, {
               revalidator: revalidator.revalidate,
               origTitle: "",
               origBody: "",
-            })
-          }
+            });
+          }}
         >
           <AddIcon />
         </Fab>

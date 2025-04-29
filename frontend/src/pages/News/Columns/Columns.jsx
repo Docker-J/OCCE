@@ -10,7 +10,7 @@ import { CircularProgress, Fab, Typography } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 
-import ColumnPostModal from "../../../components/News/Columns/ColumnPostModal";
+// import ColumnPostModal from "../../../components/News/Columns/ColumnPostModal";
 import ForumPostBoard from "../../../common/Forum/ForumPostBoard";
 import BoardPagination from "../../../components/News/Announcement/BoardPagination";
 
@@ -93,13 +93,17 @@ const Columns = () => {
       <AdminComponent>
         <Fab
           style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
-          onClick={() =>
-            openModal(ColumnPostModal, {
+          onClick={async () => {
+            const { default: ColumnPostModalComponent } = await import(
+              "../../../components/News/Columns/ColumnPostModal" // Use the correct path
+            );
+
+            openModal(ColumnPostModalComponent, {
               revalidator: revalidator.revalidate,
               origTitle: "",
               origBody: "",
-            })
-          }
+            });
+          }}
         >
           <AddIcon />
         </Fab>

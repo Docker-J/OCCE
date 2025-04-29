@@ -28,7 +28,6 @@ import {
 
 import "./WeeklyUpdate.css";
 import useModals from "../../../util/useModal";
-import WeeklyUpdatePostModal from "../../../components/News/WeeklyUpdate/WeeklyUpdatePostModal";
 import { deleteWeeklyUpdate, getWeeklyUpdate } from "../../../api/weeklyupdate";
 import { useSelector } from "react-redux";
 import { MIN_DATE } from "../../../constants/WeeklyUpdate";
@@ -184,11 +183,15 @@ const WeeklyUpdate = () => {
       <AdminComponent>
         <Fab
           id="uploadBulletinButton"
-          onClick={() =>
-            openModal(WeeklyUpdatePostModal, {
+          onClick={async () => {
+            const { default: WeeklyUpdatePostModalComponent } = await import(
+              "../../../components/News/WeeklyUpdate/WeeklyUpdatePostModal" // Use the correct path
+            );
+
+            openModal(WeeklyUpdatePostModalComponent, {
               setParentDate: setSelectedDate,
-            })
-          }
+            });
+          }}
         >
           <UploadIcon />
         </Fab>
