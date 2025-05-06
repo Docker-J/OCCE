@@ -1,36 +1,41 @@
 import { useState } from "react";
-import { Button } from "@mui/material";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
+import { Button, useForkRef } from "@mui/material";
+import {
+  DatePicker,
+  LocalizationProvider,
+  usePickerContext,
+  useSplitFieldProps,
+} from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { format } from "date-fns";
 
 const ButtonField = (props) => {
-  const {
-    setIsDatePickerOpen,
-    id,
-    disabled,
-    value,
-    InputProps: { ref } = {},
-    inputProps: { "aria-label": ariaLabel } = {},
-  } = props;
+  const { internalProps, forwardedProps } = useSplitFieldProps(props, "date");
+  const pickerContext = usePickerContext();
+  const handleRef = useForkRef(pickerContext.triggerRef, pickerContext.rootRef);
+
+  // const {
+  //   InputProps: { ref } = {},
+  //   inputProps: { "aria-label": ariaLabel } = {},
+  // } = props;
 
   return (
     <Button
+      {...forwardedProps}
       variant="outlined"
       size="large"
-      id={id}
-      disabled={disabled}
-      ref={ref}
-      aria-label={ariaLabel}
-      onClick={() => setIsDatePickerOpen?.((prev) => !prev)}
+      // id={id}
+      // disabled={disabled}
+      ref={handleRef}
+      // aria-label={ariaLabel}
+      onClick={() => pickerContext.setOpen((prev) => !prev)}
     >
-      {format(value, "yyyy/MM/dd")}
+      {format(pickerContext.value, "yyyy/MM/dd")}
     </Button>
   );
 };
 
 const ButtonDatePicker = (props) => {
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const { disableDate, ...restProps } = props;
 
   return (
@@ -38,12 +43,9 @@ const ButtonDatePicker = (props) => {
       <DatePicker
         slots={{ field: ButtonField }}
         slotProps={{
-          field: { setIsDatePickerOpen },
           popper: { placement: "bottom" },
         }}
         {...restProps}
-        open={isDatePickerOpen}
-        onClose={() => setIsDatePickerOpen(false)}
         shouldDisableDate={(date) => disableDate && disableDate(date)}
         disableHighlightToday
       />
