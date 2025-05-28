@@ -8,16 +8,6 @@ import ResponsiveAppBar from "./header/ResponsiveAppBar";
 
 import Main from "./pages/Main/Main";
 
-import { loader as AnnouncementsLoader } from "./route/AnnouncementsLoader";
-import { loader as AnnouncementLoader } from "./route/AnnouncementLoader";
-import { loader as WeeklyUpdateLoader } from "./route/WeeklyUpdateLoader";
-import { loader as ColumnsLoader } from "./route/ColumnsLoader";
-import { loader as ColumnLoader } from "./route/ColumnLoader";
-import { loader as SchedulesLoader } from "./route/SchedulesLoader";
-// import { loader as meditationONLoader } from "./route/MeditationONLoader";
-import { loader as MeditationONPostLoader } from "./route/MeditationONPostLoader";
-import { loader as Bible291Loader } from "./route/Bible291Loader";
-import { loader as AlbumLoader } from "./route/AlbumLoader";
 import Footer from "./header/Footer";
 import NotificationManager from "./manager/NotificationManager";
 import UserManager from "./manager/UserManager";
@@ -223,17 +213,26 @@ const router = createBrowserRouter([
       {
         path: "/announcements",
         element: <Announcements />,
-        loader: AnnouncementsLoader,
+        loader: async ({ request }) => {
+          const { loader } = await import("./route/AnnouncementsLoader");
+          return loader({ request });
+        },
       },
       {
         path: "/announcements/:announcementID",
         element: <Announcement />,
-        loader: AnnouncementLoader,
+        loader: async ({ params }) => {
+          const { loader } = await import("./route/AnnouncementLoader");
+          return loader({ params });
+        },
       },
       {
         path: "/weeklyupdate/:date?",
         element: <WeeklyUpdate />,
-        loader: WeeklyUpdateLoader,
+        loader: async ({ params }) => {
+          const { loader } = await import("./route/WeeklyUpdateLoader");
+          return loader({ params });
+        },
         shouldRevalidate: () => false,
       },
       // {
@@ -243,22 +242,34 @@ const router = createBrowserRouter([
       {
         path: "/albums/:albumID",
         element: <Album />,
-        loader: AlbumLoader,
+        loader: async ({ params }) => {
+          const { loader } = await import("./route/AlbumLoader");
+          return loader({ params });
+        },
       },
       {
         path: "/columns",
         element: <Columns />,
-        loader: ColumnsLoader,
+        loader: async ({ request }) => {
+          const { loader } = await import("./route/ColumnsLoader");
+          return loader({ request });
+        },
       },
       {
         path: "/columns/:columnID",
         element: <Column />,
-        loader: ColumnLoader,
+        loader: async ({ params }) => {
+          const { loader } = await import("./route/ColumnLoader");
+          return loader({ params });
+        },
       },
       {
         path: "/schedules",
         element: <Schedules />,
-        loader: SchedulesLoader,
+        loader: async () => {
+          const { loader } = await import("./route/SchedulesLoader");
+          return loader();
+        },
       },
       {
         path: "/newcomers",
@@ -307,12 +318,18 @@ const router = createBrowserRouter([
           {
             path: "meditationON/:postID",
             element: <MeditationONPost />,
-            loader: MeditationONPostLoader,
+            loader: async ({ params }) => {
+              const { loader } = await import("./route/MeditationONPostLoader");
+              return loader({ params });
+            },
           },
           {
             path: "bible291",
             element: <Bible291 />,
-            loader: Bible291Loader,
+            loader: async () => {
+              const { loader } = await import("./route/Bible291Loader");
+              return loader();
+            },
           },
         ],
       },
