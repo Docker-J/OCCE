@@ -1,0 +1,1 @@
+import{az as e}from"./index-DVYlKEFA.js";async function o(){return{schedules:e.get("https://www.googleapis.com/calendar/v3/calendars/7c618ac3ca5ba8b604730e6408ef159e3dd8cacf44e28c265cb9b001e7cc5df8@group.calendar.google.com/events?key=AIzaSyCipnxl2pZyIzYgXQd8a5oNfo0ZWJGfLec")}}export{o as loader};
