@@ -1,7 +1,6 @@
 import { IconButton, Typography } from "@mui/material";
 import Styles from "./Card.module.css";
 import { useState } from "react";
-import { useSpring, animated } from "react-spring";
 
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
@@ -9,23 +8,12 @@ import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
 import "./MinisterCard.css";
 
 const MinisterCard = ({ image, imageOffset, title, position, details }) => {
-  const [show, setShown] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
-
-  const props3 = useSpring({
-    transform: show ? "scale(1.03)" : "scale(1)",
-    boxShadow: show
-      ? "0 20px 25px rgb(0 0 0 / 25%)"
-      : "0 2px 10px rgb(0 0 0 / 8%)",
-  });
 
   return (
     <div className="box-wrapper flip-card">
-      <animated.div
+      <div
         className={`flip-card-inner ${showDetails ? "flip-card-active" : ""}`}
-        // style={props3}
-        // onMouseEnter={() => setShown(true)}
-        // onMouseLeave={() => setShown(false)}
       >
         <div className="card-item-info flip-card-front">
           <div className="card-image">
@@ -133,7 +121,7 @@ const MinisterCard = ({ image, imageOffset, title, position, details }) => {
             </IconButton>
           </div>
         )}
-      </animated.div>
+      </div>
     </div>
   );
 };
