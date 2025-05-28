@@ -28,8 +28,6 @@ import {
 
 import pages from "./Pages.js";
 import useModals from "../util/useModal.js";
-import SignInModal from "../components/User/SignInModal";
-import SignUpModal from "../components/User/SignUpModal";
 import useSnackbar from "../util/useSnackbar.js";
 
 const ResponsiveAppBar = () => {
@@ -59,13 +57,23 @@ const ResponsiveAppBar = () => {
   const settings_not_signed = [
     {
       title: "로그인",
-      onClick: () => openModal(SignInModal, {}),
+      onClick: async () => {
+        const { default: SignInModal } = await import(
+          "../components/User/SignInModal"
+        );
+        openModal(SignInModal, {});
+      },
     },
     ...(!import.meta.env.PROD
       ? [
           {
             title: "회원가입",
-            onClick: () => openModal(SignUpModal, {}),
+            onClick: async () => {
+              const { default: SignUpModal } = await import(
+                "../components/User/SignUpModal"
+              );
+              openModal(SignUpModal, {});
+            },
           },
         ]
       : []),
