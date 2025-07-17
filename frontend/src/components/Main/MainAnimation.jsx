@@ -162,9 +162,8 @@ const MainAnimation = () => {
         animate={logoControls}
         initial={{ rotate: 0, scale: 1, opacity: 1 }}
         style={{
-          maxWidth: "400px",
-          width: "21vmax",
-          height: "auto",
+          height: "23svh",
+          width: "auto",
           padding: "4svh 0",
         }}
         src="img/ONLogo.svg"
@@ -180,7 +179,7 @@ const MainAnimation = () => {
           className="old"
           variant="h5"
           fontWeight="530"
-          fontSize="min(5.5vw, 36px)"
+          fontSize="clamp(20px,4svmin, 32px)"
           color="#f1cdb0"
         >
           Based ON the OLD Truth
@@ -189,7 +188,7 @@ const MainAnimation = () => {
           className="new"
           variant="h5"
           fontWeight="530"
-          fontSize="min(5vw, 36px)"
+          fontSize="clamp(20px,4svmin, 32px)"
           color="white"
         >
           Moving ON to the NEW Calling
@@ -204,7 +203,7 @@ const MainAnimation = () => {
         <Typography
           variant="h5"
           fontWeight="530"
-          fontSize="min(5.5vw, 36px)"
+          fontSize="clamp(20px,4svmin, 32px)"
           color="#f1cdb0"
         >
           온 맘 다해 하나님을 사랑하고
@@ -212,7 +211,7 @@ const MainAnimation = () => {
         <Typography
           variant="h5"
           fontWeight="530"
-          fontSize="min(5vw, 36px)"
+          fontSize="clamp(20px,4svmin, 32px)"
           color="white"
         >
           온 힘 다해 이웃을 사랑하는 교회
