@@ -1,0 +1,1 @@
+import{az as e}from"./index-BJTAqyjR.js";async function s(){return{schedules:e.get("https://www.googleapis.com/calendar/v3/calendars/undefined/events?key=AIzaSyCipnxl2pZyIzYgXQd8a5oNfo0ZWJGfLec")}}export{s as loader};
