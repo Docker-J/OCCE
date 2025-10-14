@@ -10,9 +10,6 @@ const titleBackground = {
   backgroundPositionY: "60%",
 };
 
-// &timeMin=${new Date().toISOString()}
-// &timeMax=${addMonth(new Date(), 1),toISOString()}
-
 const Schedules = () => {
   const data = useLoaderData();
 
