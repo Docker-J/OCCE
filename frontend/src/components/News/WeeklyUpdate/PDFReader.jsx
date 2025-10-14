@@ -10,7 +10,7 @@ import "./PDFReader.css";
 //   import.meta.url
 // ).toString();
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
 
 function PDFReader({ file, documentDimension }) {
   const [numPages, setNumPages] = useState(null);
