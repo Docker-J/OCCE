@@ -1,0 +1,1 @@
+import{av as a,aw as t}from"./index-C9En9bZY.js";async function s({request:e}){const n=new URL(e.url).searchParams.get("page");return n===null?a("?page=1"):{announcementsData:t.get(`/api/announcements?page=${n}`)}}export{s as loader};
