@@ -23,6 +23,7 @@ const MainAnimation = () => {
     fadeInMulti: 6,
     fadeIn2: 4,
     moveTextMulti: 6,
+    moveTextMulti2: 5.5,
     fadeIn3: 4.1,
     spinHorizontal: 6,
   };
@@ -119,7 +120,7 @@ const MainAnimation = () => {
     churchTextControls.start({
       x: ["0%", "50%", "120%"],
       transition: {
-        duration: durations.moveTextMulti,
+        duration: durations.moveTextMulti2,
         ease: "easeInOut",
         delay: delays.moveRight,
         times: [0, 0.4, 1],

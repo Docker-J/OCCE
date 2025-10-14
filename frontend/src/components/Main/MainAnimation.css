@@ -38,9 +38,9 @@
 
 .verticalLogo {
   position: absolute;
-  left: 50.5%;
+  left: 50.25%;
   opacity: 0;
-  max-width: 5vmax;
+  max-width: min(110px, 5vmax);
   height: auto !important;
   object-fit: contain !important;
 }
