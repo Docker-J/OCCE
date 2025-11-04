@@ -1,6 +1,5 @@
 .carousel :global(.slider) {
-  height: 50svh;
-  max-height: 620px;
+  height: clamp(375px, 50svh, 620px);
 }
 
 @media only screen and (min-width: 900px) {

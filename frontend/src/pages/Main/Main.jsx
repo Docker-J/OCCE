@@ -8,7 +8,7 @@ import "./Main.css";
 // import CustomChatBot from "../../components/Main/CustomChatBot";
 import MainAnimation from "../../components/Main/MainAnimation";
 
-import test from "./MainCarousel.module.css";
+import carouselStyles from "./MainCarousel.module.css";
 import CustomCarousel from "../../common/CustomCarousel";
 
 const MainImage = ({ backgroundImage }) => {
@@ -24,7 +24,7 @@ const Main = () => {
   return (
     <>
       <CustomCarousel
-        className={test.carousel}
+        className={carouselStyles.carousel}
         showThumbs={false}
         showStatus={false}
         showArrows={false}

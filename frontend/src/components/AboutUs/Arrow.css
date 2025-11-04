@@ -2,8 +2,10 @@
   position: absolute;
   bottom: 50px;
   left: 50%;
-  transform: translate(-50%, 0);
+  transform: translateX(-50%);
   z-index: 100;
+  padding: 30px;
+  cursor: pointer;
 }
 .arrow span {
   display: block;
@@ -11,7 +13,7 @@
   height: 10px;
   border-bottom: 5px solid #ffffff;
   border-right: 5px solid #ffffff;
-  transform: rotate(45deg);
+  transform: translate(-50%, -50%) rotate(45deg);
   margin: -10px;
   animation: animate 2s infinite;
 }
