@@ -105,6 +105,7 @@ const Announcement = () => {
 
   return (
     <>
+      <title>{title}</title>
       {isLoading && <FullScreenLoading />}
 
       <div className="title-wrapper" style={titleBackground}>
@@ -152,7 +153,6 @@ const Announcement = () => {
                 <SpeedDialAction
                   key={action.name}
                   icon={action.icon}
-                  tooltipTitle={action.name}
                   onClick={action.onClick}
                 />
               ))}

@@ -119,6 +119,8 @@ const WeeklyUpdate = () => {
 
   return (
     <>
+      <title>{`${format(selectedDate, "yyyy-MM-dd")} 주보`}</title>
+
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
