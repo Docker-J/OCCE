@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button, useForkRef } from "@mui/material";
 import {
   DatePicker,
@@ -10,14 +9,9 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { format } from "date-fns";
 
 const ButtonField = (props) => {
-  const { internalProps, forwardedProps } = useSplitFieldProps(props, "date");
+  const { _, forwardedProps } = useSplitFieldProps(props, "date");
   const pickerContext = usePickerContext();
   const handleRef = useForkRef(pickerContext.triggerRef, pickerContext.rootRef);
-
-  // const {
-  //   InputProps: { ref } = {},
-  //   inputProps: { "aria-label": ariaLabel } = {},
-  // } = props;
 
   return (
     <Button
