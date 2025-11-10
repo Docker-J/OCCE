@@ -33,6 +33,8 @@ const Announcements = () => {
 
   return (
     <>
+      <title>공지사항 - OCCE</title>
+
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography

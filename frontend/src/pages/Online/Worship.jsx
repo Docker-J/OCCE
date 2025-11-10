@@ -10,6 +10,8 @@ const titleBackground = {
 const Worship = () => {
   return (
     <>
+      <title>찬양 - OCCE</title>
+
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography

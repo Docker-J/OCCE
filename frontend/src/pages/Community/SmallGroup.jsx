@@ -8,6 +8,8 @@ const titleBackground = {
 const SmallGroup = () => {
   return (
     <>
+      <title>소그룹 - OCCE</title>
+
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography

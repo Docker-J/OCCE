@@ -30,6 +30,8 @@ const ministries = [
 const Elementary = () => {
   return (
     <>
+      <title>유초등부 - OCCE</title>
+
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography

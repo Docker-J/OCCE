@@ -10,6 +10,8 @@ const titleBackground = {
 const PrayON = () => {
   return (
     <>
+      <title>기도 ON - OCCE</title>
+
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography

@@ -10,6 +10,8 @@ const titleBackground = {
 const DawnQT = () => {
   return (
     <>
+      <title>새벽 QT - OCCE</title>
+
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography

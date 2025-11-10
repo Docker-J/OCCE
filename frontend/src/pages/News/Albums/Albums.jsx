@@ -131,6 +131,8 @@ const Albums = () => {
 
   return (
     <>
+      <title>교회사진 - OCCE</title>
+
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography

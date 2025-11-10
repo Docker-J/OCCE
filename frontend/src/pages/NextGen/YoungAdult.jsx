@@ -28,6 +28,8 @@ const ministries = [
 const YoungAdult = () => {
   return (
     <>
+      <title>청년부 - OCCE</title>
+
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography

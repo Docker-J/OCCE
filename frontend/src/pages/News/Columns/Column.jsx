@@ -83,6 +83,8 @@ const Column = () => {
 
   return (
     <>
+      <title>{`${title} - OCCE`}</title>
+
       {isLoading && <FullScreenLoading />}
 
       <div className="title-wrapper" style={titleBackground}>

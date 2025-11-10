@@ -105,7 +105,7 @@ const Announcement = () => {
 
   return (
     <>
-      <title>{title}</title>
+      <title>{`${title} - OCCE`}</title>
       {isLoading && <FullScreenLoading />}
 
       <div className="title-wrapper" style={titleBackground}>

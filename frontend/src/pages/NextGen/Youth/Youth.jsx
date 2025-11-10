@@ -17,6 +17,8 @@ const imgs = [
 const Youth = () => {
   return (
     <>
+      <title>중고등부 - OCCE</title>
+
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography

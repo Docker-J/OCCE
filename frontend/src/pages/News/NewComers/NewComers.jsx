@@ -9,6 +9,8 @@ const titleBackground = {
 const NewComers = () => {
   return (
     <>
+      <title>새가족 - OCCE</title>
+
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography

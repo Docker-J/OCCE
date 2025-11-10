@@ -9,6 +9,8 @@ const titleBackground = {
 const Sermon = () => {
   return (
     <>
+      <title>말씀 - OCCE</title>
+
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography

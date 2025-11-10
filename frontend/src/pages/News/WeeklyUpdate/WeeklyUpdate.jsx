@@ -119,7 +119,7 @@ const WeeklyUpdate = () => {
 
   return (
     <>
-      <title>{`${format(selectedDate, "yyyy-MM-dd")} 주보`}</title>
+      <title>{`${format(selectedDate, "yyyy-MM-dd")} 주보 - OCCE`}</title>
 
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">

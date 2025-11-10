@@ -36,6 +36,8 @@ const Columns = () => {
 
   return (
     <>
+      <title>목회칼럼 - OCCE</title>
+
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography

@@ -12,6 +12,8 @@ const Bible291 = () => {
 
   return (
     <>
+      <title>291일 성경 1독 - OCCE</title>
+
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography

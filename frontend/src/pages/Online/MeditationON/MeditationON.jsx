@@ -97,6 +97,8 @@ const MeditationON = () => {
 
   return (
     <>
+      <title>묵상 ON - OCCE</title>
+
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
