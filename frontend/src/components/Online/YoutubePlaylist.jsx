@@ -1,5 +1,3 @@
-import "./YoutubePlaylist.css";
-
 const YoutubePlaylist = ({ src }) => {
   return (
     <div className="video">
