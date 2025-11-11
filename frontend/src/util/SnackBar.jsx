@@ -1,5 +1,5 @@
 // Modals.js
-import { useContext } from "react";
+import { use } from "react";
 import { Alert, Snackbar } from "@mui/material";
 import {
   SnackBarDispatchContext,
@@ -7,8 +7,8 @@ import {
 } from "./SnackBarContext";
 
 const SnackBar = () => {
-  const openedSnackBar = useContext(SnackBarStateContext);
-  const { close } = useContext(SnackBarDispatchContext);
+  const openedSnackBar = use(SnackBarStateContext);
+  const { close } = use(SnackBarDispatchContext);
 
   const { severity, message, action, isOpen } = openedSnackBar;
 

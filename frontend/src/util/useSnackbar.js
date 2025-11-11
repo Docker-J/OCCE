@@ -1,8 +1,8 @@
-import { useContext } from "react";
+import { use } from "react";
 import { SnackBarDispatchContext } from "./SnackBarContext";
 
 export default function useSnackbar() {
-  const { open, close } = useContext(SnackBarDispatchContext);
+  const { open, close } = use(SnackBarDispatchContext);
 
   const openSnackbar = (severity, message, action) => {
     open(severity, message, action);

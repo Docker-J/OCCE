@@ -1,10 +1,10 @@
 // Modals.js
-import { useContext } from "react";
+import { use } from "react";
 import { ModalsDispatchContext, ModalsStateContext } from "./ModalsContext";
 
 const Modals = () => {
-  const openedModal = useContext(ModalsStateContext);
-  const { close } = useContext(ModalsDispatchContext);
+  const openedModal = use(ModalsStateContext);
+  const { close } = use(ModalsDispatchContext);
 
   return openedModal.map((modal, index) => {
     const { Component, props, isOpen } = modal;
