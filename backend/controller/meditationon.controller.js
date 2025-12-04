@@ -53,10 +53,13 @@ export const getMeditationONController = async (req, res) => {
   try {
     const scanParam = {
       TableName: TABLENAME,
-      ProjectionExpression: "Images",
+      ProjectionExpression: "Images, #ts ",
       KeyConditionExpression: "ID = :postID",
       ExpressionAttributeValues: {
         ":postID": req.params.id,
+      },
+      ExpressionAttributeNames: {
+        "#ts": "Timestamp",
       },
     };
 
@@ -64,7 +67,7 @@ export const getMeditationONController = async (req, res) => {
 
     const result = await docClient.send(command);
 
-    res.send(result.Items[0].Images);
+    res.send(result.Items[0]);
     console.log(result);
   } catch (error) {
     console.log(error);
@@ -86,7 +89,7 @@ export const postMeditationONController = async (req, res) => {
       TableName: TABLENAME,
       Item: {
         ID: uuid(),
-        Timestamp: new Date().toISOString(),
+        Timestamp: req.query.date,
         Cover: ids[0],
         Images: ids,
         sort: 0,

@@ -24,11 +24,11 @@ export const getPost = async (id) => {
   }
 };
 
-export const uploadImages = async (form) => {
+export const uploadImages = async (form, date) => {
   try {
     await axios.post("/api/meditationon", form, {
-      headers: {
-        "Content-Type": `multipart/form-data`,
+      params: {
+        date: date,
       },
     });
   } catch {

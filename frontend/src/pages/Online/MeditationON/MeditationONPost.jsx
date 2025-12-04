@@ -2,6 +2,8 @@ import { useLoaderData } from "react-router";
 
 import { Box, Typography } from "@mui/material";
 
+import { format } from "date-fns";
+
 import CustomCarousel from "../../../common/CustomCarousel";
 
 const titleBackground = {
@@ -9,18 +11,21 @@ const titleBackground = {
 };
 
 const MeditationONPost = () => {
-  const images = useLoaderData();
+  const { Images, Timestamp } = useLoaderData();
 
   return (
     <>
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
+          <Typography variant="h4" fontWeight={830} sx={{ color: "white" }}>
+            {format(Timestamp, "yyyy-MM-dd")}
+          </Typography>
           <Typography
             variant="h4"
             fontWeight={830}
             sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
           >
-            묵상 ON
+            QT AS
           </Typography>
         </div>
       </div>
@@ -46,7 +51,7 @@ const MeditationONPost = () => {
             }}
           >
             <CustomCarousel>
-              {Object.values(images).map((image, index) => {
+              {Object.values(Images).map((image, index) => {
                 // if (
                 //   index === selectedItem ||
                 //   index === selectedItem + 1 ||

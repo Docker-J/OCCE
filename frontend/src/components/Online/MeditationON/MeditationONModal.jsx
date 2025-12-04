@@ -7,6 +7,8 @@ import { uploadImages } from "../../../api/meditationon";
 import CustomModal from "../../../common/CustomModal";
 import FileUploadComponent from "../../../common/FileUploadComponent";
 import ImagePreviews from "../../../common/ImagePreviews";
+import ButtonDatePicker from "../../../common/ButtonDatePicker";
+import { MIN_DATE } from "../../../constants/WeeklyUpdate";
 
 const MeditationONModal = ({ isOpen, onClose }) => {
   const { openSnackbar } = useSnackbar();
@@ -18,6 +20,8 @@ const MeditationONModal = ({ isOpen, onClose }) => {
 
   const [filesToUpload, setFilesToUpload] = useState([]);
   const [imagesPreview, setImagesPreview] = useState([]);
+
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   const handleChangeFile = (files) => {
     setFilesToUpload((prev) => [...prev, ...files]);
@@ -38,7 +42,7 @@ const MeditationONModal = ({ isOpen, onClose }) => {
     try {
       setLoading(true);
 
-      await uploadImages(form);
+      await uploadImages(form, selectedDate.toISOString());
 
       openSnackbar("success", "Uploaded Succesfully!");
       handleClose();
@@ -92,6 +96,12 @@ const MeditationONModal = ({ isOpen, onClose }) => {
               multiple={true}
             />
           </div>
+
+          <ButtonDatePicker
+            value={selectedDate}
+            minDate={MIN_DATE}
+            onChange={setSelectedDate}
+          />
 
           <div style={{ display: "flex", marginTop: "1.5em", width: "100%" }}>
             <Button
