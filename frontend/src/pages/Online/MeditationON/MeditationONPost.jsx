@@ -15,6 +15,8 @@ const MeditationONPost = () => {
 
   return (
     <>
+      <title>{`${format(Timestamp, "yyyy-MM-dd")} QT A/S - OCCE`}</title>
+
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography variant="h4" fontWeight={830} sx={{ color: "white" }}>
@@ -25,7 +27,7 @@ const MeditationONPost = () => {
             fontWeight={830}
             sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
           >
-            QT AS
+            QT A/S
           </Typography>
         </div>
       </div>
