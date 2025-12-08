@@ -48,10 +48,10 @@ const Schedules = () => {
                     justifyContent: "center",
                   }}
                 >
-                  {data.items.length === 0 ? (
+                  {data.length === 0 ? (
                     "등록된 일정이 없습니다."
                   ) : (
-                    <Schedule events={data.items} />
+                    <Schedule events={data} />
                   )}
                 </div>
               )}
