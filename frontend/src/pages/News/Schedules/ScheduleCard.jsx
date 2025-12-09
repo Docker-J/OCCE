@@ -24,9 +24,9 @@ const ScheduleCard = ({ date, event, sx }) => {
   const start = parseISO(allday ? event.start.date : event.start.dateTime);
   const end = parseISO(allday ? event.end.date : event.end.dateTime);
   const startDate = format(start, "dd");
-  const startTime = format(start, "HH:mm a");
+  const startTime = format(start, "hh:mm a");
   const endDate = format(end, "dd");
-  const endTime = format(end, "HH:mm a");
+  const endTime = format(end, "hh:mm a");
 
   const sameDay = isSameDayEvent(start, end, endTime);
 
@@ -61,7 +61,7 @@ const ScheduleCard = ({ date, event, sx }) => {
       <Typography>{event.description}</Typography>
 
       {!allday && (
-        <Stack direction="row" spacing={0.5} alignItems="flex-end">
+        <Stack direction="row" spacing={0.5} alignItems="flex-start">
           <ScheduleIcon fontSize="small" />
           <Typography variant="body2">
             {startTime}
@@ -72,7 +72,7 @@ const ScheduleCard = ({ date, event, sx }) => {
       )}
 
       {event?.location && (
-        <Stack direction="row" spacing={0.5} alignItems="flex-end">
+        <Stack direction="row" spacing={0.5} alignItems="flex-start">
           <PlaceOutlinedIcon color="orange" fontSize="small" />
           <Typography
             component="a"
