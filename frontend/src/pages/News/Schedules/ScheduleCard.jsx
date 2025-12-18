@@ -53,12 +53,6 @@ const ScheduleCard = ({ date, event, sx }) => {
         </Typography>
       )}
 
-      {!allday && !sameDay && (
-        <Typography variant="h5">
-          {`${startDate} - ${getDate(endDate)}`}
-        </Typography>
-      )}
-
       <Typography>{event.description}</Typography>
 
       {!allday && (
@@ -67,7 +61,9 @@ const ScheduleCard = ({ date, event, sx }) => {
           <Typography variant="body2">
             {startTime}
             {!allday &&
-              (sameDay ? ` - ${endTime}` : ` - ${endDate} ${endTime} `)}{" "}
+              (sameDay
+                ? ` - ${endTime}`
+                : ` - ${format(end, "MM/dd hh:mm a")} `)}{" "}
           </Typography>
         </Stack>
       )}
