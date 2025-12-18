@@ -14,7 +14,7 @@ const Schedule = ({ events }) => {
     const eventsByMonth = schedules.reduce((acc, event) => {
       const start = parseISO(event.start.dateTime || event.start.date);
       const month = format(start, "MMMM yyyy");
-      const dateKey = format(start, "dd");
+      const dateKey = format(start, "d");
 
       acc[month] = acc[month] || {}; // Initialize month as an object
       acc[month][dateKey] = acc[month][dateKey] || [];
@@ -55,6 +55,8 @@ const Schedule = ({ events }) => {
           {month}
         </Typography>
 
+        {console.log(monthEvents)}
+
         {Object.entries(monthEvents).map(([date, dateEvents]) => {
           const eventDate = new Date(`${month} ${date}`);
           const sunday = isSunday(eventDate);
@@ -68,7 +70,7 @@ const Schedule = ({ events }) => {
                 mb: 2,
                 display: "flex",
                 justifyContent: "center",
-                borderRadius: 2,
+                borderRadius: 3,
               }}
             >
               <div
@@ -89,7 +91,7 @@ const Schedule = ({ events }) => {
                 }}
               >
                 <Typography variant="h5" color={sunday ? "red" : "primary"}>
-                  {date}
+                  {date.toString().padStart(2, "0")}
                 </Typography>
                 <Typography
                   variant="caption"

@@ -33,9 +33,10 @@ const ScheduleCard = ({ date, event, sx }) => {
   return (
     <Box
       sx={{
-        border: "1px solid ",
+        // border: "1px solid ",
+        backgroundColor: allday ? "#f57c00" : "#e8eaed",
         borderColor: allday ? "#f57c00" : "#afafaf",
-        p: 1,
+        p: 1.5,
         borderRadius: 1,
         ...sx,
       }}
