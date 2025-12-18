@@ -1,8 +1,11 @@
-import { CircularProgress, Typography } from "@mui/material";
-
 import { Suspense } from "react";
-import { Await, useLoaderData } from "react-router";
+import { Await, useLoaderData, useRevalidator } from "react-router";
 import Schedule from "./Schedule";
+import AdminComponent from "../../../common/AdminComponent";
+
+import { CircularProgress, Fab, Typography } from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import { refreshSchedules } from "../../../api/schedules";
 
 const titleBackground = {
   backgroundImage: 'url("/img/News/Schedules/Schedules.jpg")',
@@ -12,6 +15,7 @@ const titleBackground = {
 
 const Schedules = () => {
   const data = useLoaderData();
+  const revalidator = useRevalidator();
 
   return (
     <>
@@ -59,6 +63,18 @@ const Schedules = () => {
           </Suspense>
         </div>
       </div>
+
+      <AdminComponent>
+        <Fab
+          style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
+          onClick={async () => {
+            await refreshSchedules();
+            revalidator.revalidate();
+          }}
+        >
+          <RefreshIcon />
+        </Fab>
+      </AdminComponent>
     </>
   );
 };
