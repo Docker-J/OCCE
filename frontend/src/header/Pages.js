@@ -130,6 +130,10 @@ if (import.meta.env.DEV) {
           to: "columns",
         },
         {
+          title: "교회일정",
+          to: "schedules",
+        },
+        {
           title: "새가족",
           to: "newcomers",
         },
