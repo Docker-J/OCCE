@@ -141,7 +141,9 @@ const MeditationON = () => {
                   ref={scrollRef}
                   cols={matches ? 4 : 3}
                   gap={3}
-                  sx={{ marginTop: { xs: "0", md: "16px" } }}
+                  sx={{
+                    my: { xs: "0", md: "16px" },
+                  }}
                 >
                   <MemoizedMeditationONComp posts={posts} />
                 </ImageList>
