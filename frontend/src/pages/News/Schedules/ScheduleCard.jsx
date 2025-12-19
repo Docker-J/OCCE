@@ -53,7 +53,7 @@ const ScheduleCard = ({ date, event, sx }) => {
         </Typography>
       )}
 
-      <Typography>{event.description}</Typography>
+      <Typography sx={{ mb: "0.2em" }}>{event.description}</Typography>
 
       {!allday && (
         <Stack direction="row" spacing={0.5} alignItems="flex-start">
@@ -63,13 +63,18 @@ const ScheduleCard = ({ date, event, sx }) => {
             {!allday &&
               (sameDay
                 ? ` - ${endTime}`
-                : ` - ${format(end, "MM/dd hh:mm a")} `)}{" "}
+                : ` - ${format(end, "MM/dd hh:mm a")} `)}
           </Typography>
         </Stack>
       )}
 
       {event?.location && (
-        <Stack direction="row" spacing={0.5} alignItems="flex-start">
+        <Stack
+          direction="row"
+          spacing={0.5}
+          alignItems="flex-start"
+          marginTop="0.1em"
+        >
           <PlaceOutlinedIcon color="orange" fontSize="small" />
           <Typography
             component="a"
