@@ -8,7 +8,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import { refreshSchedules } from "../../../api/schedules";
 
 const titleBackground = {
-  backgroundImage: 'url("/img/News/Schedules/Schedules.jpg")',
+  backgroundImage: 'url("/img/News/Schedules/Schedules.webp")',
   backgroundPositionX: "0%",
   backgroundPositionY: "60%",
 };
