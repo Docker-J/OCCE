@@ -55,8 +55,6 @@ const Schedule = ({ events }) => {
           {month}
         </Typography>
 
-        {console.log(monthEvents)}
-
         {Object.entries(monthEvents).map(([date, dateEvents]) => {
           const eventDate = new Date(`${month} ${date}`);
           const sunday = isSunday(eventDate);
@@ -66,28 +64,31 @@ const Schedule = ({ events }) => {
               key={date}
               elevation={3}
               sx={{
-                p: 2,
+                p: 1.5,
                 mb: 2,
                 display: "flex",
                 justifyContent: "center",
-                borderRadius: 3,
+                borderRadius: 2.5,
               }}
             >
               <div
                 style={{
                   borderLeft: sunday ? "3px solid red" : "3px solid #f57c00",
                   height: "32px",
+                  marginTop: "0.5em",
                   marginRight: "6px",
                 }}
               />
               <Box
                 sx={{
-                  mr: "18px",
+                  mr: "16px",
                 }}
                 style={{
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
+                  marginTop: "0.5em",
+                  minWidth: "32px",
                 }}
               >
                 <Typography variant="h5" color={sunday ? "red" : "primary"}>
