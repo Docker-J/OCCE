@@ -2,6 +2,7 @@ import {} from "dotenv/config";
 
 import express from "express";
 import cors from "cors";
+import cron from "node-cron";
 
 import user from "./routes/user.routes.js";
 import announcements from "./routes/announcements.routes.js";
@@ -11,7 +12,6 @@ import albums from "./routes/albums.routes.js";
 import meditationon from "./routes/meditationon.routes.js";
 import notification from "./routes/notification.routes.js";
 import schedules from "./routes/schedules.routes.js";
-
 import images from "./routes/images.routes.js";
 
 import { getRecentWeelyUpdateDate } from "./controller/weeklyupdate.controller.js";
@@ -36,8 +36,29 @@ app.use("/api/albums", albums);
 app.use("/api/schedules", schedules);
 app.use("/api/meditationon", meditationon);
 app.use("/api/notification", notification);
-
 app.use("/api/images", images);
+
+// ------------------------------------------------
+// CRON JOB SETUP
+// ------------------------------------------------
+cron.schedule(
+  "1 0 * * *",
+  async () => {
+    console.log("🕒 Triggering daily schedule refresh...");
+
+    try {
+      await getSchedules();
+      console.log("✅ Schedule refreshed successfully.");
+    } catch (error) {
+      console.error("❌ Failed to refresh schedule:", error);
+    }
+  },
+  {
+    scheduled: true,
+    timezone: "America/Edmonton",
+  }
+);
+// ------------------------------------------------
 
 app.listen(PORT, async () => {
   // PreFetch
