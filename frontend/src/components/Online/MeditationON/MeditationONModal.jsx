@@ -2,6 +2,9 @@ import { Button, CircularProgress } from "@mui/material";
 import { useState } from "react";
 import update from "immutability-helper";
 
+import { format } from "date-fns";
+import { fromZonedTime } from "date-fns-tz";
+
 import useSnackbar from "../../../util/useSnackbar";
 import { uploadImages } from "../../../api/meditationon";
 import CustomModal from "../../../common/CustomModal";
@@ -42,7 +45,12 @@ const MeditationONModal = ({ isOpen, onClose }) => {
     try {
       setLoading(true);
 
-      await uploadImages(form, selectedDate.toISOString());
+      const dateString = format(selectedDate, "yyyy-MM-dd");
+      const edmontonTimestamp = fromZonedTime(
+        `${dateString} 00:00`,
+        "America/Edmonton"
+      );
+      await uploadImages(form, edmontonTimestamp.toISOString());
 
       openSnackbar("success", "Uploaded Succesfully!");
       handleClose();

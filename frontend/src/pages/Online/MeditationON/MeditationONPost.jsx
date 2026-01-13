@@ -2,7 +2,7 @@ import { useLoaderData } from "react-router";
 
 import { Box, Typography } from "@mui/material";
 
-import { format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 
 import CustomCarousel from "../../../common/CustomCarousel";
 
@@ -12,15 +12,20 @@ const titleBackground = {
 
 const MeditationONPost = () => {
   const { Images, Timestamp } = useLoaderData();
+  const timestamp = formatInTimeZone(
+    Timestamp,
+    "America/Edmonton",
+    "yyyy-MM-dd"
+  );
 
   return (
     <>
-      <title>{`${format(Timestamp, "yyyy-MM-dd")} QT A/S - OCCE`}</title>
+      <title>{`${timestamp} QT A/S - OCCE`}</title>
 
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography variant="h4" fontWeight={830} sx={{ color: "white" }}>
-            {format(Timestamp, "yyyy-MM-dd")}
+            {timestamp}
           </Typography>
           <Typography
             variant="h4"
