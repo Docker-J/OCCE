@@ -1,1 +1,0 @@
-import{aw as a,a1 as t}from"./index-BCIXcEIZ.js";async function s({request:n}){const e=new URL(n.url).searchParams.get("page");return e===null?a("?page=1"):{announcementsData:t.get(`/api/columns?page=${e}`)}}export{s as loader};
