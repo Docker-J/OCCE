@@ -1,31 +1,39 @@
-#section1 {
-  display: flex;
+.section {
+  position: relative;
+  display: flex !important;
   justify-content: center;
-  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)),
-    url("../../components/AboutUs/img/FirstStep.webp");
+  align-items: center;
+  background-image: var(--bg-image);
+  background-position: var(--bg-pos, center);
   background-repeat: no-repeat;
   background-size: cover;
-  background-position: 83%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, var(--bg-tint, 0.3));
+  z-index: -1;
+}
+
+#section1 {
+  --bg-image: url("../../components/AboutUs/img/FirstStep.webp");
+  --bg-pos: 83%;
 }
 
 #section2 {
-  display: flex;
-  justify-content: center;
-  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)),
-    url("../../components/AboutUs/img/Calling.webp");
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: 35%;
+  --bg-image: url("../../components/AboutUs/img/Calling.webp");
+  --bg-pos: 35%;
 }
 
 #section3 {
-  display: flex;
-  justify-content: center;
-  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2)),
-    url("../../components/AboutUs/img/Direction.webp");
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
+  --bg-image: url("../../components/AboutUs/img/Direction.webp");
 }
 
 @media (max-height: 915px) {
@@ -36,23 +44,13 @@
 }
 
 #section4 {
-  display: flex;
-  justify-content: center;
-  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
-    url("../../components/AboutUs/img/Servers.webp");
-  background-repeat: no-repeat;
-  background-size: cover;
+  --bg-image: url("../../components/AboutUs/img/Servers.webp");
 }
 
 #section5 {
-  display: flex;
-  justify-content: center;
-  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-    url("../../components/AboutUs/img/AboutUs.webp");
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position-x: center;
-  background-position-y: 55%;
+  --bg-image: url("../../components/AboutUs/img/AboutUs.webp");
+  --bg-pos: center 55%;
+  --bg-tint: 0.6;
 }
 
 .sectionBody {
