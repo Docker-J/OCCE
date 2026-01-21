@@ -1,8 +1,6 @@
 .section {
-  position: relative;
   display: flex !important;
   justify-content: center;
-  align-items: center;
   background-image: var(--bg-image);
   background-position: var(--bg-pos, center);
   background-repeat: no-repeat;
@@ -23,6 +21,7 @@
 }
 
 #section1 {
+  display: flex;
   --bg-image: url("../../components/AboutUs/img/FirstStep.webp");
   --bg-pos: 83%;
 }
@@ -45,12 +44,19 @@
 
 #section4 {
   --bg-image: url("../../components/AboutUs/img/Servers.webp");
+  --bg-pos: 0;
 }
 
 #section5 {
   --bg-image: url("../../components/AboutUs/img/AboutUs.webp");
   --bg-pos: center 55%;
   --bg-tint: 0.6;
+}
+
+.sectionBody,
+.section4Body,
+.section5Body {
+  z-index: 2; /* Higher than the :before's z-index */
 }
 
 .sectionBody {
@@ -60,7 +66,6 @@
 }
 
 .section4Body {
-  max-width: 1500px;
   height: 100vh;
   padding: 0;
 }
