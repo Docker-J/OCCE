@@ -17,7 +17,11 @@ const MinisterCard = ({ image, imageOffset, title, position, details }) => {
       >
         <div className="card-item-info flip-card-front">
           <div className="card-image">
-            <img src={image} style={imageOffset} alt="" />
+            {image ? (
+              <img src={image} style={imageOffset} alt="" />
+            ) : (
+              <img src="https://placehold.co/300x300/FFF/FFF" />
+            )}
           </div>
 
           <div className="card-title">
@@ -25,7 +29,6 @@ const MinisterCard = ({ image, imageOffset, title, position, details }) => {
               style={{
                 display: "grid",
                 gridTemplateColumns: "1fr auto 1fr",
-
                 alignItems: "center",
                 justifyContent: "center",
               }}

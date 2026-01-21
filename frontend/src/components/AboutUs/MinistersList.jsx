@@ -30,9 +30,9 @@ export const MinistersList = [
     image: "img/About/LeeSooyeon.webp",
   },
   {
-    title: "김유정 전도사",
+    title: "\u00A0",
     position: "유아유치부",
-    image: "img/About/KimYoojeong.webp",
+    // image: "img/About/KimYoojeong.webp",
   },
   {
     title: "김태영 목사",
