@@ -59,7 +59,7 @@ const YoungAdult = () => {
             style={{ width: "100%", display: "flex", justifyContent: "center" }}
           >
             <InfoCard
-              age=""
+              age="18~35세"
               time="주일 오후 4시"
               place="Youth Room"
               ask="김휘경 전도사"
