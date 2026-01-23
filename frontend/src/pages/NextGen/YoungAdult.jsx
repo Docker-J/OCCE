@@ -2,11 +2,11 @@ import { Card, CardContent, CardHeader, Typography } from "@mui/material";
 import InfoCard from "../../components/NextGen/InfoCard";
 
 const titleBackground = {
-  backgroundImage: 'url("/img/NextGen/YoungAdult/YoungAdults.webp")',
+  backgroundImage: 'url("/img/NextGen/Youngadult/YoungAdults.webp")',
   backgroundPositionY: "60%",
 };
 
-const imgs = [{ src: "/img/NextGen/YoungAdult/1.webp" }];
+const imgs = [{ src: "/img/NextGen/Youngadult/1.webp" }];
 
 const ministries = [
   { title: "예배 Worship", content: ["주일예배", "주중예배"] },
