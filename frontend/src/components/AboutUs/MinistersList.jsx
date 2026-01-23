@@ -2,7 +2,7 @@ export const MinistersList = [
   {
     title: "진성인 목사",
     position: "담임 목사",
-    image: "img/About/ChinSeongIn.webp",
+    image: "img/About/Servers/ChinSeongIn.webp",
     // imageOffset={{ left: "2%" }}
     details: {
       "현)": { "에드먼턴 온 교회 담임": "" },
@@ -22,12 +22,12 @@ export const MinistersList = [
   {
     title: "김휘경 전도사",
     position: "중고등부/청년부/찬양",
-    image: "img/About/KimHwikyung.webp",
+    image: "img/About/Servers/KimHwikyung.webp",
   },
   {
     title: "이수연 전도사",
     position: "유초등부",
-    image: "img/About/LeeSooyeon.webp",
+    image: "img/About/Servers/LeeSooyeon.webp",
   },
   {
     title: "\u00A0",
@@ -37,6 +37,6 @@ export const MinistersList = [
   {
     title: "김태영 목사",
     position: "행정",
-    image: "img/About/KimTaeyoung.webp",
+    image: "img/About/Servers/KimTaeyoung.webp",
   },
 ];
