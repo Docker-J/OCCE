@@ -19,6 +19,7 @@ const ministries = [
     title: "교육",
     subtitle: "Teaching",
     content: ["입교/세례 교육", "성경공부, 제자훈련", "기도회, 수련회"],
+    img: "/img/Online/Worship.webp",
   },
   {
     title: "교제",
@@ -30,11 +31,13 @@ const ministries = [
     title: "봉사",
     subtitle: "Serving",
     content: ["교회사역", "봉사", "지역사회 봉사/구제"],
+    img: "/img/Online/Worship.webp",
   },
   {
     title: "전도",
     subtitle: "Preaching",
     content: ["선교지 후원", "단기선교 참여"],
+    img: "/img/Online/Worship.webp",
   },
 ];
 
