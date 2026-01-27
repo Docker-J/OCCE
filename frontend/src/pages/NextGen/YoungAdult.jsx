@@ -1,28 +1,41 @@
-import { Card, CardContent, CardHeader, Typography } from "@mui/material";
+import { Card, CardContent, Typography } from "@mui/material";
 import InfoCard from "../../components/NextGen/InfoCard";
 
 const titleBackground = {
-  backgroundImage: 'url("/img/NextGen/Youngadult/YoungAdults.webp")',
+  backgroundImage: 'url("/img/NextGen/YoungAdults/YoungAdults.webp")',
   backgroundPositionY: "60%",
 };
 
-const imgs = [{ src: "/img/NextGen/Youngadult/1.webp" }];
+const imgs = [{ src: "/img/NextGen/YoungAdults/1.webp" }];
 
 const ministries = [
-  { title: "예배 Worship", content: ["주일예배", "주중예배"] },
   {
-    title: "교육 Teaching",
-    content: ["입교/세례 교육", "성경공부", "제자훈련", "기도회", "수련회"],
+    title: "예배",
+    subtitle: "Worship",
+    content: ["주일예배", "주중예배"],
+    img: "/img/Online/Worship.webp",
   },
   {
-    title: "교제 Fellowship",
+    title: "교육",
+    subtitle: "Teaching",
+    content: ["입교/세례 교육", "성경공부, 제자훈련", "기도회, 수련회"],
+  },
+  {
+    title: "교제",
+    subtitle: "Fellowship",
     content: ["정원모임", "친교(식사, 활동)", "지역 청년들과의 교류/연합"],
+    img: "/img/NextGen/YoungAdults/Ministries/Fellowship.jpg",
   },
   {
-    title: "봉사 Serving",
+    title: "봉사",
+    subtitle: "Serving",
     content: ["교회사역", "봉사", "지역사회 봉사/구제"],
   },
-  { title: "전도 Preaching", content: ["선교지 후원", "단기선교 참여"] },
+  {
+    title: "전도",
+    subtitle: "Preaching",
+    content: ["선교지 후원", "단기선교 참여"],
+  },
 ];
 
 const YoungAdult = () => {
@@ -39,8 +52,12 @@ const YoungAdult = () => {
           >
             온마음 청년부
           </Typography>
-          <Typography variant="h5" fontWeight={700} sx={{ color: "white" }}>
-            Heart ON God YOUNG ADULTS
+          <Typography
+            variant="h5"
+            fontWeight={700}
+            sx={{ color: "white", letterSpacing: "-1.3px" }}
+          >
+            Hearts ON God {"YOUNG\u00a0ADULTS"}
           </Typography>
 
           <br />
@@ -59,7 +76,7 @@ const YoungAdult = () => {
             style={{ width: "100%", display: "flex", justifyContent: "center" }}
           >
             <InfoCard
-              age="18~35세"
+              age="18~40세"
               time="주일 오후 4시"
               place="Youth Room"
               ask="김휘경 전도사"
@@ -98,6 +115,7 @@ const YoungAdult = () => {
             style={{
               width: "100%",
               display: "flex",
+              justifyContent: "space-between",
               overflowX: "scroll",
             }}
           >
@@ -106,16 +124,51 @@ const YoungAdult = () => {
                 key={ministry.title}
                 elevation={5}
                 sx={{
-                  minWidth: "320px",
-                  m: "12px",
-                  ml: 1,
-                  borderRadius: "1em",
+                  minWidth: "220px",
+                  m: "1em",
+                  borderRadius: "1.2em",
                 }}
               >
-                <CardContent>
-                  <CardHeader title={ministry.title} />
+                <div
+                  style={{
+                    height: "120px",
+                    backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url(${ministry?.img})`,
+                    backgroundRepeat: "no-repeat",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                >
+                  <div
+                    style={{
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      textAlign: "center",
+                    }}
+                  >
+                    <Typography variant="h4" color="white">
+                      {ministry.title}
+                    </Typography>
+                    <Typography variant="h6" color="white">
+                      {ministry?.subtitle}
+                    </Typography>
+                  </div>
+                </div>
+                <CardContent
+                  sx={{
+                    height: "100px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    p: "1em 0.5em !important",
+                  }}
+                >
                   {ministry.content.map((item) => (
-                    <Typography key={item}>{item}</Typography>
+                    <Typography fontSize="1.1em" key={item}>
+                      {item}
+                    </Typography>
                   ))}
                 </CardContent>
               </Card>
