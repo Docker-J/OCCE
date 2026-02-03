@@ -9,7 +9,7 @@ import {
 
 const containerStyle = {
   width: "100%",
-  height: "200px",
+  height: "300px",
 };
 
 const defaultCenter = {
@@ -34,7 +34,7 @@ const GoogleMap = memo(() => {
       <APIProvider apiKey={import.meta.env.VITE_APP_GOOGLE_MAPS_API_KEY}>
         <Map
           defaultCenter={defaultCenter}
-          defaultZoom={14}
+          defaultZoom={13}
           disableDefaultUI={true}
           mapId="96730a2a3f5e9934"
         >
@@ -47,12 +47,17 @@ const GoogleMap = memo(() => {
               alt="OCCE Circle Logo"
               height={30}
               src="/img/OCCE_logo_circle_rim_color.png"
-            ></img>
+            />
           </AdvancedMarker>
 
           {infowindowShown && (
-            <InfoWindow anchor={marker} onCloseClick={closeInfoWindow}>
-              <h3 style={{ marginTop: 0 }}> 에드먼턴 온 교회 </h3>
+            <InfoWindow
+              anchor={marker}
+              onCloseClick={closeInfoWindow}
+              headerContent={
+                <h3 style={{ marginTop: 0 }}> 에드먼턴 온 교회 </h3>
+              }
+            >
               <a
                 href="https://goo.gl/maps/gqpiA88gJSvbjfDD9"
                 target="_blank"

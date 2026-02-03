@@ -87,17 +87,10 @@ const ResponsiveAppBar = () => {
     openSnackbar("success", "Successfully Signed Out");
   };
 
-  const appBarPosition = "absolute";
-  const appBarColor = "white";
-  const logoColor = "/img/HeaderLogoColor.png";
-
   return (
     <AppBar
-      position={appBarPosition}
+      position="absolute"
       style={{ background: "transparent", boxShadow: "none" }}
-      sx={{
-        color: appBarColor,
-      }}
     >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
@@ -109,7 +102,7 @@ const ResponsiveAppBar = () => {
             <Link to="/">
               <img
                 alt="Header Logo"
-                src={logoColor}
+                src="/img/HeaderLogoColor.png"
                 style={{ width: "240px" }}
               />
             </Link>
@@ -162,7 +155,7 @@ const ResponsiveAppBar = () => {
               <img
                 alt="Header Logo"
                 className="mobileLogo"
-                src={logoColor}
+                src="/img/HeaderLogoColor.png"
                 style={{ width: "180px" }}
               />
             </Link>
@@ -179,7 +172,7 @@ const ResponsiveAppBar = () => {
             ))}
           </Box>
 
-          <Box sx={{ ml: "15pt", flexGrow: 0 }}>
+          <Box sx={{ ml: "16px", flexGrow: 0 }}>
             <IconButton
               size="large"
               color="inherit"
@@ -190,10 +183,9 @@ const ResponsiveAppBar = () => {
             </IconButton>
 
             <Menu
-              sx={{ mt: "45px" }}
               id="menu-appbar"
               anchorOrigin={{
-                vertical: "top",
+                vertical: "bottom",
                 horizontal: "right",
               }}
               transformOrigin={{
@@ -205,15 +197,11 @@ const ResponsiveAppBar = () => {
               {(authenticated ? settings_signed : settings_not_signed).map(
                 (setting) => (
                   <MenuItem key={setting.title} onClick={userPopupState.close}>
-                    <Typography
-                      sx={{ color: "black" }}
-                      textAlign="center"
-                      onClick={setting.onClick}
-                    >
+                    <Typography onClick={setting.onClick}>
                       {setting.title}
                     </Typography>
                   </MenuItem>
-                )
+                ),
               )}
             </Menu>
           </Box>
