@@ -30,11 +30,12 @@ const SignUpRequestConfirmModal = ({ isOpen, onClose }) => {
 
   return (
     <CustomModal isOpen={isOpen} onClose={onClose} maxWidth="400px">
-      <h1 style={{ marginTop: 0 }}>이메일 인증</h1>
+      <h1 style={{ marginTop: 0 }}>전화번호 인증</h1>
+
       <TextField
         sx={{ width: "90%", mt: "1em" }}
-        label="이메일"
-        type="email"
+        label="전화번호"
+        type="tel"
         onChange={(e) => setEmail(e.target.value)}
         required
       />
@@ -43,6 +44,7 @@ const SignUpRequestConfirmModal = ({ isOpen, onClose }) => {
         sx={{ width: "90%", mt: "1em" }}
         variant="outlined"
         onClick={handleSignUp}
+        disabled={email.trim() === ""}
       >
         Send
       </Button>

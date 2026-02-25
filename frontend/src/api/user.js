@@ -10,7 +10,7 @@ export const signIn = async (email, password, success, fail) => {
           username: email,
           password: password,
         },
-      }
+      },
     );
 
     success(res.data);
@@ -30,7 +30,7 @@ export const refreshTokenSignIn = async (refreshToken, success, fail) => {
   }
 };
 
-export const signUp = async (name, email, password, success, fail) => {
+export const signUp = async (name, phone, password, success, fail) => {
   try {
     const res = await axios.post("/api/user/singup");
 

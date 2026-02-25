@@ -26,7 +26,7 @@ const SignUpModal = ({ isOpen, onClose }) => {
     successSignUp();
     // signUp(
     //   getValues("name"),
-    //   getValues("email"),
+    //   getValues("phone"),
     //   getValues("password"),
     //   successSignUp,
     //   failSignUp
@@ -34,7 +34,7 @@ const SignUpModal = ({ isOpen, onClose }) => {
   };
 
   const successSignUp = () => {
-    openModal(SignUpConfirmModal, { email: getValues("email") });
+    openModal(SignUpConfirmModal, { phone: getValues("phone") });
     handleClose();
   };
 
@@ -47,7 +47,7 @@ const SignUpModal = ({ isOpen, onClose }) => {
 
   return (
     <CustomModal isOpen={isOpen} onClose={handleClose} maxWidth="400px">
-      <h1 style={{ marginTop: 0 }}>회원가입 요청</h1>
+      <h1 style={{ marginTop: 0 }}>회원가입</h1>
 
       <form style={{ width: "90%" }} onSubmit={handleSubmit(handleSignUp)}>
         <TextField
@@ -63,30 +63,8 @@ const SignUpModal = ({ isOpen, onClose }) => {
           {...register("phone", {
             required: true,
             length: 10,
-            valueAsNumber: true,
             pattern: /^\d{10}$/,
           })}
-        />
-        <TextField
-          sx={{ width: "100%", mt: "1.5em" }}
-          label="이메일"
-          type="email"
-          {...register("email", {
-            required: true,
-            pattern: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-          })}
-        />
-        <TextField
-          sx={{ width: "100%", mt: "1em" }}
-          label="이메일 확인"
-          type="email"
-          {...register("confirmEmail", {
-            required: true,
-            pattern: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-            validate: (value) => value === watch("email"),
-          })}
-          error={errors.confirmEmail}
-          helperText={errors.confirmEmail ? "이메일이 일치하지 않습니다." : ""}
         />
         <TextField
           sx={{ width: "100%", mt: "1em" }}
@@ -134,7 +112,7 @@ const SignUpModal = ({ isOpen, onClose }) => {
         sx={{ cursor: "pointer" }}
         direction="row"
       >
-        <Typography>이메일 인증하기</Typography>
+        <Typography>전화번호 인증하기</Typography>
         <OpenInNewIcon />
       </Stack>
     </CustomModal>
