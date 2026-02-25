@@ -51,7 +51,7 @@ const Ministry = () => {
             정원 순환 사역
           </Typography>
           <Typography className="subjectContent" sx={{ fontSize: "1.1em" }}>
-            주일 안내팀과 친교팀은 각 팀 staff의 안내에 따라 매달 순서를 맡은
+            주일 안내팀과 교제팀은 각 팀 staff의 안내에 따라 매달 순서를 맡은
             소그룹 <Link to="/community/smallgroup">'정원'</Link>이 순환하여
             섬깁니다.
           </Typography>
