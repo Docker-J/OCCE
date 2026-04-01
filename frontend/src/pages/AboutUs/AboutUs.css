@@ -32,7 +32,7 @@
 }
 
 #section3 {
-  --bg-image: url("img/About/Direction.webp");
+  --bg-image: url("/img/About/Direction.webp");
 }
 
 @media (max-height: 915px) {
