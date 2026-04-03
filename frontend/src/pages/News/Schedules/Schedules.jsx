@@ -19,6 +19,8 @@ const Schedules = () => {
 
   return (
     <>
+      <title>교회일정 - OCCE</title>
+
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
