@@ -9,9 +9,13 @@
     url(NanumSquareNeo-Variable.ttf) format("truetype");
 }
 
+:root {
+  --ck-content-font-family: "NanumSquareNeoVariable", sans-serif !important;
+}
+
 body {
   word-break: keep-all;
-  font-family: "NanumSquareNeoVariable", sans-serif !important;
+  font-family: "NanumSquareNeoVariable", sans-serif;
   text-align: center;
   margin: auto;
   line-height: 1.5;
