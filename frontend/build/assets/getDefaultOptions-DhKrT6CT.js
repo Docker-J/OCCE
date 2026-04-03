@@ -1,0 +1,1 @@
+import{v as e}from"./format-0L4UnrxD.js";function t(){return Object.assign({},e())}export{t};

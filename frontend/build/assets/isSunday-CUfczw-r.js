@@ -1,0 +1,1 @@
+import{y as e}from"./format-0L4UnrxD.js";function t(t,n){return e(t,n?.in).getDay()===0}export{t};
