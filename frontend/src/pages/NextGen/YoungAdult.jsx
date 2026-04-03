@@ -19,7 +19,7 @@ const ministries = [
     title: "교육",
     subtitle: "Teaching",
     content: ["입교/세례 교육", "성경공부, 제자훈련", "기도회, 수련회"],
-    img: "/img/Online/Worship.webp",
+    img: "/img/NextGen/YoungAdults/Ministries/Teaching.webp",
   },
   {
     title: "교제",
