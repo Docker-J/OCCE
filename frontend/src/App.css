@@ -11,7 +11,7 @@
 
 body {
   word-break: keep-all;
-  font-family: "NanumSquareNeoVariable", sans-serif;
+  font-family: "NanumSquareNeoVariable", sans-serif !important;
   text-align: center;
   margin: auto;
   line-height: 1.5;
