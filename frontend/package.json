@@ -20,7 +20,7 @@
     "@vis.gl/react-google-maps": "^1.8.2",
     "axios": "^1.14.0",
     "browser-image-compression": "^2.0.2",
-    "ckeditor5-custom-build": "file:ckeditor5",
+    "ckeditor5": "^48.0.0",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
     "dotenv": "^17.4.0",
