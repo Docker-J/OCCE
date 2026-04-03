@@ -13,11 +13,13 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PlaceIcon from "@mui/icons-material/Place";
 import ContactSupportIcon from "@mui/icons-material/ContactSupport";
 
-import Slider from "react-slick";
+// FIX: Unwrap the Slider
+import SliderImport from "react-slick";
+const Slider = SliderImport.default || SliderImport;
+
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "../../common/slick/slick-default-dots.css";
-
 import Styles from "./InfoCard.module.css";
 
 const InfoCard = ({ age, time, place, ask, imgs }) => {
@@ -31,32 +33,28 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
       autoplay: true,
       slidesToShow: 1,
       slidesToScroll: 1,
-      swipe: imgs?.length > 1 ? true : false,
+      swipe: imgs?.length > 1,
     };
 
     if (imgs?.length > 1) {
       return {
         ...baseSettings,
         dotsClass: "slick-dots slick-default-dots",
-        customPaging: (i) => (
+        customPaging: () => (
           <span
             style={{
               width: "8px",
               height: "8px",
               borderRadius: "50%",
-              // cursor: isSelected ? null : "pointer",
               background: "#808080",
               display: "inline-block",
             }}
           />
         ),
       };
-    } else {
-      return baseSettings;
     }
+    return baseSettings;
   };
-
-  console.log(settings);
 
   return (
     <Card
@@ -65,7 +63,6 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
         width: "100%",
         maxWidth: { xs: "none", md: "820px" },
         borderRadius: "1em",
-        // overflow: "visible",
       }}
     >
       <CardContent
@@ -111,24 +108,14 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
         {imgs && (
           <Box
             component={Paper}
-            sx={{
-              width: "100%",
-              maxWidth: { xs: "none", md: "64%" },
-            }}
+            sx={{ width: "100%", maxWidth: { xs: "none", md: "64%" } }}
           >
-            <Box
-              sx={{
-                pb: "75%",
-                position: "relative",
-                // borderRadius: "0.5em",
-                overflow: "hidden",
-              }}
-            >
+            <Box sx={{ pb: "75%", position: "relative", overflow: "hidden" }}>
               <div className={Styles.boxContent}>
                 <Slider {...settings()}>
                   {imgs.map((img) => (
-                    <div className={Styles["img-container"]} key={uuidv4}>
-                      <img src={img.src} />
+                    <div className={Styles["img-container"]} key={uuidv4()}>
+                      <img src={img.src} alt="" />
                     </div>
                   ))}
                 </Slider>
