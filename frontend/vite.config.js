@@ -25,6 +25,10 @@ export default defineConfig(() => {
       }),
     ],
 
+    legacy: {
+      inconsistentCjsInterop: true,
+    },
+
     server: {
       proxy: {
         "/api": {

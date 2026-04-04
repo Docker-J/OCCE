@@ -13,9 +13,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PlaceIcon from "@mui/icons-material/Place";
 import ContactSupportIcon from "@mui/icons-material/ContactSupport";
 
-// FIX: Unwrap the Slider
-import SliderImport from "react-slick";
-const Slider = SliderImport.default || SliderImport;
+import Slider from "react-slick";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
