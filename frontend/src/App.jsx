@@ -12,13 +12,35 @@ import Footer from "./header/Footer";
 import NotificationManager from "./manager/NotificationManager";
 import UserManager from "./manager/UserManager";
 import RequestManager from "./manager/RequestManager";
+import { ErrorBoundary } from "react-error-boundary";
+
+function ErrorFallback({ error, resetErrorBoundary }) {
+  // Check for the specific chunk loading error
+  const isChunkError =
+    error.message.includes("Failed to fetch dynamically imported module") ||
+    error.message.includes("Loading chunk");
+
+  if (isChunkError) {
+    // Automatically reload the page once to get the fresh build
+    window.location.reload();
+    return null;
+  }
+
+  return (
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <pre>{error.message}</pre>
+      <button onClick={resetErrorBoundary}>Try again</button>
+    </div>
+  );
+}
 
 // a function to retry loading a chunk to avoid chunk load error for out of date code
 const lazyRetry = function(componentImport, name) {
   return new Promise((resolve, reject) => {
     // check if the window has already been refreshed
     const hasRefreshed = JSON.parse(
-      window.sessionStorage.getItem(`retry-${name}-refreshed`) || "false"
+      window.sessionStorage.getItem(`retry-${name}-refreshed`) || "false",
     );
     // try to import the component
     componentImport()
@@ -38,99 +60,99 @@ const lazyRetry = function(componentImport, name) {
 };
 
 const About = lazy(() =>
-  lazyRetry(() => import("./pages/AboutUs/AboutUs"), "About")
+  lazyRetry(() => import("./pages/AboutUs/AboutUs"), "About"),
 );
 
 // News
 const Announcements = lazy(() =>
   lazyRetry(
     () => import("./pages/News/Announcements/Announcements"),
-    "Announcements"
-  )
+    "Announcements",
+  ),
 );
 const Announcement = lazy(() =>
   lazyRetry(
     () => import("./pages/News/Announcements/Announcement"),
-    "Announcement"
-  )
+    "Announcement",
+  ),
 );
 const WeeklyUpdate = lazy(() =>
   lazyRetry(
     () => import("./pages/News/WeeklyUpdate/WeeklyUpdate"),
-    "WeeklyUpdate"
-  )
+    "WeeklyUpdate",
+  ),
 );
 const Columns = lazy(() =>
-  lazyRetry(() => import("./pages/News/Columns/Columns"), "Columns")
+  lazyRetry(() => import("./pages/News/Columns/Columns"), "Columns"),
 );
 const Column = lazy(() =>
-  lazyRetry(() => import("./pages/News/Columns/Column"), "Column")
+  lazyRetry(() => import("./pages/News/Columns/Column"), "Column"),
 );
 const Schedules = lazy(() =>
-  lazyRetry(() => import("./pages/News/Schedules/Schedules"), "Schedules")
+  lazyRetry(() => import("./pages/News/Schedules/Schedules"), "Schedules"),
 );
 const NewComers = lazy(() =>
-  lazyRetry(() => import("./pages/News/NewComers/NewComers"), "NewComers")
+  lazyRetry(() => import("./pages/News/NewComers/NewComers"), "NewComers"),
 );
 const Albums = lazy(() =>
-  lazyRetry(() => import("./pages/News/Albums/Albums"), "Albums")
+  lazyRetry(() => import("./pages/News/Albums/Albums"), "Albums"),
 );
 const Album = lazy(() =>
-  lazyRetry(() => import("./pages/News/Albums/Album"), "Album")
+  lazyRetry(() => import("./pages/News/Albums/Album"), "Album"),
 );
 
 // Online
 const SundayService = lazy(() =>
-  lazyRetry(() => import("./pages/Online/SundayService"), "SundayService")
+  lazyRetry(() => import("./pages/Online/SundayService"), "SundayService"),
 );
 const Sermon = lazy(() =>
-  lazyRetry(() => import("./pages/Online/Sermon"), "Sermon")
+  lazyRetry(() => import("./pages/Online/Sermon"), "Sermon"),
 );
 const Worship = lazy(() =>
-  lazyRetry(() => import("./pages/Online/Worship"), "Worship")
+  lazyRetry(() => import("./pages/Online/Worship"), "Worship"),
 );
 const DawnQT = lazy(() =>
-  lazyRetry(() => import("./pages/Online/DawnQT"), "DawnQT")
+  lazyRetry(() => import("./pages/Online/DawnQT"), "DawnQT"),
 );
 const PrayON = lazy(() =>
-  lazyRetry(() => import("./pages/Online/PrayON"), "PrayON")
+  lazyRetry(() => import("./pages/Online/PrayON"), "PrayON"),
 );
 const MeditationON = lazy(() =>
   lazyRetry(
     () => import("./pages/Online/MeditationON/MeditationON"),
-    "MeditationON"
-  )
+    "MeditationON",
+  ),
 );
 const MeditationONPost = lazy(() =>
   lazyRetry(
     () => import("./pages/Online/MeditationON/MeditationONPost"),
-    "MeditationONPost"
-  )
+    "MeditationONPost",
+  ),
 );
 const Bible291 = lazy(() =>
-  lazyRetry(() => import("./pages/Online/Bible291"), "Bible291")
+  lazyRetry(() => import("./pages/Online/Bible291"), "Bible291"),
 );
 
 // Community
 const SmallGroup = lazy(() =>
-  lazyRetry(() => import("./pages/Community/SmallGroup"), "SmallGroup")
+  lazyRetry(() => import("./pages/Community/SmallGroup"), "SmallGroup"),
 );
 const Ministry = lazy(() =>
-  lazyRetry(() => import("./pages/Community/Ministry"), "Ministry")
+  lazyRetry(() => import("./pages/Community/Ministry"), "Ministry"),
 );
 
 // NextGen
 const Preschool = lazy(() =>
-  lazyRetry(() => import("./pages/NextGen/Preschool"), "Preschool")
+  lazyRetry(() => import("./pages/NextGen/Preschool"), "Preschool"),
 );
 const Elementary = lazy(() =>
-  lazyRetry(() => import("./pages/NextGen/Elementary"), "Elementary")
+  lazyRetry(() => import("./pages/NextGen/Elementary"), "Elementary"),
 );
 const Youth = lazy(() =>
-  lazyRetry(() => import("./pages/NextGen/Youth/Youth"), "Youth")
+  lazyRetry(() => import("./pages/NextGen/Youth/Youth"), "Youth"),
 );
 const YoungAdult = lazy(() =>
-  lazyRetry(() => import("./pages/NextGen/YoungAdult"), "YoungAdult")
+  lazyRetry(() => import("./pages/NextGen/YoungAdult"), "YoungAdult"),
 );
 
 const Managers = () => {
@@ -373,9 +395,11 @@ const router = createBrowserRouter([
 
 const App = () => {
   return (
-    <Suspense>
-      <RouterProvider router={router} />
-    </Suspense>
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <Suspense>
+        <RouterProvider router={router} />
+      </Suspense>
+    </ErrorBoundary>
   );
 };
 
