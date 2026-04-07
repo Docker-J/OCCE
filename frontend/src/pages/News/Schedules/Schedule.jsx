@@ -3,6 +3,7 @@ import {
   differenceInDays,
   format,
   isSunday,
+  parse,
   parseISO,
 } from "date-fns";
 
@@ -32,7 +33,7 @@ const Schedule = ({ events }) => {
         for (let i = 1; i < event.alldaylength; i++) {
           const newStart = addDays(start, i);
           const newMonth = format(newStart, "MMMM yyyy");
-          const newDateKey = format(newStart, "dd");
+          const newDateKey = format(newStart, "d");
 
           acc[newMonth] = acc[newMonth] || {};
           acc[newMonth][newDateKey] = acc[newMonth][newDateKey] || [];
@@ -56,7 +57,11 @@ const Schedule = ({ events }) => {
         </Typography>
 
         {Object.entries(monthEvents).map(([date, dateEvents]) => {
-          const eventDate = new Date(`${month} ${date}`);
+          const eventDate = parse(
+            `${month} ${date}`,
+            "MMMM yyyy d",
+            new Date(),
+          );
           const sunday = isSunday(eventDate);
 
           return (
@@ -124,7 +129,7 @@ const Schedule = ({ events }) => {
         })}
         <br />
       </div>
-    )
+    ),
   );
 };
 
