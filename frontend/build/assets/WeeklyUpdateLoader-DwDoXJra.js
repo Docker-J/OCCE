@@ -1,0 +1,1 @@
+import{t as e}from"./parse-BA-kNtAT.js";import{n as t}from"./weeklyupdate-CtFMeoG_.js";var n=`yyyyMMdd`;async function r({params:r}){console.log(`test`);let i=await t(),a=e(JSON.stringify(i.data),n,new Date);return r.date?{maxDate:a,queryDate:e(r.date,n,new Date)}:{maxDate:a,queryDate:a}}export{r as loader};
