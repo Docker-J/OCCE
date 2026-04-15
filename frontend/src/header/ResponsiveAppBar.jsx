@@ -64,19 +64,16 @@ const ResponsiveAppBar = () => {
         openModal(SignInModal, {});
       },
     },
-    ...(!import.meta.env.PROD
-      ? [
-          {
-            title: "회원가입",
-            onClick: async () => {
-              const { default: SignUpModal } = await import(
-                "../components/User/SignUpModal"
-              );
-              openModal(SignUpModal, {});
-            },
-          },
-        ]
-      : []),
+    {
+      title: "회원가입",
+      onClick: async () => {
+        const { default: SignUpModal } = await import(
+          "../components/User/SignUpModal"
+        );
+        openModal(SignUpModal, {});
+      },
+    },
+    ,
   ];
 
   const signOutSuccess = () => {
