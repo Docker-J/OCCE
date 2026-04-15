@@ -12,10 +12,7 @@ const SignUpFinishedModal = ({ isOpen, onClose }) => {
     <CustomModal isOpen={isOpen} onClose={onClose} maxWidth="400px">
       <CheckCircleOutlineIcon sx={{ fontSize: 50 }} />
 
-      <Typography>
-        회원가입 요청이 완료되었습니다. 관리자의 승인을 기다려주세요.
-        감사합니다.
-      </Typography>
+      <Typography>회원가입이 완료되었습니다.</Typography>
     </CustomModal>
   );
 };
