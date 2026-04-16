@@ -122,7 +122,7 @@ export const uploadWeeklyUpdateController = async (req, res) => {
     sendNotification(
       "새로운 주보가 업로드 되었습니다",
       req.params.date,
-      `weeklyupdate/${req.params.date}`
+      `weeklyupdate/${req.params.date}`,
     );
   } catch (error) {
     console.log(error);
