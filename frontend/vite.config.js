@@ -10,10 +10,16 @@ export default defineConfig(() => {
       outDir: "build",
       rollupOptions: {
         output: {
-          manualChunks: {
-            firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/storage', 'firebase/functions', 'firebase/messaging'],
-            ckeditor: ['@ckeditor/ckeditor5-react', 'ckeditor5'],
-            reactVendor: ['react', 'react-dom', 'react-router'],
+          manualChunks(id) {
+            if (id.includes('node_modules/firebase')) {
+              return 'firebase';
+            }
+            if (id.includes('node_modules/@ckeditor') || id.includes('node_modules/ckeditor5')) {
+              return 'ckeditor';
+            }
+            if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router')) {
+              return 'reactVendor';
+            }
           }
         }
       }
