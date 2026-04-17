@@ -1,6 +1,4 @@
 import { memo, useEffect } from "react";
-import { messaging } from "../api/firebase";
-import { getToken, onMessage } from "firebase/messaging";
 import { registerToken } from "../api/notification";
 import useSnackbar from "../util/useSnackbar";
 import { IconButton } from "@mui/material";
@@ -26,37 +24,40 @@ const NotificationManager = memo(() => {
     );
   };
 
-  const requestWebPushPermission = async () => {
-    console.log("권한 요청 중...");
-    if (!("Notification" in window)) {
-      return;
-    }
-
-    try {
-      const permission = await Notification.requestPermission();
-      if (permission === "granted") {
-        const token = await getToken(messaging, {
-          vapidKey:
-            "BOLDzFLzljc4HkyVktgjo4-_QoXFxx__XZS6xBmGouvsisXHHe--2dSUUJtQ2cerl3v7ONBhrAPM661xRbpQcqo",
-        });
-
-        console.log(token);
-
-        // register/update token
-        await registerToken(token);
-      }
-    } catch {}
-  };
-
-  onMessage(messaging, (payload) => {
-    console.log("Message Received.", payload);
-
-    openSnackbar("info", payload.data.title, action(payload.data.click_action));
-  });
-
   useEffect(() => {
-    requestWebPushPermission();
+    const initPushOptions = async () => {
+      if (!("Notification" in window)) return;
+      
+      try {
+        console.log("권한 요청 중...");
+        const permission = await Notification.requestPermission();
+        if (permission === "granted") {
+          const { getToken, onMessage, getMessaging } = await import("firebase/messaging");
+          const { firebaseInstance } = await import("../api/firebase");
+          const messaging = getMessaging(firebaseInstance);
+
+          const token = await getToken(messaging, {
+            vapidKey: "BOLDzFLzljc4HkyVktgjo4-_QoXFxx__XZS6xBmGouvsisXHHe--2dSUUJtQ2cerl3v7ONBhrAPM661xRbpQcqo",
+          });
+
+          console.log(token);
+          await registerToken(token);
+
+          onMessage(messaging, (payload) => {
+            console.log("Message Received.", payload);
+            openSnackbar("info", payload.data.title, action(payload.data.click_action));
+          });
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    };
+
+    initPushOptions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  return null;
 });
 
 export default NotificationManager;

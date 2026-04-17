@@ -1,8 +1,7 @@
 import { initializeApp, getApp, getApps } from "firebase/app";
-import { getMessaging } from "firebase/messaging";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCipnxl2pZyIzYgXQd8a5oNfo0ZWJGfLec",
+  apiKey: import.meta.env.VITE_APP_GOOGLE_MAPS_API_KEY,
   authDomain: "church-4385c.firebaseapp.com",
   projectId: "church-4385c",
   storageBucket: "church-4385c.appspot.com",
@@ -13,7 +12,5 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const firebase = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-
-export const messaging = getMessaging(firebase);
 
 export const firebaseInstance = firebase;

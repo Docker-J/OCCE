@@ -1,7 +1,7 @@
 import { Button, CircularProgress, TextField } from "@mui/material";
-import TextEditor from "./TextEditor";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 
+const TextEditor = lazy(() => import("./TextEditor"));
 import useSnackbar from "../../../util/useSnackbar";
 import { postAnnouncement } from "../../../api/announcements";
 import CustomModal from "../../../common/CustomModal";
@@ -72,7 +72,9 @@ const AnnouncementPostModal = ({
           />
 
           <div style={{ height: "65svh", width: "100%", marginTop: "1em" }}>
-            <TextEditor body={body} getBody={setBody} />
+            <Suspense fallback={<CircularProgress />}>
+              <TextEditor body={body} getBody={setBody} />
+            </Suspense>
           </div>
 
           <Button

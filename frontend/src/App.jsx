@@ -6,8 +6,6 @@ import "./App.css";
 
 import ResponsiveAppBar from "./header/ResponsiveAppBar";
 
-import Main from "./pages/Main/Main";
-
 import Footer from "./header/Footer";
 import NotificationManager from "./manager/NotificationManager";
 import UserManager from "./manager/UserManager";
@@ -36,7 +34,7 @@ function ErrorFallback({ error, resetErrorBoundary }) {
 }
 
 // a function to retry loading a chunk to avoid chunk load error for out of date code
-const lazyRetry = function(componentImport, name) {
+const lazyRetry = function (componentImport, name) {
   return new Promise((resolve, reject) => {
     // check if the window has already been refreshed
     const hasRefreshed = JSON.parse(
@@ -58,6 +56,10 @@ const lazyRetry = function(componentImport, name) {
       });
   });
 };
+
+const Main = lazy(() =>
+  lazyRetry(() => import("./pages/Main/Main"), "Main"),
+);
 
 const About = lazy(() =>
   lazyRetry(() => import("./pages/AboutUs/AboutUs"), "About"),

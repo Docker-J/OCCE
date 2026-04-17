@@ -8,6 +8,16 @@ export default defineConfig(() => {
   return {
     build: {
       outDir: "build",
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/storage', 'firebase/functions', 'firebase/messaging'],
+            mui: ['@mui/material', '@mui/icons-material', '@mui/lab', '@mui/x-date-pickers', '@emotion/react', '@emotion/styled'],
+            ckeditor: ['@ckeditor/ckeditor5-react', 'ckeditor5'],
+            reactVendor: ['react', 'react-dom', 'react-router'],
+          }
+        }
+      }
     },
 
     plugins: [
