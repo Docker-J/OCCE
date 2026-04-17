@@ -1,0 +1,1 @@
+import{a as e}from"./rolldown-runtime-COnpUsM8.js";import{O as t}from"./ckeditor-BjoMAk85.js";var n=e(t()),r=(0,n.createContext)([]),i=(0,n.createContext)({open:()=>{},close:()=>{}});function a(){let{open:e,close:t}=(0,n.use)(i);return{openModal:(t,n)=>{e(t,n)},closeModal:e=>{t(e)}}}export{i as n,r,a as t};

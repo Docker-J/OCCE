@@ -1,1 +1,0 @@
-import{d as e,f as t}from"./createSimplePaletteValueFilter-xRUpZy8D.js";import{D as n}from"./index-pDsby_jN.js";function r({props:r,name:i}){return n({props:r,name:i,defaultTheme:t,themeId:e})}export{r as t};

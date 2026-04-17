@@ -1,0 +1,1 @@
+import{n as e}from"./columns-YGwolXZX.js";async function t({params:t}){return await e(t.columnID)}export{t as loader};

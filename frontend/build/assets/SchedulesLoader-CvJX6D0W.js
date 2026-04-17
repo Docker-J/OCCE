@@ -1,1 +1,0 @@
-import{t as e}from"./axios-10k-pgSx.js";async function t(){return{schedules:e.get(`/api/schedules`)}}export{t as loader};

@@ -1,0 +1,1 @@
+import{z as e}from"./reactVendor-B1CKzCld.js";import{t}from"./axios-1qdWRPeI.js";async function n({request:n}){let r=new URL(n.url).searchParams.get(`page`);return r===null?e(`?page=1`):{announcementsData:t.get(`/api/announcements?page=${r}`)}}export{n as loader};

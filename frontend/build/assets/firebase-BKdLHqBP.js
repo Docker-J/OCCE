@@ -1,0 +1,1 @@
+import{i as e,n as t,r as n}from"./firebase-DN8F8o7P.js";var r=n().length?t():e({apiKey:`AIzaSyCipnxl2pZyIzYgXQd8a5oNfo0ZWJGfLec`,authDomain:`church-4385c.firebaseapp.com`,projectId:`church-4385c`,storageBucket:`church-4385c.appspot.com`,messagingSenderId:`581090651615`,appId:`1:581090651615:web:692b95b77fecec4ca7286a`,measurementId:`G-CP6DP4D6WT`});export{r as firebaseInstance};
