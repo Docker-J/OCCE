@@ -12,18 +12,17 @@ import UserManager from "./manager/UserManager";
 import RequestManager from "./manager/RequestManager";
 import { ErrorBoundary } from "react-error-boundary";
 
-function ErrorFallback({ error, resetErrorBoundary }) {
-  // Check for the specific chunk loading error
-  const isChunkError =
-    error.message.includes("Failed to fetch dynamically imported module") ||
-    error.message.includes("Loading chunk");
-
-  if (isChunkError) {
-    // Automatically reload the page once to get the fresh build
+window.addEventListener("vite:preloadError", () => {
+  const isRefreshed = window.sessionStorage.getItem("vite-preload-error-refreshed");
+  if (!isRefreshed) {
+    window.sessionStorage.setItem("vite-preload-error-refreshed", "true");
     window.location.reload();
-    return null;
+  } else {
+    window.sessionStorage.removeItem("vite-preload-error-refreshed");
   }
+});
 
+function ErrorFallback({ error, resetErrorBoundary }) {
   return (
     <div role="alert">
       <p>Something went wrong:</p>
@@ -33,129 +32,50 @@ function ErrorFallback({ error, resetErrorBoundary }) {
   );
 }
 
-// a function to retry loading a chunk to avoid chunk load error for out of date code
-const lazyRetry = function (componentImport, name) {
-  return new Promise((resolve, reject) => {
-    // check if the window has already been refreshed
-    const hasRefreshed = JSON.parse(
-      window.sessionStorage.getItem(`retry-${name}-refreshed`) || "false",
-    );
-    // try to import the component
-    componentImport()
-      .then((component) => {
-        window.sessionStorage.setItem(`retry-${name}-refreshed`, "false"); // success so reset the refresh
-        resolve(component);
-      })
-      .catch((error) => {
-        if (!hasRefreshed) {
-          // not been refreshed yet
-          window.sessionStorage.setItem(`retry-${name}-refreshed`, "true"); // we are now going to refresh
-          return window.location.reload(); // refresh the page
-        }
-        reject(error); // Default error behaviour as already tried refresh
-      });
-  });
-};
+const Main = lazy(() => import("./pages/Main/Main"));
 
-const Main = lazy(() =>
-  lazyRetry(() => import("./pages/Main/Main"), "Main"),
-);
-
-const About = lazy(() =>
-  lazyRetry(() => import("./pages/AboutUs/AboutUs"), "About"),
-);
+const About = lazy(() => import("./pages/AboutUs/AboutUs"));
 
 // News
 const Announcements = lazy(() =>
-  lazyRetry(
-    () => import("./pages/News/Announcements/Announcements"),
-    "Announcements",
-  ),
+  import("./pages/News/Announcements/Announcements"),
 );
 const Announcement = lazy(() =>
-  lazyRetry(
-    () => import("./pages/News/Announcements/Announcement"),
-    "Announcement",
-  ),
+  import("./pages/News/Announcements/Announcement"),
 );
 const WeeklyUpdate = lazy(() =>
-  lazyRetry(
-    () => import("./pages/News/WeeklyUpdate/WeeklyUpdate"),
-    "WeeklyUpdate",
-  ),
+  import("./pages/News/WeeklyUpdate/WeeklyUpdate"),
 );
-const Columns = lazy(() =>
-  lazyRetry(() => import("./pages/News/Columns/Columns"), "Columns"),
-);
-const Column = lazy(() =>
-  lazyRetry(() => import("./pages/News/Columns/Column"), "Column"),
-);
-const Schedules = lazy(() =>
-  lazyRetry(() => import("./pages/News/Schedules/Schedules"), "Schedules"),
-);
-const NewComers = lazy(() =>
-  lazyRetry(() => import("./pages/News/NewComers/NewComers"), "NewComers"),
-);
-const Albums = lazy(() =>
-  lazyRetry(() => import("./pages/News/Albums/Albums"), "Albums"),
-);
-const Album = lazy(() =>
-  lazyRetry(() => import("./pages/News/Albums/Album"), "Album"),
-);
+const Columns = lazy(() => import("./pages/News/Columns/Columns"));
+const Column = lazy(() => import("./pages/News/Columns/Column"));
+const Schedules = lazy(() => import("./pages/News/Schedules/Schedules"));
+const NewComers = lazy(() => import("./pages/News/NewComers/NewComers"));
+const Albums = lazy(() => import("./pages/News/Albums/Albums"));
+const Album = lazy(() => import("./pages/News/Albums/Album"));
 
 // Online
-const SundayService = lazy(() =>
-  lazyRetry(() => import("./pages/Online/SundayService"), "SundayService"),
-);
-const Sermon = lazy(() =>
-  lazyRetry(() => import("./pages/Online/Sermon"), "Sermon"),
-);
-const Worship = lazy(() =>
-  lazyRetry(() => import("./pages/Online/Worship"), "Worship"),
-);
-const DawnQT = lazy(() =>
-  lazyRetry(() => import("./pages/Online/DawnQT"), "DawnQT"),
-);
-const PrayON = lazy(() =>
-  lazyRetry(() => import("./pages/Online/PrayON"), "PrayON"),
-);
+const SundayService = lazy(() => import("./pages/Online/SundayService"));
+const Sermon = lazy(() => import("./pages/Online/Sermon"));
+const Worship = lazy(() => import("./pages/Online/Worship"));
+const DawnQT = lazy(() => import("./pages/Online/DawnQT"));
+const PrayON = lazy(() => import("./pages/Online/PrayON"));
 const MeditationON = lazy(() =>
-  lazyRetry(
-    () => import("./pages/Online/MeditationON/MeditationON"),
-    "MeditationON",
-  ),
+  import("./pages/Online/MeditationON/MeditationON"),
 );
 const MeditationONPost = lazy(() =>
-  lazyRetry(
-    () => import("./pages/Online/MeditationON/MeditationONPost"),
-    "MeditationONPost",
-  ),
+  import("./pages/Online/MeditationON/MeditationONPost"),
 );
-const Bible291 = lazy(() =>
-  lazyRetry(() => import("./pages/Online/Bible291"), "Bible291"),
-);
+const Bible291 = lazy(() => import("./pages/Online/Bible291"));
 
 // Community
-const SmallGroup = lazy(() =>
-  lazyRetry(() => import("./pages/Community/SmallGroup"), "SmallGroup"),
-);
-const Ministry = lazy(() =>
-  lazyRetry(() => import("./pages/Community/Ministry"), "Ministry"),
-);
+const SmallGroup = lazy(() => import("./pages/Community/SmallGroup"));
+const Ministry = lazy(() => import("./pages/Community/Ministry"));
 
 // NextGen
-const Preschool = lazy(() =>
-  lazyRetry(() => import("./pages/NextGen/Preschool"), "Preschool"),
-);
-const Elementary = lazy(() =>
-  lazyRetry(() => import("./pages/NextGen/Elementary"), "Elementary"),
-);
-const Youth = lazy(() =>
-  lazyRetry(() => import("./pages/NextGen/Youth/Youth"), "Youth"),
-);
-const YoungAdult = lazy(() =>
-  lazyRetry(() => import("./pages/NextGen/YoungAdult"), "YoungAdult"),
-);
+const Preschool = lazy(() => import("./pages/NextGen/Preschool"));
+const Elementary = lazy(() => import("./pages/NextGen/Elementary"));
+const Youth = lazy(() => import("./pages/NextGen/Youth/Youth"));
+const YoungAdult = lazy(() => import("./pages/NextGen/YoungAdult"));
 
 const Managers = () => {
   return (
