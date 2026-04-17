@@ -1,5 +1,5 @@
 import { Typography } from "@mui/material";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutlined";
 import { useDropzone } from "react-dropzone";
 
 const FileUploadComponent = ({ accept, handleChangeFile, multiple }) => {

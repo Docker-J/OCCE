@@ -59,19 +59,39 @@ const Section5 = ({ fullpageApi }) => (
 
     <div className="slide" data-anchor="offering">
       <LeftButton fullpageApi={fullpageApi} />
-      <Typography variant="h5" fontWeight="800" sx={{ color: "white" }}>
+      <Typography
+        variant="h5"
+        sx={{
+          fontWeight: "800",
+          color: "white"
+        }}>
         온라인 E-Transfer 헌금
       </Typography>
-      <Typography variant="subtitle1" fontWeight="500" sx={{ color: "white" }}>
+      <Typography
+        variant="subtitle1"
+        sx={{
+          fontWeight: "500",
+          color: "white"
+        }}>
         이메일: occeoffer@gmail.com
         <br />
         비밀번호: occe0403
       </Typography>
       <br />
-      <Typography variant="h5" fontWeight="800" sx={{ color: "white" }}>
+      <Typography
+        variant="h5"
+        sx={{
+          fontWeight: "800",
+          color: "white"
+        }}>
         Cheque 헌금
       </Typography>
-      <Typography variant="subtitle1" fontWeight="500" sx={{ color: "white" }}>
+      <Typography
+        variant="subtitle1"
+        sx={{
+          fontWeight: "500",
+          color: "white"
+        }}>
         Pay To : OCCE 또는 ON Community Church of Edmonton
         <br />
         <br />

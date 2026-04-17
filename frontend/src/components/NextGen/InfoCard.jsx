@@ -74,32 +74,43 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
       >
         <Stack
           sx={{
+            gap: 0.5,
             justifyContent: "space-between",
             ml: 2,
             mr: 1,
             mb: { xs: 1.5, md: 0 },
-            mt: { xs: 2, md: 0 },
-          }}
-          gap={0.5}
-        >
-          <Typography fontSize="1.8em" fontWeight={800}>
+            mt: { xs: 2, md: 0 }
+          }}>
+          <Typography
+            sx={{
+              fontSize: "1.8em",
+              fontWeight: 800
+            }}>
             모임
           </Typography>
           <Stack direction="row" spacing={2}>
             <GroupsIcon />
-            <Typography fontSize="1.2em">{age}</Typography>
+            <Typography sx={{
+              fontSize: "1.2em"
+            }}>{age}</Typography>
           </Stack>
           <Stack direction="row" spacing={2}>
             <AccessTimeIcon />
-            <Typography fontSize="1.2em">{time}</Typography>
+            <Typography sx={{
+              fontSize: "1.2em"
+            }}>{time}</Typography>
           </Stack>
           <Stack direction="row" spacing={2}>
             <PlaceIcon />
-            <Typography fontSize="1.2em">{place}</Typography>
+            <Typography sx={{
+              fontSize: "1.2em"
+            }}>{place}</Typography>
           </Stack>
           <Stack direction="row" spacing={2}>
             <ContactSupportIcon />
-            <Typography fontSize="1.2em">{ask}</Typography>
+            <Typography sx={{
+              fontSize: "1.2em"
+            }}>{ask}</Typography>
           </Stack>
         </Stack>
 

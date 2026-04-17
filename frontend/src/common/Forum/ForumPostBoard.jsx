@@ -45,7 +45,9 @@ const ForumPostBoard = ({ announcements }) => {
                 width: "42px",
               }}
             >
-              <Typography variant="body2" whiteSpace="nowrap">
+              <Typography variant="body2" sx={{
+                whiteSpace: "nowrap"
+              }}>
                 {format(new Date(announcement.timestamp), "MMM dd")}
               </Typography>
               <Typography variant="body2">
@@ -62,23 +64,26 @@ const ForumPostBoard = ({ announcements }) => {
                 width: "100%",
               }}
             >
-              <Stack direction="row" alignItems="center">
+              <Stack direction="row" sx={{
+                alignItems: "center"
+              }}>
                 {announcement?.pin ? (
                   <PushPinIcon fontSize="small" sx={{ m: 0 }} />
                 ) : null}
                 <Typography
                   variant="h6"
-                  fontWeight={700}
                   sx={{
+                    fontWeight: 700,
                     whiteSpace: "nowrap",
                     overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
+                    textOverflow: "ellipsis"
+                  }}>
                   {announcement.title}
                 </Typography>
               </Stack>
-              <Stack direction="row" alignItems="center">
+              <Stack direction="row" sx={{
+                alignItems: "center"
+              }}>
                 <p
                   style={{
                     fontSize: "0.9em",

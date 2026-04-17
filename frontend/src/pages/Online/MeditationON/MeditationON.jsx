@@ -98,19 +98,20 @@ const MeditationON = () => {
   return (
     <>
       <title>묵상 ON - OCCE</title>
-
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
             variant="h4"
-            fontWeight={830}
-            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
-          >
+            sx={{
+              fontWeight: 830,
+              letterSpacing: "0.4em",
+              pl: "0.4em",
+              color: "white"
+            }}>
             묵상 ON
           </Typography>
         </div>
       </div>
-
       <div className="container-wrapper">
         <Box
           className="container"
@@ -120,7 +121,9 @@ const MeditationON = () => {
           }}
         >
           {posts.length <= 0 ? (
-            <Stack alignItems="center">
+            <Stack sx={{
+              alignItems: "center"
+            }}>
               <CircularProgress />
             </Stack>
           ) : (
@@ -129,7 +132,9 @@ const MeditationON = () => {
               next={onLoad}
               hasMore={!end}
               loader={
-                <Stack alignItems="center">
+                <Stack sx={{
+                  alignItems: "center"
+                }}>
                   <CircularProgress />
                 </Stack>
               }
@@ -152,7 +157,6 @@ const MeditationON = () => {
           )}
         </Box>
       </div>
-
       <AdminComponent>
         <Fab
           variant="primary"
@@ -168,7 +172,6 @@ const MeditationON = () => {
           <AddIcon />
         </Fab>
       </AdminComponent>
-
       {end && <Footer />}
     </>
   );

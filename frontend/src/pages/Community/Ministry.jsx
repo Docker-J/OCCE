@@ -32,22 +32,25 @@ const Ministry = () => {
   return (
     <>
       <title>사역 - OCCE</title>
-
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
             variant="h4"
-            fontWeight={830}
-            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
-          >
+            sx={{
+              fontWeight: 830,
+              letterSpacing: "0.4em",
+              pl: "0.4em",
+              color: "white"
+            }}>
             사역
           </Typography>
         </div>
       </div>
-
       <div className="container-wrapper">
         <div className="container">
-          <Typography variant="h5" fontWeight={800}>
+          <Typography variant="h5" sx={{
+            fontWeight: 800
+          }}>
             정원 순환 사역
           </Typography>
           <Typography className="subjectContent" sx={{ fontSize: "1.1em" }}>
@@ -58,7 +61,9 @@ const Ministry = () => {
 
           <br />
 
-          <Typography variant="h5" fontWeight={800}>
+          <Typography variant="h5" sx={{
+            fontWeight: 800
+          }}>
             온 교회 사역 지원
           </Typography>
           <Typography className="subjectContent" sx={{ fontSize: "1.1em" }}>
@@ -104,7 +109,9 @@ const Ministry = () => {
                   <ListItemIcon>{ministry.icon}</ListItemIcon>
                   <ListItemText
                     primary={
-                      <Typography noWrap fontWeight={650}>
+                      <Typography noWrap sx={{
+                        fontWeight: 650
+                      }}>
                         {ministry.title}
                       </Typography>
                     }

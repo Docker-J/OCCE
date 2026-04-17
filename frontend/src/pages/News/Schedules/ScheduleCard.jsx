@@ -42,21 +42,27 @@ const ScheduleCard = ({ date, event, sx }) => {
       }}
     >
       {allday ? (
-        <Typography fontWeight={700} color="primary">
+        <Typography color="primary" sx={{
+          fontWeight: 700
+        }}>
           {event.summary}
           {!sameDay &&
             ` (Day ${differenceInDays(date, start) + 1}/${event.alldaylength})`}
         </Typography>
       ) : (
-        <Typography fontSize="1.1em" fontWeight={700}>
+        <Typography
+          sx={{
+            fontSize: "1.1em",
+            fontWeight: 700
+          }}>
           {event.summary}
         </Typography>
       )}
-
       <Typography sx={{ mb: "0.2em" }}>{event.description}</Typography>
-
       {!allday && (
-        <Stack direction="row" spacing={0.5} alignItems="flex-start">
+        <Stack direction="row" spacing={0.5} sx={{
+          alignItems: "flex-start"
+        }}>
           <ScheduleIcon fontSize="small" />
           <Typography variant="body2">
             {startTime}
@@ -67,14 +73,14 @@ const ScheduleCard = ({ date, event, sx }) => {
           </Typography>
         </Stack>
       )}
-
       {event?.location && (
         <Stack
           direction="row"
           spacing={0.5}
-          alignItems="flex-start"
-          marginTop="0.1em"
-        >
+          sx={{
+            alignItems: "flex-start",
+            marginTop: "0.1em"
+          }}>
           <PlaceOutlinedIcon color="orange" fontSize="small" />
           <Typography
             component="a"

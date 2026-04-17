@@ -9,31 +9,38 @@ const SmallGroup = () => {
   return (
     <>
       <title>소그룹 - OCCE</title>
-
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
             variant="h4"
-            fontWeight={830}
-            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
-          >
+            sx={{
+              fontWeight: 830,
+              letterSpacing: "0.4em",
+              pl: "0.4em",
+              color: "white"
+            }}>
             소그룹
           </Typography>
           <Typography
-            textAlign="center"
             variant="h5"
-            fontWeight={700}
-            sx={{ color: "white" }}
-          >
+            sx={{
+              textAlign: "center",
+              fontWeight: 700,
+              color: "white"
+            }}>
             정원
           </Typography>
         </div>
       </div>
-
       <div className="container-wrapper">
         <div className="container">
           <Typography className="explain" sx={{ fontSize: "1.1em" }}>
-            <Typography component="span" fontWeight="bold" fontSize="2em">
+            <Typography
+              component="span"
+              sx={{
+                fontWeight: "bold",
+                fontSize: "2em"
+              }}>
               '정원'
             </Typography>
             은 하나님께서 태초에 사람에게 허락하신 에덴의 모형입니다. '정원'의

@@ -56,7 +56,6 @@ const SignInModal = ({ isOpen, onClose }) => {
   return (
     <CustomModal isOpen={isOpen} onClose={handleClose} maxWidth="400px">
       <h1 style={{ marginTop: 0 }}>로그인</h1>
-
       <form style={{ width: "90%" }} onSubmit={handleSubmit(handleSignIn)}>
         <Controller
           name="phoneNumber"

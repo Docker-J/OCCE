@@ -11,7 +11,7 @@ import SchoolIcon from "@mui/icons-material/School";
 import LocalFloristIcon from "@mui/icons-material/LocalFlorist";
 import CelebrationIcon from "@mui/icons-material/Celebration";
 
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutlined";
 import { useState } from "react";
 import { Popover, Typography } from "@mui/material";
 
@@ -39,7 +39,9 @@ const NewComersTimeline = () => {
           <TimelineConnector sx={{ height: "30px" }} />
         </TimelineSeparator>
         <TimelineContent sx={{ py: "18px" }}>
-          <Typography fontWeight={600}>방문카드 작성</Typography>
+          <Typography sx={{
+            fontWeight: 600
+          }}>방문카드 작성</Typography>
         </TimelineContent>
       </TimelineItem>
       <TimelineItem>
@@ -51,9 +53,11 @@ const NewComersTimeline = () => {
         </TimelineSeparator>
         <TimelineContent sx={{ py: "18px" }}>
           <Typography
-            fontWeight={600}
             onMouseEnter={(e) => handlePopoverOpen(e, 1)}
             onMouseLeave={handlePopoverClose}
+            sx={{
+              fontWeight: 600
+            }}
           >
             등록 <HelpOutlineIcon fontSize="small" color="primary" />
           </Typography>
@@ -92,9 +96,11 @@ const NewComersTimeline = () => {
         </TimelineSeparator>
         <TimelineContent sx={{ py: "18px" }}>
           <Typography
-            fontWeight={600}
             onMouseEnter={(e) => handlePopoverOpen(e, 2)}
             onMouseLeave={handlePopoverClose}
+            sx={{
+              fontWeight: 600
+            }}
           >
             새가족 교육 <HelpOutlineIcon fontSize="small" color="primary" />
           </Typography>
@@ -131,7 +137,9 @@ const NewComersTimeline = () => {
           <TimelineConnector sx={{ height: "30px" }} />
         </TimelineSeparator>
         <TimelineContent sx={{ py: "18px" }}>
-          <Typography fontWeight={600}>소그룹(정원) 배치</Typography>
+          <Typography sx={{
+            fontWeight: 600
+          }}>소그룹(정원) 배치</Typography>
         </TimelineContent>
       </TimelineItem>
       <TimelineItem>
@@ -141,7 +149,9 @@ const NewComersTimeline = () => {
           </TimelineDot>
         </TimelineSeparator>
         <TimelineContent sx={{ py: "18px" }}>
-          <Typography fontWeight={600}>새가족 환영회</Typography>
+          <Typography sx={{
+            fontWeight: 600
+          }}>새가족 환영회</Typography>
         </TimelineContent>
       </TimelineItem>
     </Timeline>

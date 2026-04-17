@@ -74,7 +74,6 @@ const SignUpModal = ({ isOpen, onClose }) => {
       <Typography style={{ marginBottom: "1em" }}>
         교적과 동일한 정보를 입력해주세요.
       </Typography>
-
       <form style={{ width: "90%" }} onSubmit={handleSubmit(handleSignUp)}>
         <TextField
           sx={{ width: "100%", mt: "1em" }}
@@ -165,11 +164,12 @@ const SignUpModal = ({ isOpen, onClose }) => {
           handleClose();
           openModal(SignUpRequestConfirmModal, {});
         }}
-        sx={{ cursor: "pointer" }}
         direction="row"
-        alignItems="center"
         spacing={1}
-      >
+        sx={{
+          alignItems: "center",
+          cursor: "pointer"
+        }}>
         <Typography>전화번호 인증하기</Typography>
         <OpenInNewIcon fontSize="small" />
       </Stack>

@@ -6,9 +6,12 @@ const Section1 = ({ fullpageApi }) => (
     <Typography
       style={{ textAlign: "left" }}
       variant="h1"
-      fontWeight="800"
-      sx={{ color: "white", mb: "30px", letterSpacing: "5px" }}
-    >
+      sx={{
+        fontWeight: "800",
+        color: "white",
+        mb: "30px",
+        letterSpacing: "5px"
+      }}>
       첫걸음
     </Typography>
 
@@ -18,10 +21,12 @@ const Section1 = ({ fullpageApi }) => (
     <div className="slide" data-anchor="start">
       <Typography
         variant="h5"
-        fontWeight="550"
-        fontSize="1.3rem"
-        sx={{ textAlign: "left", color: "white" }}
-      >
+        sx={{
+          fontWeight: "550",
+          fontSize: "1.3rem",
+          textAlign: "left",
+          color: "white"
+        }}>
         에드먼턴 온 교회는 2022년 4월 3일,
         <br />
         교회의 세속화에 따른 위기와 포스트 코로나라는 시대의 도전 가운데
@@ -34,9 +39,11 @@ const Section1 = ({ fullpageApi }) => (
       <Typography
         className="lovegod"
         variant="h6"
-        fontWeight="500"
-        sx={{ textAlign: "left", color: "white" }}
-      >
+        sx={{
+          fontWeight: "500",
+          textAlign: "left",
+          color: "white"
+        }}>
         Presbyterian Church in Canada 캐나다 장로교(이하 PCC)에 속했던
         공동체였으나, 2021년, 교단이 결혼의 정의에 대하여 "두 사람 간의 결합(즉,
         동성 간의 결혼)"을 인정하고 "성소수자"의 목사(teaching elders) 및

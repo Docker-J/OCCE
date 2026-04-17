@@ -37,7 +37,9 @@ const MinisterCard = ({ image, imageOffset, title, position, details }) => {
               <Typography
                 className={Styles.title}
                 variant="h5"
-                fontWeight={800}
+                sx={{
+                  fontWeight: 800
+                }}
               >
                 {title}
               </Typography>
@@ -64,7 +66,9 @@ const MinisterCard = ({ image, imageOffset, title, position, details }) => {
                 <Typography
                   className="card-back-title"
                   variant="h5"
-                  fontWeight={800}
+                  sx={{
+                    fontWeight: 800
+                  }}
                 >
                   {title}
                 </Typography>
@@ -103,11 +107,10 @@ const MinisterCard = ({ image, imageOffset, title, position, details }) => {
                       <Typography
                         key={record}
                         sx={{
+                          textAlign: "right",
                           fontSize: { xs: "0.8em", sm: "1em", md: "1.1em" },
-                          display: "block",
-                        }}
-                        textAlign="right"
-                      >
+                          display: "block"
+                        }}>
                         {record}
                       </Typography>
                     ))}

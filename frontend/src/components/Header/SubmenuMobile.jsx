@@ -4,7 +4,9 @@ import { CascadingMenuItem, CascadingSubmenu } from "./CascadingMenus";
 const SubmenuMobile = (props) => {
   return props.page.to ? (
     <CascadingMenuItem {...props}>
-      <Typography fontSize="13pt">{props.page.title}</Typography>
+      <Typography sx={{
+        fontSize: "13pt"
+      }}>{props.page.title}</Typography>
     </CascadingMenuItem>
   ) : (
     <CascadingSubmenu {...props}>

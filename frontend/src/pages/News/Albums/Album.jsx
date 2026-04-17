@@ -35,14 +35,16 @@ const Album = () => {
         <div className="title">
           <Typography
             variant="h4"
-            fontWeight={830}
-            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
-          >
+            sx={{
+              fontWeight: 830,
+              letterSpacing: "0.4em",
+              pl: "0.4em",
+              color: "white"
+            }}>
             {title}
           </Typography>
         </div>
       </div>
-
       <div className="container-wrapper">
         <div className="container">
           <ImageList variant="masonry" cols={3} gap={8}>
@@ -67,7 +69,6 @@ const Album = () => {
           </ImageList>
         </div>
       </div>
-
       <AdminComponent>
         <Fab
           variant="primary"

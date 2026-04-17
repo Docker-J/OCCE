@@ -5,13 +5,12 @@ const Section3 = ({ fullpageApi }) => (
   <div className="section3Body sectionBody">
     <Typography
       variant="h3"
-      fontWeight="1000"
       sx={{
+        fontWeight: "1000",
         textAlign: "left",
         color: "white",
-        letterSpacing: "5px",
-      }}
-    >
+        letterSpacing: "5px"
+      }}>
       부르심에 따른
       <br />
       공동체의 발걸음
@@ -24,18 +23,21 @@ const Section3 = ({ fullpageApi }) => (
       <Typography
         style={{ textAlign: "left" }}
         variant="h4"
-        fontWeight="800"
-        sx={{ color: "white" }}
-      >
+        sx={{
+          fontWeight: "800",
+          color: "white"
+        }}>
         온 맘 다해 하나님 사랑
       </Typography>
       <div className="lovegod">
         <Typography
           style={{ textAlign: "left" }}
           variant="h6"
-          fontWeight="500"
-          sx={{ color: "white", ml: "15px" }}
-        >
+          sx={{
+            fontWeight: "500",
+            color: "white",
+            ml: "15px"
+          }}>
           내가 주인 된 시대 속에서, 예배와 말씀을 통해 우리 삶의 창조자이며 참
           주인 되시며 인도자이신 성부 성자 성령 하나님의 사랑을 맛보고 나누며,
           하나님을 향한 우리의 사랑을 온전히 올려드립니다. 온 교회는 교회 성전
@@ -50,18 +52,21 @@ const Section3 = ({ fullpageApi }) => (
       <Typography
         style={{ textAlign: "left" }}
         variant="h4"
-        fontWeight="800"
-        sx={{ color: "white" }}
-      >
+        sx={{
+          fontWeight: "800",
+          color: "white"
+        }}>
         온 힘 다해 이웃 사랑
       </Typography>
 
       <Typography
         style={{ textAlign: "left" }}
         variant="h6"
-        fontWeight="500"
-        sx={{ color: "white", ml: "15px" }}
-      >
+        sx={{
+          fontWeight: "500",
+          color: "white",
+          ml: "15px"
+        }}>
         내가 중심된 세상에서 하나님께 받은 은혜와 부르신 사명에 따라 공동체와
         이웃을 말씀대로 사랑하고 섬기며 살아갑니다.
       </Typography>

@@ -43,7 +43,9 @@ const BoardTable = ({ announcements }) => {
                 width: "42px",
               }}
             >
-              <Typography variant="body2" whiteSpace="nowrap">
+              <Typography variant="body2" sx={{
+                whiteSpace: "nowrap"
+              }}>
                 {format(new Date(announcement.timestamp), "MMM dd")}
               </Typography>
               <Typography variant="body2">
@@ -59,20 +61,23 @@ const BoardTable = ({ announcements }) => {
                 overflow: "hidden",
               }}
             >
-              <Stack direction="row" alignItems="center">
+              <Stack direction="row" sx={{
+                alignItems: "center"
+              }}>
                 <Typography
                   variant="h6"
-                  fontWeight={800}
                   sx={{
+                    fontWeight: 800,
                     whiteSpace: "nowrap",
                     overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
+                    textOverflow: "ellipsis"
+                  }}>
                   {announcement.title}
                 </Typography>
               </Stack>
-              <Stack direction="row" alignItems="center">
+              <Stack direction="row" sx={{
+                alignItems: "center"
+              }}>
                 <p
                   style={{
                     fontSize: "0.9em",

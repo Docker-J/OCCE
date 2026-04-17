@@ -18,23 +18,26 @@ const Youth = () => {
   return (
     <>
       <title>중고등부 - OCCE</title>
-
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
             variant="h4"
-            fontWeight={830}
-            textAlign="center"
-            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
-          >
+            sx={{
+              fontWeight: 830,
+              textAlign: "center",
+              letterSpacing: "0.4em",
+              pl: "0.4em",
+              color: "white"
+            }}>
             중고등부
           </Typography>
           <Typography
-            textAlign="center"
             variant="h5"
-            fontWeight={700}
-            sx={{ color: "white" }}
-          >
+            sx={{
+              textAlign: "center",
+              fontWeight: 700,
+              color: "white"
+            }}>
             YOUTH ON the Rock
           </Typography>
 
@@ -49,7 +52,6 @@ const Youth = () => {
           </Typography>
         </div>
       </div>
-
       <div className="container-wrapper">
         <div className="container">
           <div
@@ -67,7 +69,12 @@ const Youth = () => {
           <br />
 
           <Typography sx={{ fontSize: "1.1em", color: "black" }}>
-            <Typography component="span" fontWeight="bold" fontSize="1.5em">
+            <Typography
+              component="span"
+              sx={{
+                fontWeight: "bold",
+                fontSize: "1.5em"
+              }}>
               온교회 중고등부
             </Typography>
             는 마태복음 7장 24절을 주제 말씀으로 하여, 말씀이신 그리스도의 "반석

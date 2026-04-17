@@ -10,24 +10,30 @@ const NewComers = () => {
   return (
     <>
       <title>새가족 - OCCE</title>
-
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
             variant="h4"
-            fontWeight={830}
-            textAlign="center"
-            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
-          >
+            sx={{
+              fontWeight: 830,
+              textAlign: "center",
+              letterSpacing: "0.4em",
+              pl: "0.4em",
+              color: "white"
+            }}>
             새가족
           </Typography>
         </div>
       </div>
-
       <div className="container-wrapper">
         <div className="container">
           <Typography sx={{ fontSize: "1.1em", color: "black" }}>
-            <Typography component="span" fontWeight="bold" fontSize="2em">
+            <Typography
+              component="span"
+              sx={{
+                fontWeight: "bold",
+                fontSize: "2em"
+              }}>
               온 교회
             </Typography>
             에 오신 여러분을 환영합니다. 교회에 처음 오신 분들과 개인 사정으로

@@ -170,7 +170,6 @@ const MainAnimation = () => {
         src="img/ONLogo.svg"
         alt="logo of ON Community Church of Edmonton"
       />
-
       <motion.div
         className="nameExplanation"
         animate={nameExplanation1Controls}
@@ -179,23 +178,26 @@ const MainAnimation = () => {
         <Typography
           className="old"
           variant="h5"
-          fontWeight="530"
-          fontSize="clamp(20px,4svmin, 32px)"
-          color="#f1cdb0"
+          sx={{
+            fontWeight: "530",
+            fontSize: "clamp(20px,4svmin, 32px)",
+            color: "#f1cdb0",
+          }}
         >
           Based ON the OLD Truth
         </Typography>
         <Typography
           className="new"
           variant="h5"
-          fontWeight="530"
-          fontSize="clamp(20px,4svmin, 32px)"
-          color="white"
+          sx={{
+            color: "white",
+            fontWeight: "530",
+            fontSize: "clamp(20px,4svmin, 32px)",
+          }}
         >
           Moving ON to the NEW Calling
         </Typography>
       </motion.div>
-
       <motion.div
         className="nameExplanation2"
         animate={nameExplanation2Controls}
@@ -203,22 +205,25 @@ const MainAnimation = () => {
       >
         <Typography
           variant="h5"
-          fontWeight="530"
-          fontSize="clamp(20px,4svmin, 32px)"
-          color="#f1cdb0"
+          sx={{
+            fontWeight: "530",
+            fontSize: "clamp(20px,4svmin, 32px)",
+            color: "#f1cdb0",
+          }}
         >
           온 맘 다해 하나님을 사랑하고
         </Typography>
         <Typography
           variant="h5"
-          fontWeight="530"
-          fontSize="clamp(20px,4svmin, 32px)"
-          color="white"
+          sx={{
+            color: "white",
+            fontWeight: "530",
+            fontSize: "clamp(20px,4svmin, 32px)",
+          }}
         >
           온 힘 다해 이웃을 사랑하는 교회
         </Typography>
       </motion.div>
-
       <motion.div
         className="nameExplanation3"
         animate={nameExplanation3Controls}
@@ -228,9 +233,11 @@ const MainAnimation = () => {
           <Typography
             className="edmonton"
             variant="h5"
-            fontWeight="530"
-            fontSize="min(3.5svmax, 75px)"
-            color="#f1cdb0"
+            sx={{
+              fontWeight: "530",
+              fontSize: "min(3.5svmax, 75px)",
+              color: "#f1cdb0",
+            }}
           >
             에드먼턴
           </Typography>
@@ -240,9 +247,11 @@ const MainAnimation = () => {
           <Typography
             className="church"
             variant="h5"
-            fontWeight="530"
-            fontSize="min(3.5svmax, 75px)"
-            color="white"
+            sx={{
+              color: "white",
+              fontWeight: "530",
+              fontSize: "min(3.5svmax, 75px)",
+            }}
           >
             교회
           </Typography>

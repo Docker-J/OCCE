@@ -44,7 +44,7 @@ root.render(
         <SnackBar />
       </SnackbarProvider>
     </ThemeProvider>
-  </Provider>
+  </Provider>,
   // </React.StrictMode>
 );
 

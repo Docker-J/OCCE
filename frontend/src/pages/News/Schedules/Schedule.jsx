@@ -52,7 +52,12 @@ const Schedule = ({ events }) => {
   return Object.entries(getEventsByMonthAndDate(events)).map(
     ([month, monthEvents]) => (
       <div key={month}>
-        <Typography variant="h5" fontWeight={500} sx={{ mb: "12px" }}>
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 500,
+            mb: "12px"
+          }}>
           {month}
         </Typography>
 
@@ -106,13 +111,13 @@ const Schedule = ({ events }) => {
                   {format(eventDate, "eee")}
                 </Typography>
               </Box>
-
               <Box
-                width="100%"
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-              >
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center"
+                }}>
                 {dateEvents.map((event, index) => (
                   <ScheduleCard
                     key={index}

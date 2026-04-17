@@ -45,20 +45,26 @@ const YoungAdult = () => {
   return (
     <>
       <title>청년부 - OCCE</title>
-
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
             variant="h4"
-            fontWeight={830}
-            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
+            sx={{
+              fontWeight: 830,
+              letterSpacing: "0.4em",
+              pl: "0.4em",
+              color: "white",
+            }}
           >
             온마음 청년부
           </Typography>
           <Typography
             variant="h5"
-            fontWeight={700}
-            sx={{ color: "white", letterSpacing: "-1.3px" }}
+            sx={{
+              fontWeight: 700,
+              color: "white",
+              letterSpacing: "-1.3px",
+            }}
           >
             Hearts ON God {"YOUNG\u00a0ADULTS"}
           </Typography>
@@ -72,7 +78,6 @@ const YoungAdult = () => {
           </Typography>
         </div>
       </div>
-
       <div className="container-wrapper">
         <div className="container">
           <div
@@ -89,7 +94,13 @@ const YoungAdult = () => {
 
           <br />
           <Typography sx={{ fontSize: "1.1em", color: "black" }}>
-            <Typography component="span" fontWeight="bold" fontSize="1.5em">
+            <Typography
+              component="span"
+              sx={{
+                fontWeight: "bold",
+                fontSize: "1.5em",
+              }}
+            >
               온교회 청년부
             </Typography>
             는 예수 그리스도의 이름으로 모여, 하나님의 성령으로 한 마음을 품고,
@@ -110,7 +121,12 @@ const YoungAdult = () => {
             <br />
           </Typography>
 
-          <Typography variant="h6" fontWeight={500}>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 500,
+            }}
+          >
             모임 및 사역 안내
           </Typography>
 
@@ -150,10 +166,10 @@ const YoungAdult = () => {
                       textAlign: "center",
                     }}
                   >
-                    <Typography variant="h4" color="white">
+                    <Typography variant="h4" sx={{ color: "white" }}>
                       {ministry.title}
                     </Typography>
-                    <Typography variant="h6" color="white">
+                    <Typography variant="h6" sx={{ color: "white" }}>
                       {ministry?.subtitle}
                     </Typography>
                   </div>
@@ -169,7 +185,12 @@ const YoungAdult = () => {
                   }}
                 >
                   {ministry.content.map((item) => (
-                    <Typography fontSize="1.1em" key={item}>
+                    <Typography
+                      key={item}
+                      sx={{
+                        fontSize: "1.1em",
+                      }}
+                    >
                       {item}
                     </Typography>
                   ))}

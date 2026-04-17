@@ -44,7 +44,9 @@ const MeditationONComp = ({ posts, cols }) => {
             <ImageListItemBar
               title={<Typography color="black">{post.Title}</Typography>}
               subtitle={
-                <Typography fontSize="small" color="black">
+                <Typography color="black" sx={{
+                  fontSize: "small"
+                }}>
                   {format(post.Timestamp, "MMdd")}
                 </Typography>
               }

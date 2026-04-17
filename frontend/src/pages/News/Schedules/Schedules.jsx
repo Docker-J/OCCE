@@ -20,20 +20,21 @@ const Schedules = () => {
   return (
     <>
       <title>교회일정 - OCCE</title>
-
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
             variant="h4"
-            fontWeight={830}
-            textAlign="center"
-            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
-          >
+            sx={{
+              fontWeight: 830,
+              textAlign: "center",
+              letterSpacing: "0.4em",
+              pl: "0.4em",
+              color: "white"
+            }}>
             교회일정
           </Typography>
         </div>
       </div>
-
       <div className="container-wrapper">
         <div
           className="container"
@@ -65,7 +66,6 @@ const Schedules = () => {
           </Suspense>
         </div>
       </div>
-
       <AdminComponent>
         <Fab
           style={{ position: "fixed", right: "2vw", bottom: "3vh" }}

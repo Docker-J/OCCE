@@ -148,14 +148,13 @@ export default function ButtonBases() {
             <Typography
               component="span"
               variant="h5"
-              color="inherit"
               sx={{
+                color: "inherit",
                 position: "relative",
                 p: 4,
                 pt: 2,
-                pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
-              }}
-            >
+                pb: (theme) => `calc(${theme.spacing(1)} + 6px)`
+              }}>
               <ImageMarkedUpper className="MuiImageMarked-root" />
               {image.title}
               <ImageMarked className="MuiImageMarked-root" />

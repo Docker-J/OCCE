@@ -120,19 +120,20 @@ const WeeklyUpdate = () => {
   return (
     <>
       <title>{`${format(selectedDate, "yyyy-MM-dd")} 주보 - OCCE`}</title>
-
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
             variant="h4"
-            fontWeight={830}
-            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
-          >
+            sx={{
+              fontWeight: 830,
+              letterSpacing: "0.4em",
+              pl: "0.4em",
+              color: "white"
+            }}>
             주보
           </Typography>
         </div>
       </div>
-
       <div className="container-wrapper">
         <div
           className="container"
@@ -181,7 +182,6 @@ const WeeklyUpdate = () => {
           )}
         </div>
       </div>
-
       <AdminComponent>
         <Fab
           id="uploadBulletinButton"

@@ -132,14 +132,16 @@ const Albums = () => {
   return (
     <>
       <title>교회사진 - OCCE</title>
-
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
             variant="h4"
-            fontWeight={830}
-            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
-          >
+            sx={{
+              fontWeight: 830,
+              letterSpacing: "0.4em",
+              pl: "0.4em",
+              color: "white"
+            }}>
             교회사진
           </Typography>
           <ButtonYearPicker
@@ -151,7 +153,6 @@ const Albums = () => {
           />
         </div>
       </div>
-
       <div className="container-wrapper">
         <Box
           className="container"
@@ -161,7 +162,11 @@ const Albums = () => {
           }}
         >
           {albums.length <= 0 ? (
-            <Stack alignItems="center" sx={{ py: 8 }}>
+            <Stack
+              sx={{
+                alignItems: "center",
+                py: 8
+              }}>
               {isLoading ? <CircularProgress /> : "사진이 존재하지 않습니다"}
             </Stack>
           ) : (
@@ -170,7 +175,9 @@ const Albums = () => {
               next={onLoad}
               hasMore={!end}
               loader={
-                <Stack alignItems="center">
+                <Stack sx={{
+                  alignItems: "center"
+                }}>
                   <CircularProgress />
                 </Stack>
               }
@@ -189,7 +196,6 @@ const Albums = () => {
           )}
         </Box>
       </div>
-
       <AdminComponent>
         <Fab
           variant="primary"
@@ -199,7 +205,6 @@ const Albums = () => {
           <AddIcon />
         </Fab>
       </AdminComponent>
-
       {end && <Footer />}
     </>
   );

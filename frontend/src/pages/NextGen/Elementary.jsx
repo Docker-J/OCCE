@@ -31,23 +31,26 @@ const Elementary = () => {
   return (
     <>
       <title>유초등부 - OCCE</title>
-
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
             variant="h4"
-            fontWeight={830}
-            textAlign="center"
-            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
-          >
+            sx={{
+              fontWeight: 830,
+              textAlign: "center",
+              letterSpacing: "0.4em",
+              pl: "0.4em",
+              color: "white"
+            }}>
             유초등부
           </Typography>
           <Typography
-            textAlign="center"
             variant="h5"
-            fontWeight={700}
-            sx={{ color: "white" }}
-          >
+            sx={{
+              textAlign: "center",
+              fontWeight: 700,
+              color: "white"
+            }}>
             KIDS ON the Tree
           </Typography>
 
@@ -61,7 +64,6 @@ const Elementary = () => {
           </Typography>
         </div>
       </div>
-
       <div className="container-wrapper">
         <div className="container">
           <div
@@ -81,7 +83,12 @@ const Elementary = () => {
             sx={{ fontSize: "1.1em", color: "black" }}
             // style={{ textAlign: "center", maxWidth: "1536px" }}
           >
-            <Typography component="span" fontWeight="bold" fontSize="1.5em">
+            <Typography
+              component="span"
+              sx={{
+                fontWeight: "bold",
+                fontSize: "1.5em"
+              }}>
               온교회 유초등부
             </Typography>
             는 초등학교 1학년에서 6학년 연령의 다음 세대 자녀들이, 누가복음 19장

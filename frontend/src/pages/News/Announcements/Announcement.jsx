@@ -107,19 +107,20 @@ const Announcement = () => {
     <>
       <title>{`${title} - OCCE`}</title>
       {isLoading && <FullScreenLoading />}
-
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
             variant="h4"
-            fontWeight={830}
-            sx={{ letterSpacing: "0.4em", pl: "0.4em", color: "white" }}
-          >
+            sx={{
+              fontWeight: 830,
+              letterSpacing: "0.4em",
+              pl: "0.4em",
+              color: "white"
+            }}>
             공지사항
           </Typography>
         </div>
       </div>
-
       <div className="container-wrapper">
         <div
           className="container"

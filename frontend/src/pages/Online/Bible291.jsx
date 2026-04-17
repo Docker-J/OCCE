@@ -13,28 +13,33 @@ const Bible291 = () => {
   return (
     <>
       <title>291일 성경 1독 - OCCE</title>
-
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
             variant="h4"
-            fontWeight={830}
-            sx={{ letterSpacing: "0.3em", pl: "0.4em", color: "white" }}
-          >
+            sx={{
+              fontWeight: 830,
+              letterSpacing: "0.3em",
+              pl: "0.4em",
+              color: "white"
+            }}>
             291일 성경 1독
           </Typography>
         </div>
       </div>
-
       <div className="container-wrapper">
         <div className="container">
-          <Typography variant="h5" fontWeight={830}>
+          <Typography variant="h5" sx={{
+            fontWeight: 830
+          }}>
             {today}
           </Typography>
 
           {match ? (
             <>
-              <Typography variant="h5" fontWeight={830}>
+              <Typography variant="h5" sx={{
+                fontWeight: 830
+              }}>
                 오늘의 1독 말씀은 "{`${match.read}`}" 입니다.
               </Typography>
               <br />
@@ -45,7 +50,9 @@ const Bible291 = () => {
               />
             </>
           ) : (
-            <Typography variant="h5" fontWeight={830}>
+            <Typography variant="h5" sx={{
+              fontWeight: 830
+            }}>
               오늘은 성경 1독을 쉬어가는 날입니다
             </Typography>
           )}
