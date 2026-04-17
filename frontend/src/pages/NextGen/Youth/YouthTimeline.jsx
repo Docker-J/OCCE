@@ -17,11 +17,9 @@ const YouthTimeline = () => {
         flexWrap: "wrap",
         justifyContent: "space-evenly",
         maxWidth: "800px",
-        margin: "0 auto"
-      }}>
-      {/* <Typography>
-        하나님 앞에서 지혜로운 사람 A wise person before God
-      </Typography> */}
+        margin: "0 auto",
+      }}
+    >
       <Timeline
         sx={{
           [`& .${timelineItemClasses.root}:before`]: {
@@ -38,9 +36,11 @@ const YouthTimeline = () => {
             <TimelineConnector />
           </TimelineSeparator>
           <TimelineContent>
-            <Typography sx={{
-              fontWeight: 600
-            }}>
+            <Typography
+              sx={{
+                fontWeight: 600,
+              }}
+            >
               들음
               <br />
               "나의 이 말을 듣고" <br />
@@ -54,9 +54,11 @@ const YouthTimeline = () => {
             <TimelineConnector />
           </TimelineSeparator>
           <TimelineContent>
-            <Typography sx={{
-              fontWeight: 600
-            }}>
+            <Typography
+              sx={{
+                fontWeight: 600,
+              }}
+            >
               예배 Worship
               <br />
               주일 예배 | 2:30 PM (본당)
@@ -69,9 +71,11 @@ const YouthTimeline = () => {
             <TimelineConnector />
           </TimelineSeparator>
           <TimelineContent>
-            <Typography sx={{
-              fontWeight: 600
-            }}>
+            <Typography
+              sx={{
+                fontWeight: 600,
+              }}
+            >
               묵상/교리문답 QT/Catechism
               <br />
               중고등부 모임 | 4 PM (Fireside)
@@ -83,9 +87,11 @@ const YouthTimeline = () => {
             <TimelineDot variant="outlined" color="primary" />
           </TimelineSeparator>
           <TimelineContent>
-            <Typography sx={{
-              fontWeight: 600
-            }}>
+            <Typography
+              sx={{
+                fontWeight: 600,
+              }}
+            >
               성경 읽기 Bible Reading
               <br />
               월-금요일 | 공동체 성경 읽기
@@ -110,9 +116,11 @@ const YouthTimeline = () => {
             <TimelineConnector />
           </TimelineSeparator>
           <TimelineContent>
-            <Typography sx={{
-              fontWeight: 600
-            }}>
+            <Typography
+              sx={{
+                fontWeight: 600,
+              }}
+            >
               행함
               <br />
               "행하는 자는" <br />
@@ -126,9 +134,11 @@ const YouthTimeline = () => {
             <TimelineConnector />
           </TimelineSeparator>
           <TimelineContent>
-            <Typography sx={{
-              fontWeight: 600
-            }}>
+            <Typography
+              sx={{
+                fontWeight: 600,
+              }}
+            >
               교제 Fellowship
               <br />
               월별 생일 축하, 실내/외 Activities
@@ -141,9 +151,11 @@ const YouthTimeline = () => {
             <TimelineConnector />
           </TimelineSeparator>
           <TimelineContent>
-            <Typography sx={{
-              fontWeight: 600
-            }}>
+            <Typography
+              sx={{
+                fontWeight: 600,
+              }}
+            >
               수련회 Retreat
               <br />
               방학 기간 수련회
@@ -155,9 +167,11 @@ const YouthTimeline = () => {
             <TimelineDot variant="outlined" color="primary" />
           </TimelineSeparator>
           <TimelineContent>
-            <Typography sx={{
-              fontWeight: 600
-            }}>
+            <Typography
+              sx={{
+                fontWeight: 600,
+              }}
+            >
               선교 Mission
               <br />
               교회 봉사, 지역 봉사, 선교 여행

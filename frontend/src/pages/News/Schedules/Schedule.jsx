@@ -101,12 +101,12 @@ const Schedule = ({ events }) => {
                   minWidth: "32px",
                 }}
               >
-                <Typography variant="h5" color={sunday ? "red" : "primary"}>
+                <Typography variant="h5" sx={{ color: sunday ? "red" : "primary.main" }}>
                   {date.toString().padStart(2, "0")}
                 </Typography>
                 <Typography
                   variant="caption"
-                  color={sunday ? "red" : "primary"}
+                  sx={{ color: sunday ? "red" : "primary.main" }}
                 >
                   {format(eventDate, "eee")}
                 </Typography>

@@ -87,8 +87,7 @@ const ScheduleCard = ({ date, event, sx }) => {
             target="_blank"
             href={`https://www.google.com/maps/search/?api=1&query=${event.location}`}
             variant="body2"
-            color="black"
-            sx={{ textDecoration: "none" }}
+            sx={{ color: "black", textDecoration: "none" }}
           >
             {event.location.split(",")[0]}
           </Typography>
