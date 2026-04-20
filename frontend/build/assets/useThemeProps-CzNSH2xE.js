@@ -1,1 +1,0 @@
-import{d as e,u as t}from"./createSimplePaletteValueFilter-BLWNyjUn.js";import{t as n}from"./useThemeProps-t0nlG0Q-.js";function r({props:r,name:i}){return n({props:r,name:i,defaultTheme:e,themeId:t})}export{r as t};

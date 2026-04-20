@@ -7,7 +7,7 @@ import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import ChurchIcon from "@mui/icons-material/Church";
 import GroupsIcon from "@mui/icons-material/Groups";
 import PaymentsIcon from "@mui/icons-material/Payments";
-import FoldedHandsIcon from "./folded_hands.svg";
+import FoldedHandsIcon from "./FoldedHandsIcon";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 
 export const MinistryList = [

@@ -1,1 +1,0 @@
-import{x as e}from"./createSimplePaletteValueFilter-BLWNyjUn.js";var t=e();export{t};

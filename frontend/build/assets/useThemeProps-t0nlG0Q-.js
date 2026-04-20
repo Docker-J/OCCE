@@ -1,1 +1,0 @@
-import{D as e,b as t}from"./createSimplePaletteValueFilter-BLWNyjUn.js";function n(e){let{theme:n,name:r,props:i}=e;return!n||!n.components||!n.components[r]||!n.components[r].defaultProps?i:t(n.components[r].defaultProps,i)}function r({props:t,name:r,defaultTheme:i,themeId:a}){let o=e(i);return a&&(o=o[a]||o),n({theme:o,name:r,props:t})}export{n,r as t};

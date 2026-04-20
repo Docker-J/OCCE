@@ -2,12 +2,9 @@
   font-family: "NanumSquareNeoVariable";
   font-display: swap;
   font-weight: 100 900;
-  src: url(NanumSquareNeo-Variable.eot);
   src: local("☺"),
-    url(NanumSquareNeo-Variable.eot?#iefix) format("embedded-opentype"),
     url(NanumSquareNeo-Variable.woff2) format("woff2"),
-    url(NanumSquareNeo-Variable.woff) format("woff"),
-    url(NanumSquareNeo-Variable.ttf) format("truetype");
+    url(NanumSquareNeo-Variable.woff) format("woff");
 }
 
 :root {

@@ -1,0 +1,1 @@
+import{t as e}from"./useForkRef-B6hEIy6t.js";import{a as t,i as n,n as r}from"./useSlot-CNn1j2AN.js";function i(i){let{elementType:a,externalSlotProps:o,ownerState:s,skipResolvingSlotProps:c=!1,...l}=i,u=c?{}:n(o,s),{props:d,internalRef:f}=r({...l,externalSlotProps:u}),p=e(f,u?.ref,i.additionalProps?.ref);return t(a,{...d,ref:p},s)}export{i as t};

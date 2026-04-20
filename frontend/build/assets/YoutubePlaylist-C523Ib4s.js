@@ -1,0 +1,1 @@
+import{A as e}from"./reactVendor-DTZvIBAs.js";var t=e(),n=({src:e})=>(0,t.jsx)(`div`,{className:`video`,children:(0,t.jsx)(`div`,{className:`video-container`,children:(0,t.jsx)(`iframe`,{src:e,title:`YouTube video player`,allow:`accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture`,allowFullScreen:!0})})});export{n as t};
