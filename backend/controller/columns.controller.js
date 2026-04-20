@@ -1,30 +1,17 @@
-import axios from "axios";
 import { v4 as uuid } from "uuid";
 import { deleteImages } from "./images.controller.js";
+import { executeD1Query } from "../api/d1.js";
 
-const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
-const CLOUDFLARE_DATABASE_ID = process.env.CLOUDFLARE_D1_DATABASE_ID;
-const CLOUDFLARE_API_KEY = process.env.CLOUDFLARE_API_KEY;
-
-const URL = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${CLOUDFLARE_DATABASE_ID}/query`;
 const TABLENAME = "Columns";
 const PAGE_SIZE = 10;
 
 var COLUMNS_COUNT;
 
 export const getColumnsCount = async () => {
-  const data = {
-    sql: `SELECT COUNT(id) AS count FROM ${TABLENAME}`,
-  };
+  const sql = `SELECT COUNT(id) AS count FROM ${TABLENAME}`;
   try {
-    const result = await axios.post(URL, data, {
-      headers: {
-        Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    COLUMNS_COUNT = result.data.result[0].results[0].count;
+    const result = await executeD1Query(sql);
+    COLUMNS_COUNT = result.result[0].results[0].count;
   } catch (error) {
     console.log(error);
   }
@@ -33,92 +20,61 @@ export const getColumnsCount = async () => {
 export const getColumnsController = async (req, res) => {
   const page = req.query.page;
 
-  const data = {
-    sql: `SELECT * FROM ${TABLENAME} ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
-      page ? (page - 1) * PAGE_SIZE : 0
-    }`,
-  };
+  const sql = `SELECT * FROM ${TABLENAME} ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
+    page ? (page - 1) * PAGE_SIZE : 0
+  }`;
   try {
-    const result = await axios.post(URL, data, {
-      headers: {
-        Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-    });
+    const result = await executeD1Query(sql);
 
     res.send({
       count: COLUMNS_COUNT,
-      announcements: result.data.result[0].results,
+      announcements: result.result[0].results,
     });
   } catch (error) {
     console.log(error);
-    res.send(error);
+    res.sendStatus(500);
   }
 };
 
 export const getColumnController = async (req, res) => {
-  const data = {
-    params: [req.params.id],
-    sql: `SELECT id, title, body, timestamp FROM ${TABLENAME} WHERE id = ?`,
-  };
+  const sql = `SELECT id, title, body, timestamp FROM ${TABLENAME} WHERE id = ?`;
+  const params = [req.params.id];
   try {
-    const result = await axios.post(URL, data, {
-      headers: {
-        Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-    });
-    console.log(result.data.result[0].results[0]);
-    res.send(result.data.result[0].results[0]);
+    const result = await executeD1Query(sql, params);
+    res.send(result.result[0].results[0]);
   } catch (error) {
     res.sendStatus(404);
   }
 };
 
 export const postColumnController = async (req, res) => {
-  const data = {
-    params: [
-      uuid(),
-      req.body.title,
-      req.body.body,
-      req.body.images.length > 0 ? req.body.images : null,
-      req.body.date,
-    ],
-    sql: `INSERT INTO ${TABLENAME} (id, title, body, images, timestamp) VALUES (?, ?, ?, ?, ?)`,
-  };
+  const sql = `INSERT INTO ${TABLENAME} (id, title, body, images, timestamp) VALUES (?, ?, ?, ?, ?)`;
+  const params = [
+    uuid(),
+    req.body.title,
+    req.body.body,
+    req.body.images.length > 0 ? req.body.images : null,
+    req.body.date,
+  ];
 
   try {
-    const result = await axios.post(URL, data, {
-      headers: {
-        Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-    });
-
+    const result = await executeD1Query(sql, params);
     COLUMNS_COUNT += 1;
-    res.send(result.data);
+    res.send(result);
   } catch (error) {
     console.log(error);
-    res.send(error);
+    res.sendStatus(500);
   }
 };
 
 export const editColumnController = async (req, res) => {
-  const getAnnouncementQuery = {
-    params: [req.params.id],
-    sql: `SELECT images FROM ${TABLENAME} WHERE id = ?`,
-  };
+  const getSql = `SELECT images FROM ${TABLENAME} WHERE id = ?`;
+  const getParams = [req.params.id];
 
   try {
-    const result = await axios.post(URL, getAnnouncementQuery, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
-      },
-    });
-
-    const images = result.data.result[0].results[0].images
-      ? result.data.result[0].results[0].images.split(",")
+    const result = await executeD1Query(getSql, getParams);
+    const images = result.result[0].results[0].images
+      ? result.result[0].results[0].images.split(",")
       : [];
 
     const missingImages = images.filter(
@@ -128,64 +84,38 @@ export const editColumnController = async (req, res) => {
     await deleteImages(missingImages);
   } catch {}
 
-  const data = {
-    params: [
-      req.body.title,
-      req.body.body,
-      req.body.images.length > 0 ? req.body.images : null,
-      req.params.id,
-    ],
-    sql: `UPDATE ${TABLENAME} SET title = ?, body = ?, images = ? WHERE id = ?`,
-  };
+  const sql = `UPDATE ${TABLENAME} SET title = ?, body = ?, images = ? WHERE id = ?`;
+  const params = [
+    req.body.title,
+    req.body.body,
+    req.body.images.length > 0 ? req.body.images : null,
+    req.params.id,
+  ];
 
   try {
-    const result = await axios.post(URL, data, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
-      },
-    });
-
-    console.log("test");
-
-    res.send(result.data);
+    const result = await executeD1Query(sql, params);
+    res.send(result);
   } catch (error) {
     console.log(error);
-    res.send(error);
+    res.sendStatus(500);
   }
 };
 
 export const deleteColumnController = async (req, res) => {
-  const deleteAnnouncementQuery = {
-    params: [req.params.id],
-    sql: `DELETE FROM ${TABLENAME} WHERE id = ?`,
-  };
-
-  const getAnnouncementQuery = {
-    params: [req.params.id],
-    sql: `SELECT images FROM ${TABLENAME} WHERE id = ?`,
-  };
+  const getSql = `SELECT images FROM ${TABLENAME} WHERE id = ?`;
+  const getParams = [req.params.id];
 
   try {
-    const result = await axios.post(URL, getAnnouncementQuery, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
-      },
-    });
-
-    const images = result.data.result[0].results[0].images
-      ? result.data.result[0].results[0].images.split(",")
+    const result = await executeD1Query(getSql, getParams);
+    const images = result.result[0].results[0].images
+      ? result.result[0].results[0].images.split(",")
       : [];
 
     await deleteImages(images);
 
-    await axios.post(URL, deleteAnnouncementQuery, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
-      },
-    });
+    const deleteSql = `DELETE FROM ${TABLENAME} WHERE id = ?`;
+    const deleteParams = [req.params.id];
+    await executeD1Query(deleteSql, deleteParams);
 
     getColumnsCount();
 

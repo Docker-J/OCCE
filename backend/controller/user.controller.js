@@ -95,69 +95,87 @@ export const refreshSignInController = async (req, res) => {
   }
 };
 
+let sheetCache = {
+  rows: null,
+  lastFetch: 0,
+};
+const CACHE_TTL = 3600 * 1000; // 1 hour
+
 const checkUserInSheet = async (name, phone) => {
-  const auth = new google.auth.GoogleAuth({
-    keyFile: KEY_PATH,
-    // Note: We switch the scope to drive.readonly
-    scopes: ["https://www.googleapis.com/auth/drive.readonly"],
-  });
+  let rows;
+  const now = Date.now();
 
-  // Use the drive client instead of sheets
-  const drive = google.drive({ version: "v3", auth });
-  const fileId = "1Uk154FmBfVHIcv8xU5V_CuTBte4QXn6D";
-
-  try {
-    // 1. Download the file as a buffer (binary data)
-    const response = await drive.files.get(
-      { fileId, alt: "media" },
-      { responseType: "arraybuffer" },
-    );
-
-    // 2. Parse the buffer
-    const workbook = XLSX.read(response.data, { type: "buffer" });
-
-    // 3. Get the first sheet's data as an array of arrays (like your original rows)
-    const firstSheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[firstSheetName];
-
-    // 'header: 1' makes it return an array of arrays (index 0 = A, 1 = B, etc.)
-    const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-    if (!rows || rows.length === 0) {
-      return false;
-    }
-
-    // 4. Use your existing logic to find a match
-    const matchFound = rows.some((row) => {
-      // 1. Get raw values from the row (adjust indices if columns changed)
-      const rowNameRaw = row[1]; // Column A
-      const rowPhoneRaw = row[9]; // Column B (e.g., "111-111-1111")
-      const statusRaw = row[3];
-
-      // 2. Normalize the Excel Data
-      // Convert to string, trim whitespace, and lowercase for name
-      const rowName = rowNameRaw?.toString().trim();
-      // Remove hyphens and all other non-digits from the Excel phone number
-      const rowPhoneClean = rowPhoneRaw?.toString().replace(/\D/g, "");
-      const status = statusRaw?.toString().trim();
-
-      // 3. Normalize the Input Data (from req.body)
-      const inputName = name.trim();
-      const inputPhoneClean = phone.replace(/\D/g, "");
-
-      // 4. Compare
-      const isNameMatch = rowName === inputName;
-      const isPhoneMatch = rowPhoneClean === inputPhoneClean;
-      const isNotRemoved = status !== "제적";
-
-      return isNameMatch && isPhoneMatch && isNotRemoved;
+  if (sheetCache.rows && now - sheetCache.lastFetch < CACHE_TTL) {
+    rows = sheetCache.rows;
+  } else {
+    const auth = new google.auth.GoogleAuth({
+      keyFile: KEY_PATH,
+      // Note: We switch the scope to drive.readonly
+      scopes: ["https://www.googleapis.com/auth/drive.readonly"],
     });
 
-    return matchFound;
-  } catch (error) {
-    console.error("Drive/Excel API Error:", error);
+    // Use the drive client instead of sheets
+    const drive = google.drive({ version: "v3", auth });
+    const fileId = "1Uk154FmBfVHIcv8xU5V_CuTBte4QXn6D";
+
+    try {
+      // 1. Download the file as a buffer (binary data)
+      const response = await drive.files.get(
+        { fileId, alt: "media" },
+        { responseType: "arraybuffer" },
+      );
+
+      // 2. Parse the buffer
+      const workbook = XLSX.read(response.data, { type: "buffer" });
+
+      // 3. Get the first sheet's data as an array of arrays (like your original rows)
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+
+      // 'header: 1' makes it return an array of arrays (index 0 = A, 1 = B, etc.)
+      rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+      if (rows && rows.length > 0) {
+        sheetCache.rows = rows;
+        sheetCache.lastFetch = now;
+      }
+    } catch (error) {
+      console.error("Drive/Excel API Error:", error);
+      return false;
+    }
+  }
+
+  if (!rows || rows.length === 0) {
     return false;
   }
+
+  // 4. Use your existing logic to find a match
+  const matchFound = rows.some((row) => {
+    // 1. Get raw values from the row (adjust indices if columns changed)
+    const rowNameRaw = row[1]; // Column A
+    const rowPhoneRaw = row[9]; // Column B (e.g., "111-111-1111")
+    const statusRaw = row[3];
+
+    // 2. Normalize the Excel Data
+    // Convert to string, trim whitespace, and lowercase for name
+    const rowName = rowNameRaw?.toString().trim();
+    // Remove hyphens and all other non-digits from the Excel phone number
+    const rowPhoneClean = rowPhoneRaw?.toString().replace(/\D/g, "");
+    const status = statusRaw?.toString().trim();
+
+    // 3. Normalize the Input Data (from req.body)
+    const inputName = name.trim();
+    const inputPhoneClean = phone.replace(/\D/g, "");
+
+    // 4. Compare
+    const isNameMatch = rowName === inputName;
+    const isPhoneMatch = rowPhoneClean === inputPhoneClean;
+    const isNotRemoved = status !== "제적";
+
+    return isNameMatch && isPhoneMatch && isNotRemoved;
+  });
+
+  return matchFound;
 };
 
 export const signUpController = async (req, res) => {
