@@ -1,6 +1,7 @@
 @font-face {
   font-family: "NanumSquareNeoVariable";
   font-display: swap;
+  font-weight: 100 900;
   src: url(NanumSquareNeo-Variable.eot);
   src: local("☺"),
     url(NanumSquareNeo-Variable.eot?#iefix) format("embedded-opentype"),
@@ -19,6 +20,8 @@ body {
   text-align: center;
   margin: auto;
   line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .title-wrapper {
@@ -94,4 +97,5 @@ iframe {
   height: 100%;
   border-radius: 1.5em;
 }
+
 /* Embeded Video Player Style */
