@@ -1,4 +1,5 @@
-import { Outlet, createBrowserRouter } from "react-router";
+import { Outlet, createBrowserRouter, useNavigation } from "react-router";
+import { LinearProgress, CircularProgress, Box } from "@mui/material";
 import { RouterProvider } from "react-router/dom";
 import { lazy, Suspense } from "react";
 
@@ -11,6 +12,7 @@ import NotificationManager from "./manager/NotificationManager";
 import UserManager from "./manager/UserManager";
 import RequestManager from "./manager/RequestManager";
 import { ErrorBoundary } from "react-error-boundary";
+import FullScreenLoading from "./common/FullScreenLoading";
 
 window.addEventListener("vite:preloadError", () => {
   const isRefreshed = window.sessionStorage.getItem("vite-preload-error-refreshed");
@@ -87,9 +89,18 @@ const Managers = () => {
   );
 };
 
+const GlobalLoader = () => {
+  const navigation = useNavigation();
+  if (navigation.state === "loading") {
+    return <LinearProgress sx={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 9999 }} color="primary" />;
+  }
+  return null;
+};
+
 const HeaderFooterWrapper = () => {
   return (
     <>
+      <GlobalLoader />
       <Managers />
       <div
         style={{
@@ -118,6 +129,7 @@ const HeaderFooterWrapper = () => {
 const HeaderWrapper = () => {
   return (
     <>
+      <GlobalLoader />
       <Managers />
       <div
         style={{
@@ -318,7 +330,7 @@ const router = createBrowserRouter([
 const App = () => {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <Suspense>
+      <Suspense fallback={<FullScreenLoading />}>
         <RouterProvider router={router} />
       </Suspense>
     </ErrorBoundary>

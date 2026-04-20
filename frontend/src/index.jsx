@@ -6,6 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 import store from "./store";
 import { Provider } from "react-redux";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
 
 import ModalsProvider from "./util/ModalsProvider";
 import Modals from "./util/Modals";
@@ -37,6 +38,7 @@ root.render(
   // <React.StrictMode>
   <Provider store={store}>
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <SnackbarProvider>
         <ModalsProvider>
           <App />
