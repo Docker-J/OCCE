@@ -18,7 +18,7 @@ function isSameDayEvent(start, end, endTime) {
   );
 }
 
-const ScheduleCard = ({ date, event, sx }) => {
+const ScheduleCard = ({ date, event, sunday }) => {
   const allday = event.allday;
 
   const start = parseISO(allday ? event.start.date : event.start.dateTime);
@@ -33,36 +33,35 @@ const ScheduleCard = ({ date, event, sx }) => {
   return (
     <Box
       sx={{
-        // border: "1px solid ",
-        backgroundColor: allday ? "#f57c00" : "#e8eaed",
-        borderColor: allday ? "#f57c00" : "#afafaf",
-        p: 1.5,
-        borderRadius: 1,
-        ...sx,
+        py: 1.5,
+        ...(allday && {
+          borderLeft: `6px solid ${sunday ? "#dc2626" : "#f57c00"}`,
+          pl: 2, // Extra padding to offset the border weight
+          my: 1, // Margin for vertical rhythm
+        }),
       }}
     >
-      {allday ? (
-        <Typography color="primary" sx={{
-          fontWeight: 700
-        }}>
-          {event.summary}
-          {!sameDay &&
-            ` (Day ${differenceInDays(date, start) + 1}/${event.alldaylength})`}
-        </Typography>
-      ) : (
-        <Typography
-          sx={{
-            fontSize: "1.1em",
-            fontWeight: 700
-          }}>
-          {event.summary}
-        </Typography>
-      )}
+      <Typography
+        sx={{
+          fontSize: "1.15em",
+          fontWeight: 800,
+        }}
+      >
+        {event.summary}
+        {allday &&
+          !sameDay &&
+          ` (Day ${differenceInDays(date, start) + 1}/${event.alldaylength})`}
+      </Typography>
+
       <Typography sx={{ mb: "0.2em" }}>{event.description}</Typography>
       {!allday && (
-        <Stack direction="row" spacing={0.5} sx={{
-          alignItems: "flex-start"
-        }}>
+        <Stack
+          direction="row"
+          spacing={0.5}
+          sx={{
+            alignItems: "flex-start",
+          }}
+        >
           <ScheduleIcon fontSize="small" />
           <Typography variant="body2">
             {startTime}
@@ -79,8 +78,9 @@ const ScheduleCard = ({ date, event, sx }) => {
           spacing={0.5}
           sx={{
             alignItems: "flex-start",
-            marginTop: "0.1em"
-          }}>
+            marginTop: "0.1em",
+          }}
+        >
           <PlaceOutlinedIcon color="orange" fontSize="small" />
           <Typography
             component="a"

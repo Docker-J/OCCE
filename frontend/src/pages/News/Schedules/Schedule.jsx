@@ -55,9 +55,10 @@ const Schedule = ({ events }) => {
         <Typography
           variant="h5"
           sx={{
-            fontWeight: 500,
-            mb: "12px"
-          }}>
+            fontWeight: 900,
+            mb: "12px",
+          }}
+        >
           {month}
         </Typography>
 
@@ -74,39 +75,34 @@ const Schedule = ({ events }) => {
               key={date}
               elevation={3}
               sx={{
-                p: 1.5,
                 mb: 2,
                 display: "flex",
-                justifyContent: "center",
-                borderRadius: 2.5,
+                overflow: "hidden",
+                borderRadius: 4,
               }}
             >
-              <div
-                style={{
-                  borderLeft: sunday ? "3px solid red" : "3px solid #f57c00",
-                  height: "32px",
-                  marginTop: "0.5em",
-                  marginRight: "6px",
-                }}
-              />
               <Box
                 sx={{
-                  mr: "16px",
-                }}
-                style={{
+                  backgroundColor: sunday ? "#dc2626" : "primary.main",
+                  p: 2.8,
+                  mr: "18px",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
-                  marginTop: "0.5em",
-                  minWidth: "32px",
+                  width: "80px",
+                  borderRadius: "16px 0 0 16px",
+                  borderBottom: `8px solid ${sunday ? "#991b1b" : "#e65100"}}`,
                 }}
               >
-                <Typography variant="h5" sx={{ color: sunday ? "red" : "primary.main" }}>
+                <Typography
+                  variant="h4"
+                  sx={{ color: "white", fontSize: "32px", fontWeight: 600 }}
+                >
                   {date.toString().padStart(2, "0")}
                 </Typography>
                 <Typography
-                  variant="caption"
-                  sx={{ color: sunday ? "red" : "primary.main" }}
+                  variant="body2"
+                  sx={{ color: "white", textTransform: "uppercase" }}
                 >
                   {format(eventDate, "eee")}
                 </Typography>
@@ -116,16 +112,15 @@ const Schedule = ({ events }) => {
                   width: "100%",
                   display: "flex",
                   flexDirection: "column",
-                  justifyContent: "center"
-                }}>
+                  justifyContent: "center",
+                }}
+              >
                 {dateEvents.map((event, index) => (
                   <ScheduleCard
                     key={index}
                     date={eventDate}
                     event={event}
-                    sx={{
-                      marginBottom: index !== dateEvents.length - 1 && "12px",
-                    }}
+                    sunday={sunday}
                   />
                 ))}
               </Box>
