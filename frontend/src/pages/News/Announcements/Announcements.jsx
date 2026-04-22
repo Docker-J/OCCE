@@ -42,8 +42,9 @@ const Announcements = () => {
               fontWeight: 830,
               letterSpacing: "0.4em",
               pl: "0.4em",
-              color: "white"
-            }}>
+              color: "white",
+            }}
+          >
             공지사항
           </Typography>
         </div>
@@ -74,11 +75,15 @@ const Announcements = () => {
                       justifyContent: "center",
                       width: "100%",
                       maxWidth: "1000px",
+                      alignItems: "center",
                     }}
                   >
                     {state === "loading" && <FullScreenLoading />}
 
-                    <ForumPostBoard announcements={data.announcements} />
+                    <ForumPostBoard
+                      announcements={data.announcements}
+                      dateFirst
+                    />
                     <BoardPagination
                       pages={Math.ceil(data.count / 10)}
                       currentPage={page}

@@ -1,17 +1,17 @@
-import { Box, Card, Divider, Stack, Typography } from "@mui/material";
+import { Box, Card, Stack, Typography } from "@mui/material";
 import { format } from "date-fns";
 import { Link } from "react-router";
 
 import PushPinIcon from "@mui/icons-material/PushPin";
-import MovieIcon from "@mui/icons-material/Movie";
-import PhotoIcon from "@mui/icons-material/Photo";
+import MovieOutlinedIcon from "@mui/icons-material/MovieOutlined";
+import PhotoOutlinedIcon from "@mui/icons-material/PhotoOutlined";
 
-const ForumPostBoard = ({ announcements }) => {
+const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
   function getText(html) {
     let doc = new DOMParser().parseFromString(html, "text/html");
     let allTextNodes = Array.from(doc.body.childNodes).filter(
       (node) =>
-        node.nodeType === Node.TEXT_NODE || node.nodeType === Node.ELEMENT_NODE
+        node.nodeType === Node.TEXT_NODE || node.nodeType === Node.ELEMENT_NODE,
     );
     return allTextNodes.map((node) => node.textContent.trim()).join(" ");
   }
@@ -21,76 +21,95 @@ const ForumPostBoard = ({ announcements }) => {
       style={{
         display: "flex",
         flexDirection: "column",
+        maxWidth: "800px",
       }}
     >
-      {announcements.map((announcement, index) => (
-        <div key={announcement.id}>
+      {posts.map((post, _) => (
+        <div key={post.id}>
           <Card
             component={Link}
-            to={announcement.id}
-            color="black"
+            to={post.id}
             sx={{
               display: "flex",
               textDecoration: "none",
-              backgroundColor: announcement?.pin ? "lightgrey" : null,
-              px: 2,
+              bgcolor: post?.pin ? "lightgrey" : null,
               my: 1.8,
+              borderRadius: 4,
             }}
             elevation={3}
           >
-            <Stack
-              direction="column"
-              sx={{
-                justifyContent: "center",
-                width: "42px",
-              }}
-            >
-              <Typography variant="body2" sx={{
-                whiteSpace: "nowrap"
-              }}>
-                {format(new Date(announcement.timestamp), "MMM dd")}
-              </Typography>
-              <Typography variant="body2">
-                {format(new Date(announcement.timestamp), "yyyy")}
-              </Typography>
-            </Stack>
-
-            <Divider orientation="vertical" flexItem sx={{ mx: 2, my: 1 }} />
+            {dateFirst && (
+              <Stack
+                direction="column"
+                sx={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "80px",
+                  p: 2.8,
+                  bgcolor: "#7b8e7e",
+                  borderRadius: "16px 0 0 16px",
+                  borderBottom: `8px solid #5d6c5f`,
+                  color: "white",
+                }}
+              >
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontWeight: 400,
+                    whiteSpace: "nowrap",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {format(new Date(post.timestamp), "MMM dd")}
+                </Typography>
+                <Typography variant="body2">
+                  {format(new Date(post.timestamp), "yyyy")}
+                </Typography>
+              </Stack>
+            )}
 
             <Box
               sx={{
-                py: 2,
+                px: 2.2,
+                py: 1.8,
                 overflow: "hidden",
                 width: "100%",
               }}
             >
-              <Stack direction="row" sx={{
-                alignItems: "center"
-              }}>
-                {announcement?.pin ? (
+              <Stack
+                direction="row"
+                sx={{
+                  alignItems: "center",
+                }}
+              >
+                {post?.pin ? (
                   <PushPinIcon fontSize="small" sx={{ m: 0 }} />
                 ) : null}
                 <Typography
-                  variant="h6"
                   sx={{
-                    fontWeight: 700,
+                    fontSize: "22px",
+                    fontWeight: 770,
                     whiteSpace: "nowrap",
                     overflow: "hidden",
-                    textOverflow: "ellipsis"
-                  }}>
-                  {announcement.title}
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {post.title}
                 </Typography>
               </Stack>
-              <Stack direction="row" sx={{
-                alignItems: "center"
-              }}>
+              <Stack
+                direction="row"
+                sx={{
+                  marginTop: "8px",
+                  alignItems: "end",
+                }}
+              >
                 <p
                   style={{
                     fontSize: "0.9em",
                     lineHeight: "1.2",
                     height: "2.4em",
                     margin: 0,
-                    marginTop: 12,
                     display: "-webkit-box",
                     WebkitBoxOrient: "vertical",
                     WebkitLineClamp: "2",
@@ -100,14 +119,43 @@ const ForumPostBoard = ({ announcements }) => {
                     textOverflow: "ellipsis",
                   }}
                 >
-                  {getText(announcement.body)}
+                  {getText(post.body)}
                 </p>
-                {announcement.images !== null ? <PhotoIcon /> : null}
-                {announcement.video ? <MovieIcon /> : null}
+                {post?.images && <PhotoOutlinedIcon sx={{ color: "gray" }} />}
+                {post?.video && <MovieOutlinedIcon sx={{ color: "gray" }} />}
               </Stack>
             </Box>
+
+            {!dateFirst && (
+              <Stack
+                direction="column"
+                sx={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "80px",
+                  p: 2.8,
+                  bgcolor: "#7b8e7e",
+                  borderRadius: "0 16px 16px 0",
+                  borderBottom: `8px solid #5d6c5f`,
+                  color: "white",
+                }}
+              >
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontWeight: 400,
+                    whiteSpace: "nowrap",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {format(new Date(post.timestamp), "MMM dd")}
+                </Typography>
+                <Typography variant="body2">
+                  {format(new Date(post.timestamp), "yyyy")}
+                </Typography>
+              </Stack>
+            )}
           </Card>
-          {/* {index !== announcements.length - 1 && <Divider variant="middle" />} */}
         </div>
       ))}
     </div>

@@ -10,7 +10,6 @@ import { CircularProgress, Fab, Typography } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 
-// import ColumnPostModal from "../../../components/News/Columns/ColumnPostModal";
 import ForumPostBoard from "../../../common/Forum/ForumPostBoard";
 import BoardPagination from "../../../components/News/Announcement/BoardPagination";
 
@@ -45,8 +44,9 @@ const Columns = () => {
               fontWeight: 830,
               letterSpacing: "0.4em",
               pl: "0.4em",
-              color: "white"
-            }}>
+              color: "white",
+            }}
+          >
             목회칼럼
           </Typography>
         </div>
@@ -76,6 +76,7 @@ const Columns = () => {
                       flexDirection: "column",
                       width: "100%",
                       maxWidth: "1000px",
+                      alignItems: "center",
                     }}
                   >
                     {state === "loading" && <FullScreenLoading />}
