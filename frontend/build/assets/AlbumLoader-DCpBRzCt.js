@@ -1,0 +1,1 @@
+import{n as e}from"./albums-Cd-qU1QF.js";function t({params:t}){return e(t.albumID)}export{t as loader};

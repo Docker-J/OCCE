@@ -1,0 +1,1 @@
+import{A as e}from"./reactVendor-DTZvIBAs.js";import{t}from"./CircularProgress-C8BBHEWV.js";var n=e(),r=()=>(0,n.jsx)(`div`,{style:{position:`fixed`,top:0,left:0,right:0,bottom:0,zIndex:9999,backgroundColor:`rgba(0,0,0,0.5)`,height:`100%`,widht:`100%`,display:`flex`,justifyContent:`center`,alignItems:`center`},children:(0,n.jsx)(t,{})});export{r as t};

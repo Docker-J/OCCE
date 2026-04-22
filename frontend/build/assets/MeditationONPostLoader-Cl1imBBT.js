@@ -1,0 +1,1 @@
+import{t as e}from"./meditationon-DqDCmDnC.js";async function t({params:t}){return(await e(t.postID)).data}export{t as loader};
