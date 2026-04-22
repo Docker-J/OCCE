@@ -72,7 +72,6 @@ const Announcements = () => {
                     style={{
                       display: "flex",
                       flexDirection: "column",
-                      justifyContent: "center",
                       width: "100%",
                       maxWidth: "1000px",
                       alignItems: "center",
