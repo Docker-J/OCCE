@@ -72,9 +72,8 @@ const Announcements = () => {
                     style={{
                       display: "flex",
                       flexDirection: "column",
-                      width: "100%",
-                      maxWidth: "1000px",
                       alignItems: "center",
+                      width: "100%",
                     }}
                   >
                     {state === "loading" && <FullScreenLoading />}

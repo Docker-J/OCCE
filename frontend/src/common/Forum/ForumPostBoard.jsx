@@ -21,11 +21,12 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
       style={{
         display: "flex",
         flexDirection: "column",
+        width: "100%",
         maxWidth: "800px",
       }}
     >
       {posts.map((post, _) => (
-        <div key={post.id}>
+        <div key={post.id} style={{ width: "100%" }}>
           <Card
             component={Link}
             to={post.id}
@@ -34,6 +35,7 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
               textDecoration: "none",
               bgcolor: post?.pin ? "lightgrey" : null,
               my: 1.8,
+
               borderRadius: 4,
             }}
             elevation={3}
@@ -85,17 +87,20 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
                 {post?.pin ? (
                   <PushPinIcon fontSize="small" sx={{ m: 0 }} />
                 ) : null}
-                <Typography
-                  sx={{
-                    fontSize: "22px",
-                    fontWeight: 770,
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {post.title}
-                </Typography>
+
+                <Box sx={{ flexGrow: 1, pr: 1, minWidth: 0 }}>
+                  <Typography
+                    sx={{
+                      fontSize: "22px",
+                      fontWeight: 770,
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {post.title}
+                  </Typography>
+                </Box>
               </Stack>
               <Stack
                 direction="row"
