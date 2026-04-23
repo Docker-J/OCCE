@@ -88,19 +88,17 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
                   <PushPinIcon fontSize="small" sx={{ m: 0 }} />
                 ) : null}
 
-                <Box sx={{ flexGrow: 1, pr: 1, minWidth: 0 }}>
-                  <Typography
-                    sx={{
-                      fontSize: "22px",
-                      fontWeight: 770,
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {post.title}
-                  </Typography>
-                </Box>
+                <Typography
+                  sx={{
+                    fontSize: "22px",
+                    fontWeight: 770,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {post.title}
+                </Typography>
               </Stack>
               <Stack
                 direction="row"
