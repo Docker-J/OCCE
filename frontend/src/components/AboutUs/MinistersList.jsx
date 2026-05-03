@@ -20,7 +20,7 @@ export const MinistersList = [
     },
   },
   {
-    title: "김휘경 전도사",
+    title: "김휘경 목사",
     position: "중고등부/청년부/찬양",
     image: "img/About/Servers/KimHwikyung.webp",
   },
