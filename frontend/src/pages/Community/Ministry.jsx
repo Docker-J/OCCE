@@ -40,30 +40,40 @@ const Ministry = () => {
               fontWeight: 830,
               letterSpacing: "0.4em",
               pl: "0.4em",
-              color: "white"
-            }}>
+              color: "white",
+            }}
+          >
             사역
           </Typography>
         </div>
       </div>
       <div className="container-wrapper">
         <div className="container">
-          <Typography variant="h5" sx={{
-            fontWeight: 800
-          }}>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 800,
+            }}
+          >
             정원 순환 사역
           </Typography>
           <Typography className="subjectContent" sx={{ fontSize: "1.1em" }}>
             주일 안내팀과 교제팀은 각 팀 staff의 안내에 따라 매달 순서를 맡은
-            소그룹 <Link to="/community/smallgroup">'정원'</Link>이 순환하여
-            섬깁니다.
+            소그룹{" "}
+            <Link to="/community/smallgroup" color="primary">
+              '정원'
+            </Link>
+            이 순환하여 섬깁니다.
           </Typography>
 
           <br />
 
-          <Typography variant="h5" sx={{
-            fontWeight: 800
-          }}>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 800,
+            }}
+          >
             온 교회 사역 지원
           </Typography>
           <Typography className="subjectContent" sx={{ fontSize: "1.1em" }}>
@@ -78,9 +88,19 @@ const Ministry = () => {
             target="__blank"
             href="https://forms.gle/5kGFLfA5fhfotVTW6"
             direction="row"
+            sx={{ alignItems: "center" }}
           >
-            <Typography>사역 지원하기</Typography>
-            <OpenInNewIcon />
+            <Typography
+              variant="h6"
+              color="primary"
+              sx={{
+                textDecorationLine: "underline",
+                textDecorationColor: "primary",
+              }}
+            >
+              사역 지원하기
+            </Typography>
+            <OpenInNewIcon color="primary" />
           </Stack>
 
           <List
@@ -109,9 +129,12 @@ const Ministry = () => {
                   <ListItemIcon>{ministry.icon}</ListItemIcon>
                   <ListItemText
                     primary={
-                      <Typography noWrap sx={{
-                        fontWeight: 650
-                      }}>
+                      <Typography
+                        noWrap
+                        sx={{
+                          fontWeight: 650,
+                        }}
+                      >
                         {ministry.title}
                       </Typography>
                     }
