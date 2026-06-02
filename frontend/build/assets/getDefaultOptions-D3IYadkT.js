@@ -1,1 +1,0 @@
-import{v as e}from"./format-nmcneqUm.js";function t(){return Object.assign({},e())}export{t};

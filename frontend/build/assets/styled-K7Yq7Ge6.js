@@ -1,1 +1,0 @@
-import{x as e}from"./createSimplePaletteValueFilter-0n5DCb6L.js";var t=e();export{t};
