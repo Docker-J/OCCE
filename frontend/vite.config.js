@@ -16,7 +16,12 @@ export default defineConfig(() => {
             if (id.includes('node_modules/@ckeditor') || id.includes('node_modules/ckeditor5')) {
               return 'ckeditor';
             }
-            if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router')) {
+            if (
+              id.includes('node_modules/react/') ||
+              id.includes('node_modules/react-dom/') ||
+              id.includes('node_modules/react-router/') ||
+              id.includes('node_modules/react-router-dom/')
+            ) {
               return 'reactVendor';
             }
           }
