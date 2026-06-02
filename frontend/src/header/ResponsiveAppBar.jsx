@@ -73,7 +73,6 @@ const ResponsiveAppBar = () => {
         openModal(SignUpModal, {});
       },
     },
-    ,
   ];
 
   const signOutSuccess = () => {
