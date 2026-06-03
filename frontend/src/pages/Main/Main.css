@@ -29,16 +29,6 @@
   bottom: 10%;
 }
 
-.cards {
-  max-width: 1536px;
-  justify-content: space-around;
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 5vh;
-  margin-bottom: 5vh;
-}
-
 .main-image-wrapper {
   position: relative;
   height: 100%;

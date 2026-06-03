@@ -53,8 +53,14 @@ const Main = () => {
         <MainImage backgroundImage={"url(/img/Main/img3.webp)"} />
       </CustomCarousel>
 
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <ButtonBases className="cards" />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          backgroundColor: "#f5f5f5",
+        }}
+      >
+        <ButtonBases />
       </div>
 
       {/* <Fab

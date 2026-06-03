@@ -153,8 +153,9 @@ export default function ButtonBases() {
                 position: "relative",
                 p: 4,
                 pt: 2,
-                pb: (theme) => `calc(${theme.spacing(1)} + 6px)`
-              }}>
+                pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
+              }}
+            >
               <ImageMarkedUpper className="MuiImageMarked-root" />
               {image.title}
               <ImageMarked className="MuiImageMarked-root" />

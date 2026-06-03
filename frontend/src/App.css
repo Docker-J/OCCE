@@ -3,8 +3,10 @@
   font-display: swap;
   font-weight: 100 900;
   src: local("☺"),
-    url("https://cdn.jsdelivr.net/gh/eunchurn/NanumSquareNeo@0.0.6/woff2/NanumSquareNeo-Variable.woff2") format("woff2"),
-    url("https://cdn.jsdelivr.net/gh/eunchurn/NanumSquareNeo@0.0.6/woff/NanumSquareNeo-Variable.woff") format("woff");
+    url("https://cdn.jsdelivr.net/gh/eunchurn/NanumSquareNeo@0.0.6/woff2/NanumSquareNeo-Variable.woff2")
+      format("woff2"),
+    url("https://cdn.jsdelivr.net/gh/eunchurn/NanumSquareNeo@0.0.6/woff/NanumSquareNeo-Variable.woff")
+      format("woff");
 }
 
 :root {
@@ -59,6 +61,8 @@ body {
   align-items: center;
   /* justify-content: center; */
   text-align: left;
+  background-color: #f5f5f5;
+  color: #2b2b2b;
 }
 
 .container {
