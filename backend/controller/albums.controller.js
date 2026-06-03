@@ -75,11 +75,12 @@ export const postAlbumController = async (req, res) => {
   const images = req.files;
 
   try {
-    for (const [index, image] of images.entries()) {
-      const result = await uploadImage(image);
-
+    const results = await Promise.all(
+      images.map((image) => uploadImage(image)),
+    );
+    results.forEach((result, index) => {
       ids[index] = result;
-    }
+    });
 
     const command = new PutCommand({
       TableName: TABLENAME,
