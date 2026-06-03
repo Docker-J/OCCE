@@ -1,1 +1,0 @@
-import{t as e}from"./axios-DH1CaHI-.js";async function t({params:t}){return(await e.get(`/api/announcements/announcement/${t.announcementID}`)).data}export{t as loader};

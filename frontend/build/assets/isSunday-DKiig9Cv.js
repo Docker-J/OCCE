@@ -1,1 +1,0 @@
-import{y as e}from"./format-oGyszoHK.js";function t(t,n){return e(t,n?.in).getDay()===0}export{t};
