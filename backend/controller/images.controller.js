@@ -6,16 +6,16 @@ const CLOUDFLARE_API_KEY = process.env.CLOUDFLARE_API_KEY;
 
 export const deleteImages = async (images) => {
   try {
-    const deletePromises = images.map((image) => {
+    const deletePromises = images.map((image) =>
       axios.delete(
         `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1/${image}`,
         {
           headers: {
             Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
           },
-        }
-      );
-    });
+        },
+      ),
+    );
 
     await Promise.all(deletePromises);
   } catch (error) {
@@ -36,7 +36,7 @@ export const uploadImage = async (image) => {
           Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
           "Content-Type": `multipart/form-data; boundary=${formData._boundary}`,
         },
-      }
+      },
     );
 
     return result.data.result.id;
