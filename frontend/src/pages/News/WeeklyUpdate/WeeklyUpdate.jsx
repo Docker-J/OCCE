@@ -73,13 +73,15 @@ const WeeklyUpdate = () => {
 
   const previousSunday = () => {
     setSelectedDate((prev) =>
-      isSunday(prev) ? subDays(prev, 7) : startOfWeek(prev, { weekStartsOn: 0 })
+      isSunday(prev)
+        ? subDays(prev, 7)
+        : startOfWeek(prev, { weekStartsOn: 0 }),
     );
   };
 
   const nextSunday = () => {
     setSelectedDate((prev) =>
-      isSunday(prev) ? addDays(prev, 7) : endOfWeek(prev, { weekStartsOn: 1 })
+      isSunday(prev) ? addDays(prev, 7) : endOfWeek(prev, { weekStartsOn: 1 }),
     );
   };
 
@@ -128,13 +130,14 @@ const WeeklyUpdate = () => {
               fontWeight: 830,
               letterSpacing: "0.4em",
               pl: "0.4em",
-              color: "white"
-            }}>
+              color: "white",
+            }}
+          >
             주보
           </Typography>
         </div>
       </div>
-      <div className="container-wrapper">
+      <div className="container-wrapper" style={{ backgroundColor: "#ffffff" }}>
         <div
           className="container"
           style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0 }}
