@@ -25,16 +25,18 @@ const Preschool = () => {
               fontWeight: 830,
               letterSpacing: "0.4em",
               pl: "0.4em",
-              color: "white"
-            }}>
+              color: "white",
+            }}
+          >
             유아유치부
           </Typography>
           <Typography
             variant="h5"
             sx={{
               fontWeight: 700,
-              color: "white"
-            }}>
+              color: "white",
+            }}
+          >
             KIDS ON Good Soil
           </Typography>
 
@@ -64,13 +66,14 @@ const Preschool = () => {
 
           <br />
 
-          <Typography sx={{ fontSize: "1.1em", color: "black" }}>
+          <Typography sx={{ fontSize: "1.1em" }}>
             <Typography
               component="span"
               sx={{
                 fontWeight: "bold",
-                fontSize: "1.5em"
-              }}>
+                fontSize: "1.5em",
+              }}
+            >
               온교회 유아유치부
             </Typography>
             는 성령으로 인하여 부드러운 마음을 가진 우리 어린이들이 말씀을

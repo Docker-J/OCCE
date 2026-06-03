@@ -93,7 +93,7 @@ const YoungAdult = () => {
           </div>
 
           <br />
-          <Typography sx={{ fontSize: "1.1em", color: "black" }}>
+          <Typography sx={{ fontSize: "1.1em" }}>
             <Typography
               component="span"
               sx={{

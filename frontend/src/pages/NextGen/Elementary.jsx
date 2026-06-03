@@ -40,8 +40,9 @@ const Elementary = () => {
               textAlign: "center",
               letterSpacing: "0.4em",
               pl: "0.4em",
-              color: "white"
-            }}>
+              color: "white",
+            }}
+          >
             유초등부
           </Typography>
           <Typography
@@ -49,8 +50,9 @@ const Elementary = () => {
             sx={{
               textAlign: "center",
               fontWeight: 700,
-              color: "white"
-            }}>
+              color: "white",
+            }}
+          >
             KIDS ON the Tree
           </Typography>
 
@@ -79,16 +81,14 @@ const Elementary = () => {
           </div>
 
           <br />
-          <Typography
-            sx={{ fontSize: "1.1em", color: "black" }}
-            // style={{ textAlign: "center", maxWidth: "1536px" }}
-          >
+          <Typography sx={{ fontSize: "1.1em" }}>
             <Typography
               component="span"
               sx={{
                 fontWeight: "bold",
-                fontSize: "1.5em"
-              }}>
+                fontSize: "1.5em",
+              }}
+            >
               온교회 유초등부
             </Typography>
             는 초등학교 1학년에서 6학년 연령의 다음 세대 자녀들이, 누가복음 19장
