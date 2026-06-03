@@ -34,6 +34,7 @@ const ScheduleCard = ({ date, event, sunday }) => {
     <Box
       sx={{
         py: 1.5,
+        px: "18px",
         ...(allday && {
           borderLeft: `6px solid ${sunday ? "#dc2626" : "#f57c00"}`,
           pl: 2, // Extra padding to offset the border weight

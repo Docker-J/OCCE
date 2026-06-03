@@ -85,7 +85,6 @@ const Schedule = ({ events }) => {
                 sx={{
                   backgroundColor: sunday ? "#dc2626" : "primary.main",
                   p: 2.8,
-                  mr: "18px",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
