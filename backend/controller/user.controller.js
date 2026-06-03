@@ -80,9 +80,10 @@ export const refreshSignInController = async (req, res) => {
     const response = await cognitoClient.send(command);
     const accessToken = response.AuthenticationResult.AccessToken;
     const newRefreshToken = response.AuthenticationResult.RefreshToken;
-    const group = JSON.parse(Buffer.from(accessToken.split(".")[1], "base64"))[
-      "cognito:groups"
-    ][0];
+    const group =
+      JSON.parse(Buffer.from(accessToken.split(".")[1], "base64"))[
+        "cognito:groups"
+      ]?.[0] || null;
 
     res.send({
       accessToken: accessToken,
