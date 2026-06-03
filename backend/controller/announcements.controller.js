@@ -32,6 +32,14 @@ export const getPinnedAnnouncements = async () => {
 export const getAnnouncementsController = async (req, res) => {
   const page = req.query.page;
 
+  // Lazily re-fetch in-memory cache if undefined (e.g. after server restart)
+  if (PINNED_ANNOUNCEMENTS == null) {
+    await getPinnedAnnouncements();
+  }
+  if (ANNOUNCEMENTS_COUNT == null) {
+    await getAnnouncementsCount();
+  }
+
   const sql = `SELECT * FROM ${TABLENAME} WHERE pin = ? ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
     page ? (page - 1) * PAGE_SIZE : 0
   }`;
@@ -39,9 +47,9 @@ export const getAnnouncementsController = async (req, res) => {
 
   try {
     const result = await executeD1Query(sql, params);
-    const announcements = PINNED_ANNOUNCEMENTS.concat(result.result[0].results);
+    const announcements = (PINNED_ANNOUNCEMENTS ?? []).concat(result.result[0].results);
 
-    res.send({ count: ANNOUNCEMENTS_COUNT, announcements: announcements });
+    res.send({ count: ANNOUNCEMENTS_COUNT ?? 0, announcements: announcements });
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
