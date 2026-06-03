@@ -22,7 +22,7 @@ export const signIn = async (phone, password, success, fail) => {
 
 export const refreshTokenSignIn = async (refreshToken, success, fail) => {
   try {
-    const res = await axios.post(`/api/user/refreshSignIn/${refreshToken}`);
+    const res = await axios.post("/api/user/refreshSignIn", { refreshToken });
 
     success(res.data);
   } catch (error) {

@@ -70,7 +70,7 @@ export const refreshSignInController = async (req, res) => {
     AuthFlow: "REFRESH_TOKEN_AUTH",
     ClientId: AWS_COGNITO_CLIENT_ID,
     AuthParameters: {
-      REFRESH_TOKEN: req.params.refreshToken,
+      REFRESH_TOKEN: req.body.refreshToken,
     },
   };
 

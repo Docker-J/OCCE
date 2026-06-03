@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.post("/signIn", signInController);
 
-router.post("/refreshSignIn/:refreshToken", refreshSignInController);
+router.post("/refreshSignIn", refreshSignInController);
 
 router.post("/signUp", signUpController);
 
