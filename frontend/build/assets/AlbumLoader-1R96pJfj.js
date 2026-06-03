@@ -1,0 +1,1 @@
+import{n as e}from"./albums-CfmOU89-.js";function t({params:t}){return e(t.albumID)}export{t as loader};
