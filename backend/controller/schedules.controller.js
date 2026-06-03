@@ -10,7 +10,7 @@ export const getSchedules = async () => {
   try {
     const auth = new google.auth.GoogleAuth({
       keyFile: KEY_PATH,
-      scopes: ["https://www.googleapis.com/auth/calendar"],
+      scopes: ["https://www.googleapis.com/auth/calendar.readonly"],
     });
 
     // 2. Create the Calendar Client
