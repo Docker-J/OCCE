@@ -84,8 +84,11 @@ body {
 
 .video-container {
   position: relative;
-  width: 100%;
-  padding-top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  /* width: 100%; */
+  max-height: 50vh;
+  aspect-ratio: 16 / 9;
 }
 
 iframe {
