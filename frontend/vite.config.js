@@ -31,9 +31,9 @@ export default defineConfig(() => {
 
     plugins: [
       react(),
-      analyzer(),
+      process.env.ANALYZE && analyzer(),
       basicSsl(),
-    ],
+    ].filter(Boolean),
 
     legacy: {
       inconsistentCjsInterop: true,
