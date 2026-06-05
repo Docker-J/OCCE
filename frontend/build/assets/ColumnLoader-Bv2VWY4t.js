@@ -1,0 +1,1 @@
+import{n as e}from"./columns-BL_IWFJA.js";async function t({params:t}){return await e(t.columnID)}export{t as loader};
