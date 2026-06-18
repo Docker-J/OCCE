@@ -99,7 +99,7 @@ const ResponsiveAppBar = () => {
               <img
                 alt="Header Logo"
                 src="/img/HeaderLogoColor.png"
-                style={{ width: "240px" }}
+                style={{ width: "240px", height: "48.92px" }}
               />
             </Link>
           </Box>
@@ -152,7 +152,7 @@ const ResponsiveAppBar = () => {
                 alt="Header Logo"
                 className="mobileLogo"
                 src="/img/HeaderLogoColor.png"
-                style={{ width: "180px" }}
+                style={{ width: "180px", height: "36.69px" }}
               />
             </Link>
           </Box>

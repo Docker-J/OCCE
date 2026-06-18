@@ -19,7 +19,7 @@ const Footer = () => {
         <img
           alt="Footer Logo"
           src="/img/HeaderLogoBW.png"
-          style={{ height: "40px" }}
+          style={{ width: "196.22px", height: "40px" }}
         />
       </Link>
       <Typography>Based ON the OLD Truth</Typography>

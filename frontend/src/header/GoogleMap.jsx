@@ -45,6 +45,7 @@ const GoogleMap = memo(() => {
           >
             <img
               alt="OCCE Circle Logo"
+              width={30}
               height={30}
               src="/img/OCCE_logo_circle_rim_color.png"
             />
