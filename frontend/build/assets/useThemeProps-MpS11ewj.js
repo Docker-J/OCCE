@@ -1,0 +1,1 @@
+import{J as e,u as t}from"./createSimplePaletteValueFilter-_ImOloiw.js";import{J as n}from"./index-DiKEOID2.js";function r({props:r,name:i}){return n({props:r,name:i,defaultTheme:t,themeId:e})}export{r as t};
