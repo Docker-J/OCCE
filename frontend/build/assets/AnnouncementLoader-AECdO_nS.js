@@ -1,0 +1,1 @@
+import{p as e}from"./index-DGKU094V.js";async function t({params:t}){return(await e.get(`/api/announcements/announcement/${t.announcementID}`)).data}export{t as loader};

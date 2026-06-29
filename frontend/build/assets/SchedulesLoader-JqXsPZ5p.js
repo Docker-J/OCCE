@@ -1,0 +1,1 @@
+import{p as e}from"./index-DGKU094V.js";async function t(){return{schedules:e.get(`/api/schedules`)}}export{t as loader};

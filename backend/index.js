@@ -13,6 +13,8 @@ import meditationon from "./routes/meditationon.routes.js";
 import notification from "./routes/notification.routes.js";
 import schedules from "./routes/schedules.routes.js";
 import images from "./routes/images.routes.js";
+import attendance from "./routes/attendance.routes.js";
+import sendNotification from "./api/sendNotification.js";
 
 import { getRecentWeelyUpdateDate } from "./controller/weeklyupdate.controller.js";
 import {
@@ -37,6 +39,7 @@ app.use("/api/schedules", schedules);
 app.use("/api/meditationon", meditationon);
 app.use("/api/notification", notification);
 app.use("/api/images", images);
+app.use("/api/attendance", attendance);
 
 // ------------------------------------------------
 // CRON JOB SETUP
@@ -51,6 +54,28 @@ cron.schedule(
       console.log("✅ Schedule refreshed successfully.");
     } catch (error) {
       console.error("❌ Failed to refresh schedule:", error);
+    }
+  },
+  {
+    scheduled: true,
+    timezone: "America/Edmonton",
+  }
+);
+
+// Weekly Garden Attendance Reminder Web Push (Every Sunday at 2:30 PM Edmonton Time)
+cron.schedule(
+  "30 14 * * 0",
+  async () => {
+    console.log("🕒 Triggering weekly Sunday garden attendance reminder...");
+    try {
+      await sendNotification(
+        "정원 출석 보고 리마인더",
+        "정원지기분들은 오늘 정원 모임 후 출석 상태를 보고해 주세요!",
+        "community/smallgroup/report"
+      );
+      console.log("✅ Weekly attendance reminder sent successfully.");
+    } catch (error) {
+      console.error("❌ Failed to send weekly attendance reminder:", error);
     }
   },
   {

@@ -71,6 +71,7 @@ const Bible291 = lazy(() => import("./pages/Online/Bible291"));
 
 // Community
 const SmallGroup = lazy(() => import("./pages/Community/SmallGroup"));
+const SmallGroupReport = lazy(() => import("./pages/Community/SmallGroupReport"));
 const Ministry = lazy(() => import("./pages/Community/Ministry"));
 
 // NextGen
@@ -237,6 +238,10 @@ const router = createBrowserRouter([
           {
             path: "smallgroup",
             element: <SmallGroup />,
+          },
+          {
+            path: "smallgroup/report",
+            element: <SmallGroupReport />,
           },
           {
             path: "ministry",

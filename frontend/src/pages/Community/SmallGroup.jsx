@@ -1,4 +1,7 @@
-import { Typography } from "@mui/material";
+import { Typography, Button, Box } from "@mui/material";
+import { Link } from "react-router";
+import { useSelector } from "react-redux";
+import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 
 const titleBackground = {
   backgroundImage: 'url("/img/Community/SmallGroup.webp")',
@@ -6,6 +9,8 @@ const titleBackground = {
 };
 
 const SmallGroup = () => {
+  const isLeader = useSelector((state) => state.authToken?.isLeader);
+
   return (
     <>
       <title>소그룹 - OCCE</title>
@@ -55,6 +60,31 @@ const SmallGroup = () => {
             태초의 에덴을 경험하는 행복한 만남과 나눔과 성장 그리고 지상 최대
             명령인 복음 전파의 자리입니다.
           </Typography>
+
+          {isLeader && (
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 5, mb: 3 }}>
+              <Button
+                component={Link}
+                to="/community/smallgroup/report"
+                variant="contained"
+                size="large"
+                startIcon={<AssignmentTurnedInIcon />}
+                sx={{
+                  backgroundColor: "#2e7d32",
+                  "&:hover": { backgroundColor: "#1b5e20" },
+                  borderRadius: "24px",
+                  px: 4,
+                  py: 1.5,
+                  fontWeight: 700,
+                  fontSize: "1.05em",
+                  boxShadow: "0 4px 12px 0 rgba(46, 125, 50, 0.2)",
+                  textTransform: "none",
+                }}
+              >
+                정원 출석 보고하기
+              </Button>
+            </Box>
+          )}
         </div>
       </div>
     </>

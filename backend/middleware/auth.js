@@ -41,3 +41,24 @@ export const authUser = async (req, res, next) => {
     next();
   }
 };
+
+const leaderVerifier = CognitoJwtVerifier.create({
+  userPoolId: process.env.AWS_COGNITO_USER_POOL_ID,
+  tokenUse: "access",
+  clientId: process.env.AWS_COGNITO_CLIENT_ID,
+  groups: ["Staff", "GardenKeeper"],
+});
+
+export const authLeader = async (req, res, next) => {
+  try {
+    const token = req.header("Authorization").split(" ")[1];
+    const payload = await leaderVerifier.verify(token);
+    console.log("Leader token is valid. Payload:", payload);
+
+    req.user = payload;
+    next();
+  } catch (err) {
+    console.log("Leader Token not valid!", err);
+    res.sendStatus(401);
+  }
+};

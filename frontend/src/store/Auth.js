@@ -7,6 +7,7 @@ export const tokenSlice = createSlice({
   initialState: {
     authenticated: false,
     admin: false,
+    isLeader: false,
     accessToken: null,
     expireTime: null,
   },
@@ -16,12 +17,16 @@ export const tokenSlice = createSlice({
       state.admin = action.payload.groups.some((group) => {
         return group === "Staff";
       });
+      state.isLeader = action.payload.groups.some((group) => {
+        return group === "Staff" || group === "GardenKeeper";
+      });
       state.accessToken = action.payload.accessToken;
       state.expireTime = new Date().getTime() + TOKEN_TIME_OUT;
     },
     DELETE_TOKEN: (state) => {
       state.authenticated = false;
       state.admin = false;
+      state.isLeader = false;
       state.accessToken = null;
       state.expireTime = null;
     },
