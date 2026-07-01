@@ -5,6 +5,7 @@ import {
   InitiateAuthCommand,
   ResendConfirmationCodeCommand,
   SignUpCommand,
+  AdminGetUserCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { google } from "googleapis";
 import path from "path";
@@ -245,10 +246,35 @@ export const confimrSignUpController = async (req, res) => {
 
 export const requestConfirmController = async (req, res) => {
   console.log(req.query.phone);
+  const username = "+1" + req.query.phone;
+
+  try {
+    const getUserCommand = new AdminGetUserCommand({
+      UserPoolId: process.env.AWS_COGNITO_USER_POOL_ID,
+      Username: username,
+    });
+    const user = await cognitoClient.send(getUserCommand);
+
+    if (user.UserStatus === "CONFIRMED") {
+      return res.status(400).json({
+        error: "UserAlreadyConfirmedException",
+        message: "이미 인증이 완료된 회원입니다.",
+      });
+    }
+  } catch (error) {
+    if (error.name === "UserNotFoundException") {
+      return res.status(404).json({
+        error: "UserNotFoundException",
+        message: "등록되지 않은 회원입니다.",
+      });
+    }
+    console.error("Error checking user status:", error);
+  }
+
   const input = {
     // ResendConfirmationCodeRequest
     ClientId: AWS_COGNITO_CLIENT_ID,
-    Username: "+1" + req.query.phone, // required
+    Username: username, // required
   };
   const command = new ResendConfirmationCodeCommand(input);
 

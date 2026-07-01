@@ -26,7 +26,13 @@ const SignUpRequestConfirmModal = ({ isOpen, onClose }) => {
   };
 
   const confirmFail = (error) => {
-    openSnackbar("error", "인증 요청에 실패했습니다.");
+    let message = "인증 요청에 실패했습니다.";
+    if (error === "UserAlreadyConfirmedException") {
+      message = "이미 가입 및 번호 인증이 완료된 회원입니다. 로그인 해주세요.";
+    } else if (error === "UserNotFoundException") {
+      message = "등록되지 않은 번호입니다. 회원가입을 먼저 진행해주세요.";
+    }
+    openSnackbar("error", message);
   };
 
   const handleClose = () => {

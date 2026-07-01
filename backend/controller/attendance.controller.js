@@ -1,6 +1,9 @@
 import { google } from "googleapis";
 import path from "path";
-import { CognitoIdentityProviderClient, GetUserCommand } from "@aws-sdk/client-cognito-identity-provider";
+import {
+  CognitoIdentityProviderClient,
+  GetUserCommand,
+} from "@aws-sdk/client-cognito-identity-provider";
 
 const KEY_PATH = path.join(process.cwd(), "church-4385c-ceedf27e8d20.json");
 
@@ -14,7 +17,7 @@ const getSheetsClient = () => {
     keyFile: KEY_PATH,
     scopes: [
       "https://www.googleapis.com/auth/spreadsheets",
-      "https://www.googleapis.com/auth/drive"
+      "https://www.googleapis.com/auth/drive",
     ],
   });
   return google.sheets({ version: "v4", auth });
@@ -25,7 +28,9 @@ const getCognitoUserName = async (accessToken) => {
   try {
     const command = new GetUserCommand({ AccessToken: accessToken });
     const response = await cognitoClient.send(command);
-    const nameAttr = response.UserAttributes.find((attr) => attr.Name === "name");
+    const nameAttr = response.UserAttributes.find(
+      (attr) => attr.Name === "name",
+    );
     return nameAttr ? nameAttr.Value : "";
   } catch (error) {
     console.error("Error fetching Cognito user name:", error);
@@ -39,7 +44,7 @@ const getDriveClient = () => {
     keyFile: KEY_PATH,
     scopes: [
       "https://www.googleapis.com/auth/spreadsheets",
-      "https://www.googleapis.com/auth/drive"
+      "https://www.googleapis.com/auth/drive",
     ],
   });
   return google.drive({ version: "v3", auth });
@@ -48,7 +53,9 @@ const getDriveClient = () => {
 export const getGardensController = async (req, res) => {
   const spreadsheetId = process.env.ATTENDANCE_SHEET_ID;
   if (!spreadsheetId) {
-    return res.status(500).json({ error: "Attendance Sheet ID is not configured." });
+    return res
+      .status(500)
+      .json({ error: "Attendance Sheet ID is not configured." });
   }
 
   const isStaff = req.user["cognito:groups"]?.includes("Staff") || false;
@@ -63,7 +70,9 @@ export const getGardensController = async (req, res) => {
 
     // 2. Read Garden Keepers mapping sheet
     if (!sheetNames.includes("정원지기")) {
-      return res.status(500).json({ error: "'정원지기' tab not found in the spreadsheet." });
+      return res
+        .status(500)
+        .json({ error: "'정원지기' tab not found in the spreadsheet." });
     }
 
     const keepersResponse = await sheets.spreadsheets.values.get({
@@ -73,14 +82,18 @@ export const getGardensController = async (req, res) => {
     const keeperRows = keepersResponse.data.values || [];
 
     // Dynamically skip header if it exists
-    const startIdx = keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
+    const startIdx =
+      keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
     let assignedGardens = [];
     for (const row of keeperRows.slice(startIdx)) {
       const phone = row[2]?.toString().replace(/\D/g, "") || "";
       const gardensStr = row[3]?.toString().trim() || "";
 
       if (phone.slice(-10) === cleanUserPhone.slice(-10)) {
-        assignedGardens = gardensStr.split(",").map((g) => g.trim()).filter(Boolean);
+        assignedGardens = gardensStr
+          .split(",")
+          .map((g) => g.trim())
+          .filter(Boolean);
         break;
       }
     }
@@ -89,7 +102,8 @@ export const getGardensController = async (req, res) => {
     if (!isStaff && assignedGardens.length === 0) {
       return res.status(403).json({
         error: "NotAssignedLeader",
-        message: "이 계정의 전화번호가 스프레드시트의 '정원지기' 명단에 존재하지 않거나 정원이 매핑되지 않았습니다.",
+        message:
+          "이 계정의 전화번호가 스프레드시트의 '정원지기' 명단에 존재하지 않거나 정원이 매핑되지 않았습니다.",
       });
     }
 
@@ -98,7 +112,10 @@ export const getGardensController = async (req, res) => {
     if (isStaff) {
       // Staff can see all gardens. Filter out metadata tabs.
       const gardenTabs = sheetNames.filter(
-        (name) => name !== "정원지기" && name !== "출석보고" && !/^\d{4}-\d{2}-\d{2}$/.test(name)
+        (name) =>
+          name !== "정원지기" &&
+          name !== "출석보고" &&
+          !/^\d{4}-\d{2}-\d{2}$/.test(name),
       );
 
       if (gardenTabs.length > 0) {
@@ -146,7 +163,9 @@ export const getGardensController = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in getGardensController:", error);
-    res.status(500).json({ error: "Failed to retrieve gardens and members data." });
+    res
+      .status(500)
+      .json({ error: "Failed to retrieve gardens and members data." });
   }
 };
 
@@ -155,10 +174,14 @@ export const postReportController = async (req, res) => {
   const folderId = process.env.DRIVE_FOLDER_ID;
 
   if (!spreadsheetId) {
-    return res.status(500).json({ error: "Attendance Sheet ID is not configured." });
+    return res
+      .status(500)
+      .json({ error: "Attendance Sheet ID is not configured." });
   }
   if (!folderId) {
-    return res.status(500).json({ error: "Drive Folder ID is not configured." });
+    return res
+      .status(500)
+      .json({ error: "Drive Folder ID is not configured." });
   }
 
   const { date, gardenName, attendees, absentees, absenceReasons } = req.body;
@@ -179,7 +202,8 @@ export const postReportController = async (req, res) => {
       range: "정원지기!A:D",
     });
     const keeperRows = keepersResponse.data.values || [];
-    const startIdx = keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
+    const startIdx =
+      keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
 
     let assignedGardens = [];
     let reporterName = null;
@@ -190,7 +214,10 @@ export const postReportController = async (req, res) => {
       const gardensStr = row[3]?.toString().trim() || "";
 
       if (phone.slice(-10) === cleanUserPhone.slice(-10)) {
-        assignedGardens = gardensStr.split(",").map((g) => g.trim()).filter(Boolean);
+        assignedGardens = gardensStr
+          .split(",")
+          .map((g) => g.trim())
+          .filter(Boolean);
         reporterName = name;
         break;
       }
@@ -214,12 +241,18 @@ export const postReportController = async (req, res) => {
         if (token) {
           const fetchPromise = getCognitoUserName(token);
           const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Cognito request timeout")), 2500)
+            setTimeout(
+              () => reject(new Error("Cognito request timeout")),
+              2500,
+            ),
           );
           reporterName = await Promise.race([fetchPromise, timeoutPromise]);
         }
       } catch (err) {
-        console.warn("Failed or timed out fetching name from Cognito:", err.message);
+        console.warn(
+          "Failed or timed out fetching name from Cognito:",
+          err.message,
+        );
       }
       if (!reporterName) {
         reporterName = isStaff ? "목회자/스태프" : cleanUserPhone;
@@ -228,7 +261,9 @@ export const postReportController = async (req, res) => {
 
     // 2. Search for existing weekly file named 'OCCE_정원출석부_[date]' in DRIVE_FOLDER_ID
     const fileName = `OCCE_정원출석부_${date}`;
-    console.log(`Searching for file '${fileName}' in Shared Drive folder '${folderId}'...`);
+    console.log(
+      `Searching for file '${fileName}' in Shared Drive folder '${folderId}'...`,
+    );
     const searchResponse = await drive.files.list({
       q: `'${folderId}' in parents and name = '${fileName}' and trashed = false`,
       spaces: "drive",
@@ -244,7 +279,9 @@ export const postReportController = async (req, res) => {
       console.log(`Found existing weekly spreadsheet: ${weeklySpreadsheetId}`);
     } else {
       // 3. File does not exist: Copy master spreadsheet to folderId
-      console.log(`Weekly spreadsheet not found. Copying master spreadsheet ${spreadsheetId}...`);
+      console.log(
+        `Weekly spreadsheet not found. Copying master spreadsheet ${spreadsheetId}...`,
+      );
       const copyResponse = await drive.files.copy({
         fileId: spreadsheetId,
         requestBody: {
@@ -254,15 +291,25 @@ export const postReportController = async (req, res) => {
         supportsAllDrives: true,
       });
       weeklySpreadsheetId = copyResponse.data.id;
-      console.log(`Master spreadsheet copied successfully. New ID: ${weeklySpreadsheetId}`);
+      console.log(
+        `Master spreadsheet copied successfully. New ID: ${weeklySpreadsheetId}`,
+      );
 
       // 4. Initialize the copied weekly spreadsheet: Add '종합통계' tab and configure all garden tabs
-      const weeklySpreadsheetInfo = await sheets.spreadsheets.get({ spreadsheetId: weeklySpreadsheetId });
-      const weeklySheetNames = weeklySpreadsheetInfo.data.sheets.map((s) => s.properties.title);
+      const weeklySpreadsheetInfo = await sheets.spreadsheets.get({
+        spreadsheetId: weeklySpreadsheetId,
+      });
+      const weeklySheetNames = weeklySpreadsheetInfo.data.sheets.map(
+        (s) => s.properties.title,
+      );
 
       // Find '정원지기' tab to delete
-      const keepersSheet = weeklySpreadsheetInfo.data.sheets.find((s) => s.properties.title === "정원지기");
-      const keepersSheetId = keepersSheet ? keepersSheet.properties.sheetId : null;
+      const keepersSheet = weeklySpreadsheetInfo.data.sheets.find(
+        (s) => s.properties.title === "정원지기",
+      );
+      const keepersSheetId = keepersSheet
+        ? keepersSheet.properties.sheetId
+        : null;
 
       // Create '종합통계' sheet tab at index 0 and delete '정원지기' sheet tab
       console.log("Creating '종합통계' tab and deleting '정원지기' tab...");
@@ -293,7 +340,12 @@ export const postReportController = async (req, res) => {
 
       // Filter to get only garden tabs
       const gardenTabs = weeklySheetNames.filter(
-        (name) => name !== "정원지기" && name !== "종합통계" && name !== "출석부" && name !== "출석보고" && !/^\d{4}-\d{2}-\d{2}$/.test(name)
+        (name) =>
+          name !== "정원지기" &&
+          name !== "종합통계" &&
+          name !== "출석부" &&
+          name !== "출석보고" &&
+          !/^\d{4}-\d{2}-\d{2}$/.test(name),
       );
       gardenTabs.sort(); // Sort alphabetically
 
@@ -304,17 +356,21 @@ export const postReportController = async (req, res) => {
         ranges,
       });
 
-      const summaryRows = [
-        ["구분", "정원", "총원", "출석", "결석", "출석율"],
-      ];
+      const summaryRows = [["구분", "정원", "총원", "출석", "결석", "출석율"]];
 
       const validationRequests = [];
       const updateValueRequests = [];
 
       // Get the sheetId of the newly created '종합통계' sheet
-      const updatedSpreadsheetInfo = await sheets.spreadsheets.get({ spreadsheetId: weeklySpreadsheetId });
-      const totalSummarySheet = updatedSpreadsheetInfo.data.sheets.find((s) => s.properties.title === "종합통계");
-      const summarySheetId = totalSummarySheet ? totalSummarySheet.properties.sheetId : null;
+      const updatedSpreadsheetInfo = await sheets.spreadsheets.get({
+        spreadsheetId: weeklySpreadsheetId,
+      });
+      const totalSummarySheet = updatedSpreadsheetInfo.data.sheets.find(
+        (s) => s.properties.title === "종합통계",
+      );
+      const summarySheetId = totalSummarySheet
+        ? totalSummarySheet.properties.sheetId
+        : null;
 
       gardenTabs.forEach((gardenTabName, idx) => {
         const vr = batchResponse.data.valueRanges[idx];
@@ -338,7 +394,9 @@ export const postReportController = async (req, res) => {
         ]);
 
         // Initialize Column B with false and apply native checkbox validation
-        const currentTab = updatedSpreadsheetInfo.data.sheets.find((s) => s.properties.title === gardenTabName);
+        const currentTab = updatedSpreadsheetInfo.data.sheets.find(
+          (s) => s.properties.title === gardenTabName,
+        );
         const currentTabId = currentTab ? currentTab.properties.sheetId : null;
 
         if (currentTabId && memberCount > 0) {
@@ -429,8 +487,12 @@ export const postReportController = async (req, res) => {
 
     // 5. Update reported garden attendance in its tab (Native Checkbox + Note comments)
     console.log(`Updating attendance in tab '${gardenName}'...`);
-    const currentSpreadsheetInfo = await sheets.spreadsheets.get({ spreadsheetId: weeklySpreadsheetId });
-    const currentTab = currentSpreadsheetInfo.data.sheets.find((s) => s.properties.title === gardenName);
+    const currentSpreadsheetInfo = await sheets.spreadsheets.get({
+      spreadsheetId: weeklySpreadsheetId,
+    });
+    const currentTab = currentSpreadsheetInfo.data.sheets.find(
+      (s) => s.properties.title === gardenName,
+    );
     if (!currentTab) {
       return res.status(404).json({
         error: "GardenTabNotFound",
@@ -486,7 +548,9 @@ export const postReportController = async (req, res) => {
       });
     }
 
-    console.log(`✅ Attendance reported successfully for ${gardenName} on ${date} (Weekly Sheet updated with native checkboxes and comments)`);
+    console.log(
+      `✅ Attendance reported successfully for ${gardenName} on ${date} (Weekly Sheet updated with native checkboxes and comments)`,
+    );
     res.sendStatus(200);
   } catch (error) {
     console.error("Error in postReportController:", error);

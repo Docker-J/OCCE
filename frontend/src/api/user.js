@@ -64,8 +64,8 @@ export const resendSignUpConfirm = async (phone, success, fail) => {
     const res = await axios.get(`/api/user/resendConfirm?phone=${phone}`);
 
     success();
-  } catch {
-    fail();
+  } catch (error) {
+    fail(error.response?.data?.error);
   }
 };
 

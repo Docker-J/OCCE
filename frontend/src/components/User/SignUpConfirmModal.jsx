@@ -72,7 +72,7 @@ const SignUpConfirmModal = ({ phone, isOpen, onClose }) => {
   };
 
   const resendFail = () => {
-    openSnackbar();
+    openSnackbar("error", "인증번호 재전송에 실패했습니다.");
   };
 
   return (
