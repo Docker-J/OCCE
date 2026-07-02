@@ -347,7 +347,6 @@ export const postReportController = async (req, res) => {
           name !== "출석보고" &&
           !/^\d{4}-\d{2}-\d{2}$/.test(name),
       );
-      gardenTabs.sort(); // Sort alphabetically
 
       // Fetch members count of all garden tabs to populate '종합통계' and initialize checkboxes
       const ranges = gardenTabs.map((name) => `${name}!A:A`);
