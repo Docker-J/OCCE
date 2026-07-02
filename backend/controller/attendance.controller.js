@@ -355,7 +355,7 @@ export const postReportController = async (req, res) => {
         ranges,
       });
 
-      const summaryRows = [["구분", "정원", "총원", "출석", "결석", "출석율"]];
+      const summaryRows = [["보고여부", "정원", "총원", "출석", "결석", "출석율"]];
 
       const validationRequests = [];
       const updateValueRequests = [];
@@ -384,7 +384,7 @@ export const postReportController = async (req, res) => {
         // Formulas:
         // C: 총원, D: 출석, E: 결석, F: 출석율
         summaryRows.push([
-          idx + 1,
+          false, // Initialize '보고여부' as false (unchecked checkbox)
           gardenTabName,
           `=COUNTA('${gardenTabName}'!A1:A200)`,
           `=COUNTIF('${gardenTabName}'!B1:B200, TRUE)`,
@@ -471,6 +471,28 @@ export const postReportController = async (req, res) => {
             fields: "userEnteredFormat.numberFormat",
           },
         });
+
+        // Add '종합통계' checkbox data validation (Column A, rows 1 to gardenTabs.length + 1)
+        for (let idx = 0; idx < gardenTabs.length; idx++) {
+          const rowIdx = idx + 1; // Row 2 in sheet is index 1
+          validationRequests.push({
+            setDataValidation: {
+              range: {
+                sheetId: summarySheetId,
+                startRowIndex: rowIdx,
+                endRowIndex: rowIdx + 1,
+                startColumnIndex: 0, // Column A is index 0
+                endColumnIndex: 1,
+              },
+              rule: {
+                condition: {
+                  type: "BOOLEAN",
+                },
+                showCustomUi: true,
+              },
+            },
+          });
+        }
       }
 
       // Apply batch validations and formatting
@@ -543,6 +565,33 @@ export const postReportController = async (req, res) => {
               },
             },
           ],
+        },
+      });
+    }
+
+    // 6. Update '보고여부' status to true in '종합통계' sheet tab
+    console.log("Updating report status to true in '종합통계'...");
+    const summaryResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId: weeklySpreadsheetId,
+      range: "종합통계!A:F",
+    });
+    const summaryRowsData = summaryResponse.data.values || [];
+
+    let gardenRowIdx = -1;
+    for (let i = 1; i < summaryRowsData.length; i++) {
+      if (summaryRowsData[i][1]?.toString().trim() === gardenName.trim()) {
+        gardenRowIdx = i + 1; // 1-based sheet row index
+        break;
+      }
+    }
+
+    if (gardenRowIdx !== -1) {
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: weeklySpreadsheetId,
+        range: `종합통계!A${gardenRowIdx}`,
+        valueInputOption: "USER_ENTERED",
+        requestBody: {
+          values: [[true]],
         },
       });
     }
