@@ -1,45 +1,36 @@
 import { google } from "googleapis";
-import path from "path";
 import { addMonths } from "date-fns";
-
-const KEY_PATH = path.join(process.cwd(), "church-4385c-ceedf27e8d20.json");
+import { getGoogleAuth } from "../api/googleAuth.js";
 
 var SCHEDULES;
 
-export const getSchedules = async () => {
+export const getSchedules = async (env) => {
   try {
-    const auth = new google.auth.GoogleAuth({
-      keyFile: KEY_PATH,
-      scopes: ["https://www.googleapis.com/auth/calendar.readonly"],
-    });
-
-    // 2. Create the Calendar Client
+    const auth = getGoogleAuth(env, ["https://www.googleapis.com/auth/calendar.readonly"]);
     const calendar = google.calendar({ version: "v3", auth });
 
     const response = await calendar.events.list({
-      calendarId: process.env.GOOGLE_CALENDAR_ID, // The calendar you shared
+      calendarId: env.GOOGLE_CALENDAR_ID,
       timeMin: new Date().toISOString(),
       timeMax: addMonths(new Date(), 2).toISOString(),
       singleEvents: true,
       orderBy: "startTime",
     });
 
-    // 4. Return the data
     SCHEDULES = response.data.items;
   } catch (err) {
-    console.log(err);
+    console.error("Error fetching schedules from Google Calendar:", err);
   }
 };
 
-export const getSchedulesController = async (req, res) => {
+export const getSchedulesController = async (c) => {
   if (SCHEDULES == null) {
-    await getSchedules();
+    await getSchedules(c.env);
   }
-
-  res.send(SCHEDULES);
+  return c.json(SCHEDULES || []);
 };
 
-export const refreshSchedulesController = async (req, res) => {
-  await getSchedules();
-  res.sendStatus(200);
+export const refreshSchedulesController = async (c) => {
+  await getSchedules(c.env);
+  return c.body(null, 200);
 };

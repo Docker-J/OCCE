@@ -1,0 +1,1 @@
+import{p as e}from"./index-BfQ0SPTH.js";async function t(){return{schedules:e.get(`/api/schedules`)}}export{t as loader};

@@ -1,4 +1,3 @@
-import { v4 as uuid } from "uuid";
 import { deleteImages } from "../controller/images.controller.js";
 import { executeD1Query } from "../api/d1.js";
 
@@ -8,36 +7,38 @@ const PAGE_SIZE = 10;
 var ANNOUNCEMENTS_COUNT;
 var PINNED_ANNOUNCEMENTS;
 
-export const getAnnouncementsCount = async () => {
+export const getAnnouncementsCount = async (db) => {
   const sql = `SELECT COUNT(id) AS count FROM ${TABLENAME} WHERE pin = 0`;
   try {
-    const result = await executeD1Query(sql);
+    const result = await executeD1Query(db, sql);
     ANNOUNCEMENTS_COUNT = result.result[0].results[0].count;
   } catch (error) {
-    console.log(error);
+    console.error("Error getting announcements count:", error);
   }
 };
 
-export const getPinnedAnnouncements = async () => {
+export const getPinnedAnnouncements = async (db) => {
   const sql = `SELECT * FROM ${TABLENAME} WHERE pin = ? ORDER BY timestamp DESC`;
   const params = [1];
   try {
-    const result = await executeD1Query(sql, params);
+    const result = await executeD1Query(db, sql, params);
     PINNED_ANNOUNCEMENTS = result.result[0].results;
   } catch (error) {
-    console.log(error);
+    console.error("Error getting pinned announcements:", error);
   }
 };
 
-export const getAnnouncementsController = async (req, res) => {
-  const page = req.query.page;
+export const getAnnouncementsController = async (c) => {
+  const pageStr = c.req.query("page");
+  const page = pageStr ? parseInt(pageStr, 10) : null;
+  const db = c.env.DB;
 
-  // Lazily re-fetch in-memory cache if undefined (e.g. after server restart)
+  // Lazily re-fetch in-memory cache if undefined
   if (PINNED_ANNOUNCEMENTS == null) {
-    await getPinnedAnnouncements();
+    await getPinnedAnnouncements(db);
   }
   if (ANNOUNCEMENTS_COUNT == null) {
-    await getAnnouncementsCount();
+    await getAnnouncementsCount(db);
   }
 
   const sql = `SELECT * FROM ${TABLENAME} WHERE pin = ? ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
@@ -46,120 +47,144 @@ export const getAnnouncementsController = async (req, res) => {
   const params = [0];
 
   try {
-    const result = await executeD1Query(sql, params);
+    const result = await executeD1Query(db, sql, params);
     const announcements = (PINNED_ANNOUNCEMENTS ?? []).concat(result.result[0].results);
 
-    res.send({ count: ANNOUNCEMENTS_COUNT ?? 0, announcements: announcements });
+    return c.json({ count: ANNOUNCEMENTS_COUNT ?? 0, announcements: announcements });
   } catch (error) {
-    console.log(error);
-    res.sendStatus(500);
+    console.error("Get announcements error:", error);
+    return c.body(null, 500);
   }
 };
 
-export const getAnnouncementController = async (req, res) => {
+export const getAnnouncementController = async (c) => {
+  const id = c.req.param("id");
+  const db = c.env.DB;
   const sql = `SELECT id, title, body, timestamp, pin FROM ${TABLENAME} WHERE id = ?`;
-  const params = [req.params.id];
+  const params = [id];
 
   try {
-    const result = await executeD1Query(sql, params);
-    res.send(result.result[0].results[0]);
+    const result = await executeD1Query(db, sql, params);
+    if (!result.result[0].results || result.result[0].results.length === 0) {
+      return c.body(null, 404);
+    }
+    return c.json(result.result[0].results[0]);
   } catch (error) {
-    res.sendStatus(404);
+    console.error("Get announcement error:", error);
+    return c.body(null, 404);
   }
 };
 
-export const postAnnouncementController = async (req, res) => {
+export const postAnnouncementController = async (c) => {
+  const body = await c.req.json();
+  const db = c.env.DB;
   const sql = `INSERT INTO ${TABLENAME} (id, title, body, images, timestamp, video) VALUES (?, ?, ?, ?, ?, ?)`;
   const params = [
-    uuid(),
-    req.body.title,
-    req.body.body,
-    req.body.images.length > 0 ? req.body.images : null,
-    new Date(),
-    req.body.video,
+    crypto.randomUUID(), // Native crypto API in Cloudflare Workers
+    body.title,
+    body.body,
+    body.images && body.images.length > 0 ? body.images : null,
+    new Date().toISOString(),
+    body.video,
   ];
 
   try {
-    const result = await executeD1Query(sql, params);
-    ANNOUNCEMENTS_COUNT += 1;
-    res.send(result);
+    const result = await executeD1Query(db, sql, params);
+    if (ANNOUNCEMENTS_COUNT != null) {
+      ANNOUNCEMENTS_COUNT += 1;
+    }
+    return c.json(result);
   } catch (error) {
-    console.log(error);
-    res.sendStatus(500);
+    console.error("Post announcement error:", error);
+    return c.body(null, 500);
   }
 };
 
-export const editAnnouncementController = async (req, res) => {
+export const editAnnouncementController = async (c) => {
+  const id = c.req.param("id");
+  const body = await c.req.json();
+  const db = c.env.DB;
+
   const getSql = `SELECT images FROM ${TABLENAME} WHERE id = ?`;
-  const getParams = [req.params.id];
+  const getParams = [id];
 
   try {
-    const result = await executeD1Query(getSql, getParams);
+    const result = await executeD1Query(db, getSql, getParams);
     const images = result.result[0].results[0].images
       ? result.result[0].results[0].images.split(",")
       : [];
 
     const missingImages = images.filter(
-      (item) => !req.body.images.includes(item)
+      (item) => !body.images.includes(item)
     );
 
-    await deleteImages(missingImages);
-  } catch {}
+    await deleteImages(c.env, missingImages);
+  } catch (e) {
+    console.error("Error removing old images:", e);
+  }
 
   const sql = `UPDATE ${TABLENAME} SET title = ?, body = ?, images = ?, video = ? WHERE id = ?`;
   const params = [
-    req.body.title,
-    req.body.body,
-    req.body.images.length > 0 ? req.body.images : null,
-    req.body.video,
-    req.params.id,
+    body.title,
+    body.body,
+    body.images && body.images.length > 0 ? body.images : null,
+    body.video,
+    id,
   ];
 
   try {
-    const result = await executeD1Query(sql, params);
-    res.send(result);
+    const result = await executeD1Query(db, sql, params);
+    return c.json(result);
   } catch (error) {
-    console.log(error);
-    res.sendStatus(500);
+    console.error("Edit announcement error:", error);
+    return c.body(null, 500);
   }
 };
 
-export const deleteAnnouncementController = async (req, res) => {
+export const deleteAnnouncementController = async (c) => {
+  const id = c.req.param("id");
+  const db = c.env.DB;
+
   const getSql = `SELECT images FROM ${TABLENAME} WHERE id = ?`;
-  const getParams = [req.params.id];
+  const getParams = [id];
 
   try {
-    const result = await executeD1Query(getSql, getParams);
+    const result = await executeD1Query(db, getSql, getParams);
     const images = result.result[0].results[0].images
       ? result.result[0].results[0].images.split(",")
       : [];
 
-    await deleteImages(images);
+    await deleteImages(c.env, images);
 
     const deleteSql = `DELETE FROM ${TABLENAME} WHERE id = ?`;
-    const deleteParams = [req.params.id];
-    await executeD1Query(deleteSql, deleteParams);
+    const deleteParams = [id];
+    await executeD1Query(db, deleteSql, deleteParams);
 
-    getAnnouncementsCount();
-    getPinnedAnnouncements();
+    await getAnnouncementsCount(db);
+    await getPinnedAnnouncements(db);
 
-    res.sendStatus(200);
+    return c.body(null, 200);
   } catch (error) {
-    res.sendStatus(500);
+    console.error("Delete announcement error:", error);
+    return c.body(null, 500);
   }
 };
 
-export const pinAnnouncementController = async (req, res) => {
+export const pinAnnouncementController = async (c) => {
+  const id = c.req.param("id");
+  const body = await c.req.json();
+  const db = c.env.DB;
+
   const sql = `UPDATE ${TABLENAME} SET pin = ? WHERE id = ?`;
-  const params = [req.body.pin, req.params.id];
+  const params = [body.pin, id];
 
   try {
-    await executeD1Query(sql, params);
-    getAnnouncementsCount();
-    getPinnedAnnouncements();
-    res.sendStatus(201);
+    await executeD1Query(db, sql, params);
+    await getAnnouncementsCount(db);
+    await getPinnedAnnouncements(db);
+    return c.body(null, 201);
   } catch (error) {
-    console.log(error);
-    res.sendStatus(500);
+    console.error("Pin announcement error:", error);
+    return c.body(null, 500);
   }
 };

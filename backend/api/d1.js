@@ -1,30 +1,33 @@
-import axios from "axios";
-
-const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
-const CLOUDFLARE_API_KEY = process.env.CLOUDFLARE_API_KEY;
-// Fallback to the known DB ID if the env variable isn't set
-const CLOUDFLARE_DATABASE_ID = process.env.CLOUDFLARE_D1_DATABASE_ID;
-
-const URL = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${CLOUDFLARE_DATABASE_ID}/query`;
-
 /**
- * Execute a query against the Cloudflare D1 database.
+ * Execute a query against the Cloudflare D1 database natively.
+ * @param {any} db - The D1 database binding (env.DB).
  * @param {string} sql - The SQL statement.
  * @param {Array} params - Optional parameters for the query.
  * @returns {Promise<any>}
  */
-export const executeD1Query = async (sql, params = []) => {
-  const data = { sql };
-  if (params && params.length > 0) {
-    data.params = params;
+export const executeD1Query = async (db, sql, params = []) => {
+  if (!db || typeof db.prepare !== "function") {
+    throw new Error("D1 database binding 'DB' is not available. Please verify D1 config in wrangler.json.");
   }
 
-  const response = await axios.post(URL, data, {
-    headers: {
-      Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-  });
+  try {
+    const stmt = db.prepare(sql);
+    const bound = params && params.length > 0 ? stmt.bind(...params) : stmt;
+    const res = await bound.all();
 
-  return response.data;
+    // Preserve the response structure of the Cloudflare D1 HTTP API
+    // so controllers don't need any changes to parse D1 outputs.
+    return {
+      result: [
+        {
+          results: res.results || [],
+          success: res.success,
+          meta: res.meta,
+        },
+      ],
+    };
+  } catch (error) {
+    console.error("D1 Query execution error:", error);
+    throw error;
+  }
 };

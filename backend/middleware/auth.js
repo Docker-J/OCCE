@@ -1,64 +1,93 @@
 import { CognitoJwtVerifier } from "aws-jwt-verify";
 
-const staffVerifier = CognitoJwtVerifier.create({
-  userPoolId: process.env.AWS_COGNITO_USER_POOL_ID,
-  tokenUse: "access",
-  clientId: process.env.AWS_COGNITO_CLIENT_ID,
-  groups: "Staff",
-});
+// Cache verifiers per environment configuration
+let staffVerifierInstance;
+let userVerifierInstance;
+let leaderVerifierInstance;
 
-const userVerfier = CognitoJwtVerifier.create({
-  userPoolId: process.env.AWS_COGNITO_USER_POOL_ID,
-  tokenUse: "access",
-  clientId: process.env.AWS_COGNITO_CLIENT_ID,
-});
+const getStaffVerifier = (env) => {
+  if (!staffVerifierInstance) {
+    staffVerifierInstance = CognitoJwtVerifier.create({
+      userPoolId: env.AWS_COGNITO_USER_POOL_ID,
+      tokenUse: "access",
+      clientId: env.AWS_COGNITO_CLIENT_ID,
+      groups: "Staff",
+    });
+  }
+  return staffVerifierInstance;
+};
 
-export const authStaff = async (req, res, next) => {
+const getUserVerifier = (env) => {
+  if (!userVerifierInstance) {
+    userVerifierInstance = CognitoJwtVerifier.create({
+      userPoolId: env.AWS_COGNITO_USER_POOL_ID,
+      tokenUse: "access",
+      clientId: env.AWS_COGNITO_CLIENT_ID,
+    });
+  }
+  return userVerifierInstance;
+};
+
+const getLeaderVerifier = (env) => {
+  if (!leaderVerifierInstance) {
+    leaderVerifierInstance = CognitoJwtVerifier.create({
+      userPoolId: env.AWS_COGNITO_USER_POOL_ID,
+      tokenUse: "access",
+      clientId: env.AWS_COGNITO_CLIENT_ID,
+      groups: ["Staff", "GardenKeeper"],
+    });
+  }
+  return leaderVerifierInstance;
+};
+
+export const authStaff = async (c, next) => {
   try {
-    const token = req.header("Authorization").split(" ")[1];
-    console.log(req.header("Authorization"));
-    const payload = await staffVerifier.verify(token);
-    console.log("Token is valid. Payload:", payload);
+    const authHeader = c.req.header("Authorization");
+    if (!authHeader) throw new Error("No Authorization header provided");
 
-    next();
+    const token = authHeader.split(" ")[1];
+    const verifier = getStaffVerifier(c.env);
+    const payload = await verifier.verify(token);
+
+    c.set("user", payload);
+    await next();
   } catch (err) {
-    console.log("Token not valid!");
-
-    res.sendStatus(401);
+    console.error("Staff authentication failed:", err);
+    return c.text("Unauthorized", 401);
   }
 };
 
-export const authUser = async (req, res, next) => {
+export const authUser = async (c, next) => {
   try {
-    const token = req.header("Authorization").split(" ")[1];
-    const payload = await userVerfier.verify(token);
-    console.log("Token is valid. Payload:", payload);
+    const authHeader = c.req.header("Authorization");
+    if (!authHeader) throw new Error("No Authorization header provided");
 
-    res.locals.authenticated = true;
+    const token = authHeader.split(" ")[1];
+    const verifier = getUserVerifier(c.env);
+    const payload = await verifier.verify(token);
+
+    c.set("user", payload);
+    c.set("authenticated", true);
   } catch (err) {
-    res.locals.authenticated = false;
+    c.set("authenticated", false);
   } finally {
-    next();
+    await next();
   }
 };
 
-const leaderVerifier = CognitoJwtVerifier.create({
-  userPoolId: process.env.AWS_COGNITO_USER_POOL_ID,
-  tokenUse: "access",
-  clientId: process.env.AWS_COGNITO_CLIENT_ID,
-  groups: ["Staff", "GardenKeeper"],
-});
-
-export const authLeader = async (req, res, next) => {
+export const authLeader = async (c, next) => {
   try {
-    const token = req.header("Authorization").split(" ")[1];
-    const payload = await leaderVerifier.verify(token);
-    console.log("Leader token is valid. Payload:", payload);
+    const authHeader = c.req.header("Authorization");
+    if (!authHeader) throw new Error("No Authorization header provided");
 
-    req.user = payload;
-    next();
+    const token = authHeader.split(" ")[1];
+    const verifier = getLeaderVerifier(c.env);
+    const payload = await verifier.verify(token);
+
+    c.set("user", payload);
+    await next();
   } catch (err) {
-    console.log("Leader Token not valid!", err);
-    res.sendStatus(401);
+    console.error("Leader authentication failed:", err);
+    return c.text("Unauthorized", 401);
   }
 };

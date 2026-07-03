@@ -10,30 +10,31 @@ export default defineConfig(() => {
       rollupOptions: {
         output: {
           manualChunks(id) {
-            if (id.includes('node_modules/firebase')) {
-              return 'firebase';
-            }
-            if (id.includes('node_modules/@ckeditor') || id.includes('node_modules/ckeditor5')) {
-              return 'ckeditor';
+            if (id.includes("node_modules/firebase")) {
+              return "firebase";
             }
             if (
-              id.includes('node_modules/react/') ||
-              id.includes('node_modules/react-dom/') ||
-              id.includes('node_modules/react-router/') ||
-              id.includes('node_modules/react-router-dom/')
+              id.includes("node_modules/@ckeditor") ||
+              id.includes("node_modules/ckeditor5")
             ) {
-              return 'reactVendor';
+              return "ckeditor";
             }
-          }
-        }
-      }
+            if (
+              id.includes("node_modules/react/") ||
+              id.includes("node_modules/react-dom/") ||
+              id.includes("node_modules/react-router/") ||
+              id.includes("node_modules/react-router-dom/")
+            ) {
+              return "reactVendor";
+            }
+          },
+        },
+      },
     },
 
-    plugins: [
-      react(),
-      process.env.ANALYZE && analyzer(),
-      basicSsl(),
-    ].filter(Boolean),
+    plugins: [react(), process.env.ANALYZE && analyzer(), basicSsl()].filter(
+      Boolean,
+    ),
 
     legacy: {
       inconsistentCjsInterop: true,
@@ -42,7 +43,7 @@ export default defineConfig(() => {
     server: {
       proxy: {
         "/api": {
-          target: "http://localhost:3001",
+          target: "http://localhost:8787",
           secure: false,
         },
       },

@@ -1,8 +1,7 @@
-import express from "express";
-
+import { Hono } from "hono";
 import { registerController } from "../controller/notification.controller.js";
 
-const router = express.Router();
+const router = new Hono();
 
 router.put("/register", registerController);
 

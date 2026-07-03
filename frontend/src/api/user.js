@@ -3,7 +3,7 @@ import axios from "axios";
 export const signIn = async (phone, password, success, fail) => {
   try {
     const res = await axios.post(
-      "/api/user/signIn",
+      "/api/user/sign-in",
       {},
       {
         auth: {
@@ -22,7 +22,7 @@ export const signIn = async (phone, password, success, fail) => {
 
 export const refreshTokenSignIn = async (refreshToken, success, fail) => {
   try {
-    const res = await axios.post("/api/user/refreshSignIn", { refreshToken });
+    const res = await axios.post("/api/user/refresh-sign-in", { refreshToken });
 
     success(res.data);
   } catch (error) {
@@ -32,7 +32,7 @@ export const refreshTokenSignIn = async (refreshToken, success, fail) => {
 
 export const signUp = async (name, phone, password, success, fail) => {
   try {
-    const res = await axios.post("/api/user/signUp", {
+    const res = await axios.post("/api/user/sign-up", {
       phone: phone,
       password: password,
       name: name,
@@ -61,7 +61,7 @@ export const confirmSignUp = async (phone, confirmCode, success, fail) => {
 
 export const resendSignUpConfirm = async (phone, success, fail) => {
   try {
-    const res = await axios.get(`/api/user/resendConfirm?phone=${phone}`);
+    const res = await axios.get(`/api/user/resend-confirm?phone=${phone}`);
 
     success();
   } catch (error) {
@@ -71,7 +71,7 @@ export const resendSignUpConfirm = async (phone, success, fail) => {
 
 export const signOut = async (success) => {
   try {
-    await axios.post("/api/user/signout");
+    await axios.post("/api/user/sign-out");
   } catch {
   } finally {
     success();
