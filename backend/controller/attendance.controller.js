@@ -1,8 +1,4 @@
 import { google } from "googleapis";
-import {
-  CognitoIdentityProviderClient,
-  GetUserCommand,
-} from "@aws-sdk/client-cognito-identity-provider";
 import { getGoogleAuth } from "../api/googleAuth.js";
 
 // Helper to get Google Sheets client
@@ -14,27 +10,7 @@ const getSheetsClient = (env) => {
   return google.sheets({ version: "v4", auth });
 };
 
-// Helper to get actual name from Cognito profile
-const getCognitoUserName = async (env, accessToken) => {
-  try {
-    const cognitoClient = new CognitoIdentityProviderClient({
-      region: env.AWS_REGION || "us-west-2",
-      credentials: {
-        accessKeyId: env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
-      },
-    });
-    const command = new GetUserCommand({ AccessToken: accessToken });
-    const response = await cognitoClient.send(command);
-    const nameAttr = response.UserAttributes.find(
-      (attr) => attr.Name === "name",
-    );
-    return nameAttr ? nameAttr.Value : "";
-  } catch (error) {
-    console.error("Error fetching Cognito user name:", error);
-    throw error;
-  }
-};
+// Helper to get Google Sheets client
 
 // Helper to get Google Drive client
 const getDriveClient = (env) => {
@@ -55,7 +31,12 @@ export const getGardensController = async (c) => {
   }
 
   const isStaff = user["cognito:groups"]?.includes("Staff") || false;
-  const cleanUserPhone = user.username.replace(/\D/g, ""); // e.g. "17801234567"
+  let cleanUserPhone = "";
+
+  // Only non-staff need to verify mapping against '정원지기' tab
+  if (!isStaff) {
+    cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
+  }
 
   try {
     const sheets = getSheetsClient(env);
@@ -64,41 +45,51 @@ export const getGardensController = async (c) => {
     const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
     const sheetNames = spreadsheet.data.sheets.map((s) => s.properties.title);
 
-    // 2. Read Garden Keepers mapping sheet
-    if (!sheetNames.includes("정원지기")) {
-      return c.json({ error: "'정원지기' tab not found in the spreadsheet." }, 500);
-    }
-
-    const keepersResponse = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: "정원지기!A:D",
-    });
-    const keeperRows = keepersResponse.data.values || [];
-
-    // Dynamically skip header if it exists
-    const startIdx =
-      keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
     let assignedGardens = [];
-    for (const row of keeperRows.slice(startIdx)) {
-      const phone = row[2]?.toString().replace(/\D/g, "") || "";
-      const gardensStr = row[3]?.toString().trim() || "";
 
-      if (phone.slice(-10) === cleanUserPhone.slice(-10)) {
-        assignedGardens = gardensStr
-          .split(",")
-          .map((g) => g.trim())
-          .filter(Boolean);
-        break;
+    if (!isStaff) {
+      // 2. Read Garden Keepers mapping sheet
+      if (!sheetNames.includes("정원지기")) {
+        return c.json(
+          { error: "'정원지기' tab not found in the spreadsheet." },
+          500,
+        );
       }
-    }
 
-    // Authorization: Non-staff users must be mapped to at least one garden
-    if (!isStaff && assignedGardens.length === 0) {
-      return c.json({
-        error: "NotAssignedLeader",
-        message:
-          "이 계정의 전화번호가 스프레드시트의 '정원지기' 명단에 존재하지 않거나 정원이 매핑되지 않았습니다.",
-      }, 403);
+      const keepersResponse = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: "정원지기!A:D",
+      });
+      const keeperRows = keepersResponse.data.values || [];
+
+      // Dynamically skip header if it exists
+      const startIdx =
+        keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
+
+      for (const row of keeperRows.slice(startIdx)) {
+        const phone = row[2]?.toString().replace(/\D/g, "") || "";
+        const gardensStr = row[3]?.toString().trim() || "";
+
+        if (phone.slice(-10) === cleanUserPhone.slice(-10)) {
+          assignedGardens = gardensStr
+            .split(",")
+            .map((g) => g.trim())
+            .filter(Boolean);
+          break;
+        }
+      }
+
+      // Authorization: Non-staff users must be mapped to at least one garden
+      if (assignedGardens.length === 0) {
+        return c.json(
+          {
+            error: "NotAssignedLeader",
+            message:
+              "이 계정의 전화번호가 스프레드시트의 '정원지기' 명단에 존재하지 않거나 정원이 매핑되지 않았습니다.",
+          },
+          403,
+        );
+      }
     }
 
     const gardensData = {};
@@ -157,7 +148,10 @@ export const getGardensController = async (c) => {
     });
   } catch (error) {
     console.error("Error in getGardensController:", error);
-    return c.json({ error: "Failed to retrieve gardens and members data." }, 500);
+    return c.json(
+      { error: "Failed to retrieve gardens and members data." },
+      500,
+    );
   }
 };
 
@@ -181,72 +175,54 @@ export const postReportController = async (c) => {
   }
 
   const isStaff = user["cognito:groups"]?.includes("Staff") || false;
-  const cleanUserPhone = user.username.replace(/\D/g, "");
+  let cleanUserPhone = "";
+
+  // Only non-staff need to verify mapping against '정원지기' tab
+  if (!isStaff) {
+    cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
+  }
 
   try {
     const sheets = getSheetsClient(env);
     const drive = getDriveClient(env);
 
-    // 1. Read keepers mapping from the master spreadsheet to check authorization and get reporterName
-    const keepersResponse = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: "정원지기!A:D",
-    });
-    const keeperRows = keepersResponse.data.values || [];
-    const startIdx =
-      keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
-
     let assignedGardens = [];
-    let reporterName = null;
+    let reporterName = isStaff ? "목회자/스태프" : (user.name || "");
 
-    for (const row of keeperRows.slice(startIdx)) {
-      const phone = row[2]?.toString().replace(/\D/g, "") || "";
-      const name = row[0]?.toString().trim();
-      const gardensStr = row[3]?.toString().trim() || "";
-
-      if (phone.slice(-10) === cleanUserPhone.slice(-10)) {
-        assignedGardens = gardensStr
-          .split(",")
-          .map((g) => g.trim())
-          .filter(Boolean);
-        reporterName = name;
-        break;
-      }
-    }
-
-    // Security check for non-staff
     if (!isStaff) {
-      if (!assignedGardens.includes(gardenName)) {
-        return c.json({
-          error: "UnauthorizedGardenReport",
-          message: "본인이 담당하지 않은 정원의 출석을 보고할 수 없습니다.",
-        }, 403);
-      }
-    }
+      // 1. Read keepers mapping from the master spreadsheet to check authorization and get reporterName
+      const keepersResponse = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: "정원지기!A:D",
+      });
+      const keeperRows = keepersResponse.data.values || [];
+      const startIdx =
+        keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
 
-    // Fallback for reporterName
-    if (!reporterName) {
-      try {
-        const authHeader = c.req.header("Authorization");
-        const token = authHeader?.split(" ")[1];
-        if (token) {
-          const fetchPromise = getCognitoUserName(env, token);
-          const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(
-              () => reject(new Error("Cognito request timeout")),
-              2500,
-            ),
-          );
-          reporterName = await Promise.race([fetchPromise, timeoutPromise]);
+      for (const row of keeperRows.slice(startIdx)) {
+        const phone = row[2]?.toString().replace(/\D/g, "") || "";
+        const name = row[0]?.toString().trim();
+        const gardensStr = row[3]?.toString().trim() || "";
+
+        if (phone.slice(-10) === cleanUserPhone.slice(-10)) {
+          assignedGardens = gardensStr
+            .split(",")
+            .map((g) => g.trim())
+            .filter(Boolean);
+          reporterName = name || user.name || "";
+          break;
         }
-      } catch (err) {
-        console.warn(
-          "Failed or timed out fetching name from Cognito:",
-          err.message,
-        );
       }
-      if (!reporterName) {
-        reporterName = isStaff ? "목회자/스태프" : cleanUserPhone;
+
+      // Security check for non-staff
+      if (!assignedGardens.includes(gardenName)) {
+        return c.json(
+          {
+            error: "UnauthorizedGardenReport",
+            message: "본인이 담당하지 않은 정원의 출석을 보고할 수 없습니다.",
+          },
+          403,
+        );
       }
     }
 
@@ -334,8 +310,6 @@ export const postReportController = async (c) => {
         (name) =>
           name !== "정원지기" &&
           name !== "종합통계" &&
-          name !== "출석부" &&
-          name !== "출석보고" &&
           !/^\d{4}-\d{2}-\d{2}$/.test(name),
       );
 
@@ -346,7 +320,9 @@ export const postReportController = async (c) => {
         ranges,
       });
 
-      const summaryRows = [["보고여부", "정원", "총원", "출석", "결석", "출석율"]];
+      const summaryRows = [
+        ["보고여부", "정원", "총원", "출석", "결석", "출석율"],
+      ];
 
       const validationRequests = [];
       const updateValueRequests = [];
@@ -503,10 +479,13 @@ export const postReportController = async (c) => {
       (s) => s.properties.title === gardenName,
     );
     if (!currentTab) {
-      return c.json({
-        error: "GardenTabNotFound",
-        message: `'${gardenName}' 탭이 스프레드시트에 존재하지 않습니다.`,
-      }, 404);
+      return c.json(
+        {
+          error: "GardenTabNotFound",
+          message: `'${gardenName}' 탭이 스프레드시트에 존재하지 않습니다.`,
+        },
+        404,
+      );
     }
     const currentTabId = currentTab.properties.sheetId;
 
