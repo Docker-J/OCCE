@@ -1,1 +1,0 @@
-import{J as e,u as t}from"./createSimplePaletteValueFilter-_ImOloiw.js";import{P as n}from"./index-BfQ0SPTH.js";function r({props:r,name:i}){return n({props:r,name:i,defaultTheme:t,themeId:e})}export{r as t};

@@ -99,7 +99,10 @@ export const getGardensController = async (c) => {
       const gardenTabs = sheetNames.filter(
         (name) =>
           name !== "정원지기" &&
+          name !== "종합통계" &&
+          name !== "출석부" &&
           name !== "출석보고" &&
+          name !== "정원모임보고" &&
           !/^\d{4}-\d{2}-\d{2}$/.test(name),
       );
 
@@ -310,6 +313,7 @@ export const postReportController = async (c) => {
         (name) =>
           name !== "정원지기" &&
           name !== "종합통계" &&
+          name !== "정원모임보고" &&
           !/^\d{4}-\d{2}-\d{2}$/.test(name),
       );
 
@@ -570,5 +574,236 @@ export const postReportController = async (c) => {
   } catch (error) {
     console.error("Error in postReportController:", error);
     return c.json({ error: "Failed to submit attendance report." }, 500);
+  }
+};
+
+export const postGatheringReportController = async (c) => {
+  const env = c.env;
+  const user = c.get("user");
+  const spreadsheetId = env.ATTENDANCE_SHEET_ID;
+  const folderId = env.DRIVE_FOLDER_ID;
+
+  if (!spreadsheetId) {
+    return c.json({ error: "Attendance Sheet ID is not configured." }, 500);
+  }
+  if (!folderId) {
+    return c.json({ error: "Drive Folder ID is not configured." }, 500);
+  }
+
+  const body = await c.req.json();
+  const { date, time, location, notes, gardenName, attendees, absentees } = body;
+  if (!date || !gardenName || !attendees || !absentees) {
+    return c.json({ error: "Missing required fields." }, 400);
+  }
+
+  const isStaff = user["cognito:groups"]?.includes("Staff") || false;
+  let cleanUserPhone = "";
+
+  if (!isStaff) {
+    cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
+  }
+
+  try {
+    const sheets = getSheetsClient(env);
+    const drive = getDriveClient(env);
+
+    let assignedGardens = [];
+    let reporterName = isStaff ? "목회자/스태프" : (user.name || "");
+
+    if (!isStaff) {
+      // 1. Read keepers mapping from the master spreadsheet to check authorization and get reporterName
+      const keepersResponse = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: "정원지기!A:D",
+      });
+      const keeperRows = keepersResponse.data.values || [];
+      const startIdx =
+        keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
+
+      for (const row of keeperRows.slice(startIdx)) {
+        const phone = row[2]?.toString().replace(/\D/g, "") || "";
+        const name = row[0]?.toString().trim();
+        const gardensStr = row[3]?.toString().trim() || "";
+
+        if (phone.slice(-10) === cleanUserPhone.slice(-10)) {
+          assignedGardens = gardensStr
+            .split(",")
+            .map((g) => g.trim())
+            .filter(Boolean);
+          reporterName = name || user.name || "";
+          break;
+        }
+      }
+
+      // Security check for non-staff
+      if (!assignedGardens.includes(gardenName)) {
+        return c.json(
+          {
+            error: "UnauthorizedGardenReport",
+            message: "본인이 담당하지 않은 정원의 출석을 보고할 수 없습니다.",
+          },
+          403,
+        );
+      }
+    }
+
+    // 2. Search for existing file named '[GardenName]_[Date]' in DRIVE_FOLDER_ID
+    const fileName = `${gardenName}_${date}`;
+    console.log(`Searching for existing file '${fileName}' in Shared Drive folder '${folderId}'...`);
+    const searchResponse = await drive.files.list({
+      q: `name = '${fileName}' and '${folderId}' in parents and trashed = false`,
+      spaces: "drive",
+      fields: "files(id, name)",
+      supportsAllDrives: true,
+      includeItemsFromAllDrives: true,
+    });
+    const filesList = searchResponse.data.files || [];
+
+    // Trash existing files with the same name if any
+    if (filesList.length > 0) {
+      for (const file of filesList) {
+        console.log(`Trashing existing file: ${file.name} (${file.id})`);
+        try {
+          await drive.files.update({
+            fileId: file.id,
+            requestBody: { trashed: true },
+            supportsAllDrives: true,
+          });
+        } catch (err) {
+          console.warn(`Failed to trash file ${file.id}:`, err.message);
+        }
+      }
+    }
+
+    // 3. Copy master spreadsheet to folderId
+    console.log(`Copying master spreadsheet ${spreadsheetId} to file '${fileName}'...`);
+    const copyResponse = await drive.files.copy({
+      fileId: spreadsheetId,
+      requestBody: {
+        name: fileName,
+        parents: [folderId],
+      },
+      supportsAllDrives: true,
+    });
+    const weeklySpreadsheetId = copyResponse.data.id;
+    console.log(`Spreadsheet copied successfully. New ID: ${weeklySpreadsheetId}`);
+
+    // 4. Initialize the copied spreadsheet: Add '모임정보' tab, keep only 'gardenName' tab
+    const weeklySpreadsheetInfo = await sheets.spreadsheets.get({
+      spreadsheetId: weeklySpreadsheetId,
+    });
+    const weeklySheetNames = weeklySpreadsheetInfo.data.sheets.map((s) => s.properties.title);
+
+    const batchRequests = [{ addSheet: { properties: { title: "모임정보", index: 0 } } }];
+
+    // Queue deletion of all other tabs except the active gardenName
+    weeklySpreadsheetInfo.data.sheets.forEach((sheet) => {
+      const title = sheet.properties.title;
+      const id = sheet.properties.sheetId;
+      if (title !== gardenName) {
+        batchRequests.push({ deleteSheet: { sheetId: id } });
+      }
+    });
+
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: weeklySpreadsheetId,
+      requestBody: { requests: batchRequests },
+    });
+
+    // 5. Get current members from column A of the garden tab to count and update checkboxes
+    const membersResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId: weeklySpreadsheetId,
+      range: `${gardenName}!A:A`,
+    });
+    const rows = membersResponse.data.values || [];
+    const members = rows
+      .map((r) => r[0]?.toString().trim())
+      .filter((name) => name && name !== "이름" && name !== "성명");
+    const memberCount = members.length;
+
+    // 6. Write gathering info to '모임정보' tab
+    const localNow = new Date();
+    // Adjust to local timezone KST (UTC+9)
+    const kstOffset = 9 * 60 * 60 * 1000;
+    const kstNow = new Date(localNow.getTime() + kstOffset);
+    const timestamp = kstNow.toISOString().replace("T", " ").substring(0, 16);
+    const gatheringDateTime = `${date} ${time}`;
+
+    const infoRows = [
+      ["구분", "내용"],
+      ["모임정원", gardenName],
+      ["모임일시", gatheringDateTime],
+      ["모임장소", location || ""],
+      ["총원", `=COUNTA('${gardenName}'!A1:A200)`],
+      ["참석", `=COUNTIF('${gardenName}'!B1:B200, TRUE)`],
+      ["결석", `=COUNTIF('${gardenName}'!B1:B200, FALSE)`],
+      ["모임내용 및 기도제목", notes || ""],
+      ["보고일시", timestamp],
+    ];
+
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: weeklySpreadsheetId,
+      range: "모임정보!A1",
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: infoRows,
+      },
+    });
+
+    // 7. Update attendance checkboxes in the gardenName tab
+    const updatedSpreadsheetInfo = await sheets.spreadsheets.get({ spreadsheetId: weeklySpreadsheetId });
+    const currentTab = updatedSpreadsheetInfo.data.sheets.find((s) => s.properties.title === gardenName);
+    const currentTabId = currentTab ? currentTab.properties.sheetId : null;
+
+    if (currentTabId && memberCount > 0) {
+      const validationRequests = [];
+      const updateValueRequests = [];
+
+      for (let mIdx = 0; mIdx < memberCount; mIdx++) {
+        const name = members[mIdx];
+        const isAttended = attendees.includes(name);
+        const cellValue = isAttended ? true : false;
+
+        const sheetRowIndex = mIdx;
+
+        updateValueRequests.push({
+          range: `${gardenName}!B${sheetRowIndex + 1}`,
+          values: [[cellValue]],
+        });
+
+        validationRequests.push({
+          setDataValidation: {
+            range: {
+              sheetId: currentTabId,
+              startRowIndex: sheetRowIndex,
+              endRowIndex: sheetRowIndex + 1,
+              startColumnIndex: 1,
+              endColumnIndex: 2,
+            },
+            rule: { condition: { type: "BOOLEAN" }, showCustomUi: true },
+          },
+        });
+      }
+
+      if (updateValueRequests.length > 0) {
+        await sheets.spreadsheets.values.batchUpdate({
+          spreadsheetId: weeklySpreadsheetId,
+          requestBody: { valueInputOption: "USER_ENTERED", data: updateValueRequests },
+        });
+      }
+
+      if (validationRequests.length > 0) {
+        await sheets.spreadsheets.batchUpdate({
+          spreadsheetId: weeklySpreadsheetId,
+          requestBody: { requests: validationRequests },
+        });
+      }
+    }
+
+    console.log(`✅ Garden gathering report submitted successfully as separate file '${fileName}'`);
+    return c.body(null, 200);
+  } catch (error) {
+    console.error("Error in postGatheringReportController:", error);
+    return c.json({ error: "Failed to submit garden gathering report." }, 500);
   }
 };

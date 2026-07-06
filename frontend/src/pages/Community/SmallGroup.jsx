@@ -62,10 +62,10 @@ const SmallGroup = () => {
           </Typography>
 
           {isLeader && (
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 5, mb: 3 }}>
+            <Box sx={{ display: "flex", justifyContent: "center", gap: 3, mt: 5, mb: 3, flexWrap: "wrap" }}>
               <Button
                 component={Link}
-                to="/community/smallgroup/report"
+                to="/community/smallgroup/report?type=sunday"
                 variant="contained"
                 size="large"
                 startIcon={<AssignmentTurnedInIcon />}
@@ -81,7 +81,27 @@ const SmallGroup = () => {
                   textTransform: "none",
                 }}
               >
-                정원 출석 보고하기
+                주일 출석 보고하기
+              </Button>
+              <Button
+                component={Link}
+                to="/community/smallgroup/report?type=gathering"
+                variant="contained"
+                size="large"
+                startIcon={<AssignmentTurnedInIcon />}
+                sx={{
+                  backgroundColor: "#1976d2",
+                  "&:hover": { backgroundColor: "#115293" },
+                  borderRadius: "24px",
+                  px: 4,
+                  py: 1.5,
+                  fontWeight: 700,
+                  fontSize: "1.05em",
+                  boxShadow: "0 4px 12px 0 rgba(25, 118, 210, 0.2)",
+                  textTransform: "none",
+                }}
+              >
+                정원 모임 보고하기
               </Button>
             </Box>
           )}
