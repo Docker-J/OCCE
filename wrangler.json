@@ -25,15 +25,6 @@
       "id": "33508149bdd44b2daf3bb45498e5b240"
     }
   ],
-  "routes": [
-    {
-      "pattern": "test.oncce.ca",
-      "zone_name": "oncce.ca",
-      "custom_domain": true,
-      "enabled": true,
-      "previews_enabled": false
-    }
-  ],
   "triggers": {
     "crons": ["1 6 * * *"]
   }

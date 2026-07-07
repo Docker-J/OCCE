@@ -1,7 +1,5 @@
 import sendNotification from "./../api/sendNotification.js";
 
-var RECENTDATE;
-
 async function getMostRecentFile(env) {
   const bucket = env.weeklyupdate;
   if (!bucket) {
@@ -34,38 +32,33 @@ async function getMostRecentFile(env) {
   }
 }
 
-export const getRecentWeelyUpdateDate = async (env, force = false) => {
-  const kv = env.weeklyupdate_kv;
+export const getRecentWeeklyUpdateDateController = async (c) => {
+  const force = c.req.query("refresh") === "true";
+  const kv = c.env.weeklyupdate_kv;
+  
+  let recentDate = null;
   if (kv && !force) {
     try {
-      RECENTDATE = await kv.get("recent_date");
+      recentDate = await kv.get("recent_date");
     } catch (e) {
       console.error("Failed to read recent_date from KV:", e);
     }
-  } else {
-    RECENTDATE = null;
   }
 
-  if (!RECENTDATE) {
+  if (!recentDate) {
     console.log("KV cache miss or forced refresh. Scanning R2 bucket for recent weekly update date...");
-    RECENTDATE = await getMostRecentFile(env);
-    if (RECENTDATE && kv) {
+    recentDate = await getMostRecentFile(c.env);
+    if (recentDate && kv) {
       try {
-        await kv.put("recent_date", RECENTDATE);
-        console.log(`KV cache populated with: ${RECENTDATE}`);
+        await kv.put("recent_date", recentDate);
+        console.log(`KV cache populated with: ${recentDate}`);
       } catch (e) {
         console.error("Failed to write recent_date to KV:", e);
       }
     }
   }
-};
 
-export const getRecentWeeklyUpdateDateController = async (c) => {
-  const force = c.req.query("refresh") === "true";
-  if (RECENTDATE == null || force) {
-    await getRecentWeelyUpdateDate(c.env, force);
-  }
-  return c.text(RECENTDATE || "");
+  return c.text(recentDate || "");
 };
 
 export const getWeeklyUpdateController = async (c) => {
@@ -124,15 +117,16 @@ export const uploadWeeklyUpdateController = async (c) => {
     });
     await Promise.all(promises);
 
+    // Update the KV cache directly
     const kv = env.weeklyupdate_kv;
-    if (!RECENTDATE || date > RECENTDATE) {
-      RECENTDATE = date;
-      if (kv) {
-        try {
+    if (kv) {
+      try {
+        const cached = await kv.get("recent_date");
+        if (!cached || date > cached) {
           await kv.put("recent_date", date);
-        } catch (e) {
-          console.error("Failed to update KV with new upload date:", e);
         }
+      } catch (e) {
+        console.error("Failed to update KV with new upload date:", e);
       }
     }
 
@@ -167,13 +161,13 @@ export const deleteWeeklyUpdateController = async (c) => {
     await bucket.delete(`${date}_member`);
     
     // Recalculate recent date
-    RECENTDATE = await getMostRecentFile(env);
+    const newRecentDate = await getMostRecentFile(env);
     
     const kv = env.weeklyupdate_kv;
     if (kv) {
       try {
-        if (RECENTDATE) {
-          await kv.put("recent_date", RECENTDATE);
+        if (newRecentDate) {
+          await kv.put("recent_date", newRecentDate);
         } else {
           await kv.delete("recent_date");
         }
@@ -182,7 +176,7 @@ export const deleteWeeklyUpdateController = async (c) => {
       }
     }
     
-    return c.text(RECENTDATE || "");
+    return c.text(newRecentDate || "");
   } catch (error) {
     console.error("Delete weekly update failed:", error);
     return c.body(null, 500);
