@@ -34,10 +34,15 @@ export const getSchedules = async (env) => {
 };
 
 export const getSchedulesController = async (c) => {
+  const force = c.req.query("refresh") === "true";
   const kv = c.env.weeklyupdate_kv;
   
+  if (force) {
+    SCHEDULES = null;
+  }
+
   if (SCHEDULES == null) {
-    if (kv) {
+    if (kv && !force) {
       try {
         const cached = await kv.get("schedules");
         if (cached) {
@@ -51,7 +56,7 @@ export const getSchedulesController = async (c) => {
   }
 
   if (SCHEDULES == null) {
-    console.log("Schedules cache miss. Fetching from Google Calendar...");
+    console.log("Schedules cache miss or forced refresh. Fetching from Google Calendar...");
     await getSchedules(c.env);
   }
 

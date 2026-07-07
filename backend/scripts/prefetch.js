@@ -21,12 +21,12 @@ async function prefetch() {
   
   try {
     console.log("Warming recent weekly update date cache...");
-    const res1 = await fetch(`${url}/api/weekly-update/recent-date`);
+    const res1 = await fetch(`${url}/api/weekly-update/recent-date?refresh=true`);
     const date = await res1.text();
     console.log(`✅ Weekly update cache warmed. Recent date: "${date}" (Status: ${res1.status})`);
     
     console.log("Warming calendar schedules cache...");
-    const res2 = await fetch(`${url}/api/schedules`);
+    const res2 = await fetch(`${url}/api/schedules?refresh=true`);
     console.log(`✅ Calendar schedules cache warmed. (Status: ${res2.status})`);
     
     console.log("🎉 Prefetch complete!");

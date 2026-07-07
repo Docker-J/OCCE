@@ -34,18 +34,20 @@ async function getMostRecentFile(env) {
   }
 }
 
-export const getRecentWeelyUpdateDate = async (env) => {
+export const getRecentWeelyUpdateDate = async (env, force = false) => {
   const kv = env.weeklyupdate_kv;
-  if (kv) {
+  if (kv && !force) {
     try {
       RECENTDATE = await kv.get("recent_date");
     } catch (e) {
       console.error("Failed to read recent_date from KV:", e);
     }
+  } else {
+    RECENTDATE = null;
   }
 
   if (!RECENTDATE) {
-    console.log("KV cache miss or empty. Scanning R2 bucket for recent weekly update date...");
+    console.log("KV cache miss or forced refresh. Scanning R2 bucket for recent weekly update date...");
     RECENTDATE = await getMostRecentFile(env);
     if (RECENTDATE && kv) {
       try {
@@ -59,8 +61,9 @@ export const getRecentWeelyUpdateDate = async (env) => {
 };
 
 export const getRecentWeeklyUpdateDateController = async (c) => {
-  if (RECENTDATE == null) {
-    await getRecentWeelyUpdateDate(c.env);
+  const force = c.req.query("refresh") === "true";
+  if (RECENTDATE == null || force) {
+    await getRecentWeelyUpdateDate(c.env, force);
   }
   return c.text(RECENTDATE || "");
 };
