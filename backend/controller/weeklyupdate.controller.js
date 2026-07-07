@@ -1,4 +1,5 @@
 import sendNotification from "./../api/sendNotification.js";
+import { format, subMonths } from "date-fns";
 
 async function getMostRecentFile(env) {
   const bucket = env.weeklyupdate;
@@ -7,27 +8,43 @@ async function getMostRecentFile(env) {
   }
 
   const today = new Date();
-  const currentYear = today.getFullYear();
-  const previousYear = (currentYear - 1).toString();
-  const nextYear = (currentYear + 1).toString();
-
-  const prefixes = [previousYear, currentYear.toString(), nextYear];
-  const promises = prefixes.map((prefix) => {
-    return bucket.list({ prefix, delimiter: "/" });
-  });
+  const currentPrefix = format(today, "yyyyMM");
+  const prevPrefix = format(subMonths(today, 1), "yyyyMM");
+  const currentYear = format(today, "yyyy");
 
   try {
+    // 1. List current month and previous month in parallel (2 requests concurrent)
+    const promises = [
+      bucket.list({ prefix: currentPrefix, delimiter: "/" }),
+      bucket.list({ prefix: prevPrefix, delimiter: "/" }),
+    ];
+    
     const results = await Promise.all(promises);
+    const objects = results
+      .flatMap((res) => res.objects || [])
+      .map((obj) => obj.key)
+      .filter((key) => !key.includes("_member"));
 
-    const allObjects = results
-      .flatMap((result) => result.objects || []) // list() returns result.objects in Workers
-      .map((obj) => obj.key) // Extract the file name
-      .filter((key) => !key.includes("_member")); // Filter out _member files
+    if (objects.length > 0) {
+      objects.sort((a, b) => b.localeCompare(a));
+      return objects[0];
+    }
 
-    allObjects.sort((a, b) => b.localeCompare(a)); // Reverse sort
-    return allObjects[0]; // Return the most recent file name
+    // 2. Last resort fallback: scan the entire current year (e.g. 2026)
+    console.log(`No files found for prefixes ${currentPrefix} or ${prevPrefix}. Scanning current year ${currentYear}...`);
+    const listResult = await bucket.list({ prefix: currentYear, delimiter: "/" });
+    const fallbackObjects = (listResult.objects || [])
+      .map((obj) => obj.key)
+      .filter((key) => !key.includes("_member"));
+
+    if (fallbackObjects.length > 0) {
+      fallbackObjects.sort((a, b) => b.localeCompare(a));
+      return fallbackObjects[0];
+    }
+
+    return null;
   } catch (error) {
-    console.error("Error listing R2 objects:", error);
+    console.error("Error listing R2 objects in getMostRecentFile:", error);
     return null;
   }
 }
