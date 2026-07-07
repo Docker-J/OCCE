@@ -151,6 +151,7 @@ export const deleteWeeklyUpdateController = async (c) => {
   const date = c.req.param("date");
   const env = c.env;
   const bucket = env.weeklyupdate;
+  const kv = env.weeklyupdate_kv;
 
   if (!bucket) {
     return c.json({ error: "R2 bucket binding 'weeklyupdate' is missing." }, 500);
@@ -160,19 +161,35 @@ export const deleteWeeklyUpdateController = async (c) => {
     await bucket.delete(date);
     await bucket.delete(`${date}_member`);
     
-    // Recalculate recent date
-    const newRecentDate = await getMostRecentFile(env);
-    
-    const kv = env.weeklyupdate_kv;
+    let newRecentDate = null;
+    let skipScan = false;
+
     if (kv) {
       try {
-        if (newRecentDate) {
-          await kv.put("recent_date", newRecentDate);
-        } else {
-          await kv.delete("recent_date");
+        const cachedRecentDate = await kv.get("recent_date");
+        if (cachedRecentDate && date < cachedRecentDate) {
+          newRecentDate = cachedRecentDate;
+          skipScan = true;
+          console.log(`Deleted an older weekly update (${date}). Skipping R2 scan. Recent date remains: ${newRecentDate}`);
         }
       } catch (e) {
-        console.error("Failed to update KV on deletion:", e);
+        console.error("Failed to read recent_date from KV on deletion check:", e);
+      }
+    }
+
+    if (!skipScan) {
+      console.log(`Deleted the most recent or uncached weekly update (${date}). Recalculating...`);
+      newRecentDate = await getMostRecentFile(env);
+      if (kv) {
+        try {
+          if (newRecentDate) {
+            await kv.put("recent_date", newRecentDate);
+          } else {
+            await kv.delete("recent_date");
+          }
+        } catch (e) {
+          console.error("Failed to update KV on deletion:", e);
+        }
       }
     }
     
