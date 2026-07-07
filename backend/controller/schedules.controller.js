@@ -17,16 +17,44 @@ export const getSchedules = async (env) => {
       orderBy: "startTime",
     });
 
-    SCHEDULES = response.data.items;
+    SCHEDULES = response.data.items || [];
+    
+    const kv = env.weeklyupdate_kv;
+    if (kv) {
+      try {
+        await kv.put("schedules", JSON.stringify(SCHEDULES));
+        console.log("Calendar schedules successfully cached in KV.");
+      } catch (e) {
+        console.error("Failed to cache schedules in KV:", e);
+      }
+    }
   } catch (err) {
     console.error("Error fetching schedules from Google Calendar:", err);
   }
 };
 
 export const getSchedulesController = async (c) => {
+  const kv = c.env.weeklyupdate_kv;
+  
   if (SCHEDULES == null) {
+    if (kv) {
+      try {
+        const cached = await kv.get("schedules");
+        if (cached) {
+          SCHEDULES = JSON.parse(cached);
+          console.log("Loaded schedules from KV cache.");
+        }
+      } catch (e) {
+        console.error("Failed to read schedules from KV:", e);
+      }
+    }
+  }
+
+  if (SCHEDULES == null) {
+    console.log("Schedules cache miss. Fetching from Google Calendar...");
     await getSchedules(c.env);
   }
+
   return c.json(SCHEDULES || []);
 };
 
