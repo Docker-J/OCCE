@@ -77,3 +77,27 @@ export const signOut = async (success) => {
     success();
   }
 };
+
+export const forgotPassword = async (phone, success, fail) => {
+  try {
+    const res = await axios.post("/api/user/forgot-password", { phone });
+    success(res.data);
+  } catch (error) {
+    console.log(error);
+    fail(error.response?.data?.error);
+  }
+};
+
+export const confirmForgotPassword = async (phone, confirmCode, password, success, fail) => {
+  try {
+    const res = await axios.post("/api/user/confirm-forgot-password", {
+      phone,
+      confirmCode,
+      password,
+    });
+    success(res.data);
+  } catch (error) {
+    console.log(error);
+    fail(error.response?.data?.error);
+  }
+};

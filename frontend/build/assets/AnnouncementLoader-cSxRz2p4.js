@@ -1,1 +1,0 @@
-import{m as e}from"./index-DiGk_WfZ.js";async function t({params:t}){return(await e.get(`/api/announcements/announcement/${t.announcementID}`)).data}export{t as loader};

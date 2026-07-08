@@ -1,1 +1,0 @@
-import{m as e}from"./index-DiGk_WfZ.js";async function t(){return{schedules:e.get(`/api/schedules`)}}export{t as loader};

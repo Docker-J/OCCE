@@ -1,4 +1,4 @@
-import { Button, Checkbox, FormControlLabel, TextField } from "@mui/material";
+import { Button, Checkbox, FormControlLabel, TextField, Typography } from "@mui/material";
 import { signIn } from "../../api/user";
 import { useDispatch } from "react-redux";
 import { SET_TOKEN } from "../../store/Auth";
@@ -6,9 +6,12 @@ import useSnackbar from "../../util/useSnackbar";
 import { useForm, Controller } from "react-hook-form"; // Added Controller
 import { PatternFormat } from "react-number-format"; // Added PatternFormat
 import CustomModal from "../../common/CustomModal";
+import useModals from "../../util/useModal";
+import ResetPasswordRequestModal from "./ResetPasswordRequestModal";
 
 const SignInModal = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
+  const { openModal } = useModals();
 
   // We use control and handleSubmit for the third-party input integration
   const { control, handleSubmit, reset, getValues } = useForm({
@@ -122,6 +125,23 @@ const SignInModal = ({ isOpen, onClose }) => {
         >
           로그인
         </Button>
+
+        <Typography
+          onClick={() => {
+            handleClose();
+            openModal(ResetPasswordRequestModal, {});
+          }}
+          sx={{
+            mt: "1.5em",
+            textAlign: "center",
+            cursor: "pointer",
+            textDecoration: "underline",
+            fontSize: "0.9rem",
+            color: "primary.main",
+          }}
+        >
+          비밀번호를 잊으셨나요?
+        </Typography>
       </form>
     </CustomModal>
   );

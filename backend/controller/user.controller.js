@@ -6,6 +6,8 @@ import {
   ResendConfirmationCodeCommand,
   SignUpCommand,
   AdminGetUserCommand,
+  ForgotPasswordCommand,
+  ConfirmForgotPasswordCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { google } from "googleapis";
 import * as XLSX from "xlsx";
@@ -339,5 +341,71 @@ export const signOutController = async (c) => {
   } catch (error) {
     console.log(error);
     return c.json(error);
+  }
+};
+
+export const forgotPasswordController = async (c) => {
+  const body = await c.req.json();
+  const phone = body.phone;
+  const username = "+1" + phone;
+
+  const env = c.env;
+  const AWS_COGNITO_CLIENT_ID = env.AWS_COGNITO_CLIENT_ID;
+  const cognitoClient = getCognitoClient(env);
+
+  const input = {
+    ClientId: AWS_COGNITO_CLIENT_ID,
+    Username: username,
+  };
+  const command = new ForgotPasswordCommand(input);
+
+  try {
+    const response = await cognitoClient.send(command);
+    console.log(response);
+    return c.json(response);
+  } catch (error) {
+    console.log(error);
+    return c.json(
+      {
+        error: error.name,
+        message: error.message,
+      },
+      error.$metadata?.httpStatusCode || 400
+    );
+  }
+};
+
+export const confirmForgotPasswordController = async (c) => {
+  const body = await c.req.json();
+  const phone = body.phone;
+  const username = "+1" + phone;
+  const code = body.confirmCode;
+  const password = body.password;
+
+  const env = c.env;
+  const AWS_COGNITO_CLIENT_ID = env.AWS_COGNITO_CLIENT_ID;
+  const cognitoClient = getCognitoClient(env);
+
+  const input = {
+    ClientId: AWS_COGNITO_CLIENT_ID,
+    Username: username,
+    ConfirmationCode: code,
+    Password: password,
+  };
+  const command = new ConfirmForgotPasswordCommand(input);
+
+  try {
+    const response = await cognitoClient.send(command);
+    console.log(response);
+    return c.json(response);
+  } catch (error) {
+    console.log(error);
+    return c.json(
+      {
+        error: error.name,
+        message: error.message,
+      },
+      error.$metadata?.httpStatusCode || 400
+    );
   }
 };
