@@ -1,1 +1,0 @@
-import{m as e}from"./index-BtN7nk6l.js";async function t({params:t}){return(await e.get(`/api/announcements/announcement/${t.announcementID}`)).data}export{t as loader};
