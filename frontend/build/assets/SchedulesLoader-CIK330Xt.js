@@ -1,1 +1,0 @@
-import{p as e}from"./index-D1_-Dmmg.js";async function t(){return{schedules:e.get(`/api/schedules`)}}export{t as loader};
