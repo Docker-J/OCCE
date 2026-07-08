@@ -64,43 +64,35 @@ const ROUTE_TITLES = {
   "/nextgen/youngadult": "청년부 - OCCE",
 };
 
-export async function onRequest(context) {
-  const { request } = context;
-  const url = new URL(request.url);
-  const userAgent = (request.headers.get("user-agent") || "").toLowerCase();
-
-  // 1. Quick Bot Detection
+export const linkPreviewMiddleware = async (c, next) => {
+  const userAgent = (c.req.header("user-agent") || "").toLowerCase();
   const isBot = BOT_AGENTS.some((bot) => userAgent.includes(bot));
 
-  // 2. Fetch the actual asset from your static Pages build
-  const response = await context.next();
+  const url = new URL(c.req.url);
+  const cleanPath = url.pathname.length > 1 && url.pathname.endsWith("/")
+    ? url.pathname.slice(0, -1)
+    : url.pathname;
 
-  // 3. Intercept only if it's a bot AND it's a structural HTML document
-  const contentType = response.headers.get("content-type") || "";
-  if (isBot && contentType.includes("text/html")) {
-    // Normalize path by removing any trailing slash (except for home page '/')
-    let cleanPath = url.pathname;
-    if (cleanPath.length > 1 && cleanPath.endsWith("/")) {
-      cleanPath = cleanPath.slice(0, -1);
-    }
+  const isApi = cleanPath.startsWith("/api/");
+  const isStaticFile = /\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|webmanifest|json)$/i.test(cleanPath);
 
-    // Determine the dynamic title
+  if (isBot && !isApi && !isStaticFile) {
     let title = ROUTE_TITLES[cleanPath] || "ON Community Church of Edmonton";
 
     // Handle dynamic routing
     try {
       if (cleanPath.startsWith("/announcements/")) {
         const id = cleanPath.split("/")[2];
-        if (id && context.env.DB) {
-          const { results } = await context.env.DB.prepare("SELECT title FROM Announcements WHERE id = ?").bind(id).all();
+        if (id && c.env.DB) {
+          const { results } = await c.env.DB.prepare("SELECT title FROM Announcements WHERE id = ?").bind(id).all();
           if (results && results.length > 0) {
             title = `${results[0].title} - OCCE`;
           }
         }
       } else if (cleanPath.startsWith("/columns/")) {
         const id = cleanPath.split("/")[2];
-        if (id && context.env.DB) {
-          const { results } = await context.env.DB.prepare("SELECT title FROM Columns WHERE id = ?").bind(id).all();
+        if (id && c.env.DB) {
+          const { results } = await c.env.DB.prepare("SELECT title FROM Columns WHERE id = ?").bind(id).all();
           if (results && results.length > 0) {
             title = `${results[0].title} - OCCE`;
           }
@@ -130,7 +122,7 @@ export async function onRequest(context) {
                 month: "2-digit",
                 day: "2-digit"
               });
-              const formattedDate = formatter.format(dateObj); // yyyy-MM-dd
+              const formattedDate = formatter.format(dateObj);
               title = `${formattedDate} QT A/S - OCCE`;
             }
           }
@@ -145,33 +137,39 @@ export async function onRequest(context) {
         }
       }
     } catch (error) {
-      console.error("Error setting dynamic title in worker:", error);
+      console.error("Error setting dynamic title in middleware:", error);
     }
 
     const logoUrl = new URL("/img/OCCE_logo_circle.png", url.origin).toString();
 
-    // 4. Transform the response stream on-the-fly
-    return (
-      new HTMLRewriter()
-        .on("title", {
-          element(element) {
-            element.setInnerContent(title);
-          },
-        })
-        .on("head", {
-          element(element) {
-            element.append(`<meta property="og:title" content="${title}" />`, { html: true });
-            element.append(`<meta name="twitter:title" content="${title}" />`, { html: true });
-            element.append(`<meta property="og:image" content="${logoUrl}" />`, { html: true });
-            element.append(`<meta name="twitter:image" content="${logoUrl}" />`, { html: true });
-            element.append(`<meta property="og:type" content="website" />`, { html: true });
-            element.append(`<meta name="twitter:card" content="summary_large_image" />`, { html: true });
-          },
-        })
-        .transform(response)
-    );
+    // Fetch the index.html from static assets using c.env.ASSETS
+    if (c.env.ASSETS) {
+      try {
+        const response = await c.env.ASSETS.fetch(new URL("/index.html", c.req.url));
+        const rewrittenResponse = new HTMLRewriter()
+          .on("title", {
+            element(element) {
+              element.setInnerContent(title);
+            },
+          })
+          .on("head", {
+            element(element) {
+              element.append(`<meta property="og:title" content="${title}" />`, { html: true });
+              element.append(`<meta name="twitter:title" content="${title}" />`, { html: true });
+              element.append(`<meta property="og:image" content="${logoUrl}" />`, { html: true });
+              element.append(`<meta name="twitter:image" content="${logoUrl}" />`, { html: true });
+              element.append(`<meta property="og:type" content="website" />`, { html: true });
+              element.append(`<meta name="twitter:card" content="summary_large_image" />`, { html: true });
+            },
+          })
+          .transform(response);
+
+        return rewrittenResponse;
+      } catch (err) {
+        console.error("Error running HTMLRewriter in middleware:", err);
+      }
+    }
   }
 
-  // Fall through normally for human browsers and non-HTML assets (JS, CSS, PNGs)
-  return response;
-}
+  await next();
+};

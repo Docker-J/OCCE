@@ -14,10 +14,12 @@ import attendance from "./routes/attendance.routes.js";
 
 import { getSchedules } from "./controller/schedules.controller.js";
 import sendNotification from "./api/sendNotification.js";
+import { linkPreviewMiddleware } from "./middleware/linkPreview.js";
 
 const app = new Hono();
 
 app.use("*", cors());
+app.use("*", linkPreviewMiddleware);
 
 // Mount sub-routers
 app.route("/api/user", user);
