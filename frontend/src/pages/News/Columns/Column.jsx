@@ -83,7 +83,7 @@ const Column = () => {
 
   return (
     <>
-      <title>{`${title} - OCCE`}</title>
+      <title>{`${title} - 목회칼럼 - OCCE`}</title>
       {isLoading && <FullScreenLoading />}
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">

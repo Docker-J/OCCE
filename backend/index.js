@@ -19,7 +19,7 @@ import { linkPreviewMiddleware } from "./middleware/linkPreview.js";
 const app = new Hono();
 
 app.use("*", cors());
-app.use("*", linkPreviewMiddleware);
+app.use("*", (c, next) => linkPreviewMiddleware(c, next, app));
 
 // Mount sub-routers
 app.route("/api/user", user);

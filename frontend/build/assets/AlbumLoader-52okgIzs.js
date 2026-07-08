@@ -1,0 +1,1 @@
+import{n as e}from"./albums-DsmR6eM4.js";function t({params:t}){return e(t.albumID)}export{t as loader};

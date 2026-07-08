@@ -64,7 +64,7 @@ const ROUTE_TITLES = {
   "/nextgen/youngadult": "청년부 - OCCE",
 };
 
-export const linkPreviewMiddleware = async (c, next) => {
+export const linkPreviewMiddleware = async (c, next, app) => {
   const userAgent = (c.req.header("user-agent") || "").toLowerCase();
   const isBot = BOT_AGENTS.some((bot) => userAgent.includes(bot));
 
@@ -81,7 +81,8 @@ export const linkPreviewMiddleware = async (c, next) => {
 
     // Handle dynamic routing
     try {
-      if (cleanPath.startsWith("/announcements/")) {
+      const cleanPathLower = cleanPath.toLowerCase();
+      if (cleanPathLower.startsWith("/announcements/")) {
         const id = cleanPath.split("/")[2];
         if (id && c.env.DB) {
           const { results } = await c.env.DB.prepare("SELECT title FROM Announcements WHERE id = ?").bind(id).all();
@@ -89,18 +90,18 @@ export const linkPreviewMiddleware = async (c, next) => {
             title = `${results[0].title} - OCCE`;
           }
         }
-      } else if (cleanPath.startsWith("/columns/")) {
+      } else if (cleanPathLower.startsWith("/columns/")) {
         const id = cleanPath.split("/")[2];
         if (id && c.env.DB) {
           const { results } = await c.env.DB.prepare("SELECT title FROM Columns WHERE id = ?").bind(id).all();
           if (results && results.length > 0) {
-            title = `${results[0].title} - OCCE`;
+            title = `${results[0].title} - 목회칼럼 - OCCE`;
           }
         }
-      } else if (cleanPath.startsWith("/albums/")) {
+      } else if (cleanPathLower.startsWith("/albums/")) {
         const id = cleanPath.split("/")[2];
-        if (id) {
-          const res = await fetch(new URL(`/api/albums/${id}`, url.origin));
+        if (id && app) {
+          const res = await app.fetch(new Request(new URL(`/api/albums/${id}`, url.origin)), c.env);
           if (res.ok) {
             const data = await res.json();
             if (data && data.title) {
@@ -108,10 +109,10 @@ export const linkPreviewMiddleware = async (c, next) => {
             }
           }
         }
-      } else if (cleanPath.startsWith("/online/meditationon/")) {
+      } else if (cleanPathLower.startsWith("/online/meditationon/")) {
         const id = cleanPath.split("/")[3];
-        if (id) {
-          const res = await fetch(new URL(`/api/meditation-on/${id}`, url.origin));
+        if (id && app) {
+          const res = await app.fetch(new Request(new URL(`/api/meditation-on/${id}`, url.origin)), c.env);
           if (res.ok) {
             const data = await res.json();
             if (data && data.Timestamp) {
@@ -127,7 +128,7 @@ export const linkPreviewMiddleware = async (c, next) => {
             }
           }
         }
-      } else if (cleanPath.startsWith("/weeklyupdate/")) {
+      } else if (cleanPathLower.startsWith("/weeklyupdate/")) {
         const dateParam = cleanPath.split("/")[2];
         if (dateParam && /^\d{8}$/.test(dateParam)) {
           const year = dateParam.slice(0, 4);
@@ -140,7 +141,7 @@ export const linkPreviewMiddleware = async (c, next) => {
       console.error("Error setting dynamic title in middleware:", error);
     }
 
-    const logoUrl = new URL("/img/OCCE_logo_circle.png", url.origin).toString();
+    const logoUrl = new URL("/img/link_preview_banner.jpg", url.origin).toString();
 
     // Fetch the index.html from static assets using c.env.ASSETS
     if (c.env.ASSETS) {
