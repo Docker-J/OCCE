@@ -1,5 +1,5 @@
 import { getDocClient } from "../api/dynamodb.js";
-import { PutCommand } from "@aws-sdk/lib-dynamodb";
+import { PutCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
 
 const TABLENAME = "FCMToken";
 
@@ -29,3 +29,24 @@ export const registerController = async (c) => {
     return c.body(null, 500);
   }
 };
+
+export const unregisterController = async (c) => {
+  try {
+    const body = await c.req.json();
+    const docClient = getDocClient(c.env);
+
+    const command = new DeleteCommand({
+      TableName: TABLENAME,
+      Key: {
+        token: body.token,
+      },
+    });
+
+    await docClient.send(command);
+    return c.body(null, 200);
+  } catch (err) {
+    console.error("Unregister notification token error:", err);
+    return c.body(null, 500);
+  }
+};
+
