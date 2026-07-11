@@ -1,4 +1,5 @@
-import { Button, Checkbox, FormControlLabel, TextField, Typography } from "@mui/material";
+import { useState } from "react";
+import { Button, Checkbox, FormControlLabel, TextField, Typography, CircularProgress } from "@mui/material";
 import { signIn } from "../../api/user";
 import { useDispatch } from "react-redux";
 import { SET_TOKEN } from "../../store/Auth";
@@ -23,6 +24,7 @@ const SignInModal = ({ isOpen, onClose }) => {
   });
 
   const { openSnackbar } = useSnackbar();
+  const [isLoading, setIsLoading] = useState(false);
 
   const signInSuccess = (result) => {
     const data = {
@@ -48,7 +50,19 @@ const SignInModal = ({ isOpen, onClose }) => {
 
   const handleSignIn = (data) => {
     // data.phoneNumber will contain the formatted string "(123) 456-7890"
-    signIn(data.phoneNumber, data.password, signInSuccess, signInFail);
+    setIsLoading(true);
+    signIn(
+      data.phoneNumber,
+      data.password,
+      (result) => {
+        setIsLoading(false);
+        signInSuccess(result);
+      },
+      () => {
+        setIsLoading(false);
+        signInFail();
+      }
+    );
   };
 
   const handleClose = () => {
@@ -82,6 +96,7 @@ const SignInModal = ({ isOpen, onClose }) => {
               sx={{ mt: "1.5em" }}
               error={!!error}
               helperText={error?.message}
+              disabled={isLoading}
               onValueChange={(values) => {
                 // .value provides just digits (1234567890)
                 // .formattedValue provides the string ((123) 456-7890)
@@ -96,6 +111,7 @@ const SignInModal = ({ isOpen, onClose }) => {
           label="비밀번호"
           type="password"
           required
+          disabled={isLoading}
           {...control.register("password", {
             required: true,
             minLength: 8,
@@ -111,7 +127,7 @@ const SignInModal = ({ isOpen, onClose }) => {
               name="remember"
               control={control}
               render={({ field }) => (
-                <Checkbox {...field} checked={field.value} />
+                <Checkbox {...field} checked={field.value} disabled={isLoading} />
               )}
             />
           }
@@ -122,8 +138,9 @@ const SignInModal = ({ isOpen, onClose }) => {
           sx={{ width: "100%", mt: "1em" }}
           variant="outlined"
           type="submit"
+          disabled={isLoading}
         >
-          로그인
+          {isLoading ? <CircularProgress size={24} color="inherit" /> : "로그인"}
         </Button>
 
         <Typography

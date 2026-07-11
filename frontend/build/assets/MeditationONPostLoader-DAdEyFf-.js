@@ -1,1 +1,0 @@
-import{t as e}from"./meditationon-Chzk3w2H.js";async function t({params:t}){return(await e(t.postID)).data}export{t as loader};

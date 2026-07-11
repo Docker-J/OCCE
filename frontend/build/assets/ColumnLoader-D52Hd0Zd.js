@@ -1,1 +1,0 @@
-import{n as e}from"./columns-N61vEh21.js";async function t({params:t}){return await e(t.columnID)}export{t as loader};
