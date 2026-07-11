@@ -35,6 +35,7 @@ async function prefetch() {
     const res2 = await fetch(`${url}/api/schedules?refresh=true`);
     console.log(`✅ Calendar schedules cache warmed. (Status: ${res2.status})`);
 
+
     console.log("🎉 Prefetch complete!");
   } catch (e) {
     console.error("❌ Prefetch failed:", e.message);

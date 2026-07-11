@@ -1,5 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { subHours, format } from "date-fns";
+import schedule from "./data/schedule.json";
 
 import user from "./routes/user.routes.js";
 import announcements from "./routes/announcements.routes.js";
@@ -11,6 +13,7 @@ import notification from "./routes/notification.routes.js";
 import schedules from "./routes/schedules.routes.js";
 import images from "./routes/images.routes.js";
 import attendance from "./routes/attendance.routes.js";
+import bible291 from "./routes/bible291.routes.js";
 
 import { getSchedules } from "./controller/schedules.controller.js";
 import sendNotification from "./api/sendNotification.js";
@@ -32,6 +35,7 @@ app.route("/api/meditation-on", meditationon);
 app.route("/api/notification", notification);
 app.route("/api/images", images);
 app.route("/api/attendance", attendance);
+app.route("/api/bible291", bible291);
 
 export default {
   /**
@@ -56,6 +60,24 @@ export default {
             console.log("✅ Schedule refreshed successfully.");
           } catch (error) {
             console.error("❌ Failed to refresh schedule:", error);
+          }
+        } else if (event.cron === "30 12 * * *") {
+          console.log("🕒 Triggering daily Bible reading FCM...");
+          try {
+            const today = format(subHours(new Date(), 6), "M월 d일");
+            const match = schedule.find((item) => item.date === today);
+            if (match) {
+              const title = "291일 성경 1독";
+              const body = `${today}\n오늘의 1독 말씀은 "${match.read}" 입니다.`;
+              const link = match.link;
+
+              await sendNotification(env, title, body, link);
+              console.log(`✅ Daily Bible reading FCM sent successfully for date: ${today}`);
+            } else {
+              console.log(`ℹ️ No Bible reading schedule found for today (${today}) - likely rest day.`);
+            }
+          } catch (error) {
+            console.error("❌ Failed to process daily Bible reading FCM:", error);
           }
         }
         // else if (event.cron === "30 14 * * 0") {

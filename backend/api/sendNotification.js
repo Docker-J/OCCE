@@ -71,6 +71,8 @@ const sendNotification = async (env, title, body, pathname) => {
     Limit: 499,
   };
 
+  const clickAction = pathname.startsWith("http") ? pathname : `https://oncce.ca/${pathname}`;
+
   const message = {
     notification: {
       title: title,
@@ -79,7 +81,7 @@ const sendNotification = async (env, title, body, pathname) => {
     data: {
       title: title,
       body: body,
-      click_action: `https://oncce.ca/${pathname}`,
+      click_action: clickAction,
     },
     webpush: {
       notification: {
@@ -87,7 +89,7 @@ const sendNotification = async (env, title, body, pathname) => {
         badge: "https://oncce.ca/favicons/favicon-32x32.png",
       },
       fcm_options: {
-        link: `https://oncce.ca/${pathname}`,
+        link: clickAction,
       },
     },
   };
