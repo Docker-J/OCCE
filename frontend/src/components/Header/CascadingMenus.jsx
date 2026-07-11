@@ -6,6 +6,7 @@ import {
   bindFocus,
   bindHover,
   bindMenu,
+  bindTrigger,
   usePopupState,
 } from "material-ui-popup-state/hooks";
 import { createContext, useCallback, use, useMemo } from "react";
@@ -23,7 +24,7 @@ export const CascadingMenu = ({ popupState, ...props }) => {
       rootPopupState: rootPopupState || popupState,
       popupState: popupState,
     }),
-    [rootPopupState, popupState]
+    [rootPopupState, popupState],
   );
 
   return (
@@ -40,7 +41,7 @@ export const CascadingHoverMenu = ({ popupState, ...props }) => {
       rootPopupState: rootPopupState || popupState,
       parentPopupState: popupState,
     }),
-    [rootPopupState, popupState]
+    [rootPopupState, popupState],
   );
 
   return (
@@ -57,7 +58,7 @@ export const CascadingMenuItem = (props) => {
     (event) => {
       rootPopupState.close(event);
     },
-    [rootPopupState]
+    [rootPopupState],
   );
 
   return (
@@ -84,8 +85,7 @@ export const CascadingSubmenu = ({ title, popupId, ...props }) => {
     <>
       <MenuItem
         sx={{ py: 1.8 }}
-        {...bindHover(popupState)}
-        {...bindFocus(popupState)}
+        {...bindTrigger(popupState)}
       >
         <Typography sx={{ fontSize: "13pt" }}>{props.page.title}</Typography>
         <ListItemIcon>
