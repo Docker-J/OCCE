@@ -1,1 +1,0 @@
-import{n as e}from"./albums-CNqgsHS-.js";function t({params:t}){return e(t.albumID)}export{t as loader};
