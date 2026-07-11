@@ -85,7 +85,10 @@ const SignInModal = ({ isOpen, onClose }) => {
         <Controller
           name="phoneNumber"
           control={control}
-          rules={{ required: "전화번호를 입력해주세요" }}
+          rules={{
+            required: "전화번호를 입력해주세요",
+            validate: (value) => value?.length === 10 || "올바른 전화번호 10자리를 입력해주세요",
+          }}
           render={({
             field: { onChange, name, value },
             fieldState: { error },

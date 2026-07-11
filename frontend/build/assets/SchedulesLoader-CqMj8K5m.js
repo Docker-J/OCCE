@@ -1,0 +1,1 @@
+import{g as e}from"./index-DsaXO_wx.js";async function t(){return{schedules:e.get(`/api/schedules`)}}export{t as loader};
