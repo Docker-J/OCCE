@@ -1,1 +1,0 @@
-import{t as e}from"./meditationon-CZ2vGTv5.js";async function t({params:t}){return(await e(t.postID)).data}export{t as loader};

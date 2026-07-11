@@ -50,6 +50,14 @@ const SignInModal = ({ isOpen, onClose }) => {
 
   const handleSignIn = (data) => {
     // data.phoneNumber will contain the formatted string "(123) 456-7890"
+    const PASSWORD_REGEX = /^(?=.*[\d])(?=.*[!@#$%^&*])[\w!@#$%^&*]/;
+    const isValid = data.password.length >= 8 && data.password.length <= 24 && PASSWORD_REGEX.test(data.password);
+
+    if (!isValid) {
+      signInFail();
+      return;
+    }
+
     setIsLoading(true);
     signIn(
       data.phoneNumber,
@@ -113,10 +121,7 @@ const SignInModal = ({ isOpen, onClose }) => {
           required
           disabled={isLoading}
           {...control.register("password", {
-            required: true,
-            minLength: 8,
-            maxLength: 24,
-            pattern: /^(?=.*[\d])(?=.*[!@#$%^&*])[\w!@#$%^&*]/,
+            required: "비밀번호를 입력해주세요",
           })}
         />
 
