@@ -25,7 +25,9 @@ async function sendMessages(env, scanParam, message, accessToken, projectId) {
           message: {
             token: token,
             data: message.data,
+            android: message.android,
             webpush: message.webpush,
+            apns: message.apns,
           },
         };
 
@@ -77,6 +79,25 @@ const sendNotification = async (env, title, body, pathname) => {
       title: title,
       body: body,
       click_action: clickAction,
+    },
+    android: {
+      priority: "high",
+    },
+    webpush: {
+      headers: {
+        Urgency: "high",
+      },
+    },
+    apns: {
+      headers: {
+        "apns-priority": "5",
+        "apns-push-type": "background",
+      },
+      payload: {
+        aps: {
+          "content-available": 1,
+        },
+      },
     },
   };
 
