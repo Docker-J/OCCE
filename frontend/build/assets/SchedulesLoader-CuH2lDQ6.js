@@ -1,0 +1,1 @@
+import{g as e}from"./index-rGSy71cS.js";async function t(){return{schedules:e.get(`/api/schedules`)}}export{t as loader};

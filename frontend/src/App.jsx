@@ -204,7 +204,10 @@ const router = createBrowserRouter([
           },
           {
             path: "smallgroup/report",
-            lazy: async () => ({ Component: (await import("./pages/Community/SmallGroupReport")).default }),
+            lazy: async () => {
+              const m = await import("./pages/Community/SmallGroupReport");
+              return { Component: m.default, action: m.action };
+            },
           },
           {
             path: "ministry",
