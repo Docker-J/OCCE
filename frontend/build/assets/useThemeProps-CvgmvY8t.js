@@ -1,0 +1,1 @@
+import{J as e,u as t}from"./createSimplePaletteValueFilter-BISh_PXC.js";import{L as n}from"./index-hgiLmd34.js";function r({props:r,name:i}){return n({props:r,name:i,defaultTheme:t,themeId:e})}export{r as t};
