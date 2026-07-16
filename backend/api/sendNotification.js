@@ -24,7 +24,6 @@ async function sendMessages(env, scanParam, message, accessToken, projectId) {
         const payload = {
           message: {
             token: token,
-            notification: message.notification,
             data: message.data,
             webpush: message.webpush,
           },
@@ -74,23 +73,10 @@ const sendNotification = async (env, title, body, pathname) => {
   const clickAction = pathname.startsWith("http") ? pathname : `https://oncce.ca/${pathname}`;
 
   const message = {
-    notification: {
-      title: title,
-      body: body,
-    },
     data: {
       title: title,
       body: body,
       click_action: clickAction,
-    },
-    webpush: {
-      notification: {
-        icon: "https://oncce.ca/favicons/android-icon-192x192.png",
-        badge: "https://oncce.ca/favicons/favicon-32x32.png",
-      },
-      fcm_options: {
-        link: clickAction,
-      },
     },
   };
 

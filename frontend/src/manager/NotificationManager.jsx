@@ -10,13 +10,19 @@ const NotificationManager = memo(() => {
   const navigate = useNavigate();
   const { openSnackbar, closeSnackbar } = useSnackbar();
 
-  const action = (action) => {
-    const pathname = new URL(action).pathname;
+  const action = (targetAction) => {
     return (
       <IconButton
         onClick={() => {
-          navigate(pathname);
           closeSnackbar();
+          if (targetAction && targetAction.startsWith("http") && !targetAction.includes("oncce.ca")) {
+            window.open(targetAction, "_blank");
+          } else {
+            const pathname = targetAction.startsWith("http")
+              ? new URL(targetAction).pathname
+              : targetAction;
+            navigate(pathname);
+          }
         }}
       >
         <LaunchIcon />
