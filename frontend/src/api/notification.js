@@ -22,3 +22,15 @@ export const unregisterToken = async (token) => {
   }
 };
 
+export const broadcastNotification = async (title, body, pathname) => {
+  try {
+    await axios.post("/api/notification/broadcast", {
+      title,
+      body,
+      pathname,
+    });
+  } catch {
+    throw new Error();
+  }
+};
+

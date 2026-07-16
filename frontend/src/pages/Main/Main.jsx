@@ -1,6 +1,7 @@
 import { Link } from "react-router";
-
-import { Button } from "@mui/material";
+import { useState } from "react";
+import { Button, Fab } from "@mui/material";
+import CampaignIcon from "@mui/icons-material/Campaign";
 
 import ButtonBases from "../../components/Main/MainButtonBanner";
 import "./Main.css";
@@ -10,6 +11,8 @@ import MainAnimation from "../../components/Main/MainAnimation";
 
 import carouselStyles from "./MainCarousel.module.css";
 import CustomCarousel from "../../common/CustomCarousel";
+import AdminComponent from "../../common/AdminComponent";
+import BroadcastModal from "../../components/Main/BroadcastModal";
 
 const MainImage = ({ backgroundImage }) => {
   return (
@@ -21,6 +24,8 @@ const MainImage = ({ backgroundImage }) => {
 };
 
 const Main = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <>
       <CustomCarousel
@@ -63,12 +68,17 @@ const Main = () => {
         <ButtonBases />
       </div>
 
-      {/* <Fab
-        variant="primary"
-        style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
-      >
-        <QuestionAnswerOutlinedIcon />
-      </Fab> */}
+      <AdminComponent>
+        <Fab
+          color="primary"
+          style={{ position: "fixed", right: "2vw", bottom: "3vh", zIndex: 1000, backgroundColor: "#964B00" }}
+          onClick={() => setIsModalOpen(true)}
+        >
+          <CampaignIcon style={{ color: "white" }} />
+        </Fab>
+      </AdminComponent>
+
+      <BroadcastModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
       {/* <CustomChatBot /> */}
     </>

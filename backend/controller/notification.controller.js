@@ -50,3 +50,23 @@ export const unregisterController = async (c) => {
   }
 };
 
+export const broadcastController = async (c) => {
+  try {
+    const body = await c.req.json();
+    const { title, body: notificationBody, pathname } = body;
+
+    if (!title || !notificationBody) {
+      return c.json({ error: "Title and body are required" }, 400);
+    }
+
+    // Import sendNotification dynamically or call it
+    const { default: sendNotification } = await import("../api/sendNotification.js");
+    await sendNotification(c.env, title, notificationBody, pathname || "");
+
+    return c.json({ success: true }, 200);
+  } catch (err) {
+    console.error("Broadcast notification error:", err);
+    return c.json({ error: "Internal Server Error" }, 500);
+  }
+};
+
