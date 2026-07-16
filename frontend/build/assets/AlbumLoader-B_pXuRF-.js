@@ -1,0 +1,1 @@
+import{n as e}from"./albums-BK2X28mG.js";function t({params:t}){return e(t.albumID)}export{t as loader};

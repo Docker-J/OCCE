@@ -1,4 +1,4 @@
-import { Outlet, createBrowserRouter, useNavigation, RouterProvider, ScrollRestoration } from "react-router";
+import { Outlet, createBrowserRouter, useNavigation, RouterProvider } from "react-router";
 import { LinearProgress, CircularProgress, Box } from "@mui/material";
 import { lazy, Suspense } from "react";
 
@@ -54,7 +54,6 @@ const GlobalLoader = () => {
 const HeaderFooterWrapper = () => {
   return (
     <>
-      <ScrollRestoration />
       <GlobalLoader />
       <Managers />
       <div
@@ -84,7 +83,6 @@ const HeaderFooterWrapper = () => {
 const HeaderWrapper = () => {
   return (
     <>
-      <ScrollRestoration />
       <GlobalLoader />
       <Managers />
       <div
