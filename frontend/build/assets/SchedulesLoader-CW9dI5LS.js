@@ -1,0 +1,1 @@
+import{g as e}from"./index-CNSiE21e.js";async function t(){return{schedules:e.get(`/api/schedules`)}}export{t as loader};

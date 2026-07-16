@@ -1,0 +1,1 @@
+import{c as e}from"./reactVendor-Dh_V2l1N.js";import{g as t}from"./index-CNSiE21e.js";async function n({request:n}){let r=new URL(n.url).searchParams.get(`page`);return r===null?e(`?page=1`):{announcementsData:t.get(`/api/announcements?page=${r}`)}}export{n as loader};

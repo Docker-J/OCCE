@@ -1,5 +1,5 @@
 import { memo, useEffect } from "react";
-import { registerToken } from "../api/notification";
+import { registerToken, unregisterToken } from "../api/notification";
 import useSnackbar from "../util/useSnackbar";
 import { IconButton } from "@mui/material";
 import { useNavigate } from "react-router";
@@ -116,7 +116,6 @@ const NotificationManager = memo(() => {
       try {
         const { getMessaging, deleteToken, getToken } = await import("firebase/messaging");
         const { firebaseInstance } = await import("../api/firebase");
-        const { unregisterToken } = await import("../api/notification");
         const messaging = getMessaging(firebaseInstance);
 
         // Get the active token first to delete it from DynamoDB

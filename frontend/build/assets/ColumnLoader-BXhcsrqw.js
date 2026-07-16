@@ -1,1 +1,0 @@
-import{n as e}from"./columns-DA6jVyB6.js";async function t({params:t}){return await e(t.columnID)}export{t as loader};
