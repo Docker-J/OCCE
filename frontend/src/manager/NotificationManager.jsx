@@ -69,9 +69,29 @@ const NotificationManager = memo(() => {
         }
 
         if (permission === "granted") {
-          const { getToken, onMessage, getMessaging } = await import("firebase/messaging");
+          const { getToken, onMessage, getMessaging, deleteToken } = await import("firebase/messaging");
           const { firebaseInstance } = await import("../api/firebase");
           const messaging = getMessaging(firebaseInstance);
+
+          const lastRefresh = localStorage.getItem("last_fcm_token_refresh");
+          const now = Date.now();
+          // If last refresh was more than 7 days ago (604,800,000 ms), force a clean token rotation
+          const shouldForceRefresh = !lastRefresh || (now - parseInt(lastRefresh, 10) > 604800000);
+
+          if (shouldForceRefresh) {
+            console.log("Forcing FCM token refresh to prevent silent expiration...");
+            try {
+              const cachedToken = await getToken(messaging, {
+                vapidKey: "BOLDzFLzljc4HkyVktgjo4-_QoXFxx__XZS6xBmGouvsisXHHe--2dSUUJtQ2cerl3v7ONBhrAPM661xRbpQcqo",
+                serviceWorkerRegistration: registration,
+              });
+              if (cachedToken) {
+                await deleteToken(messaging);
+              }
+            } catch (err) {
+              console.warn("Failed to delete old token during force refresh:", err);
+            }
+          }
 
           const token = await getToken(messaging, {
             vapidKey: "BOLDzFLzljc4HkyVktgjo4-_QoXFxx__XZS6xBmGouvsisXHHe--2dSUUJtQ2cerl3v7ONBhrAPM661xRbpQcqo",
@@ -80,6 +100,7 @@ const NotificationManager = memo(() => {
 
           console.log("FCM Token:", token);
           await registerToken(token);
+          localStorage.setItem("last_fcm_token_refresh", now.toString());
 
           // Force dispatch state change to update icon colors
           window.dispatchEvent(new CustomEvent("notification-state-changed"));

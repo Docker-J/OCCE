@@ -1,1 +1,0 @@
-import{g as e}from"./index-B7ayJe8R.js";async function t(){return{schedules:e.get(`/api/schedules`)}}export{t as loader};

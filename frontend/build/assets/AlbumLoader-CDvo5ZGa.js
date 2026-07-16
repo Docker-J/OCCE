@@ -1,0 +1,1 @@
+import{n as e}from"./albums-CbqmTPzS.js";function t({params:t}){return e(t.albumID)}export{t as loader};
