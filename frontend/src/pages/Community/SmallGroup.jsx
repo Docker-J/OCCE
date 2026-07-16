@@ -22,8 +22,9 @@ const SmallGroup = () => {
               fontWeight: 830,
               letterSpacing: "0.4em",
               pl: "0.4em",
-              color: "white"
-            }}>
+              color: "white",
+            }}
+          >
             소그룹
           </Typography>
           <Typography
@@ -31,8 +32,9 @@ const SmallGroup = () => {
             sx={{
               textAlign: "center",
               fontWeight: 700,
-              color: "white"
-            }}>
+              color: "white",
+            }}
+          >
             정원
           </Typography>
         </div>
@@ -44,8 +46,9 @@ const SmallGroup = () => {
               component="span"
               sx={{
                 fontWeight: "bold",
-                fontSize: "2em"
-              }}>
+                fontSize: "2em",
+              }}
+            >
               '정원'
             </Typography>
             은 하나님께서 태초에 사람에게 허락하신 에덴의 모형입니다. '정원'의
@@ -62,26 +65,55 @@ const SmallGroup = () => {
           </Typography>
 
           {isLeader && (
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 5, mb: 3 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                gap: 3,
+                mt: 5,
+                mb: 3,
+                flexWrap: "wrap",
+              }}
+            >
               <Button
                 component={Link}
-                to="/community/smallgroup/report"
+                to="/community/smallgroup/report?type=sunday"
                 variant="contained"
                 size="large"
                 startIcon={<AssignmentTurnedInIcon />}
                 sx={{
-                  backgroundColor: "#2e7d32",
-                  "&:hover": { backgroundColor: "#1b5e20" },
+                  backgroundColor: "#dc2626",
+                  "&:hover": { backgroundColor: "#b91c1c" },
                   borderRadius: "24px",
                   px: 4,
                   py: 1.5,
                   fontWeight: 700,
                   fontSize: "1.05em",
-                  boxShadow: "0 4px 12px 0 rgba(46, 125, 50, 0.2)",
+                  boxShadow: "0 4px 12px 0 rgba(220, 38, 38, 0.2)",
                   textTransform: "none",
                 }}
               >
-                정원 출석 보고하기
+                주일 출석 보고하기
+              </Button>
+              <Button
+                component={Link}
+                to="/community/smallgroup/report?type=gathering"
+                variant="contained"
+                size="large"
+                startIcon={<AssignmentTurnedInIcon />}
+                sx={{
+                  backgroundColor: "#ea580c",
+                  "&:hover": { backgroundColor: "#c2410c" },
+                  borderRadius: "24px",
+                  px: 4,
+                  py: 1.5,
+                  fontWeight: 700,
+                  fontSize: "1.05em",
+                  boxShadow: "0 4px 12px 0 rgba(234, 88, 12, 0.2)",
+                  textTransform: "none",
+                }}
+              >
+                정원 모임 보고하기
               </Button>
             </Box>
           )}

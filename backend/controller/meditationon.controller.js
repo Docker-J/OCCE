@@ -1,13 +1,14 @@
 import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
-import { v4 as uuid } from "uuid";
-import docClient from "../api/dynamodb.js";
+import { getDocClient } from "../api/dynamodb.js";
 import { uploadImage } from "./images.controller.js";
 
 const TABLENAME = "MeditationON";
 const PAGE_SIZE = 12;
 
-export const getMeditationONsController = async (req, res) => {
-  const lastVisibleID = req.query.lastVisible;
+export const getMeditationONsController = async (c) => {
+  const lastVisibleID = c.req.query("lastVisible");
+  const timeStamp = c.req.query("timeStamp");
+  const docClient = getDocClient(c.env);
 
   const scanParam = {
     TableName: TABLENAME,
@@ -28,7 +29,7 @@ export const getMeditationONsController = async (req, res) => {
   if (lastVisibleID != null) {
     scanParam.ExclusiveStartKey = {
       ID: lastVisibleID,
-      Timestamp: req.query.timeStamp,
+      Timestamp: timeStamp,
       sort: 0,
     };
   }
@@ -43,20 +44,24 @@ export const getMeditationONsController = async (req, res) => {
       dataArray.push(data);
     });
 
-    res.send(dataArray);
+    return c.json(dataArray);
   } catch (error) {
-    console.log(error);
+    console.error("Get meditation list error:", error);
+    return c.body(null, 500);
   }
 };
 
-export const getMeditationONController = async (req, res) => {
+export const getMeditationONController = async (c) => {
+  const id = c.req.param("id");
+  const docClient = getDocClient(c.env);
+
   try {
     const scanParam = {
       TableName: TABLENAME,
       ProjectionExpression: "Images, #ts ",
       KeyConditionExpression: "ID = :postID",
       ExpressionAttributeValues: {
-        ":postID": req.params.id,
+        ":postID": id,
       },
       ExpressionAttributeNames: {
         "#ts": "Timestamp",
@@ -64,32 +69,42 @@ export const getMeditationONController = async (req, res) => {
     };
 
     const command = new QueryCommand(scanParam);
-
     const result = await docClient.send(command);
 
-    res.send(result.Items[0]);
-    console.log(result);
+    if (!result.Items || result.Items.length === 0) {
+      return c.body(null, 404);
+    }
+
+    return c.json(result.Items[0]);
   } catch (error) {
-    console.log(error);
+    console.error("Get meditation error:", error);
+    return c.body(null, 500);
   }
 };
 
-export const postMeditationONController = async (req, res) => {
-  const ids = {};
-  const images = req.files;
-
+export const postMeditationONController = async (c) => {
   try {
-    for (const [index, image] of images.entries()) {
-      const result = await uploadImage(image);
+    const formData = await c.req.formData();
+    const images = formData.getAll("images"); // Array of File objects
+    const date = c.req.query("date");
 
+    if (images.length === 0) {
+      return c.text("No images provided", 400);
+    }
+
+    const docClient = getDocClient(c.env);
+
+    const ids = {};
+    for (const [index, image] of images.entries()) {
+      const result = await uploadImage(c.env, image);
       ids[index] = result;
     }
 
     const command = new PutCommand({
       TableName: TABLENAME,
       Item: {
-        ID: uuid(),
-        Timestamp: req.query.date,
+        ID: crypto.randomUUID(), // Native crypto API in Cloudflare Workers
+        Timestamp: date,
         Cover: ids[0],
         Images: ids,
         sort: 0,
@@ -99,8 +114,9 @@ export const postMeditationONController = async (req, res) => {
     const response = await docClient.send(command);
     console.log(response);
 
-    res.sendStatus(201);
+    return c.body(null, 201);
   } catch (error) {
-    console.log(error);
+    console.error("Post meditation error:", error);
+    return c.body(null, 500);
   }
 };

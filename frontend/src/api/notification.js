@@ -9,3 +9,16 @@ export const registerToken = async (token) => {
     throw new Error();
   }
 };
+
+export const unregisterToken = async (token) => {
+  try {
+    await axios.delete("/api/notification/unregister", {
+      data: {
+        token: token,
+      },
+    });
+  } catch {
+    throw new Error();
+  }
+};
+

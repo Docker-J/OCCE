@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router";
 
 import "./ResponsiveAppBar.css";
@@ -14,8 +15,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import MenuItem from "@mui/material/MenuItem";
 
 import Submenu from "../components/Header/Submenu";
-import SubmenuMobile from "../components/Header/SubmenuMobile";
-import { CascadingMenu } from "../components/Header/CascadingMenus";
+import SubmenuMobileDrawer from "../components/Header/SubmenuMobileDrawer";
 
 import { signOut } from "../api/user.js";
 import { useDispatch, useSelector } from "react-redux";
@@ -37,10 +37,16 @@ const ResponsiveAppBar = () => {
   const dispatch = useDispatch();
   const authenticated = useSelector((state) => state.authToken?.authenticated);
 
-  const popupState = usePopupState({
-    variant: "popover",
-    popupId: "menuPopupState",
-  });
+  const [scrolled, setScrolled] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const userPopupState = usePopupState({
     variant: "popover",
@@ -85,25 +91,50 @@ const ResponsiveAppBar = () => {
 
   return (
     <AppBar
-      position="absolute"
-      style={{ background: "transparent", boxShadow: "none" }}
+      position="fixed"
+      sx={{
+        background: scrolled ? "rgba(252, 251, 249, 0.9)" : "transparent",
+        backdropFilter: scrolled ? "blur(24px)" : "none",
+        boxShadow: scrolled ? "0 12px 40px rgba(150, 75, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05)" : "none",
+        border: scrolled ? "1px solid rgba(150, 75, 0, 0.15)" : "none",
+        color: scrolled ? "#2b2b2b" : "#ffffff",
+        py: scrolled ? 1.0 : 2.0,
+        transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+        // Floating pill behavior when scrolled
+        ...(scrolled && {
+          top: "12px",
+          left: { xs: "12px", md: "24px" },
+          right: { xs: "12px", md: "24px" },
+          width: { xs: "calc(100% - 24px)", md: "calc(100% - 48px)" },
+          borderRadius: "16px",
+        }),
+        // Ensure transparency has correct bounds
+        ...(!scrolled && {
+          top: 0,
+          left: 0,
+          right: 0,
+          width: "100%",
+        })
+      }}
     >
       <Container maxWidth="xl">
-        <Toolbar disableGutters>
+        <Toolbar disableGutters sx={{ position: "relative" }}>
           <Box
             sx={{
               display: { xs: "none", md: "flex" },
+              alignItems: "center",
             }}
           >
-            <Link to="/">
+            <Link to="/" style={{ display: "flex", alignItems: "center" }}>
               <img
                 alt="Header Logo"
-                src="/img/HeaderLogoColor.png"
-                style={{ width: "240px", height: "48.92px" }}
+                src={scrolled ? "/img/HeaderLogoBW.png" : "/img/HeaderLogoColor.png"}
+                style={{ width: "240px", height: "48.92px", display: "block" }}
               />
             </Link>
           </Box>
 
+          {/* Hamburger Menu Trigger for Mobile */}
           <Box
             sx={{
               flexGrow: 1,
@@ -116,29 +147,18 @@ const ResponsiveAppBar = () => {
               aria-controls="menu-appbar"
               aria-haspopup="true"
               color="inherit"
-              {...bindTrigger(popupState)}
+              onClick={() => setDrawerOpen(true)}
             >
               <MenuIcon />
             </IconButton>
-            <CascadingMenu
-              id="menu-appbar"
-              popupState={popupState}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "left",
-              }}
-              sx={{
-                display: { xs: "block", md: "none" },
-              }}
-            >
-              {pages.map((page) => (
-                <SubmenuMobile key={page.title} page={page} />
-              ))}
-            </CascadingMenu>
+            <SubmenuMobileDrawer
+              isOpen={drawerOpen}
+              onClose={() => setDrawerOpen(false)}
+              pages={pages}
+              authenticated={authenticated}
+              settings_signed={settings_signed}
+              settings_not_signed={settings_not_signed}
+            />
           </Box>
 
           <Box
@@ -147,12 +167,12 @@ const ResponsiveAppBar = () => {
               display: { xs: "flex", md: "none" },
             }}
           >
-            <Link to="/">
+            <Link to="/" style={{ display: "flex", alignItems: "center" }}>
               <img
                 alt="Header Logo"
                 className="mobileLogo"
-                src="/img/HeaderLogoColor.png"
-                style={{ width: "180px", height: "36.69px" }}
+                src={scrolled ? "/img/HeaderLogoBW.png" : "/img/HeaderLogoColor.png"}
+                style={{ width: "180px", height: "36.69px", display: "block" }}
               />
             </Link>
           </Box>
@@ -164,7 +184,7 @@ const ResponsiveAppBar = () => {
             }}
           >
             {pages.map((page) => (
-              <Submenu key={page.title} page={page} />
+              <Submenu key={page.title} page={page} scrolled={scrolled} />
             ))}
           </Box>
 

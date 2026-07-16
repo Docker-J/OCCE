@@ -1,0 +1,32 @@
+{
+  "name": "oncce",
+  "main": "./backend/index.js",
+  "compatibility_date": "2026-07-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./frontend/build",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_id": "1de4220d-820c-4074-ae4f-b4aabeacf83e"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "weeklyupdate",
+      "bucket_name": "weeklyupdate"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "weeklyupdate_kv",
+      "id": "33508149bdd44b2daf3bb45498e5b240"
+    }
+  ],
+  "triggers": {
+    "crons": ["1 6 * * *", "30 12 * * *"]
+  }
+}

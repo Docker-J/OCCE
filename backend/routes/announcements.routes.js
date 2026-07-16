@@ -1,7 +1,5 @@
-import express from "express";
-
+import { Hono } from "hono";
 import { authStaff } from "../middleware/auth.js";
-
 import {
   deleteAnnouncementController,
   editAnnouncementController,
@@ -11,18 +9,13 @@ import {
   postAnnouncementController,
 } from "../controller/announcements.controller.js";
 
-const router = express.Router();
+const router = new Hono();
 
 router.get("/", getAnnouncementsController);
-
 router.get("/announcement/:id", getAnnouncementController);
-
 router.put("/announcement", authStaff, postAnnouncementController);
-
 router.put("/announcement/:id", authStaff, editAnnouncementController);
-
 router.put("/announcement/:id/pin", authStaff, pinAnnouncementController);
-
 router.delete("/announcement/:id", authStaff, deleteAnnouncementController);
 
 export default router;

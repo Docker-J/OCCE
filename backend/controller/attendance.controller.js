@@ -1,110 +1,95 @@
 import { google } from "googleapis";
-import path from "path";
-import {
-  CognitoIdentityProviderClient,
-  GetUserCommand,
-} from "@aws-sdk/client-cognito-identity-provider";
-
-const KEY_PATH = path.join(process.cwd(), "church-4385c-ceedf27e8d20.json");
-
-const cognitoClient = new CognitoIdentityProviderClient({
-  region: process.env.AWS_REGION,
-});
+import { getGoogleAuth } from "../api/googleAuth.js";
 
 // Helper to get Google Sheets client
-const getSheetsClient = () => {
-  const auth = new google.auth.GoogleAuth({
-    keyFile: KEY_PATH,
-    scopes: [
-      "https://www.googleapis.com/auth/spreadsheets",
-      "https://www.googleapis.com/auth/drive",
-    ],
-  });
+const getSheetsClient = (env) => {
+  const auth = getGoogleAuth(env, [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+  ]);
   return google.sheets({ version: "v4", auth });
 };
 
-// Helper to get actual name from Cognito profile
-const getCognitoUserName = async (accessToken) => {
-  try {
-    const command = new GetUserCommand({ AccessToken: accessToken });
-    const response = await cognitoClient.send(command);
-    const nameAttr = response.UserAttributes.find(
-      (attr) => attr.Name === "name",
-    );
-    return nameAttr ? nameAttr.Value : "";
-  } catch (error) {
-    console.error("Error fetching Cognito user name:", error);
-    throw error;
-  }
-};
+// Helper to get Google Sheets client
 
 // Helper to get Google Drive client
-const getDriveClient = () => {
-  const auth = new google.auth.GoogleAuth({
-    keyFile: KEY_PATH,
-    scopes: [
-      "https://www.googleapis.com/auth/spreadsheets",
-      "https://www.googleapis.com/auth/drive",
-    ],
-  });
+const getDriveClient = (env) => {
+  const auth = getGoogleAuth(env, [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+  ]);
   return google.drive({ version: "v3", auth });
 };
 
-export const getGardensController = async (req, res) => {
-  const spreadsheetId = process.env.ATTENDANCE_SHEET_ID;
+export const getGardensController = async (c) => {
+  const env = c.env;
+  const user = c.get("user");
+  const spreadsheetId = env.ATTENDANCE_SHEET_ID;
+
   if (!spreadsheetId) {
-    return res
-      .status(500)
-      .json({ error: "Attendance Sheet ID is not configured." });
+    return c.json({ error: "Attendance Sheet ID is not configured." }, 500);
   }
 
-  const isStaff = req.user["cognito:groups"]?.includes("Staff") || false;
-  const cleanUserPhone = req.user.username.replace(/\D/g, ""); // e.g. "17801234567"
+  const isStaff = user["cognito:groups"]?.includes("Staff") || false;
+  let cleanUserPhone = "";
+
+  // Only non-staff need to verify mapping against '정원지기' tab
+  if (!isStaff) {
+    cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
+  }
 
   try {
-    const sheets = getSheetsClient();
+    const sheets = getSheetsClient(env);
 
     // 1. Read sheet metadata to get tab names
     const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
     const sheetNames = spreadsheet.data.sheets.map((s) => s.properties.title);
 
-    // 2. Read Garden Keepers mapping sheet
-    if (!sheetNames.includes("정원지기")) {
-      return res
-        .status(500)
-        .json({ error: "'정원지기' tab not found in the spreadsheet." });
-    }
-
-    const keepersResponse = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: "정원지기!A:D",
-    });
-    const keeperRows = keepersResponse.data.values || [];
-
-    // Dynamically skip header if it exists
-    const startIdx =
-      keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
     let assignedGardens = [];
-    for (const row of keeperRows.slice(startIdx)) {
-      const phone = row[2]?.toString().replace(/\D/g, "") || "";
-      const gardensStr = row[3]?.toString().trim() || "";
 
-      if (phone.slice(-10) === cleanUserPhone.slice(-10)) {
-        assignedGardens = gardensStr
-          .split(",")
-          .map((g) => g.trim())
-          .filter(Boolean);
-        break;
+    if (!isStaff) {
+      // 2. Read Garden Keepers mapping sheet
+      if (!sheetNames.includes("정원지기")) {
+        return c.json(
+          { error: "'정원지기' tab not found in the spreadsheet." },
+          500,
+        );
       }
-    }
 
-    // Authorization: Non-staff users must be mapped to at least one garden
-    if (!isStaff && assignedGardens.length === 0) {
-      return res.status(403).json({
-        error: "NotAssignedLeader",
-        message:
-          "이 계정의 전화번호가 스프레드시트의 '정원지기' 명단에 존재하지 않거나 정원이 매핑되지 않았습니다.",
+      const keepersResponse = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: "정원지기!A:D",
       });
+      const keeperRows = keepersResponse.data.values || [];
+
+      // Dynamically skip header if it exists
+      const startIdx =
+        keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
+
+      for (const row of keeperRows.slice(startIdx)) {
+        const phone = row[2]?.toString().replace(/\D/g, "") || "";
+        const gardensStr = row[3]?.toString().trim() || "";
+
+        if (phone.slice(-10) === cleanUserPhone.slice(-10)) {
+          assignedGardens = gardensStr
+            .split(",")
+            .map((g) => g.trim())
+            .filter(Boolean);
+          break;
+        }
+      }
+
+      // Authorization: Non-staff users must be mapped to at least one garden
+      if (assignedGardens.length === 0) {
+        return c.json(
+          {
+            error: "NotAssignedLeader",
+            message:
+              "이 계정의 전화번호가 스프레드시트의 '정원지기' 명단에 존재하지 않거나 정원이 매핑되지 않았습니다.",
+          },
+          403,
+        );
+      }
     }
 
     const gardensData = {};
@@ -114,7 +99,10 @@ export const getGardensController = async (req, res) => {
       const gardenTabs = sheetNames.filter(
         (name) =>
           name !== "정원지기" &&
+          name !== "종합통계" &&
+          name !== "출석부" &&
           name !== "출석보고" &&
+          name !== "정원모임보고" &&
           !/^\d{4}-\d{2}-\d{2}$/.test(name),
       );
 
@@ -156,106 +144,88 @@ export const getGardensController = async (req, res) => {
       }
     }
 
-    res.json({
+    return c.json({
       isStaff,
       assignedGarden: assignedGardens[0] || null, // Default to first assigned garden
       gardens: gardensData,
     });
   } catch (error) {
     console.error("Error in getGardensController:", error);
-    res
-      .status(500)
-      .json({ error: "Failed to retrieve gardens and members data." });
+    return c.json(
+      { error: "Failed to retrieve gardens and members data." },
+      500,
+    );
   }
 };
 
-export const postReportController = async (req, res) => {
-  const spreadsheetId = process.env.ATTENDANCE_SHEET_ID;
-  const folderId = process.env.DRIVE_FOLDER_ID;
+export const postReportController = async (c) => {
+  const env = c.env;
+  const user = c.get("user");
+  const spreadsheetId = env.ATTENDANCE_SHEET_ID;
+  const folderId = env.DRIVE_FOLDER_ID;
 
   if (!spreadsheetId) {
-    return res
-      .status(500)
-      .json({ error: "Attendance Sheet ID is not configured." });
+    return c.json({ error: "Attendance Sheet ID is not configured." }, 500);
   }
   if (!folderId) {
-    return res
-      .status(500)
-      .json({ error: "Drive Folder ID is not configured." });
+    return c.json({ error: "Drive Folder ID is not configured." }, 500);
   }
 
-  const { date, gardenName, attendees, absentees, absenceReasons } = req.body;
+  const body = await c.req.json();
+  const { date, gardenName, attendees, absentees, absenceReasons } = body;
   if (!date || !gardenName || !attendees || !absentees) {
-    return res.status(400).json({ error: "Missing required fields." });
+    return c.json({ error: "Missing required fields." }, 400);
   }
 
-  const isStaff = req.user["cognito:groups"]?.includes("Staff") || false;
-  const cleanUserPhone = req.user.username.replace(/\D/g, "");
+  const isStaff = user["cognito:groups"]?.includes("Staff") || false;
+  let cleanUserPhone = "";
+
+  // Only non-staff need to verify mapping against '정원지기' tab
+  if (!isStaff) {
+    cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
+  }
 
   try {
-    const sheets = getSheetsClient();
-    const drive = getDriveClient();
-
-    // 1. Read keepers mapping from the master spreadsheet to check authorization and get reporterName
-    const keepersResponse = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: "정원지기!A:D",
-    });
-    const keeperRows = keepersResponse.data.values || [];
-    const startIdx =
-      keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
+    const sheets = getSheetsClient(env);
+    const drive = getDriveClient(env);
 
     let assignedGardens = [];
-    let reporterName = null;
+    let reporterName = isStaff ? "목회자/스태프" : (user.name || "");
 
-    for (const row of keeperRows.slice(startIdx)) {
-      const phone = row[2]?.toString().replace(/\D/g, "") || "";
-      const name = row[0]?.toString().trim();
-      const gardensStr = row[3]?.toString().trim() || "";
-
-      if (phone.slice(-10) === cleanUserPhone.slice(-10)) {
-        assignedGardens = gardensStr
-          .split(",")
-          .map((g) => g.trim())
-          .filter(Boolean);
-        reporterName = name;
-        break;
-      }
-    }
-
-    // Security check for non-staff
     if (!isStaff) {
-      if (!assignedGardens.includes(gardenName)) {
-        return res.status(403).json({
-          error: "UnauthorizedGardenReport",
-          message: "본인이 담당하지 않은 정원의 출석을 보고할 수 없습니다.",
-        });
-      }
-    }
+      // 1. Read keepers mapping from the master spreadsheet to check authorization and get reporterName
+      const keepersResponse = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: "정원지기!A:D",
+      });
+      const keeperRows = keepersResponse.data.values || [];
+      const startIdx =
+        keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
 
-    // Fallback for reporterName
-    if (!reporterName) {
-      try {
-        const authHeader = req.header("Authorization");
-        const token = authHeader?.split(" ")[1];
-        if (token) {
-          const fetchPromise = getCognitoUserName(token);
-          const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(
-              () => reject(new Error("Cognito request timeout")),
-              2500,
-            ),
-          );
-          reporterName = await Promise.race([fetchPromise, timeoutPromise]);
+      for (const row of keeperRows.slice(startIdx)) {
+        const phone = row[2]?.toString().replace(/\D/g, "") || "";
+        const name = row[0]?.toString().trim();
+        const gardensStr = row[3]?.toString().trim() || "";
+
+        if (phone.slice(-10) === cleanUserPhone.slice(-10)) {
+          assignedGardens = gardensStr
+            .split(",")
+            .map((g) => g.trim())
+            .filter(Boolean);
+          reporterName = name || user.name || "";
+          break;
         }
-      } catch (err) {
-        console.warn(
-          "Failed or timed out fetching name from Cognito:",
-          err.message,
-        );
       }
-      if (!reporterName) {
-        reporterName = isStaff ? "목회자/스태프" : cleanUserPhone;
+
+      // Security check for non-staff
+      if (!assignedGardens.includes(gardenName)) {
+        return c.json(
+          {
+            error: "UnauthorizedGardenReport",
+            message: "본인이 담당하지 않은 정원의 출석을 보고할 수 없습니다.",
+          },
+          403,
+        );
       }
     }
 
@@ -271,11 +241,11 @@ export const postReportController = async (req, res) => {
       supportsAllDrives: true,
       includeItemsFromAllDrives: true,
     });
-    const files = searchResponse.data.files || [];
+    const filesList = searchResponse.data.files || [];
     let weeklySpreadsheetId = null;
 
-    if (files.length > 0) {
-      weeklySpreadsheetId = files[0].id;
+    if (filesList.length > 0) {
+      weeklySpreadsheetId = filesList[0].id;
       console.log(`Found existing weekly spreadsheet: ${weeklySpreadsheetId}`);
     } else {
       // 3. File does not exist: Copy master spreadsheet to folderId
@@ -343,8 +313,7 @@ export const postReportController = async (req, res) => {
         (name) =>
           name !== "정원지기" &&
           name !== "종합통계" &&
-          name !== "출석부" &&
-          name !== "출석보고" &&
+          name !== "정원모임보고" &&
           !/^\d{4}-\d{2}-\d{2}$/.test(name),
       );
 
@@ -355,7 +324,9 @@ export const postReportController = async (req, res) => {
         ranges,
       });
 
-      const summaryRows = [["보고여부", "정원", "총원", "출석", "결석", "출석율"]];
+      const summaryRows = [
+        ["보고여부", "정원", "총원", "출석", "결석", "출석율"],
+      ];
 
       const validationRequests = [];
       const updateValueRequests = [];
@@ -381,10 +352,8 @@ export const postReportController = async (req, res) => {
         const memberCount = members.length;
         const rowIdx = idx + 2; // 1-based index (header is 1)
 
-        // Formulas:
-        // C: 총원, D: 출석, E: 결석, F: 출석율
         summaryRows.push([
-          false, // Initialize '보고여부' as false (unchecked checkbox)
+          false,
           gardenTabName,
           `=COUNTA('${gardenTabName}'!A1:A200)`,
           `=COUNTIF('${gardenTabName}'!B1:B200, TRUE)`,
@@ -392,7 +361,6 @@ export const postReportController = async (req, res) => {
           `=IFERROR(D${rowIdx}/C${rowIdx}, 0)`,
         ]);
 
-        // Initialize Column B with false and apply native checkbox validation
         const currentTab = updatedSpreadsheetInfo.data.sheets.find(
           (s) => s.properties.title === gardenTabName,
         );
@@ -406,14 +374,14 @@ export const postReportController = async (req, res) => {
           });
 
           for (let mIdx = 0; mIdx < memberCount; mIdx++) {
-            const sheetRowIndex = mIdx; // Member 0 at Row 1 (index 0)
+            const sheetRowIndex = mIdx;
             validationRequests.push({
               setDataValidation: {
                 range: {
                   sheetId: currentTabId,
                   startRowIndex: sheetRowIndex,
                   endRowIndex: sheetRowIndex + 1,
-                  startColumnIndex: 1, // Column B is index 1
+                  startColumnIndex: 1,
                   endColumnIndex: 2,
                 },
                 rule: {
@@ -449,7 +417,7 @@ export const postReportController = async (req, res) => {
         });
       }
 
-      // Add '종합통계' percentage formatting (Column F, rows 2 to gardenTabs.length + 1)
+      // Add '종합통계' percentage formatting
       if (summarySheetId && gardenTabs.length > 0) {
         validationRequests.push({
           repeatCell: {
@@ -457,7 +425,7 @@ export const postReportController = async (req, res) => {
               sheetId: summarySheetId,
               startRowIndex: 1,
               endRowIndex: gardenTabs.length + 1,
-              startColumnIndex: 5, // Column F is index 5
+              startColumnIndex: 5,
               endColumnIndex: 6,
             },
             cell: {
@@ -472,16 +440,16 @@ export const postReportController = async (req, res) => {
           },
         });
 
-        // Add '종합통계' checkbox data validation (Column A, rows 1 to gardenTabs.length + 1)
+        // Add '종합통계' checkbox data validation
         for (let idx = 0; idx < gardenTabs.length; idx++) {
-          const rowIdx = idx + 1; // Row 2 in sheet is index 1
+          const rowIdx = idx + 1;
           validationRequests.push({
             setDataValidation: {
               range: {
                 sheetId: summarySheetId,
                 startRowIndex: rowIdx,
                 endRowIndex: rowIdx + 1,
-                startColumnIndex: 0, // Column A is index 0
+                startColumnIndex: 0,
                 endColumnIndex: 1,
               },
               rule: {
@@ -506,7 +474,7 @@ export const postReportController = async (req, res) => {
       }
     }
 
-    // 5. Update reported garden attendance in its tab (Native Checkbox + Note comments)
+    // 5. Update reported garden attendance in its tab
     console.log(`Updating attendance in tab '${gardenName}'...`);
     const currentSpreadsheetInfo = await sheets.spreadsheets.get({
       spreadsheetId: weeklySpreadsheetId,
@@ -515,10 +483,13 @@ export const postReportController = async (req, res) => {
       (s) => s.properties.title === gardenName,
     );
     if (!currentTab) {
-      return res.status(404).json({
-        error: "GardenTabNotFound",
-        message: `'${gardenName}' 탭이 스프레드시트에 존재하지 않습니다.`,
-      });
+      return c.json(
+        {
+          error: "GardenTabNotFound",
+          message: `'${gardenName}' 탭이 스프레드시트에 존재하지 않습니다.`,
+        },
+        404,
+      );
     }
     const currentTabId = currentTab.properties.sheetId;
 
@@ -526,8 +497,8 @@ export const postReportController = async (req, res) => {
       spreadsheetId: weeklySpreadsheetId,
       range: `${gardenName}!A:A`,
     });
-    const rows = memberResponse.data.values || [];
-    const members = rows
+    const rowsList = memberResponse.data.values || [];
+    const members = rowsList
       .map((r) => r[0]?.toString().trim())
       .filter((name) => name && name !== "이름" && name !== "성명");
 
@@ -541,7 +512,7 @@ export const postReportController = async (req, res) => {
               userEnteredValue: {
                 boolValue: isPresent,
               },
-              note: !isPresent && reason ? reason : "", // Set note to reason if absent, else clear note
+              note: !isPresent && reason ? reason : "",
             },
           ],
         };
@@ -559,7 +530,7 @@ export const postReportController = async (req, res) => {
                   sheetId: currentTabId,
                   startRowIndex: 0,
                   endRowIndex: members.length,
-                  startColumnIndex: 1, // Column B (index 1)
+                  startColumnIndex: 1,
                   endColumnIndex: 2,
                 },
               },
@@ -580,7 +551,7 @@ export const postReportController = async (req, res) => {
     let gardenRowIdx = -1;
     for (let i = 1; i < summaryRowsData.length; i++) {
       if (summaryRowsData[i][1]?.toString().trim() === gardenName.trim()) {
-        gardenRowIdx = i + 1; // 1-based sheet row index
+        gardenRowIdx = i + 1;
         break;
       }
     }
@@ -599,9 +570,240 @@ export const postReportController = async (req, res) => {
     console.log(
       `✅ Attendance reported successfully for ${gardenName} on ${date} (Weekly Sheet updated with native checkboxes and comments)`,
     );
-    res.sendStatus(200);
+    return c.body(null, 200);
   } catch (error) {
     console.error("Error in postReportController:", error);
-    res.status(500).json({ error: "Failed to submit attendance report." });
+    return c.json({ error: "Failed to submit attendance report." }, 500);
+  }
+};
+
+export const postGatheringReportController = async (c) => {
+  const env = c.env;
+  const user = c.get("user");
+  const spreadsheetId = env.ATTENDANCE_SHEET_ID;
+  const folderId = env.DRIVE_FOLDER_ID;
+
+  if (!spreadsheetId) {
+    return c.json({ error: "Attendance Sheet ID is not configured." }, 500);
+  }
+  if (!folderId) {
+    return c.json({ error: "Drive Folder ID is not configured." }, 500);
+  }
+
+  const body = await c.req.json();
+  const { date, time, location, notes, gardenName, attendees, absentees } = body;
+  if (!date || !gardenName || !attendees || !absentees) {
+    return c.json({ error: "Missing required fields." }, 400);
+  }
+
+  const isStaff = user["cognito:groups"]?.includes("Staff") || false;
+  let cleanUserPhone = "";
+
+  if (!isStaff) {
+    cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
+  }
+
+  try {
+    const sheets = getSheetsClient(env);
+    const drive = getDriveClient(env);
+
+    let assignedGardens = [];
+    let reporterName = isStaff ? "목회자/스태프" : (user.name || "");
+
+    if (!isStaff) {
+      // 1. Read keepers mapping from the master spreadsheet to check authorization and get reporterName
+      const keepersResponse = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: "정원지기!A:D",
+      });
+      const keeperRows = keepersResponse.data.values || [];
+      const startIdx =
+        keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
+
+      for (const row of keeperRows.slice(startIdx)) {
+        const phone = row[2]?.toString().replace(/\D/g, "") || "";
+        const name = row[0]?.toString().trim();
+        const gardensStr = row[3]?.toString().trim() || "";
+
+        if (phone.slice(-10) === cleanUserPhone.slice(-10)) {
+          assignedGardens = gardensStr
+            .split(",")
+            .map((g) => g.trim())
+            .filter(Boolean);
+          reporterName = name || user.name || "";
+          break;
+        }
+      }
+
+      // Security check for non-staff
+      if (!assignedGardens.includes(gardenName)) {
+        return c.json(
+          {
+            error: "UnauthorizedGardenReport",
+            message: "본인이 담당하지 않은 정원의 출석을 보고할 수 없습니다.",
+          },
+          403,
+        );
+      }
+    }
+
+    // 2. Search for existing file named '[GardenName]_[Date]' in DRIVE_FOLDER_ID
+    const fileName = `${gardenName}_${date}`;
+    console.log(`Searching for existing file '${fileName}' in Shared Drive folder '${folderId}'...`);
+    const searchResponse = await drive.files.list({
+      q: `name = '${fileName}' and '${folderId}' in parents and trashed = false`,
+      spaces: "drive",
+      fields: "files(id, name)",
+      supportsAllDrives: true,
+      includeItemsFromAllDrives: true,
+    });
+    const filesList = searchResponse.data.files || [];
+
+    // Trash existing files with the same name if any
+    if (filesList.length > 0) {
+      for (const file of filesList) {
+        console.log(`Trashing existing file: ${file.name} (${file.id})`);
+        try {
+          await drive.files.update({
+            fileId: file.id,
+            requestBody: { trashed: true },
+            supportsAllDrives: true,
+          });
+        } catch (err) {
+          console.warn(`Failed to trash file ${file.id}:`, err.message);
+        }
+      }
+    }
+
+    // 3. Copy master spreadsheet to folderId
+    console.log(`Copying master spreadsheet ${spreadsheetId} to file '${fileName}'...`);
+    const copyResponse = await drive.files.copy({
+      fileId: spreadsheetId,
+      requestBody: {
+        name: fileName,
+        parents: [folderId],
+      },
+      supportsAllDrives: true,
+    });
+    const weeklySpreadsheetId = copyResponse.data.id;
+    console.log(`Spreadsheet copied successfully. New ID: ${weeklySpreadsheetId}`);
+
+    // 4. Initialize the copied spreadsheet: Add '모임정보' tab, keep only 'gardenName' tab
+    const weeklySpreadsheetInfo = await sheets.spreadsheets.get({
+      spreadsheetId: weeklySpreadsheetId,
+    });
+    const weeklySheetNames = weeklySpreadsheetInfo.data.sheets.map((s) => s.properties.title);
+
+    const batchRequests = [{ addSheet: { properties: { title: "모임정보", index: 0 } } }];
+
+    // Queue deletion of all other tabs except the active gardenName
+    weeklySpreadsheetInfo.data.sheets.forEach((sheet) => {
+      const title = sheet.properties.title;
+      const id = sheet.properties.sheetId;
+      if (title !== gardenName) {
+        batchRequests.push({ deleteSheet: { sheetId: id } });
+      }
+    });
+
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: weeklySpreadsheetId,
+      requestBody: { requests: batchRequests },
+    });
+
+    // 5. Get current members from column A of the garden tab to count and update checkboxes
+    const membersResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId: weeklySpreadsheetId,
+      range: `${gardenName}!A:A`,
+    });
+    const rows = membersResponse.data.values || [];
+    const members = rows
+      .map((r) => r[0]?.toString().trim())
+      .filter((name) => name && name !== "이름" && name !== "성명");
+    const memberCount = members.length;
+
+    // 6. Write gathering info to '모임정보' tab
+    const localNow = new Date();
+    // Adjust to local timezone KST (UTC+9)
+    const kstOffset = 9 * 60 * 60 * 1000;
+    const kstNow = new Date(localNow.getTime() + kstOffset);
+    const timestamp = kstNow.toISOString().replace("T", " ").substring(0, 16);
+    const gatheringDateTime = `${date} ${time}`;
+
+    const infoRows = [
+      ["구분", "내용"],
+      ["모임정원", gardenName],
+      ["모임일시", gatheringDateTime],
+      ["모임장소", location || ""],
+      ["총원", `=COUNTA('${gardenName}'!A1:A200)`],
+      ["참석", `=COUNTIF('${gardenName}'!B1:B200, TRUE)`],
+      ["결석", `=COUNTIF('${gardenName}'!B1:B200, FALSE)`],
+      ["모임내용 및 기도제목", notes || ""],
+      ["보고일시", timestamp],
+    ];
+
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: weeklySpreadsheetId,
+      range: "모임정보!A1",
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: infoRows,
+      },
+    });
+
+    // 7. Update attendance checkboxes in the gardenName tab
+    const updatedSpreadsheetInfo = await sheets.spreadsheets.get({ spreadsheetId: weeklySpreadsheetId });
+    const currentTab = updatedSpreadsheetInfo.data.sheets.find((s) => s.properties.title === gardenName);
+    const currentTabId = currentTab ? currentTab.properties.sheetId : null;
+
+    if (currentTabId && memberCount > 0) {
+      const validationRequests = [];
+      const updateValueRequests = [];
+
+      for (let mIdx = 0; mIdx < memberCount; mIdx++) {
+        const name = members[mIdx];
+        const isAttended = attendees.includes(name);
+        const cellValue = isAttended ? true : false;
+
+        const sheetRowIndex = mIdx;
+
+        updateValueRequests.push({
+          range: `${gardenName}!B${sheetRowIndex + 1}`,
+          values: [[cellValue]],
+        });
+
+        validationRequests.push({
+          setDataValidation: {
+            range: {
+              sheetId: currentTabId,
+              startRowIndex: sheetRowIndex,
+              endRowIndex: sheetRowIndex + 1,
+              startColumnIndex: 1,
+              endColumnIndex: 2,
+            },
+            rule: { condition: { type: "BOOLEAN" }, showCustomUi: true },
+          },
+        });
+      }
+
+      if (updateValueRequests.length > 0) {
+        await sheets.spreadsheets.values.batchUpdate({
+          spreadsheetId: weeklySpreadsheetId,
+          requestBody: { valueInputOption: "USER_ENTERED", data: updateValueRequests },
+        });
+      }
+
+      if (validationRequests.length > 0) {
+        await sheets.spreadsheets.batchUpdate({
+          spreadsheetId: weeklySpreadsheetId,
+          requestBody: { requests: validationRequests },
+        });
+      }
+    }
+
+    console.log(`✅ Garden gathering report submitted successfully as separate file '${fileName}'`);
+    return c.body(null, 200);
+  } catch (error) {
+    console.error("Error in postGatheringReportController:", error);
+    return c.json({ error: "Failed to submit garden gathering report." }, 500);
   }
 };

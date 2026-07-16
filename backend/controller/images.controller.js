@@ -1,58 +1,77 @@
-import axios from "axios";
-import FormData from "form-data";
-
-const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
-const CLOUDFLARE_API_KEY = process.env.CLOUDFLARE_API_KEY;
-
-export const deleteImages = async (images) => {
+export const deleteImages = async (env, images) => {
   try {
-    const deletePromises = images.map((image) =>
-      axios.delete(
+    const CLOUDFLARE_ACCOUNT_ID = env.CLOUDFLARE_ACCOUNT_ID;
+    const CLOUDFLARE_API_KEY = env.CLOUDFLARE_API_KEY;
+
+    const deletePromises = images.map(async (image) => {
+      const res = await fetch(
         `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1/${image}`,
         {
+          method: "DELETE",
           headers: {
             Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
           },
-        },
-      ),
-    );
+        }
+      );
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error(`Failed to delete Cloudflare image ${image}:`, errText);
+      }
+    });
 
     await Promise.all(deletePromises);
   } catch (error) {
-    throw new Error(error);
+    throw new Error(error.message || error);
   }
 };
 
-export const uploadImage = async (image) => {
+export const uploadImage = async (env, file) => {
   try {
-    const formData = new FormData();
-    formData.append("file", image.buffer, image.originalname);
+    const CLOUDFLARE_ACCOUNT_ID = env.CLOUDFLARE_ACCOUNT_ID;
+    const CLOUDFLARE_API_KEY = env.CLOUDFLARE_API_KEY;
 
-    const result = await axios.post(
+    const arrayBuffer = await file.arrayBuffer();
+    const blob = new Blob([arrayBuffer], { type: file.type });
+
+    const formData = new FormData();
+    formData.append("file", blob, file.name);
+
+    const res = await fetch(
       `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1`,
-      formData,
       {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
-          "Content-Type": `multipart/form-data; boundary=${formData._boundary}`,
         },
-      },
+        body: formData,
+      }
     );
 
-    return result.data.result.id;
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`Cloudflare Images upload failed: ${errText}`);
+    }
+
+    const result = await res.json();
+    return result.result.id;
   } catch (error) {
-    throw new Error(error);
+    throw new Error(error.message || error);
   }
 };
 
-export const uploadImageController = async (req, res) => {
-  const image = req.file;
-
+export const uploadImageController = async (c) => {
   try {
-    const result = await uploadImage(image);
-    res.send(result);
+    const formData = await c.req.formData();
+    const image = formData.get("image");
+
+    if (!image) {
+      return c.text("No image file provided", 400);
+    }
+
+    const result = await uploadImage(c.env, image);
+    return c.text(result);
   } catch (error) {
-    console.log(error);
-    res.sendStatus(500);
+    console.error("Image upload controller error:", error);
+    return c.body(null, 500);
   }
 };
