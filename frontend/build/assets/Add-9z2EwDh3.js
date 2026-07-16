@@ -1,0 +1,1 @@
+import{n as e}from"./reactVendor-Dh_V2l1N.js";import{t}from"./createSvgIcon-mkVfC-_6.js";var n=t((0,e().jsx)(`path`,{d:`M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z`}),`Add`);export{n as t};
