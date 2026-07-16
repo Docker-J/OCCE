@@ -28,12 +28,9 @@ import LoginIcon from "@mui/icons-material/Login";
 import SendIcon from "@mui/icons-material/Send";
 import useModals from "../../util/useModal.js";
 import useSnackbar from "../../util/useSnackbar.js";
-import {
-  getGardensAndMembers,
-  submitAttendanceReport,
-  submitGatheringReport,
-} from "../../api/attendance.js";
-import { useSearchParams } from "react-router";
+import { getGardensAndMembers } from "../../api/attendance.js";
+import { useSearchParams, useSubmit, useActionData, useNavigation } from "react-router";
+import axios from "axios";
 import { format } from "date-fns";
 import ButtonDatePicker from "../../common/ButtonDatePicker";
 
@@ -88,7 +85,10 @@ const SmallGroupReport = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [checkedMembers, setCheckedMembers] = useState({});
   const [absenceReasons, setAbsenceReasons] = useState({});
-  const [submitting, setSubmitting] = useState(false);
+  const submit = useSubmit();
+  const actionData = useActionData();
+  const navigation = useNavigation();
+  const submitting = navigation.state === "submitting";
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -179,6 +179,37 @@ const SmallGroupReport = () => {
     }
   }, [selectedGarden, gardens]);
 
+  // Handle submission side effects from React Router Action
+  useEffect(() => {
+    if (!actionData) return;
+
+    if (actionData.success) {
+      openSnackbar(
+        "success",
+        actionData.reportType === "gathering"
+          ? `${selectedGarden} 정원 모임 보고가 완료되었습니다!`
+          : `${selectedGarden} 출석 보고가 완료되었습니다!`
+      );
+
+      if (actionData.reportType === "gathering") {
+        setGatheringNotes("");
+        setGatheringLocation("");
+      } else {
+        setAbsenceReasons({});
+      }
+
+      if (gardens[selectedGarden]) {
+        const resetChecked = {};
+        gardens[selectedGarden].forEach((member) => {
+          resetChecked[member] = true;
+        });
+        setCheckedMembers(resetChecked);
+      }
+    } else if (actionData.error) {
+      openSnackbar("error", actionData.error);
+    }
+  }, [actionData]);
+
   const handleLoginClick = async () => {
     const { default: SignInModal } = await import(
       "../../components/User/SignInModal"
@@ -246,7 +277,6 @@ const SmallGroupReport = () => {
 
   const handleConfirmSubmit = () => {
     setConfirmOpen(false);
-    setSubmitting(true);
 
     if (reportType === "gathering") {
       const payload = {
@@ -259,32 +289,9 @@ const SmallGroupReport = () => {
         absentees,
       };
 
-      submitGatheringReport(
-        payload,
-        () => {
-          setSubmitting(false);
-          openSnackbar(
-            "success",
-            `${selectedGarden} 정원 모임 보고가 완료되었습니다!`,
-          );
-          setGatheringNotes("");
-          setGatheringLocation("");
-          // Reset members state
-          if (gardens[selectedGarden]) {
-            const resetChecked = {};
-            gardens[selectedGarden].forEach((member) => {
-              resetChecked[member] = true;
-            });
-            setCheckedMembers(resetChecked);
-          }
-        },
-        (errMsg) => {
-          setSubmitting(false);
-          openSnackbar(
-            "error",
-            errMsg || "정원 모임 보고 제출에 실패했습니다.",
-          );
-        },
+      submit(
+        { reportType, payload },
+        { method: "post", encType: "application/json" }
       );
     } else {
       const payload = {
@@ -295,28 +302,9 @@ const SmallGroupReport = () => {
         absenceReasons,
       };
 
-      submitAttendanceReport(
-        payload,
-        () => {
-          setSubmitting(false);
-          openSnackbar(
-            "success",
-            `${selectedGarden} 출석 보고가 완료되었습니다!`,
-          );
-          setAbsenceReasons({});
-          // Reset members state
-          if (gardens[selectedGarden]) {
-            const resetChecked = {};
-            gardens[selectedGarden].forEach((member) => {
-              resetChecked[member] = true;
-            });
-            setCheckedMembers(resetChecked);
-          }
-        },
-        (errMsg) => {
-          setSubmitting(false);
-          openSnackbar("error", errMsg || "출석 보고 제출에 실패했습니다.");
-        },
+      submit(
+        { reportType, payload },
+        { method: "post", encType: "application/json" }
       );
     }
   };
@@ -1238,3 +1226,23 @@ const SmallGroupReport = () => {
 };
 
 export default SmallGroupReport;
+
+export async function action({ request }) {
+  try {
+    const { reportType, payload } = await request.json();
+
+    if (reportType === "gathering") {
+      const res = await axios.post("/api/attendance/gathering-report", payload);
+      return { success: true, reportType, message: res.data || "Success" };
+    } else {
+      const res = await axios.post("/api/attendance/report", payload);
+      return { success: true, reportType, message: res.data || "Success" };
+    }
+  } catch (error) {
+    console.error("Action error:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "보고 제출에 실패했습니다."
+    };
+  }
+}

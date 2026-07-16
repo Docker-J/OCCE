@@ -1,9 +1,7 @@
-import { Pagination } from "@mui/material";
-import { useNavigate } from "react-router";
+import { Pagination, PaginationItem } from "@mui/material";
+import { Link } from "react-router";
 
 const BoardPagination = ({ pages, currentPage }) => {
-  const navigate = useNavigate();
-
   return (
     <Pagination
       className="pagination"
@@ -11,13 +9,17 @@ const BoardPagination = ({ pages, currentPage }) => {
       page={Number(currentPage)}
       variant="outlined"
       color="primary"
-      // hideNextButton={pages === 1}
-      // hidePrevButton={pages === numberOfAnnouncements}
       sx={{
         margin: "auto",
         mt: 4,
       }}
-      onChange={(_, pageNumber) => navigate(`?page=${pageNumber}`)}
+      renderItem={(item) => (
+        <PaginationItem
+          component={Link}
+          to={`?page=${item.page}`}
+          {...item}
+        />
+      )}
     />
   );
 };

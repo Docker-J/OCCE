@@ -1,6 +1,5 @@
-import { Outlet, createBrowserRouter, useNavigation } from "react-router";
+import { Outlet, createBrowserRouter, useNavigation, RouterProvider } from "react-router";
 import { LinearProgress, CircularProgress, Box } from "@mui/material";
-import { RouterProvider } from "react-router/dom";
 import { lazy, Suspense } from "react";
 
 import "./App.css";
@@ -33,52 +32,6 @@ function ErrorFallback({ error, resetErrorBoundary }) {
     </div>
   );
 }
-
-const Main = lazy(() => import("./pages/Main/Main"));
-
-const About = lazy(() => import("./pages/AboutUs/AboutUs"));
-
-// News
-const Announcements = lazy(() =>
-  import("./pages/News/Announcements/Announcements"),
-);
-const Announcement = lazy(() =>
-  import("./pages/News/Announcements/Announcement"),
-);
-const WeeklyUpdate = lazy(() =>
-  import("./pages/News/WeeklyUpdate/WeeklyUpdate"),
-);
-const Columns = lazy(() => import("./pages/News/Columns/Columns"));
-const Column = lazy(() => import("./pages/News/Columns/Column"));
-const Schedules = lazy(() => import("./pages/News/Schedules/Schedules"));
-const NewComers = lazy(() => import("./pages/News/NewComers/NewComers"));
-const Albums = lazy(() => import("./pages/News/Albums/Albums"));
-const Album = lazy(() => import("./pages/News/Albums/Album"));
-
-// Online
-const SundayService = lazy(() => import("./pages/Online/SundayService"));
-const Sermon = lazy(() => import("./pages/Online/Sermon"));
-const Worship = lazy(() => import("./pages/Online/Worship"));
-const DawnQT = lazy(() => import("./pages/Online/DawnQT"));
-const PrayON = lazy(() => import("./pages/Online/PrayON"));
-const MeditationON = lazy(() =>
-  import("./pages/Online/MeditationON/MeditationON"),
-);
-const MeditationONPost = lazy(() =>
-  import("./pages/Online/MeditationON/MeditationONPost"),
-);
-const Bible291 = lazy(() => import("./pages/Online/Bible291"));
-
-// Community
-const SmallGroup = lazy(() => import("./pages/Community/SmallGroup"));
-const SmallGroupReport = lazy(() => import("./pages/Community/SmallGroupReport"));
-const Ministry = lazy(() => import("./pages/Community/Ministry"));
-
-// NextGen
-const Preschool = lazy(() => import("./pages/NextGen/Preschool"));
-const Elementary = lazy(() => import("./pages/NextGen/Elementary"));
-const Youth = lazy(() => import("./pages/NextGen/Youth/Youth"));
-const YoungAdult = lazy(() => import("./pages/NextGen/YoungAdult"));
 
 const Managers = () => {
   return (
@@ -161,91 +114,104 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Main />,
+        lazy: async () => ({ Component: (await import("./pages/Main/Main")).default }),
       },
       {
         path: "/aboutus",
-        element: <About />,
+        lazy: async () => ({ Component: (await import("./pages/AboutUs/AboutUs")).default }),
       },
       {
         path: "/announcements",
-        element: <Announcements />,
-        loader: async ({ request }) => {
-          const { loader } = await import("./route/AnnouncementsLoader");
-          return loader({ request });
+        lazy: async () => {
+          const [m, l] = await Promise.all([
+            import("./pages/News/Announcements/Announcements"),
+            import("./route/AnnouncementsLoader")
+          ]);
+          return { Component: m.default, loader: l.loader };
         },
       },
       {
         path: "/announcements/:announcementID",
-        element: <Announcement />,
-        loader: async ({ params }) => {
-          const { loader } = await import("./route/AnnouncementLoader");
-          return loader({ params });
+        lazy: async () => {
+          const [m, l] = await Promise.all([
+            import("./pages/News/Announcements/Announcement"),
+            import("./route/AnnouncementLoader")
+          ]);
+          return { Component: m.default, loader: l.loader };
         },
       },
       {
         path: "/weeklyupdate/:date?",
-        element: <WeeklyUpdate />,
-        loader: async ({ params }) => {
-          const { loader } = await import("./route/WeeklyUpdateLoader");
-          return loader({ params });
+        lazy: async () => {
+          const [m, l] = await Promise.all([
+            import("./pages/News/WeeklyUpdate/WeeklyUpdate"),
+            import("./route/WeeklyUpdateLoader")
+          ]);
+          return { Component: m.default, loader: l.loader };
         },
         shouldRevalidate: () => false,
       },
-      // {
-      //   path: "/albums",
-      //   element: <Albums />,
-      // },
       {
         path: "/albums/:albumID",
-        element: <Album />,
-        loader: async ({ params }) => {
-          const { loader } = await import("./route/AlbumLoader");
-          return loader({ params });
+        lazy: async () => {
+          const [m, l] = await Promise.all([
+            import("./pages/News/Albums/Album"),
+            import("./route/AlbumLoader")
+          ]);
+          return { Component: m.default, loader: l.loader };
         },
       },
       {
         path: "/columns",
-        element: <Columns />,
-        loader: async ({ request }) => {
-          const { loader } = await import("./route/ColumnsLoader");
-          return loader({ request });
+        lazy: async () => {
+          const [m, l] = await Promise.all([
+            import("./pages/News/Columns/Columns"),
+            import("./route/ColumnsLoader")
+          ]);
+          return { Component: m.default, loader: l.loader };
         },
       },
       {
         path: "/columns/:columnID",
-        element: <Column />,
-        loader: async ({ params }) => {
-          const { loader } = await import("./route/ColumnLoader");
-          return loader({ params });
+        lazy: async () => {
+          const [m, l] = await Promise.all([
+            import("./pages/News/Columns/Column"),
+            import("./route/ColumnLoader")
+          ]);
+          return { Component: m.default, loader: l.loader };
         },
       },
       {
         path: "/schedules",
-        element: <Schedules />,
-        loader: async () => {
-          const { loader } = await import("./route/SchedulesLoader");
-          return loader();
+        lazy: async () => {
+          const [m, l] = await Promise.all([
+            import("./pages/News/Schedules/Schedules"),
+            import("./route/SchedulesLoader")
+          ]);
+          return { Component: m.default, loader: l.loader };
         },
       },
       {
         path: "/newcomers",
-        element: <NewComers />,
+        lazy: async () => ({ Component: (await import("./pages/News/NewComers/NewComers")).default }),
       },
       {
         path: "/community",
         children: [
           {
             path: "smallgroup",
-            element: <SmallGroup />,
+            lazy: async () => ({ Component: (await import("./pages/Community/SmallGroup")).default }),
           },
           {
             path: "smallgroup/report",
-            element: <SmallGroupReport />,
+            lazy: async () => {
+              const m = await import("./pages/Community/SmallGroupReport");
+              return { Component: m.default, action: m.action };
+            },
           },
           {
             path: "ministry",
-            element: <Ministry />,
+            lazy: async () => ({ Component: (await import("./pages/Community/Ministry")).default }),
           },
         ],
       },
@@ -254,42 +220,42 @@ const router = createBrowserRouter([
         children: [
           {
             path: "sundayservice",
-            element: <SundayService />,
+            lazy: async () => ({ Component: (await import("./pages/Online/SundayService")).default }),
           },
           {
             path: "sermon",
-            element: <Sermon />,
+            lazy: async () => ({ Component: (await import("./pages/Online/Sermon")).default }),
           },
           {
             path: "worship",
-            element: <Worship />,
+            lazy: async () => ({ Component: (await import("./pages/Online/Worship")).default }),
           },
           {
             path: "dawnQT",
-            element: <DawnQT />,
+            lazy: async () => ({ Component: (await import("./pages/Online/DawnQT")).default }),
           },
           {
             path: "prayON",
-            element: <PrayON />,
+            lazy: async () => ({ Component: (await import("./pages/Online/PrayON")).default }),
           },
-          // {
-          //   path: "/online/meditationON",
-          //   element: <MeditationON />,
-          // },
           {
             path: "meditationON/:postID",
-            element: <MeditationONPost />,
-            loader: async ({ params }) => {
-              const { loader } = await import("./route/MeditationONPostLoader");
-              return loader({ params });
+            lazy: async () => {
+              const [m, l] = await Promise.all([
+                import("./pages/Online/MeditationON/MeditationONPost"),
+                import("./route/MeditationONPostLoader")
+              ]);
+              return { Component: m.default, loader: l.loader };
             },
           },
           {
             path: "bible291",
-            element: <Bible291 />,
-            loader: async () => {
-              const { loader } = await import("./route/Bible291Loader");
-              return loader();
+            lazy: async () => {
+              const [m, l] = await Promise.all([
+                import("./pages/Online/Bible291"),
+                import("./route/Bible291Loader")
+              ]);
+              return { Component: m.default, loader: l.loader };
             },
           },
         ],
@@ -299,19 +265,19 @@ const router = createBrowserRouter([
         children: [
           {
             path: "preschool",
-            element: <Preschool />,
+            lazy: async () => ({ Component: (await import("./pages/NextGen/Preschool")).default }),
           },
           {
             path: "elementary",
-            element: <Elementary />,
+            lazy: async () => ({ Component: (await import("./pages/NextGen/Elementary")).default }),
           },
           {
             path: "youth",
-            element: <Youth />,
+            lazy: async () => ({ Component: (await import("./pages/NextGen/Youth/Youth")).default }),
           },
           {
             path: "youngadult",
-            element: <YoungAdult />,
+            lazy: async () => ({ Component: (await import("./pages/NextGen/YoungAdult")).default }),
           },
         ],
       },
@@ -322,11 +288,11 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/albums",
-        element: <Albums />,
+        lazy: async () => ({ Component: (await import("./pages/News/Albums/Albums")).default }),
       },
       {
         path: "/online/meditationON",
-        element: <MeditationON />,
+        lazy: async () => ({ Component: (await import("./pages/Online/MeditationON/MeditationON")).default }),
       },
     ],
   },
