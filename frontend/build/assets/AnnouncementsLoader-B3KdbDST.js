@@ -1,0 +1,1 @@
+import{_ as e}from"./reactVendor-DTdocjAl.js";import{g as t}from"./index-zLf5uL-V.js";async function n({request:n}){let r=new URL(n.url).searchParams.get(`page`);return r===null?e(`?page=1`):{announcementsData:t.get(`/api/announcements?page=${r}`)}}export{n as loader};
