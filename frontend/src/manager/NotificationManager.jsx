@@ -86,6 +86,8 @@ const NotificationManager = memo(() => {
                 serviceWorkerRegistration: registration,
               });
               if (cachedToken) {
+                // Delete from our database first, then delete from Firebase cache
+                await unregisterToken(cachedToken);
                 await deleteToken(messaging);
               }
             } catch (err) {
