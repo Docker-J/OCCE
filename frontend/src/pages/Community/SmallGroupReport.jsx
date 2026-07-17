@@ -458,6 +458,40 @@ const SmallGroupReport = () => {
                 </Button>
               </CardContent>
             </Card>
+          ) : submitting ? (
+            // 5. Submitting Loader View
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                py: 12,
+                background: "rgba(255, 255, 255, 0.8)",
+                backdropFilter: "blur(8px)",
+                borderRadius: "16px",
+                boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.08)",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
+                textAlign: "center",
+              }}
+            >
+              <CircularProgress
+                sx={{
+                  color: reportType === "sunday" ? "#dc2626" : "#ea580c",
+                  mb: 3,
+                }}
+                size={50}
+              />
+              <Typography
+                variant="h6"
+                sx={{ color: "#333", fontWeight: 700, mb: 1 }}
+              >
+                보고서를 제출하는 중입니다...
+              </Typography>
+              <Typography variant="body2" sx={{ color: "#666" }}>
+                잠시만 기다려 주세요. 구글 드라이브에 저장 중입니다.
+              </Typography>
+            </Box>
           ) : (
             // 4. Form View (Authenticated & Loaded)
             <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
