@@ -1,1 +1,0 @@
-import{_ as e}from"./index-GxqtQPLG.js";async function t(){try{return(await e.get(`/api/bible291/today`)).data}catch(e){return console.error(`Failed to load Bible 291 schedule from backend:`,e),{today:``,match:null}}}export{t as loader};
