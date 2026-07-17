@@ -162,7 +162,7 @@ export const postReportController = async (c) => {
   const env = c.env;
   const user = c.get("user");
   const spreadsheetId = env.ATTENDANCE_SHEET_ID;
-  const folderId = env.DRIVE_FOLDER_ID;
+  const folderId = env.DRIVE_WEEKLY_FOLDER_ID;
 
   if (!spreadsheetId) {
     return c.json({ error: "Attendance Sheet ID is not configured." }, 500);
@@ -581,7 +581,7 @@ export const postGatheringReportController = async (c) => {
   const env = c.env;
   const user = c.get("user");
   const spreadsheetId = env.ATTENDANCE_SHEET_ID;
-  const folderId = env.DRIVE_FOLDER_ID;
+  const folderId = env.DRIVE_GATHERING_FOLDER_ID;
 
   if (!spreadsheetId) {
     return c.json({ error: "Attendance Sheet ID is not configured." }, 500);
