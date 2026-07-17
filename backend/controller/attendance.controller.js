@@ -301,12 +301,14 @@ export const postReportController = async (c) => {
         });
       }
 
-      await sheets.spreadsheets.batchUpdate({
+      const batchResponseUpdate = await sheets.spreadsheets.batchUpdate({
         spreadsheetId: weeklySpreadsheetId,
         requestBody: {
           requests: batchRequests,
         },
       });
+
+      const summarySheetId = batchResponseUpdate.data.replies[0].addSheet.properties.sheetId;
 
       // Filter to get only garden tabs
       const gardenTabs = weeklySheetNames.filter(
@@ -331,17 +333,6 @@ export const postReportController = async (c) => {
       const validationRequests = [];
       const updateValueRequests = [];
 
-      // Get the sheetId of the newly created '종합통계' sheet
-      const updatedSpreadsheetInfo = await sheets.spreadsheets.get({
-        spreadsheetId: weeklySpreadsheetId,
-      });
-      const totalSummarySheet = updatedSpreadsheetInfo.data.sheets.find(
-        (s) => s.properties.title === "종합통계",
-      );
-      const summarySheetId = totalSummarySheet
-        ? totalSummarySheet.properties.sheetId
-        : null;
-
       gardenTabs.forEach((gardenTabName, idx) => {
         const vr = batchResponse.data.valueRanges[idx];
         const rows = vr.values || [];
@@ -361,7 +352,7 @@ export const postReportController = async (c) => {
           `=IFERROR(D${rowIdx}/C${rowIdx}, 0)`,
         ]);
 
-        const currentTab = updatedSpreadsheetInfo.data.sheets.find(
+        const currentTab = weeklySpreadsheetInfo.data.sheets.find(
           (s) => s.properties.title === gardenTabName,
         );
         const currentTabId = currentTab ? currentTab.properties.sheetId : null;
@@ -373,26 +364,23 @@ export const postReportController = async (c) => {
             values: falseValues,
           });
 
-          for (let mIdx = 0; mIdx < memberCount; mIdx++) {
-            const sheetRowIndex = mIdx;
-            validationRequests.push({
-              setDataValidation: {
-                range: {
-                  sheetId: currentTabId,
-                  startRowIndex: sheetRowIndex,
-                  endRowIndex: sheetRowIndex + 1,
-                  startColumnIndex: 1,
-                  endColumnIndex: 2,
-                },
-                rule: {
-                  condition: {
-                    type: "BOOLEAN",
-                  },
-                  showCustomUi: true,
-                },
+          validationRequests.push({
+            setDataValidation: {
+              range: {
+                sheetId: currentTabId,
+                startRowIndex: 0,
+                endRowIndex: memberCount,
+                startColumnIndex: 1,
+                endColumnIndex: 2,
               },
-            });
-          }
+              rule: {
+                condition: {
+                  type: "BOOLEAN",
+                },
+                showCustomUi: true,
+              },
+            },
+          });
         }
       });
 
@@ -417,7 +405,7 @@ export const postReportController = async (c) => {
         });
       }
 
-      // Add '종합통계' percentage formatting
+      // Add '종합통계' percentage formatting and column-wide checkbox data validation
       if (summarySheetId && gardenTabs.length > 0) {
         validationRequests.push({
           repeatCell: {
@@ -440,27 +428,23 @@ export const postReportController = async (c) => {
           },
         });
 
-        // Add '종합통계' checkbox data validation
-        for (let idx = 0; idx < gardenTabs.length; idx++) {
-          const rowIdx = idx + 1;
-          validationRequests.push({
-            setDataValidation: {
-              range: {
-                sheetId: summarySheetId,
-                startRowIndex: rowIdx,
-                endRowIndex: rowIdx + 1,
-                startColumnIndex: 0,
-                endColumnIndex: 1,
-              },
-              rule: {
-                condition: {
-                  type: "BOOLEAN",
-                },
-                showCustomUi: true,
-              },
+        validationRequests.push({
+          setDataValidation: {
+            range: {
+              sheetId: summarySheetId,
+              startRowIndex: 1,
+              endRowIndex: gardenTabs.length + 1,
+              startColumnIndex: 0,
+              endColumnIndex: 1,
             },
-          });
-        }
+            rule: {
+              condition: {
+                type: "BOOLEAN",
+              },
+              showCustomUi: true,
+            },
+          },
+        });
       }
 
       // Apply batch validations and formatting
@@ -474,15 +458,15 @@ export const postReportController = async (c) => {
       }
     }
 
-    // 5. Update reported garden attendance in its tab
+    // 5. Update reported garden attendance in its tab & update '보고여부' in '종합통계' sheet in a single batch
     console.log(`Updating attendance in tab '${gardenName}'...`);
-    const currentSpreadsheetInfo = await sheets.spreadsheets.get({
+    const spreadsheetInfo = await sheets.spreadsheets.get({
       spreadsheetId: weeklySpreadsheetId,
     });
-    const currentTab = currentSpreadsheetInfo.data.sheets.find(
+    const targetTab = spreadsheetInfo.data.sheets.find(
       (s) => s.properties.title === gardenName,
     );
-    if (!currentTab) {
+    if (!targetTab) {
       return c.json(
         {
           error: "GardenTabNotFound",
@@ -491,16 +475,33 @@ export const postReportController = async (c) => {
         404,
       );
     }
-    const currentTabId = currentTab.properties.sheetId;
+    const targetTabId = targetTab.properties.sheetId;
 
-    const memberResponse = await sheets.spreadsheets.values.get({
+    const summaryTab = spreadsheetInfo.data.sheets.find(
+      (s) => s.properties.title === "종합통계",
+    );
+    const summaryTabId = summaryTab ? summaryTab.properties.sheetId : null;
+
+    const batchGetResp = await sheets.spreadsheets.values.batchGet({
       spreadsheetId: weeklySpreadsheetId,
-      range: `${gardenName}!A:A`,
+      ranges: [`${gardenName}!A:A`, "종합통계!A:F"],
     });
-    const rowsList = memberResponse.data.values || [];
+    const rowsList = batchGetResp.data.valueRanges[0].values || [];
+    const summaryRowsData = batchGetResp.data.valueRanges[1].values || [];
+
     const members = rowsList
       .map((r) => r[0]?.toString().trim())
       .filter((name) => name && name !== "이름" && name !== "성명");
+
+    let gardenRowIdx = -1;
+    for (let i = 1; i < summaryRowsData.length; i++) {
+      if (summaryRowsData[i][1]?.toString().trim() === gardenName.trim()) {
+        gardenRowIdx = i; // 0-based index
+        break;
+      }
+    }
+
+    const updateRequests = [];
 
     if (members.length > 0) {
       const rowsData = members.map((name) => {
@@ -518,51 +519,52 @@ export const postReportController = async (c) => {
         };
       });
 
-      await sheets.spreadsheets.batchUpdate({
-        spreadsheetId: weeklySpreadsheetId,
-        requestBody: {
-          requests: [
-            {
-              updateCells: {
-                rows: rowsData,
-                fields: "userEnteredValue,note",
-                range: {
-                  sheetId: currentTabId,
-                  startRowIndex: 0,
-                  endRowIndex: members.length,
-                  startColumnIndex: 1,
-                  endColumnIndex: 2,
-                },
-              },
-            },
-          ],
+      updateRequests.push({
+        updateCells: {
+          rows: rowsData,
+          fields: "userEnteredValue,note",
+          range: {
+            sheetId: targetTabId,
+            startRowIndex: 0,
+            endRowIndex: members.length,
+            startColumnIndex: 1,
+            endColumnIndex: 2,
+          },
         },
       });
     }
 
-    // 6. Update '보고여부' status to true in '종합통계' sheet tab
-    console.log("Updating report status to true in '종합통계'...");
-    const summaryResponse = await sheets.spreadsheets.values.get({
-      spreadsheetId: weeklySpreadsheetId,
-      range: "종합통계!A:F",
-    });
-    const summaryRowsData = summaryResponse.data.values || [];
-
-    let gardenRowIdx = -1;
-    for (let i = 1; i < summaryRowsData.length; i++) {
-      if (summaryRowsData[i][1]?.toString().trim() === gardenName.trim()) {
-        gardenRowIdx = i + 1;
-        break;
-      }
+    if (summaryTabId && gardenRowIdx !== -1) {
+      updateRequests.push({
+        updateCells: {
+          rows: [
+            {
+              values: [
+                {
+                  userEnteredValue: {
+                    boolValue: true,
+                  },
+                },
+              ],
+            },
+          ],
+          fields: "userEnteredValue",
+          range: {
+            sheetId: summaryTabId,
+            startRowIndex: gardenRowIdx,
+            endRowIndex: gardenRowIdx + 1,
+            startColumnIndex: 0,
+            endColumnIndex: 1,
+          },
+        },
+      });
     }
 
-    if (gardenRowIdx !== -1) {
-      await sheets.spreadsheets.values.update({
+    if (updateRequests.length > 0) {
+      await sheets.spreadsheets.batchUpdate({
         spreadsheetId: weeklySpreadsheetId,
-        range: `종합통계!A${gardenRowIdx}`,
-        valueInputOption: "USER_ENTERED",
         requestBody: {
-          values: [[true]],
+          requests: updateRequests,
         },
       });
     }
@@ -694,6 +696,9 @@ export const postGatheringReportController = async (c) => {
     });
     const weeklySheetNames = weeklySpreadsheetInfo.data.sheets.map((s) => s.properties.title);
 
+    const currentTab = weeklySpreadsheetInfo.data.sheets.find((s) => s.properties.title === gardenName);
+    const currentTabId = currentTab ? currentTab.properties.sheetId : null;
+
     const batchRequests = [{ addSheet: { properties: { title: "모임정보", index: 0 } } }];
 
     // Queue deletion of all other tabs except the active gardenName
@@ -721,7 +726,7 @@ export const postGatheringReportController = async (c) => {
       .filter((name) => name && name !== "이름" && name !== "성명");
     const memberCount = members.length;
 
-    // 6. Write gathering info to '모임정보' tab
+    // 6. Write gathering info to '모임정보' tab and attendance checkboxes in a single batch values update
     const localNow = new Date();
     // Adjust to local timezone KST (UTC+9)
     const kstOffset = 9 * 60 * 60 * 1000;
@@ -741,63 +746,54 @@ export const postGatheringReportController = async (c) => {
       ["보고일시", timestamp],
     ];
 
-    await sheets.spreadsheets.values.update({
-      spreadsheetId: weeklySpreadsheetId,
-      range: "모임정보!A1",
-      valueInputOption: "USER_ENTERED",
-      requestBody: {
+    const checkboxValues = members.map((name) => [attendees.includes(name)]);
+
+    const updateData = [
+      {
+        range: "모임정보!A1",
         values: infoRows,
+      },
+    ];
+
+    if (memberCount > 0) {
+      updateData.push({
+        range: `${gardenName}!B1:B${memberCount}`,
+        values: checkboxValues,
+      });
+    }
+
+    await sheets.spreadsheets.values.batchUpdate({
+      spreadsheetId: weeklySpreadsheetId,
+      requestBody: {
+        valueInputOption: "USER_ENTERED",
+        data: updateData,
       },
     });
 
-    // 7. Update attendance checkboxes in the gardenName tab
-    const updatedSpreadsheetInfo = await sheets.spreadsheets.get({ spreadsheetId: weeklySpreadsheetId });
-    const currentTab = updatedSpreadsheetInfo.data.sheets.find((s) => s.properties.title === gardenName);
-    const currentTabId = currentTab ? currentTab.properties.sheetId : null;
-
+    // 7. Update column-wide checkbox data validation in a single batchUpdate
     if (currentTabId && memberCount > 0) {
-      const validationRequests = [];
-      const updateValueRequests = [];
-
-      for (let mIdx = 0; mIdx < memberCount; mIdx++) {
-        const name = members[mIdx];
-        const isAttended = attendees.includes(name);
-        const cellValue = isAttended ? true : false;
-
-        const sheetRowIndex = mIdx;
-
-        updateValueRequests.push({
-          range: `${gardenName}!B${sheetRowIndex + 1}`,
-          values: [[cellValue]],
-        });
-
-        validationRequests.push({
-          setDataValidation: {
-            range: {
-              sheetId: currentTabId,
-              startRowIndex: sheetRowIndex,
-              endRowIndex: sheetRowIndex + 1,
-              startColumnIndex: 1,
-              endColumnIndex: 2,
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: weeklySpreadsheetId,
+        requestBody: {
+          requests: [
+            {
+              setDataValidation: {
+                range: {
+                  sheetId: currentTabId,
+                  startRowIndex: 0,
+                  endRowIndex: memberCount,
+                  startColumnIndex: 1,
+                  endColumnIndex: 2,
+                },
+                rule: {
+                  condition: { type: "BOOLEAN" },
+                  showCustomUi: true,
+                },
+              },
             },
-            rule: { condition: { type: "BOOLEAN" }, showCustomUi: true },
-          },
-        });
-      }
-
-      if (updateValueRequests.length > 0) {
-        await sheets.spreadsheets.values.batchUpdate({
-          spreadsheetId: weeklySpreadsheetId,
-          requestBody: { valueInputOption: "USER_ENTERED", data: updateValueRequests },
-        });
-      }
-
-      if (validationRequests.length > 0) {
-        await sheets.spreadsheets.batchUpdate({
-          spreadsheetId: weeklySpreadsheetId,
-          requestBody: { requests: validationRequests },
-        });
-      }
+          ],
+        },
+      });
     }
 
     console.log(`✅ Garden gathering report submitted successfully as separate file '${fileName}'`);
