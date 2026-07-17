@@ -1,4 +1,10 @@
-import { Button, CircularProgress, TextField, Typography, Box } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  TextField,
+  Typography,
+  Box,
+} from "@mui/material";
 import { useState } from "react";
 import useSnackbar from "../../util/useSnackbar";
 import { broadcastNotification } from "../../api/notification";
@@ -28,7 +34,10 @@ const BroadcastModal = ({ isOpen, onClose }) => {
       handleClose();
     } catch (error) {
       console.error(error);
-      openSnackbar("error", "알림 발송 중 오류가 발생했습니다. 관리자에게 문의하세요.");
+      openSnackbar(
+        "error",
+        "알림 발송 중 오류가 발생했습니다. 관리자에게 문의하세요.",
+      );
     } finally {
       setLoading(false);
     }
@@ -37,22 +46,43 @@ const BroadcastModal = ({ isOpen, onClose }) => {
   return (
     <CustomModal isOpen={isOpen} onClose={handleClose} maxWidth="500px">
       {loading ? (
-        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, py: 4 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 2,
+            py: 4,
+          }}
+        >
           <CircularProgress color="primary" />
           <Typography variant="body2" color="text.secondary">
             알림을 발송하고 있습니다...
           </Typography>
         </Box>
       ) : (
-        <Box sx={{ width: "90%", display: "flex", flexDirection: "column", gap: 3, pt: 1 }}>
-          <Typography variant="h6" fontWeight="bold" textAlign="center" gutterBottom>
-            전체 알림 발송 (FCM Broadcast)
+        <Box
+          sx={{
+            width: "90%",
+            display: "flex",
+            flexDirection: "column",
+            gap: 3,
+            pt: 1,
+          }}
+        >
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: "bold" }}
+            textAlign="center"
+            gutterBottom
+          >
+            전체 알림 발송
           </Typography>
 
           <TextField
             label="알림 제목"
             variant="outlined"
-            placeholder="예: 291일 성경 1독"
+            // placeholder="예: 291일 성경 1독"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             fullWidth
@@ -63,7 +93,7 @@ const BroadcastModal = ({ isOpen, onClose }) => {
           <TextField
             label="알림 내용"
             variant="outlined"
-            placeholder="예: 오늘의 1독 말씀은 '창세기 1-5장' 입니다."
+            // placeholder="예: 오늘의 1독 말씀은 '창세기 1-5장' 입니다."
             value={body}
             onChange={(e) => setBody(e.target.value)}
             multiline
@@ -73,9 +103,9 @@ const BroadcastModal = ({ isOpen, onClose }) => {
           />
 
           <TextField
-            label="이동 링크 / 경로"
+            label="링크"
             variant="outlined"
-            placeholder="예: /schedules 또는 유튜브 주소"
+            // placeholder="예: /schedules 또는 유튜브 주소"
             value={pathname}
             onChange={(e) => setPathname(e.target.value)}
             fullWidth
@@ -91,10 +121,13 @@ const BroadcastModal = ({ isOpen, onClose }) => {
               fontWeight: "bold",
               bgcolor: "#964B00",
               ":hover": { bgcolor: "#7e3f00" },
-              "&.Mui-disabled": { bgcolor: "#f5f5f5", color: "rgba(0, 0, 0, 0.26)" }
+              "&.Mui-disabled": {
+                bgcolor: "#f5f5f5",
+                color: "rgba(0, 0, 0, 0.26)",
+              },
             }}
           >
-            발송하기 (Broadcast)
+            발송하기
           </Button>
         </Box>
       )}

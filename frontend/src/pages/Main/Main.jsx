@@ -6,7 +6,6 @@ import CampaignIcon from "@mui/icons-material/Campaign";
 import ButtonBases from "../../components/Main/MainButtonBanner";
 import "./Main.css";
 
-// import CustomChatBot from "../../components/Main/CustomChatBot";
 import MainAnimation from "../../components/Main/MainAnimation";
 
 import carouselStyles from "./MainCarousel.module.css";
@@ -71,16 +70,22 @@ const Main = () => {
       <AdminComponent>
         <Fab
           color="primary"
-          style={{ position: "fixed", right: "2vw", bottom: "3vh", zIndex: 1000, backgroundColor: "#964B00" }}
+          style={{
+            position: "fixed",
+            right: "2vw",
+            bottom: "3vh",
+            zIndex: 1000,
+          }}
           onClick={() => setIsModalOpen(true)}
         >
           <CampaignIcon style={{ color: "white" }} />
         </Fab>
       </AdminComponent>
 
-      <BroadcastModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-
-      {/* <CustomChatBot /> */}
+      <BroadcastModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </>
   );
 };
