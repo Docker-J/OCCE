@@ -155,9 +155,6 @@ const ResponsiveAppBar = () => {
               isOpen={drawerOpen}
               onClose={() => setDrawerOpen(false)}
               pages={pages}
-              authenticated={authenticated}
-              settings_signed={settings_signed}
-              settings_not_signed={settings_not_signed}
             />
           </Box>
 

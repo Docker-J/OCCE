@@ -101,6 +101,14 @@ self.addEventListener("push", (event) => {
 
   console.log("[Service Worker] Push payload:", payload);
 
+  // If the payload already contains a standard 'notification' block,
+  // the browser/FCM SDK will handle showing it automatically.
+  // We only show it manually if there is no 'notification' block (i.e. data-only message).
+  if (payload.notification) {
+    console.log("[Service Worker] Notification payload present. Let browser/FCM SDK handle display.");
+    return;
+  }
+
   // Extract title and body from standard notification or data payload
   const notificationTitle = payload.notification?.title || payload.data?.title || "OCCE 알림";
   const notificationBody = payload.notification?.body || payload.data?.body || "새로운 소식이 있습니다.";

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, NavLink, useLocation } from "react-router";
+import { NavLink, useLocation } from "react-router";
 import {
   Drawer,
   IconButton,
@@ -7,22 +7,17 @@ import {
   ListItemButton,
   ListItemText,
   Collapse,
-  Divider,
   Box,
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 const SubmenuMobileDrawer = ({
   isOpen,
   onClose,
   pages,
-  authenticated,
-  settings_signed,
-  settings_not_signed,
 }) => {
   const location = useLocation();
   const [expandedPage, setExpandedPage] = useState(null);
@@ -31,21 +26,14 @@ const SubmenuMobileDrawer = ({
     setExpandedPage(expandedPage === title ? null : title);
   };
 
-  const handleSettingClick = (onClickAction) => {
-    onClose();
-    onClickAction();
-  };
-
-  const settings = authenticated ? settings_signed : settings_not_signed;
-
   return (
     <Drawer
       anchor="left"
       open={isOpen}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "300px",
+      sx={{
+        "& .MuiDrawer-paper": {
+          width: "200px",
           maxWidth: "85vw",
           bgcolor: "rgba(255, 255, 255, 0.9)",
           backdropFilter: "blur(20px)",
@@ -53,6 +41,8 @@ const SubmenuMobileDrawer = ({
           flexDirection: "column",
           justifyContent: "space-between",
           borderRight: "1px solid rgba(255, 255, 255, 0.3)",
+          overflowX: "hidden",
+          boxSizing: "border-box",
         },
       }}
     >
@@ -105,12 +95,17 @@ const SubmenuMobileDrawer = ({
                       }}
                     >
                       <ListItemText
-                        primary={page.title}
-                        primaryTypographyProps={{
-                          fontSize: "18px",
-                          fontWeight: isChildActive ? "600" : "550",
-                          color: "inherit",
-                        }}
+                        primary={
+                          <Typography
+                            sx={{
+                              fontSize: "18px",
+                              fontWeight: isChildActive ? 700 : 550,
+                              color: "inherit",
+                            }}
+                          >
+                            {page.title}
+                          </Typography>
+                        }
                       />
                       {isExpanded ? (
                         <ExpandLess sx={{ color: isChildActive ? "#964B00" : "#777" }} />
@@ -136,19 +131,24 @@ const SubmenuMobileDrawer = ({
                               "&.active": {
                                 bgcolor: "rgba(150, 75, 0, 0.08)",
                                 color: "#964B00",
-                                "& .MuiListItemText-primary": {
-                                  fontWeight: "600 !important",
+                                "& .MuiTypography-root": {
+                                  fontWeight: "650 !important",
                                 }
                               },
                             }}
                           >
                             <ListItemText
-                              primary={subpage.title}
-                              primaryTypographyProps={{
-                                fontSize: "16px",
-                                fontWeight: "500",
-                                color: "inherit",
-                              }}
+                              primary={
+                                <Typography
+                                  sx={{
+                                    fontSize: "16px",
+                                    fontWeight: 500,
+                                    color: "inherit",
+                                  }}
+                                >
+                                  {subpage.title}
+                                </Typography>
+                              }
                             />
                           </ListItemButton>
                         ))}
@@ -169,19 +169,24 @@ const SubmenuMobileDrawer = ({
                       "&.active": {
                         bgcolor: "rgba(150, 75, 0, 0.08)",
                         color: "#964B00",
-                        "& .MuiListItemText-primary": {
-                          fontWeight: "600 !important",
+                        "& .MuiTypography-root": {
+                          fontWeight: "700 !important",
                         }
                       },
                     }}
                   >
                     <ListItemText
-                      primary={page.title}
-                      primaryTypographyProps={{
-                        fontSize: "18px",
-                        fontWeight: "550",
-                        color: "inherit",
-                      }}
+                      primary={
+                        <Typography
+                          sx={{
+                            fontSize: "18px",
+                            fontWeight: 550,
+                            color: "inherit",
+                          }}
+                        >
+                          {page.title}
+                        </Typography>
+                      }
                     />
                   </ListItemButton>
                 )}
@@ -189,39 +194,6 @@ const SubmenuMobileDrawer = ({
             );
           })}
         </List>
-      </Box>
-
-      {/* Drawer Footer with User Actions */}
-      <Box sx={{ p: 2 }}>
-        <Divider sx={{ mb: 2, borderColor: "rgba(0, 0, 0, 0.08)" }} />
-        <Box sx={{ display: "flex", alignItems: "center", px: 1, mb: 2 }}>
-          <AccountCircleIcon sx={{ color: "#aaa", mr: 1.5, fontSize: "28px" }} />
-          <Typography sx={{ fontSize: "14px", fontWeight: "550", color: "#666" }}>
-            {authenticated ? "온교회 교우님" : "환영합니다"}
-          </Typography>
-        </Box>
-        <Box sx={{ display: "flex", gap: 1 }}>
-          {settings.map((setting) => (
-            <ListItemButton
-              key={setting.title}
-              onClick={() => handleSettingClick(setting.onClick)}
-              sx={{
-                justifyContent: "center",
-                borderRadius: "10px",
-                py: 1.2,
-                bgcolor: setting.title === "로그인" || setting.title === "로그아웃" ? "#964B00" : "rgba(0, 0, 0, 0.05)",
-                color: setting.title === "로그인" || setting.title === "로그아웃" ? "white" : "#2b2b2b",
-                "&:hover": {
-                  bgcolor: setting.title === "로그인" || setting.title === "로그아웃" ? "#7c3d00" : "rgba(0, 0, 0, 0.08)",
-                },
-              }}
-            >
-              <Typography sx={{ fontSize: "14px", fontWeight: "600" }}>
-                {setting.title}
-              </Typography>
-            </ListItemButton>
-          ))}
-        </Box>
       </Box>
     </Drawer>
   );

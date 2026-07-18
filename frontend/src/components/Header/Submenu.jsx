@@ -32,10 +32,10 @@ const Submenu = ({ page, scrolled }) => {
         to={page?.to}
         key={page.title}
         sx={{
-          my: 2,
+          my: 1.75,
           ml: 0.8,
           color: isAnySubpageActive ? (scrolled ? "#964B00" : "#FFE082") : "inherit",
-          fontSize: "20px",
+          fontSize: "20.5px",
           fontWeight: "600",
           textTransform: "none",
           transition: "color 0.3s ease",

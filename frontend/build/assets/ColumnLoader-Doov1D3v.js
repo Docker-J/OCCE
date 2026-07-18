@@ -1,0 +1,1 @@
+import{n as e}from"./columns-L3EK3DDb.js";async function t({params:t}){return await e(t.columnID)}export{t as loader};

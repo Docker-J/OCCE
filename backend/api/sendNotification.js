@@ -41,7 +41,7 @@ async function sendMessages(env, scanParam, message, accessToken, projectId) {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify(payload),
-            }
+            },
           );
           if (!res.ok) {
             const errText = await res.text();
@@ -72,7 +72,9 @@ const sendNotification = async (env, title, body, pathname) => {
     Limit: 499,
   };
 
-  const clickAction = pathname.startsWith("http") ? pathname : `https://oncce.ca/${pathname}`;
+  const clickAction = pathname.startsWith("http")
+    ? pathname
+    : `https://oncce.ca/${pathname}`;
 
   const message = {
     data: {
@@ -91,18 +93,24 @@ const sendNotification = async (env, title, body, pathname) => {
     apns: {
       headers: {
         "apns-priority": "5",
-        "apns-push-type": "background",
+        "apns-push-type": "alert",
       },
       payload: {
         aps: {
-          "content-available": 1,
+          alert: {
+            title: title,
+            body: body,
+          },
+          sound: "default",
         },
       },
     },
   };
 
   // Get access token for FCM once per notification broadcast
-  const auth = getGoogleAuth(env, ["https://www.googleapis.com/auth/firebase.messaging"]);
+  const auth = getGoogleAuth(env, [
+    "https://www.googleapis.com/auth/firebase.messaging",
+  ]);
   const credentials = await auth.getCredentials();
   const projectId = credentials.project_id || "church-4385c";
   const client = await auth.getClient();
