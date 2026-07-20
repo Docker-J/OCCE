@@ -10,15 +10,17 @@ const FullScreenLoading = () => {
         right: 0,
         bottom: 0,
         zIndex: 9999,
-        backgroundColor: "rgba(0,0,0,0.5)",
+        backgroundColor: "rgba(252, 251, 249, 0.45)",
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
         height: "100%",
-        widht: "100%",
+        width: "100%",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
       }}
     >
-      <CircularProgress />
+      <CircularProgress sx={{ color: "#964b00" }} />
     </div>
   );
 };

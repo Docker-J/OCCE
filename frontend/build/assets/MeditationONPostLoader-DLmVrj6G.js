@@ -1,0 +1,1 @@
+import{t as e}from"./meditationon-BRIq5MvS.js";async function t({params:t}){return(await e(t.postID)).data}export{t as loader};

@@ -73,36 +73,23 @@ const NotificationManager = memo(() => {
           const { firebaseInstance } = await import("../api/firebase");
           const messaging = getMessaging(firebaseInstance);
 
-          const lastRefresh = localStorage.getItem("last_fcm_token_refresh");
-          const now = Date.now();
-          // If last refresh was more than 7 days ago (604,800,000 ms), force a clean token rotation
-          const shouldForceRefresh = !lastRefresh || (now - parseInt(lastRefresh, 10) > 604800000);
-
-          if (shouldForceRefresh) {
-            console.log("Forcing FCM token refresh to prevent silent expiration...");
-            try {
-              const cachedToken = await getToken(messaging, {
-                vapidKey: "BOLDzFLzljc4HkyVktgjo4-_QoXFxx__XZS6xBmGouvsisXHHe--2dSUUJtQ2cerl3v7ONBhrAPM661xRbpQcqo",
-                serviceWorkerRegistration: registration,
-              });
-              if (cachedToken) {
-                // Delete from our database first, then delete from Firebase cache
-                await unregisterToken(cachedToken);
-                await deleteToken(messaging);
-              }
-            } catch (err) {
-              console.warn("Failed to delete old token during force refresh:", err);
-            }
-          }
-
           const token = await getToken(messaging, {
             vapidKey: "BOLDzFLzljc4HkyVktgjo4-_QoXFxx__XZS6xBmGouvsisXHHe--2dSUUJtQ2cerl3v7ONBhrAPM661xRbpQcqo",
             serviceWorkerRegistration: registration,
           });
 
           console.log("FCM Token:", token);
-          await registerToken(token);
-          localStorage.setItem("last_fcm_token_refresh", now.toString());
+
+          const lastRefresh = localStorage.getItem("last_fcm_token_refresh");
+          const now = Date.now();
+          // If last refresh was more than 3 days ago (259,200,000 ms), update DynamoDB TTL
+          const shouldRefreshTTL = !lastRefresh || (now - parseInt(lastRefresh, 10) > 259200000);
+
+          if (shouldRefreshTTL) {
+            console.log("Refreshing FCM token TTL in database...");
+            await registerToken(token);
+            localStorage.setItem("last_fcm_token_refresh", now.toString());
+          }
 
           // Force dispatch state change to update icon colors
           window.dispatchEvent(new CustomEvent("notification-state-changed"));
@@ -113,7 +100,11 @@ const NotificationManager = memo(() => {
 
           onMessage(messaging, (payload) => {
             console.log("Message Received.", payload);
-            openSnackbar("info", payload.data.title, action(payload.data.click_action));
+            const title = payload.data?.title || payload.notification?.title || "OCCE 알림";
+            const body = payload.data?.body || payload.notification?.body || "";
+            const displayMessage = body ? `${title} | ${body}` : title;
+            const clickAction = payload.data?.click_action || payload.notification?.click_action;
+            openSnackbar("info", displayMessage, action(clickAction));
           });
         } else if (forcePrompt) {
           openSnackbar("warning", "알림 권한이 거부되었습니다.");
@@ -162,6 +153,7 @@ const NotificationManager = memo(() => {
           console.warn("FCM deleteToken failed:", e);
         }
 
+        localStorage.removeItem("last_fcm_token_refresh");
         localStorage.setItem("notifications_opt_out", "true");
         window.dispatchEvent(new CustomEvent("notification-state-changed"));
         openSnackbar("success", "알림 수신이 거부되었습니다.");

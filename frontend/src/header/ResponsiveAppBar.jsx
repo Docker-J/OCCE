@@ -13,6 +13,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
 import PersonIcon from "@mui/icons-material/Person";
 import MenuItem from "@mui/material/MenuItem";
+import FullScreenLoading from "../common/FullScreenLoading";
 
 import Submenu from "../components/Header/Submenu";
 import SubmenuMobileDrawer from "../components/Header/SubmenuMobileDrawer";
@@ -39,6 +40,7 @@ const ResponsiveAppBar = () => {
 
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -56,7 +58,13 @@ const ResponsiveAppBar = () => {
   const settings_signed = [
     {
       title: "로그아웃",
-      onClick: () => signOut(signOutSuccess),
+      onClick: () => {
+        setIsLoggingOut(true);
+        signOut(() => {
+          signOutSuccess();
+          setIsLoggingOut(false);
+        });
+      },
     },
   ];
 
@@ -90,137 +98,140 @@ const ResponsiveAppBar = () => {
   };
 
   return (
-    <AppBar
-      position="fixed"
-      sx={{
-        background: scrolled ? "rgba(252, 251, 249, 0.9)" : "transparent",
-        backdropFilter: scrolled ? "blur(24px)" : "none",
-        boxShadow: scrolled ? "0 12px 40px rgba(150, 75, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05)" : "none",
-        border: scrolled ? "1px solid rgba(150, 75, 0, 0.15)" : "none",
-        color: scrolled ? "#2b2b2b" : "#ffffff",
-        py: scrolled ? 1.0 : 2.0,
-        transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-        // Floating pill behavior when scrolled
-        ...(scrolled && {
-          top: "12px",
-          left: { xs: "12px", md: "24px" },
-          right: { xs: "12px", md: "24px" },
-          width: { xs: "calc(100% - 24px)", md: "calc(100% - 48px)" },
-          borderRadius: "16px",
-        }),
-        // Ensure transparency has correct bounds
-        ...(!scrolled && {
-          top: 0,
-          left: 0,
-          right: 0,
-          width: "100%",
-        })
-      }}
-    >
-      <Container maxWidth="xl">
-        <Toolbar disableGutters sx={{ position: "relative" }}>
-          <Box
-            sx={{
-              display: { xs: "none", md: "flex" },
-              alignItems: "center",
-            }}
-          >
-            <Link to="/" style={{ display: "flex", alignItems: "center" }}>
-              <img
-                alt="Header Logo"
-                src={scrolled ? "/img/HeaderLogoBW.png" : "/img/HeaderLogoColor.png"}
-                style={{ width: "240px", height: "48.92px", display: "block" }}
-              />
-            </Link>
-          </Box>
-
-          {/* Hamburger Menu Trigger for Mobile */}
-          <Box
-            sx={{
-              flexGrow: 1,
-              display: { xs: "flex", md: "none" },
-            }}
-          >
-            <IconButton
-              size="large"
-              aria-label="menus"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              color="inherit"
-              onClick={() => setDrawerOpen(true)}
-            >
-              <MenuIcon />
-            </IconButton>
-            <SubmenuMobileDrawer
-              isOpen={drawerOpen}
-              onClose={() => setDrawerOpen(false)}
-              pages={pages}
-            />
-          </Box>
-
-          <Box
-            sx={{
-              flexGrow: 1,
-              display: { xs: "flex", md: "none" },
-            }}
-          >
-            <Link to="/" style={{ display: "flex", alignItems: "center" }}>
-              <img
-                alt="Header Logo"
-                className="mobileLogo"
-                src={scrolled ? "/img/HeaderLogoBW.png" : "/img/HeaderLogoColor.png"}
-                style={{ width: "180px", height: "36.69px", display: "block" }}
-              />
-            </Link>
-          </Box>
-
-          <Box
-            sx={{
-              ml: "auto",
-              display: { xs: "none", md: "flex" },
-            }}
-          >
-            {pages.map((page) => (
-              <Submenu key={page.title} page={page} scrolled={scrolled} />
-            ))}
-          </Box>
-
-          <Box sx={{ ml: "16px", flexGrow: 0 }}>
-            <IconButton
-              size="large"
-              color="inherit"
-              sx={{ pl: 0 }}
-              {...bindTrigger(userPopupState)}
-            >
-              <PersonIcon fontSize="large" />
-            </IconButton>
-
-            <Menu
-              id="menu-appbar"
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
+    <>
+      <AppBar
+        position="fixed"
+        sx={{
+          background: scrolled ? "rgba(252, 251, 249, 0.9)" : "transparent",
+          backdropFilter: scrolled ? "blur(24px)" : "none",
+          boxShadow: scrolled ? "0 12px 40px rgba(150, 75, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05)" : "none",
+          border: scrolled ? "1px solid rgba(150, 75, 0, 0.15)" : "none",
+          color: scrolled ? "#2b2b2b" : "#ffffff",
+          py: scrolled ? 1.0 : 2.0,
+          transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+          // Floating pill behavior when scrolled
+          ...(scrolled && {
+            top: "12px",
+            left: { xs: "12px", md: "24px" },
+            right: { xs: "12px", md: "24px" },
+            width: { xs: "calc(100% - 24px)", md: "calc(100% - 48px)" },
+            borderRadius: "16px",
+          }),
+          // Ensure transparency has correct bounds
+          ...(!scrolled && {
+            top: 0,
+            left: 0,
+            right: 0,
+            width: "100%",
+          })
+        }}
+      >
+        <Container maxWidth="xl">
+          <Toolbar disableGutters sx={{ position: "relative" }}>
+            <Box
+              sx={{
+                display: { xs: "none", md: "flex" },
+                alignItems: "center",
               }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              {...bindMenu(userPopupState)}
             >
-              {(authenticated ? settings_signed : settings_not_signed).map(
-                (setting) => (
-                  <MenuItem key={setting.title} onClick={userPopupState.close}>
-                    <Typography onClick={setting.onClick}>
-                      {setting.title}
-                    </Typography>
-                  </MenuItem>
-                ),
-              )}
-            </Menu>
-          </Box>
-        </Toolbar>
-      </Container>
-    </AppBar>
+              <Link to="/" style={{ display: "flex", alignItems: "center" }}>
+                <img
+                  alt="Header Logo"
+                  src={scrolled ? "/img/HeaderLogoBW.png" : "/img/HeaderLogoColor.png"}
+                  style={{ width: "240px", height: "48.92px", display: "block" }}
+                />
+              </Link>
+            </Box>
+  
+            {/* Hamburger Menu Trigger for Mobile */}
+            <Box
+              sx={{
+                flexGrow: 1,
+                display: { xs: "flex", md: "none" },
+              }}
+            >
+              <IconButton
+                size="large"
+                aria-label="menus"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                color="inherit"
+                onClick={() => setDrawerOpen(true)}
+              >
+                <MenuIcon />
+              </IconButton>
+              <SubmenuMobileDrawer
+                isOpen={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                pages={pages}
+              />
+            </Box>
+  
+            <Box
+              sx={{
+                flexGrow: 1,
+                display: { xs: "flex", md: "none" },
+              }}
+            >
+              <Link to="/" style={{ display: "flex", alignItems: "center" }}>
+                <img
+                  alt="Header Logo"
+                  className="mobileLogo"
+                  src={scrolled ? "/img/HeaderLogoBW.png" : "/img/HeaderLogoColor.png"}
+                  style={{ width: "180px", height: "36.69px", display: "block" }}
+                />
+              </Link>
+            </Box>
+  
+            <Box
+              sx={{
+                ml: "auto",
+                display: { xs: "none", md: "flex" },
+              }}
+            >
+              {pages.map((page) => (
+                <Submenu key={page.title} page={page} scrolled={scrolled} />
+              ))}
+            </Box>
+  
+            <Box sx={{ ml: "16px", flexGrow: 0 }}>
+              <IconButton
+                size="large"
+                color="inherit"
+                sx={{ pl: 0 }}
+                {...bindTrigger(userPopupState)}
+              >
+                <PersonIcon fontSize="large" />
+              </IconButton>
+  
+              <Menu
+                id="menu-appbar"
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "right",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                {...bindMenu(userPopupState)}
+              >
+                {(authenticated ? settings_signed : settings_not_signed).map(
+                  (setting) => (
+                    <MenuItem key={setting.title} onClick={userPopupState.close}>
+                      <Typography onClick={setting.onClick}>
+                        {setting.title}
+                      </Typography>
+                    </MenuItem>
+                  ),
+                )}
+              </Menu>
+            </Box>
+          </Toolbar>
+        </Container>
+      </AppBar>
+      {isLoggingOut && <FullScreenLoading />}
+    </>
   );
 };
 
