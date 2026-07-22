@@ -4,6 +4,7 @@ import {
   Chip,
   Container,
   Divider,
+  Fab,
   IconButton,
   SpeedDial,
   SpeedDialAction,
@@ -148,35 +149,9 @@ const Announcement = () => {
               flexDirection: "column",
             }}
           >
-            {/* Top Navigation Bar & Pin Status */}
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                mb: 3,
-              }}
-            >
-              <Button
-                startIcon={<ArrowBackIcon />}
-                onClick={() => navigate("/announcements")}
-                sx={{
-                  color: "#FF6B00",
-                  fontWeight: 600,
-                  fontSize: "14px",
-                  borderRadius: "12px",
-                  px: 2,
-                  py: 0.75,
-                  backgroundColor: "rgba(255, 107, 0, 0.06)",
-                  "&:hover": {
-                    backgroundColor: "rgba(255, 107, 0, 0.12)",
-                  },
-                }}
-              >
-                목록으로
-              </Button>
-
-              {pin === 1 && (
+            {/* Top Pin Badge if Pinned */}
+            {pin === 1 && (
+              <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
                 <Chip
                   icon={<PushPinIcon style={{ color: "#FF6B00", fontSize: 16 }} />}
                   label="고정 공지"
@@ -188,8 +163,8 @@ const Announcement = () => {
                     borderRadius: "8px",
                   }}
                 />
-              )}
-            </Box>
+              </Box>
+            )}
 
             {/* Post Title */}
             <Typography
@@ -315,35 +290,6 @@ const Announcement = () => {
               }}
             />
 
-            {/* Bottom Actions */}
-            <Divider sx={{ my: 4 }} />
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Button
-                startIcon={<ArrowBackIcon />}
-                onClick={() => navigate("/announcements")}
-                variant="outlined"
-                sx={{
-                  borderColor: "rgba(255, 107, 0, 0.3)",
-                  color: "#FF6B00",
-                  fontWeight: 600,
-                  borderRadius: "12px",
-                  px: 3,
-                  "&:hover": {
-                    borderColor: "#FF6B00",
-                    backgroundColor: "rgba(255, 107, 0, 0.04)",
-                  },
-                }}
-              >
-                목록으로 돌아가기
-              </Button>
-            </Box>
-
             {/* Admin SpeedDial Controls */}
             <AdminComponent>
               <SpeedDial
@@ -363,6 +309,46 @@ const Announcement = () => {
             </AdminComponent>
           </Box>
         </Container>
+
+        {/* Floating Back to List Button */}
+        <Fab
+          variant="extended"
+          onClick={() => navigate("/announcements")}
+          sx={{
+            position: "fixed",
+            bottom: { xs: 24, sm: 32 },
+            left: { xs: 20, sm: 32 },
+            zIndex: 1000,
+            backgroundColor: "rgba(255, 255, 255, 0.92)",
+            backdropFilter: "blur(16px)",
+            color: "#FF6B00",
+            fontWeight: 700,
+            fontSize: "14.5px",
+            px: 2.5,
+            py: 1,
+            borderRadius: "30px",
+            border: "1px solid rgba(255, 107, 0, 0.25)",
+            boxShadow: "0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(255, 107, 0, 0.15)",
+            textTransform: "none",
+            transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+            "&:hover": {
+              backgroundColor: "#FF6B00",
+              color: "#ffffff",
+              transform: "translateY(-3px)",
+              boxShadow: "0 12px 36px rgba(255, 107, 0, 0.35)",
+              "& .MuiSvgIcon-root": {
+                transform: "translateX(-4px)",
+              },
+            },
+            "& .MuiSvgIcon-root": {
+              transition: "transform 0.2s ease",
+              mr: 0.8,
+            },
+          }}
+        >
+          <ArrowBackIcon sx={{ fontSize: 20 }} />
+          목록으로
+        </Fab>
       </div>
     </>
   );
