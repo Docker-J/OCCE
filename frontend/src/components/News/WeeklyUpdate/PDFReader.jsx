@@ -51,37 +51,44 @@ function PDFReader({ file, documentDimension }) {
 
   return file ? (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      {/* Floating Control Bar - Fixed Bottom Center */}
       <Box
         sx={{
+          position: "fixed",
+          bottom: "30px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          zIndex: 1000,
           display: "inline-flex",
           alignItems: "center",
-          backgroundColor: "#ffffff",
+          backgroundColor: "rgba(255, 255, 255, 0.85)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
           borderRadius: "40px",
-          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
-          border: "1px solid rgba(0, 0, 0, 0.04)",
-          px: 1.5,
-          py: 0.5,
-          mb: 3,
-          gap: 0.5,
+          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.15)",
+          border: "1px solid rgba(255, 255, 255, 0.4)",
+          px: { xs: 1.5, sm: 2 },
+          py: { xs: 0.8, sm: 1 },
+          gap: { xs: 0.2, sm: 0.5 },
           transition: "all 0.3s ease",
         }}
       >
         <IconButton onClick={minus} disabled={scale <= 1} sx={{ color: "#757575", "&:hover": { color: "#FF6B00", bgcolor: "rgba(255,107,0,0.08)" } }}>
           <ZoomOutIcon />
         </IconButton>
-        <Typography variant="body2" sx={{ fontWeight: 700, color: "#555", minWidth: "45px", textAlign: "center" }}>
+        <Typography variant="body2" sx={{ fontWeight: 700, color: "#555", minWidth: { xs: "35px", sm: "45px" }, textAlign: "center", fontSize: { xs: "0.8rem", sm: "0.875rem" } }}>
           {Math.round(scale * 100)}%
         </Typography>
         <IconButton onClick={add} sx={{ color: "#757575", "&:hover": { color: "#FF6B00", bgcolor: "rgba(255,107,0,0.08)" } }}>
           <ZoomInIcon />
         </IconButton>
 
-        <Divider orientation="vertical" flexItem sx={{ mx: 1, my: 1, borderColor: "rgba(0,0,0,0.08)" }} />
+        <Divider orientation="vertical" flexItem sx={{ mx: 1, my: 1, borderColor: "rgba(0,0,0,0.15)" }} />
 
         <IconButton onClick={previousPage} disabled={pageNumber <= 1} sx={{ color: "#FF6B00", "&:hover": { bgcolor: "rgba(255,107,0,0.08)" } }}>
           <KeyboardArrowLeftIcon />
         </IconButton>
-        <Typography variant="body2" sx={{ fontWeight: 800, color: "#2b2b2b", minWidth: "55px", textAlign: "center" }}>
+        <Typography variant="body2" sx={{ fontWeight: 800, color: "#2b2b2b", minWidth: { xs: "40px", sm: "55px" }, textAlign: "center", fontSize: { xs: "0.8rem", sm: "0.875rem" } }}>
           {pageNumber} / {numPages || "-"}
         </Typography>
         <IconButton onClick={nextPage} disabled={pageNumber >= numPages} sx={{ color: "#FF6B00", "&:hover": { bgcolor: "rgba(255,107,0,0.08)" } }}>
