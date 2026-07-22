@@ -176,6 +176,9 @@ const WeeklyUpdate = () => {
               maxDate={maxDate}
               onChange={setSelectedDate}
               disableDate={(date) => !isSunday(date)}
+              buttonVariant="text"
+              hideIcon={true}
+              buttonSx={{ px: { xs: 1, sm: 2 } }}
             />
 
             <IconButton
