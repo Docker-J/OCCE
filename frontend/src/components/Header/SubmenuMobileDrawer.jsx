@@ -114,7 +114,17 @@ const SubmenuMobileDrawer = ({
                       )}
                     </ListItemButton>
                     <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                      <List component="div" disablePadding sx={{ pl: 2, mt: 0.5 }}>
+                      <List
+                        component="div"
+                        disablePadding
+                        sx={{
+                          pl: 1.5,
+                          mt: 0.5,
+                          mb: 1,
+                          ml: 1,
+                          borderLeft: "2px solid rgba(255, 107, 0, 0.25)",
+                        }}
+                      >
                         {page.subpages.map((subpage) => (
                           <ListItemButton
                             key={subpage.title}

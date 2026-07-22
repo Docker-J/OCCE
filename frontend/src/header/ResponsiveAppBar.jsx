@@ -214,12 +214,50 @@ const ResponsiveAppBar = () => {
                   vertical: "top",
                   horizontal: "right",
                 }}
+                disableScrollLock
                 {...bindMenu(userPopupState)}
+                PaperProps={{
+                  elevation: 0,
+                  sx: {
+                    bgcolor: "rgba(255, 255, 255, 0.96)",
+                    backdropFilter: "blur(24px)",
+                    color: "#2b2b2b",
+                    boxShadow: "0 12px 36px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(255, 107, 0, 0.08)",
+                    border: "1px solid rgba(255, 107, 0, 0.18)",
+                    borderRadius: "16px",
+                    mt: 0.8,
+                    py: 1,
+                    minWidth: "160px",
+                    overflow: "hidden",
+                  },
+                }}
               >
                 {(authenticated ? settings_signed : settings_not_signed).map(
                   (setting) => (
-                    <MenuItem key={setting.title} onClick={userPopupState.close}>
-                      <Typography onClick={setting.onClick}>
+                    <MenuItem
+                      key={setting.title}
+                      onClick={() => {
+                        userPopupState.close();
+                        if (setting.onClick) setting.onClick();
+                      }}
+                      sx={{
+                        fontSize: "16px",
+                        fontWeight: "600",
+                        color: "#2b2b2b",
+                        mx: 1,
+                        my: 0.3,
+                        py: 1.2,
+                        px: 2,
+                        borderRadius: "10px",
+                        transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                        "&:hover": {
+                          bgcolor: "rgba(255, 107, 0, 0.08)",
+                          color: "#FF6B00",
+                          transform: "translateX(4px)",
+                        },
+                      }}
+                    >
+                      <Typography sx={{ fontWeight: "inherit", fontSize: "inherit", color: "inherit" }}>
                         {setting.title}
                       </Typography>
                     </MenuItem>

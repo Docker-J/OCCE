@@ -88,15 +88,19 @@ const Submenu = ({ page, scrolled }) => {
           disableScrollLock
           {...bindMenu(popupState)}
           PaperProps={{
+            elevation: 0,
             sx: {
-              bgcolor: "rgba(252, 251, 249, 0.92)",
+              bgcolor: "rgba(255, 255, 255, 0.96)",
               backdropFilter: "blur(24px)",
-              boxShadow: "0 12px 40px rgba(255, 107, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05)",
-              border: "1px solid rgba(255, 107, 0, 0.15)",
-              borderRadius: "14px",
-              mt: 1.5,
-              py: 0.8,
-            }
+              color: "#2b2b2b",
+              boxShadow: "0 12px 36px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(255, 107, 0, 0.08)",
+              border: "1px solid rgba(255, 107, 0, 0.18)",
+              borderRadius: "16px",
+              mt: 0.8,
+              py: 1,
+              minWidth: "180px",
+              overflow: "hidden",
+            },
           }}
         >
           {page.subpages.map((subpage) => (
@@ -106,23 +110,25 @@ const Submenu = ({ page, scrolled }) => {
               component={NavLink}
               to={subpage.to}
               sx={{
-                fontSize: "17px",
-                fontWeight: "550",
-                color: "#444",
+                fontSize: "16.5px",
+                fontWeight: "600",
+                color: "#2b2b2b",
                 mx: 1,
                 my: 0.3,
                 py: 1.2,
                 px: 2,
-                borderRadius: "8px",
-                transition: "all 0.2s ease-in-out",
+                borderRadius: "10px",
+                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
                 "&:hover": {
                   bgcolor: "rgba(255, 107, 0, 0.08)",
                   color: "#FF6B00",
+                  transform: "translateX(4px)",
                 },
                 "&.active": {
                   bgcolor: "rgba(255, 107, 0, 0.12)",
                   color: "#FF6B00",
-                }
+                  fontWeight: "700",
+                },
               }}
             >
               {subpage.title}
