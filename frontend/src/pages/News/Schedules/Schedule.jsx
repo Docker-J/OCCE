@@ -55,8 +55,11 @@ const Schedule = ({ events }) => {
         <Typography
           variant="h5"
           sx={{
-            fontWeight: 900,
-            mb: "12px",
+            fontWeight: 800,
+            color: "#2b2b2b",
+            mb: "16px",
+            mt: "8px",
+            pl: "4px"
           }}
         >
           {month}
@@ -73,35 +76,53 @@ const Schedule = ({ events }) => {
           return (
             <Paper
               key={date}
-              elevation={3}
+              elevation={0}
               sx={{
                 mb: 2,
                 display: "flex",
                 overflow: "hidden",
-                borderRadius: 4,
+                borderRadius: "24px",
+                backgroundColor: "#ffffff",
+                boxShadow: "0 4px 20px rgba(255, 107, 0, 0.05), 0 1px 8px rgba(0, 0, 0, 0.03)",
+                border: "1px solid rgba(255, 107, 0, 0.1)",
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                "&:hover": {
+                  transform: "translateY(-3px)",
+                  boxShadow: "0 12px 30px rgba(255, 107, 0, 0.12)",
+                  borderColor: "rgba(255, 107, 0, 0.3)",
+                },
               }}
             >
               <Box
                 sx={{
-                  backgroundColor: sunday ? "#dc2626" : "primary.main",
-                  p: 2.8,
+                  backgroundColor: sunday ? "rgba(220, 38, 38, 0.06)" : "rgba(255, 107, 0, 0.06)",
+                  p: { xs: 1.5, sm: 2.5 },
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
-                  width: "80px",
-                  borderRadius: "16px 0 0 16px",
-                  borderBottom: `8px solid ${sunday ? "#991b1b" : "#e65100"}}`,
+                  justifyContent: "center",
+                  width: { xs: "75px", sm: "90px" },
+                  borderRight: `1px solid ${sunday ? "rgba(220, 38, 38, 0.15)" : "rgba(255, 107, 0, 0.1)"}`,
                 }}
               >
                 <Typography
                   variant="h4"
-                  sx={{ color: "white", fontSize: "32px", fontWeight: 600 }}
+                  sx={{ 
+                    color: sunday ? "#dc2626" : "#FF6B00", 
+                    fontSize: { xs: "24px", sm: "32px" }, 
+                    fontWeight: 700 
+                  }}
                 >
                   {date.toString().padStart(2, "0")}
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ color: "white", textTransform: "uppercase" }}
+                  sx={{ 
+                    color: sunday ? "rgba(220, 38, 38, 0.8)" : "rgba(255, 107, 0, 0.8)", 
+                    textTransform: "uppercase", 
+                    fontWeight: 600,
+                    fontSize: { xs: "12px", sm: "14px" }
+                  }}
                 >
                   {format(eventDate, "eee")}
                 </Typography>
@@ -112,6 +133,8 @@ const Schedule = ({ events }) => {
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
+                  py: 1.5,
+                  px: { xs: 1.5, sm: 2.5 }
                 }}
               >
                 {dateEvents.map((event, index) => (
@@ -120,6 +143,7 @@ const Schedule = ({ events }) => {
                     date={eventDate}
                     event={event}
                     sunday={sunday}
+                    isLast={index === dateEvents.length - 1}
                   />
                 ))}
               </Box>

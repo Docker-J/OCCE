@@ -35,7 +35,7 @@ const Schedules = () => {
           </Typography>
         </div>
       </div>
-      <div className="container-wrapper">
+      <div className="container-wrapper" style={{ backgroundColor: "#fcfbf9", minHeight: "60vh", paddingTop: "20px", paddingBottom: "40px" }}>
         <div
           className="container"
           style={{ display: "flex", justifyContent: "center" }}

@@ -34,18 +34,21 @@ const ScheduleCard = ({ date, event, sunday }) => {
     <Box
       sx={{
         py: 1.5,
-        px: "18px",
+        borderBottom: isLast ? "none" : "1px solid rgba(0, 0, 0, 0.05)",
         ...(allday && {
-          borderLeft: `6px solid ${sunday ? "#dc2626" : "#FF6B00"}`,
-          pl: 2, // Extra padding to offset the border weight
-          my: 1, // Margin for vertical rhythm
+          borderLeft: `4px solid ${sunday ? "#dc2626" : "#FF6B00"}`,
+          pl: 2,
+          my: 1,
+          bgcolor: sunday ? "rgba(220, 38, 38, 0.02)" : "rgba(255, 107, 0, 0.02)",
+          borderRadius: "0 8px 8px 0"
         }),
       }}
     >
       <Typography
         sx={{
           fontSize: "1.15em",
-          fontWeight: 800,
+          fontWeight: 750,
+          color: "#2b2b2b"
         }}
       >
         {event.summary}
@@ -54,17 +57,18 @@ const ScheduleCard = ({ date, event, sunday }) => {
           ` (Day ${differenceInDays(date, start) + 1}/${event.alldaylength})`}
       </Typography>
 
-      <Typography sx={{ mb: "0.2em" }}>{event.description}</Typography>
+      {event.description && <Typography sx={{ mb: 0.5, color: "#666", fontSize: "0.95em" }}>{event.description}</Typography>}
       {!allday && (
         <Stack
           direction="row"
-          spacing={0.5}
+          spacing={0.8}
           sx={{
-            alignItems: "flex-start",
+            alignItems: "center",
+            mt: 0.5
           }}
         >
-          <ScheduleIcon fontSize="small" />
-          <Typography variant="body2">
+          <ScheduleIcon sx={{ fontSize: 18, color: "#888" }} />
+          <Typography variant="body2" sx={{ color: "#555", fontWeight: 500 }}>
             {startTime}
             {!allday &&
               (sameDay
@@ -76,19 +80,25 @@ const ScheduleCard = ({ date, event, sunday }) => {
       {event?.location && (
         <Stack
           direction="row"
-          spacing={0.5}
+          spacing={0.8}
           sx={{
-            alignItems: "flex-start",
-            marginTop: "0.1em",
+            alignItems: "center",
+            marginTop: "6px",
           }}
         >
-          <PlaceOutlinedIcon color="orange" fontSize="small" />
+          <PlaceOutlinedIcon sx={{ color: "#FF6B00", fontSize: 18 }} />
           <Typography
             component="a"
             target="_blank"
             href={`https://www.google.com/maps/search/?api=1&query=${event.location}`}
             variant="body2"
-            sx={{ color: "black", textDecoration: "none" }}
+            sx={{ 
+              color: "#555", 
+              textDecoration: "none", 
+              fontWeight: 500,
+              transition: "color 0.2s",
+              "&:hover": { color: "#FF6B00" } 
+            }}
           >
             {event.location.split(",")[0]}
           </Typography>
