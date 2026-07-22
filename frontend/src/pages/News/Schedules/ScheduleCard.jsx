@@ -36,10 +36,10 @@ const ScheduleCard = ({ date, event, sunday, isLast }) => {
         py: 1.5,
         borderBottom: isLast ? "none" : "1px solid rgba(0, 0, 0, 0.05)",
         ...(allday && {
-          borderLeft: `4px solid ${sunday ? "#dc2626" : "#FF6B00"}`,
+          borderLeft: `4px solid ${sunday ? "#dc2626" : "#888888"}`,
           pl: 2,
           my: 1,
-          bgcolor: sunday ? "rgba(220, 38, 38, 0.02)" : "rgba(255, 107, 0, 0.02)",
+          bgcolor: sunday ? "rgba(220, 38, 38, 0.02)" : "rgba(0, 0, 0, 0.015)",
           borderRadius: "0 8px 8px 0"
         }),
       }}

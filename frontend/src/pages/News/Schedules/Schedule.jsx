@@ -98,20 +98,20 @@ const Schedule = ({ events }) => {
             >
               <Box
                 sx={{
-                  backgroundColor: sunday ? "rgba(220, 38, 38, 0.06)" : "rgba(255, 107, 0, 0.06)",
+                  backgroundColor: sunday ? "rgba(220, 38, 38, 0.06)" : "rgba(0, 0, 0, 0.03)",
                   p: { xs: 1.5, sm: 2.5 },
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
                   width: { xs: "75px", sm: "90px" },
-                  borderRight: `1px solid ${sunday ? "rgba(220, 38, 38, 0.15)" : "rgba(255, 107, 0, 0.1)"}`,
+                  borderRight: `1px solid ${sunday ? "rgba(220, 38, 38, 0.15)" : "rgba(0, 0, 0, 0.08)"}`,
                 }}
               >
                 <Typography
                   variant="h4"
                   sx={{ 
-                    color: sunday ? "#dc2626" : "#FF6B00", 
+                    color: sunday ? "#dc2626" : "#424242", 
                     fontSize: { xs: "24px", sm: "32px" }, 
                     fontWeight: 700 
                   }}
@@ -121,7 +121,7 @@ const Schedule = ({ events }) => {
                 <Typography
                   variant="body2"
                   sx={{ 
-                    color: sunday ? "rgba(220, 38, 38, 0.8)" : "rgba(255, 107, 0, 0.8)", 
+                    color: sunday ? "rgba(220, 38, 38, 0.8)" : "#757575", 
                     textTransform: "uppercase", 
                     fontWeight: 600,
                     fontSize: { xs: "12px", sm: "14px" }
