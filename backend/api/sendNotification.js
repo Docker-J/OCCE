@@ -76,18 +76,32 @@ const sendNotification = async (env, title, body, pathname) => {
     ? pathname
     : `https://oncce.ca/${pathname}`;
 
+  const iconUrl = "https://oncce.ca/favicons/android-icon-192x192.png";
+  const badgeUrl = "https://oncce.ca/favicons/favicon-32x32.png";
+
   const message = {
     data: {
       title: title,
       body: body,
       click_action: clickAction,
+      icon: iconUrl,
     },
     android: {
       priority: "high",
+      notification: {
+        icon: iconUrl,
+        color: "#FF6B00",
+      },
     },
     webpush: {
       headers: {
         Urgency: "high",
+      },
+      notification: {
+        title: title,
+        body: body,
+        icon: iconUrl,
+        badge: badgeUrl,
       },
     },
     apns: {
