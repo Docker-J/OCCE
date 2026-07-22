@@ -76,9 +76,6 @@ function PDFReader({ file, documentDimension }) {
         <IconButton onClick={minus} disabled={scale <= 1} sx={{ color: "#757575", "&:hover": { color: "#FF6B00", bgcolor: "rgba(255,107,0,0.08)" } }}>
           <ZoomOutIcon />
         </IconButton>
-        <Typography variant="body2" sx={{ fontWeight: 700, color: "#555", minWidth: { xs: "35px", sm: "45px" }, textAlign: "center", fontSize: { xs: "0.8rem", sm: "0.875rem" } }}>
-          {Math.round(scale * 100)}%
-        </Typography>
         <IconButton onClick={add} sx={{ color: "#757575", "&:hover": { color: "#FF6B00", bgcolor: "rgba(255,107,0,0.08)" } }}>
           <ZoomInIcon />
         </IconButton>
