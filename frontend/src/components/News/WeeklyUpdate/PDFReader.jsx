@@ -1,4 +1,8 @@
-import { Button, ButtonGroup, CircularProgress } from "@mui/material";
+import { Box, IconButton, Typography, CircularProgress, Divider } from "@mui/material";
+import ZoomInIcon from "@mui/icons-material/ZoomIn";
+import ZoomOutIcon from "@mui/icons-material/ZoomOut";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { useState, useEffect } from "react";
 import { pdfjs, Page, Document } from "react-pdf";
 
@@ -46,15 +50,44 @@ function PDFReader({ file, documentDimension }) {
   }, [file]);
 
   return file ? (
-    <div>
-      <ButtonGroup id="scaleButton" sx={{ my: "1em" }}>
-        <Button onClick={add} variant="outlined">
-          +
-        </Button>
-        <Button onClick={minus} variant="outlined" disabled={scale <= 1}>
-          -
-        </Button>
-      </ButtonGroup>
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <Box
+        sx={{
+          display: "inline-flex",
+          alignItems: "center",
+          backgroundColor: "#ffffff",
+          borderRadius: "40px",
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+          border: "1px solid rgba(0, 0, 0, 0.04)",
+          px: 1.5,
+          py: 0.5,
+          mb: 3,
+          gap: 0.5,
+          transition: "all 0.3s ease",
+        }}
+      >
+        <IconButton onClick={minus} disabled={scale <= 1} sx={{ color: "#757575", "&:hover": { color: "#FF6B00", bgcolor: "rgba(255,107,0,0.08)" } }}>
+          <ZoomOutIcon />
+        </IconButton>
+        <Typography variant="body2" sx={{ fontWeight: 700, color: "#555", minWidth: "45px", textAlign: "center" }}>
+          {Math.round(scale * 100)}%
+        </Typography>
+        <IconButton onClick={add} sx={{ color: "#757575", "&:hover": { color: "#FF6B00", bgcolor: "rgba(255,107,0,0.08)" } }}>
+          <ZoomInIcon />
+        </IconButton>
+
+        <Divider orientation="vertical" flexItem sx={{ mx: 1, my: 1, borderColor: "rgba(0,0,0,0.08)" }} />
+
+        <IconButton onClick={previousPage} disabled={pageNumber <= 1} sx={{ color: "#FF6B00", "&:hover": { bgcolor: "rgba(255,107,0,0.08)" } }}>
+          <KeyboardArrowLeftIcon />
+        </IconButton>
+        <Typography variant="body2" sx={{ fontWeight: 800, color: "#2b2b2b", minWidth: "55px", textAlign: "center" }}>
+          {pageNumber} / {numPages || "-"}
+        </Typography>
+        <IconButton onClick={nextPage} disabled={pageNumber >= numPages} sx={{ color: "#FF6B00", "&:hover": { bgcolor: "rgba(255,107,0,0.08)" } }}>
+          <KeyboardArrowRightIcon />
+        </IconButton>
+      </Box>
 
       <Document
         file={file}
@@ -65,9 +98,12 @@ function PDFReader({ file, documentDimension }) {
             style={{
               height: documentDimension.height,
               width: documentDimension.width,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center"
             }}
           >
-            <CircularProgress />
+            <CircularProgress sx={{ color: "#FF6B00" }} />
           </div>
         }
       >
@@ -83,33 +119,21 @@ function PDFReader({ file, documentDimension }) {
               style={{
                 height: documentDimension.height,
                 width: documentDimension.width,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
               }}
             >
-              <CircularProgress />
+              <CircularProgress sx={{ color: "#FF6B00" }} />
             </div>
           }
         />
       </Document>
-
-      <ButtonGroup sx={{ mt: "0.8em" }}>
-        <Button disabled={pageNumber <= 1} onClick={previousPage}>
-          Prev
-        </Button>
-        <Button style={{ pointerEvents: "none" }}>
-          {pageNumber || (numPages ? 1 : "--")} / {numPages || "--"}
-        </Button>
-
-        <Button
-          variant="outlined"
-          disabled={pageNumber >= numPages}
-          onClick={nextPage}
-        >
-          Next
-        </Button>
-      </ButtonGroup>
-    </div>
+    </Box>
   ) : (
-    <p>해당 날짜의 주보가 존재하지 않습니다.</p>
+    <Typography sx={{ color: "#888", mt: 4, fontWeight: 500 }}>
+      해당 날짜의 주보가 존재하지 않습니다.
+    </Typography>
   );
 }
 
