@@ -18,7 +18,7 @@ function isSameDayEvent(start, end, endTime) {
   );
 }
 
-const ScheduleCard = ({ date, event, sunday }) => {
+const ScheduleCard = ({ date, event, sunday, isLast }) => {
   const allday = event.allday;
 
   const start = parseISO(allday ? event.start.date : event.start.dateTime);
