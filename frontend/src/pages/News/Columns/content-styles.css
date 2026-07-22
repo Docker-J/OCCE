@@ -587,3 +587,31 @@
     display: none;
   }
 }
+
+/* Custom OCCE Article Content Enhancements */
+.ck-content {
+  line-height: 1.85 !important;
+  color: #2c2c2c !important;
+}
+
+.ck-content img {
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  margin: 1.5em auto;
+  max-width: 100%;
+}
+
+.ck-content blockquote {
+  border-left: 4px solid #964b00 !important;
+  background: rgba(150, 75, 0, 0.04) !important;
+  padding: 1.2rem 1.5rem !important;
+  border-radius: 0 12px 12px 0 !important;
+  margin: 1.5rem 0 !important;
+  font-style: italic !important;
+  color: #4a4a4a !important;
+}
+
+.ck-content p {
+  margin-bottom: 1.2em;
+}
+

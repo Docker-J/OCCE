@@ -1,0 +1,1 @@
+import{g as e}from"./index-8MP5itsG.js";async function t({params:t}){return(await e.get(`/api/announcements/announcement/${t.announcementID}`)).data}export{t as loader};

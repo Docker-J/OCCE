@@ -1,0 +1,1 @@
+import{n as e}from"./albums-D-Bbn5v3.js";function t({params:t}){return e(t.albumID)}export{t as loader};
