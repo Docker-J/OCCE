@@ -110,7 +110,7 @@ const ImagePreviewCard = ({
           zIndex: 99,
           top: 4,
           right: 4,
-          backgroundColor: "#f57c00",
+          backgroundColor: "#FF6B00",
           cursor: "pointer",
           width: 30,
           height: 30,

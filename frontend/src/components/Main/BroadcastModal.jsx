@@ -119,8 +119,8 @@ const BroadcastModal = ({ isOpen, onClose }) => {
             sx={{
               py: 1.2,
               fontWeight: "bold",
-              bgcolor: "#964B00",
-              ":hover": { bgcolor: "#7e3f00" },
+              bgcolor: "#FF6B00",
+              ":hover": { bgcolor: "#d95b00" },
               "&.Mui-disabled": {
                 bgcolor: "#f5f5f5",
                 color: "rgba(0, 0, 0, 0.26)",

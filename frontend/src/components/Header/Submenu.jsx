@@ -34,7 +34,7 @@ const Submenu = ({ page, scrolled }) => {
         sx={{
           my: 1.75,
           ml: 0.8,
-          color: isAnySubpageActive ? (scrolled ? "#964B00" : "#FFE082") : "inherit",
+          color: isAnySubpageActive ? (scrolled ? "#FF6B00" : "#FFE082") : "inherit",
           fontSize: "20.5px",
           fontWeight: "600",
           textTransform: "none",
@@ -91,8 +91,8 @@ const Submenu = ({ page, scrolled }) => {
             sx: {
               bgcolor: "rgba(252, 251, 249, 0.92)",
               backdropFilter: "blur(24px)",
-              boxShadow: "0 12px 40px rgba(150, 75, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05)",
-              border: "1px solid rgba(150, 75, 0, 0.15)",
+              boxShadow: "0 12px 40px rgba(255, 107, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05)",
+              border: "1px solid rgba(255, 107, 0, 0.15)",
               borderRadius: "14px",
               mt: 1.5,
               py: 0.8,
@@ -116,12 +116,12 @@ const Submenu = ({ page, scrolled }) => {
                 borderRadius: "8px",
                 transition: "all 0.2s ease-in-out",
                 "&:hover": {
-                  bgcolor: "rgba(150, 75, 0, 0.08)",
-                  color: "#964B00",
+                  bgcolor: "rgba(255, 107, 0, 0.08)",
+                  color: "#FF6B00",
                 },
                 "&.active": {
-                  bgcolor: "rgba(150, 75, 0, 0.12)",
-                  color: "#964B00",
+                  bgcolor: "rgba(255, 107, 0, 0.12)",
+                  color: "#FF6B00",
                 }
               }}
             >

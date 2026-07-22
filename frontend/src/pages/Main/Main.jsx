@@ -45,7 +45,7 @@ const Main = () => {
             sx={{
               color: "white",
               borderColor: "white",
-              ":hover": { borderColor: "white", bgcolor: "#964B00" },
+              ":hover": { borderColor: "white", bgcolor: "#FF6B00" },
             }}
           >
             온 교회 이야기

@@ -20,7 +20,7 @@ const FullScreenLoading = () => {
         alignItems: "center",
       }}
     >
-      <CircularProgress sx={{ color: "#964b00" }} />
+      <CircularProgress sx={{ color: "#FF6B00" }} />
     </div>
   );
 };

@@ -90,7 +90,7 @@ const SubmenuMobileDrawer = ({
                       sx={{
                         borderRadius: "10px",
                         py: 1.5,
-                        color: isChildActive ? "#964B00" : "#2b2b2b",
+                        color: isChildActive ? "#FF6B00" : "#2b2b2b",
                         "&:hover": { bgcolor: "rgba(0, 0, 0, 0.04)" },
                       }}
                     >
@@ -108,9 +108,9 @@ const SubmenuMobileDrawer = ({
                         }
                       />
                       {isExpanded ? (
-                        <ExpandLess sx={{ color: isChildActive ? "#964B00" : "#777" }} />
+                        <ExpandLess sx={{ color: isChildActive ? "#FF6B00" : "#777" }} />
                       ) : (
-                        <ExpandMore sx={{ color: isChildActive ? "#964B00" : "#777" }} />
+                        <ExpandMore sx={{ color: isChildActive ? "#FF6B00" : "#777" }} />
                       )}
                     </ListItemButton>
                     <Collapse in={isExpanded} timeout="auto" unmountOnExit>
@@ -129,8 +129,8 @@ const SubmenuMobileDrawer = ({
                               transition: "all 0.2s ease-in-out",
                               "&:hover": { bgcolor: "rgba(0, 0, 0, 0.03)" },
                               "&.active": {
-                                bgcolor: "rgba(150, 75, 0, 0.08)",
-                                color: "#964B00",
+                                bgcolor: "rgba(255, 107, 0, 0.08)",
+                                color: "#FF6B00",
                                 "& .MuiTypography-root": {
                                   fontWeight: "650 !important",
                                 }
@@ -167,8 +167,8 @@ const SubmenuMobileDrawer = ({
                       transition: "all 0.2s ease-in-out",
                       "&:hover": { bgcolor: "rgba(0, 0, 0, 0.04)" },
                       "&.active": {
-                        bgcolor: "rgba(150, 75, 0, 0.08)",
-                        color: "#964B00",
+                        bgcolor: "rgba(255, 107, 0, 0.08)",
+                        color: "#FF6B00",
                         "& .MuiTypography-root": {
                           fontWeight: "700 !important",
                         }

@@ -36,7 +36,7 @@ const ScheduleCard = ({ date, event, sunday }) => {
         py: 1.5,
         px: "18px",
         ...(allday && {
-          borderLeft: `6px solid ${sunday ? "#dc2626" : "#f57c00"}`,
+          borderLeft: `6px solid ${sunday ? "#dc2626" : "#FF6B00"}`,
           pl: 2, // Extra padding to offset the border weight
           my: 1, // Margin for vertical rhythm
         }),

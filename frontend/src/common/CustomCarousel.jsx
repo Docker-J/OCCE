@@ -18,7 +18,7 @@ const Indicator = ({ isSelected, clickHandler }) => {
         margin: "0 7px",
         borderRadius: "50%",
         cursor: isSelected ? null : "pointer",
-        background: isSelected ? "#f57c00" : "#808080",
+        background: isSelected ? "#FF6B00" : "#808080",
         display: "inline-block",
       }}
     />

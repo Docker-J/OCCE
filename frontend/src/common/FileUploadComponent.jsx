@@ -16,7 +16,7 @@ const FileUploadComponent = ({ accept, handleChangeFile, multiple }) => {
       style={{
         width: "100%",
         height: "100%",
-        border: "1pt dotted #f57c00",
+        border: "1pt dotted #FF6B00",
         borderRadius: "1em",
         overflowY: "auto",
       }}

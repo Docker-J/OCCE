@@ -602,8 +602,8 @@
 }
 
 .ck-content blockquote {
-  border-left: 4px solid #964b00 !important;
-  background: rgba(150, 75, 0, 0.04) !important;
+  border-left: 4px solid #FF6B00 !important;
+  background: rgba(255, 107, 0, 0.04) !important;
   padding: 1.2rem 1.5rem !important;
   border-radius: 0 12px 12px 0 !important;
   margin: 1.5rem 0 !important;

@@ -104,8 +104,8 @@ const ResponsiveAppBar = () => {
         sx={{
           background: scrolled ? "rgba(252, 251, 249, 0.9)" : "transparent",
           backdropFilter: scrolled ? "blur(24px)" : "none",
-          boxShadow: scrolled ? "0 12px 40px rgba(150, 75, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05)" : "none",
-          border: scrolled ? "1px solid rgba(150, 75, 0, 0.15)" : "none",
+          boxShadow: scrolled ? "0 12px 40px rgba(255, 107, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05)" : "none",
+          border: scrolled ? "1px solid rgba(255, 107, 0, 0.15)" : "none",
           color: scrolled ? "#2b2b2b" : "#ffffff",
           py: scrolled ? 1.0 : 2.0,
           transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",

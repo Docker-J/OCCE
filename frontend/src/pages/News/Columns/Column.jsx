@@ -3,7 +3,6 @@ import {
   Button,
   Container,
   Divider,
-  IconButton,
   SpeedDial,
   SpeedDialAction,
   SpeedDialIcon,
@@ -14,11 +13,10 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { format } from "date-fns";
 
 import useSnackbar from "../../../util/useSnackbar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FullScreenLoading from "../../../common/FullScreenLoading";
 
 import AdminComponent from "../../../common/AdminComponent";
@@ -42,13 +40,13 @@ const Column = () => {
   const { id, title, body, timestamp } = useLoaderData();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [fontSize, setFontSize] = useState(17);
 
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState(false);
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    openSnackbar("success", "링크가 클립보드에 복사되었습니다!");
-  };
+  const handleIncreaseFont = () => setFontSize((prev) => Math.min(prev + 2, 25));
+  const handleDecreaseFont = () => setFontSize((prev) => Math.max(prev - 2, 13));
+  const handleResetFont = () => setFontSize(17);
 
   const onDelete = async () => {
     setIsLoading(true);
@@ -97,6 +95,7 @@ const Column = () => {
     <>
       <title>{`${title} - 목회칼럼 - OCCE`}</title>
       {isLoading && <FullScreenLoading />}
+
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
@@ -118,8 +117,8 @@ const Column = () => {
             sx={{
               backgroundColor: "#ffffff",
               borderRadius: "24px",
-              boxShadow: "0 10px 40px rgba(150, 75, 0, 0.05), 0 2px 10px rgba(0, 0, 0, 0.02)",
-              border: "1px solid rgba(150, 75, 0, 0.1)",
+              boxShadow: "0 10px 40px rgba(255, 107, 0, 0.05), 0 2px 10px rgba(0, 0, 0, 0.02)",
+              border: "1px solid rgba(255, 107, 0, 0.1)",
               p: { xs: 2.5, sm: 4, md: 5 },
               display: "flex",
               flexDirection: "column",
@@ -138,15 +137,15 @@ const Column = () => {
                 startIcon={<ArrowBackIcon />}
                 onClick={() => navigate("/columns")}
                 sx={{
-                  color: "#964b00",
+                  color: "#FF6B00",
                   fontWeight: 600,
                   fontSize: "14px",
                   borderRadius: "12px",
                   px: 2,
                   py: 0.75,
-                  backgroundColor: "rgba(150, 75, 0, 0.06)",
+                  backgroundColor: "rgba(255, 107, 0, 0.06)",
                   "&:hover": {
-                    backgroundColor: "rgba(150, 75, 0, 0.12)",
+                    backgroundColor: "rgba(255, 107, 0, 0.12)",
                   },
                 }}
               >
@@ -181,29 +180,86 @@ const Column = () => {
                 pb: 2.5,
                 mb: 3.5,
                 borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
+                flexWrap: "wrap",
+                gap: 1.5,
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <CalendarTodayIcon sx={{ fontSize: 16, color: "#964b00" }} />
+                <CalendarTodayIcon sx={{ fontSize: 16, color: "#FF6B00" }} />
                 <Typography variant="body2" sx={{ color: "#666", fontWeight: 500 }}>
                   {format(new Date(timestamp), "yyyy년 M월 d일")}
                 </Typography>
               </Box>
 
-              <IconButton
-                onClick={handleCopyLink}
-                size="small"
-                title="링크 복사"
+              {/* Font Size Adjuster Controls */}
+              <Box
                 sx={{
-                  color: "#666",
-                  border: "1px solid #e0e0e0",
-                  borderRadius: "8px",
-                  p: 0.75,
-                  "&:hover": { color: "#964b00", borderColor: "#964b00" },
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  backgroundColor: "rgba(0, 0, 0, 0.03)",
+                  borderRadius: "20px",
+                  px: 1.5,
+                  py: 0.5,
+                  border: "1px solid rgba(0, 0, 0, 0.06)",
                 }}
               >
-                <ContentCopyIcon sx={{ fontSize: 18 }} />
-              </IconButton>
+                <Typography
+                  variant="caption"
+                  sx={{ color: "#777", fontWeight: 600, mr: 0.5, fontSize: "12px" }}
+                >
+                  글꼴 크기
+                </Typography>
+                <Button
+                  size="small"
+                  onClick={handleDecreaseFont}
+                  disabled={fontSize <= 13}
+                  title="글자 줄이기"
+                  sx={{
+                    minWidth: "28px",
+                    height: "28px",
+                    p: 0,
+                    fontSize: "13px",
+                    fontWeight: 700,
+                    color: "#555",
+                    borderRadius: "6px",
+                  }}
+                >
+                  가-
+                </Button>
+                <Typography
+                  variant="caption"
+                  onClick={handleResetFont}
+                  title="기본 크기로 초기화"
+                  sx={{
+                    color: "#FF6B00",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    px: 0.75,
+                    fontSize: "13px",
+                    userSelect: "none",
+                  }}
+                >
+                  {fontSize}px
+                </Typography>
+                <Button
+                  size="small"
+                  onClick={handleIncreaseFont}
+                  disabled={fontSize >= 25}
+                  title="글자 키우기"
+                  sx={{
+                    minWidth: "28px",
+                    height: "28px",
+                    p: 0,
+                    fontSize: "13px",
+                    fontWeight: 700,
+                    color: "#555",
+                    borderRadius: "6px",
+                  }}
+                >
+                  가+
+                </Button>
+              </Box>
             </Box>
 
             {/* CKEditor Body Content */}
@@ -214,9 +270,10 @@ const Column = () => {
               }}
               style={{
                 wordBreak: "break-word",
-                fontSize: "17px",
+                fontSize: `${fontSize}px`,
                 lineHeight: 1.85,
                 color: "#333333",
+                transition: "font-size 0.2s ease",
               }}
             />
 
@@ -234,14 +291,14 @@ const Column = () => {
                 onClick={() => navigate("/columns")}
                 variant="outlined"
                 sx={{
-                  borderColor: "rgba(150, 75, 0, 0.3)",
-                  color: "#964b00",
+                  borderColor: "rgba(255, 107, 0, 0.3)",
+                  color: "#FF6B00",
                   fontWeight: 600,
                   borderRadius: "12px",
                   px: 3,
                   "&:hover": {
-                    borderColor: "#964b00",
-                    backgroundColor: "rgba(150, 75, 0, 0.04)",
+                    borderColor: "#FF6B00",
+                    backgroundColor: "rgba(255, 107, 0, 0.04)",
                   },
                 }}
               >

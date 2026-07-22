@@ -4,11 +4,11 @@ import { ThemeProvider } from "styled-components";
 
 const theme = {
   background: "#f5f8fb",
-  // fontFamily: "Helvetica Neue",
-  headerBgColor: "#f57c00",
+  fontFamily: "Helvetica Neue",
+  headerBgColor: "#FF6B00",
   headerFontColor: "#fff",
-  headerFontSize: "18px",
-  botBubbleColor: "#f57c00",
+  headerFontSize: "15px",
+  botBubbleColor: "#FF6B00",
   botFontColor: "#fff",
   userBubbleColor: "#fff",
   userFontColor: "#4a4a4a",
