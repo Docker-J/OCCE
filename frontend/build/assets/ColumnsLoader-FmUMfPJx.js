@@ -1,0 +1,1 @@
+import{y as e}from"./reactVendor-BRmMH0Ga.js";import{g as t}from"./index-D3-wLIIs.js";async function n({request:n}){let r=new URL(n.url).searchParams.get(`page`);return r===null?e(`?page=1`):{announcementsData:t.get(`/api/columns?page=${r}`)}}export{n as loader};

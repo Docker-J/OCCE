@@ -128,6 +128,7 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
                     fontSize: "14px",
                     color: "#757575",
                     lineHeight: "1.5",
+                    height: "42px",
                     margin: 0,
                     display: "-webkit-box",
                     WebkitBoxOrient: "vertical",
