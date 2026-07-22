@@ -21,23 +21,26 @@ const Schedule = ({ events }) => {
       acc[month][dateKey] = acc[month][dateKey] || [];
 
       if (event.start.date) {
-        event.allday = !!event.start.date;
-
-        console.log(event);
-
-        acc[month][dateKey].unshift(event);
-
         const end = parseISO(event.end.date);
-        event.alldaylength = differenceInDays(end, start);
+        const alldaylength = differenceInDays(end, start);
+        
+        // Use a shallow copy to prevent mutating the original data
+        const allDayEvent = {
+          ...event,
+          allday: true,
+          alldaylength,
+        };
 
-        for (let i = 1; i < event.alldaylength; i++) {
+        acc[month][dateKey].unshift(allDayEvent);
+
+        for (let i = 1; i < alldaylength; i++) {
           const newStart = addDays(start, i);
           const newMonth = format(newStart, "MMMM yyyy");
           const newDateKey = format(newStart, "d");
 
           acc[newMonth] = acc[newMonth] || {};
           acc[newMonth][newDateKey] = acc[newMonth][newDateKey] || [];
-          acc[newMonth][newDateKey].unshift(event);
+          acc[newMonth][newDateKey].unshift(allDayEvent);
         }
       } else {
         acc[month][dateKey].push(event);
