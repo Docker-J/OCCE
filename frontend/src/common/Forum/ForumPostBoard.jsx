@@ -23,6 +23,7 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
         flexDirection: "column",
         width: "100%",
         maxWidth: "800px",
+        padding: "0 16px",
       }}
     >
       {posts.map((post, _) => (
@@ -30,15 +31,22 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
           <Card
             component={Link}
             to={post.id}
+            elevation={0}
             sx={{
               display: "flex",
               textDecoration: "none",
-              bgcolor: post?.pin ? "lightgrey" : null,
-              my: 1.8,
-
-              borderRadius: 4,
+              bgcolor: post?.pin ? "rgba(255, 107, 0, 0.04)" : "#ffffff",
+              my: 1.5,
+              borderRadius: "24px",
+              boxShadow: "0 4px 20px rgba(255, 107, 0, 0.05), 0 1px 8px rgba(0, 0, 0, 0.03)",
+              border: "1px solid rgba(255, 107, 0, 0.1)",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              "&:hover": {
+                transform: "translateY(-3px)",
+                boxShadow: "0 12px 30px rgba(255, 107, 0, 0.12)",
+                borderColor: "rgba(255, 107, 0, 0.3)",
+              },
             }}
-            elevation={3}
           >
             {dateFirst && (
               <Stack
@@ -46,25 +54,27 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
                 sx={{
                   justifyContent: "center",
                   alignItems: "center",
-                  width: "80px",
-                  p: 2.8,
-                  bgcolor: "#7b8e7e",
-                  borderRadius: "16px 0 0 16px",
-                  borderBottom: `8px solid #5d6c5f`,
-                  color: "white",
+                  width: { xs: "75px", sm: "90px" },
+                  px: 1,
+                  py: 2.5,
+                  bgcolor: "rgba(255, 107, 0, 0.06)",
+                  borderRight: "1px solid rgba(255, 107, 0, 0.1)",
+                  color: "#FF6B00",
                 }}
               >
                 <Typography
-                  variant="body1"
+                  variant="body2"
                   sx={{
-                    fontWeight: 400,
+                    fontWeight: 750,
                     whiteSpace: "nowrap",
                     textTransform: "uppercase",
+                    fontSize: { xs: "12px", sm: "14px" },
+                    mb: 0.5,
                   }}
                 >
                   {format(new Date(post.timestamp), "MMM dd")}
                 </Typography>
-                <Typography variant="body2">
+                <Typography variant="caption" sx={{ fontWeight: 600, color: "rgba(255, 107, 0, 0.7)" }}>
                   {format(new Date(post.timestamp), "yyyy")}
                 </Typography>
               </Stack>
@@ -72,26 +82,32 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
 
             <Box
               sx={{
-                px: 2.2,
-                py: 1.8,
+                px: { xs: 2.5, sm: 3.5 },
+                py: { xs: 2, sm: 2.5 },
                 overflow: "hidden",
                 width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
               }}
             >
               <Stack
                 direction="row"
                 sx={{
                   alignItems: "center",
+                  gap: 0.8,
+                  mb: 1,
                 }}
               >
                 {post?.pin ? (
-                  <PushPinIcon fontSize="small" sx={{ m: 0 }} />
+                  <PushPinIcon sx={{ color: "#FF6B00", fontSize: 20 }} />
                 ) : null}
 
                 <Typography
                   sx={{
-                    fontSize: "22px",
-                    fontWeight: 770,
+                    fontSize: { xs: "18px", sm: "22px" },
+                    fontWeight: 800,
+                    color: "#2b2b2b",
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -103,20 +119,20 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
               <Stack
                 direction="row"
                 sx={{
-                  marginTop: "8px",
-                  alignItems: "end",
+                  alignItems: "flex-end",
+                  gap: 1.5,
                 }}
               >
                 <p
                   style={{
-                    fontSize: "0.9em",
-                    lineHeight: "1.2",
-                    height: "2.4em",
+                    fontSize: "14px",
+                    color: "#757575",
+                    lineHeight: "1.5",
                     margin: 0,
                     display: "-webkit-box",
                     WebkitBoxOrient: "vertical",
                     WebkitLineClamp: "2",
-                    width: "100%",
+                    flex: 1,
                     wordBreak: "break-all",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -124,8 +140,8 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
                 >
                   {getText(post.body)}
                 </p>
-                {post?.images && <PhotoOutlinedIcon sx={{ color: "gray" }} />}
-                {post?.video && <MovieOutlinedIcon sx={{ color: "gray" }} />}
+                {post?.images && <PhotoOutlinedIcon sx={{ color: "#b0b0b0", fontSize: 20 }} />}
+                {post?.video && <MovieOutlinedIcon sx={{ color: "#b0b0b0", fontSize: 20 }} />}
               </Stack>
             </Box>
 
@@ -135,25 +151,27 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
                 sx={{
                   justifyContent: "center",
                   alignItems: "center",
-                  width: "80px",
-                  p: 2.8,
-                  bgcolor: "#7b8e7e",
-                  borderRadius: "0 16px 16px 0",
-                  borderBottom: `8px solid #5d6c5f`,
-                  color: "white",
+                  width: { xs: "75px", sm: "90px" },
+                  px: 1,
+                  py: 2.5,
+                  bgcolor: "rgba(255, 107, 0, 0.06)",
+                  borderLeft: "1px solid rgba(255, 107, 0, 0.1)",
+                  color: "#FF6B00",
                 }}
               >
                 <Typography
-                  variant="body1"
+                  variant="body2"
                   sx={{
-                    fontWeight: 400,
+                    fontWeight: 750,
                     whiteSpace: "nowrap",
                     textTransform: "uppercase",
+                    fontSize: { xs: "12px", sm: "14px" },
+                    mb: 0.5,
                   }}
                 >
                   {format(new Date(post.timestamp), "MMM dd")}
                 </Typography>
-                <Typography variant="body2">
+                <Typography variant="caption" sx={{ fontWeight: 600, color: "rgba(255, 107, 0, 0.7)" }}>
                   {format(new Date(post.timestamp), "yyyy")}
                 </Typography>
               </Stack>

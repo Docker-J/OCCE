@@ -1,0 +1,1 @@
+import{n as e}from"./albums-BBBS_Ti2.js";function t({params:t}){return e(t.albumID)}export{t as loader};

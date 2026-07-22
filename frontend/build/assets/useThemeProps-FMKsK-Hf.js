@@ -1,0 +1,1 @@
+import{J as e,u as t}from"./createSimplePaletteValueFilter-CmaluhCA.js";import{Y as n}from"./index-D__WyfjD.js";function r({props:r,name:i}){return n({props:r,name:i,defaultTheme:t,themeId:e})}export{r as t};
