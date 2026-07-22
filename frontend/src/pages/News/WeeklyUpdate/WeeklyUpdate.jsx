@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-import { CircularProgress, Fab, IconButton, Typography } from "@mui/material";
+import { Box, CircularProgress, Fab, IconButton, Typography } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import UploadIcon from "@mui/icons-material/Upload";
@@ -142,7 +142,21 @@ const WeeklyUpdate = () => {
           className="container"
           style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0 }}
         >
-          <>
+          <Box
+            sx={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#ffffff",
+              borderRadius: "40px",
+              boxShadow: "0 4px 20px rgba(0, 0, 0, 0.06)",
+              border: "1px solid rgba(0, 0, 0, 0.04)",
+              px: 1,
+              py: 0.5,
+              mb: 3,
+              mt: 1,
+            }}
+          >
             <IconButton
               id="previousBulletin"
               onClick={previousSunday}
@@ -151,8 +165,9 @@ const WeeklyUpdate = () => {
                 isBefore(selectedDate, MIN_DATE) ||
                 loading
               }
+              sx={{ color: "#FF6B00", "&:hover": { backgroundColor: "rgba(255, 107, 0, 0.1)" } }}
             >
-              <ArrowBackIosIcon />
+              <ArrowBackIosIcon sx={{ fontSize: "1.1rem", ml: 0.5 }} />
             </IconButton>
 
             <ButtonDatePicker
@@ -171,10 +186,11 @@ const WeeklyUpdate = () => {
                 isAfter(selectedDate, maxDate) ||
                 loading
               }
+              sx={{ color: "#FF6B00", "&:hover": { backgroundColor: "rgba(255, 107, 0, 0.1)" } }}
             >
-              <ArrowForwardIosIcon />
+              <ArrowForwardIosIcon sx={{ fontSize: "1.1rem" }} />
             </IconButton>
-          </>
+          </Box>
 
           {loading ? (
             <div style={{ height: "100vh" }}>

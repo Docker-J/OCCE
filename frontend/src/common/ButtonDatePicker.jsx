@@ -16,15 +16,22 @@ const ButtonField = (props) => {
   return (
     <Button
       {...forwardedProps}
-      variant="outlined"
+      variant="text"
       size="large"
-      // id={id}
-      // disabled={disabled}
       ref={handleRef}
-      // aria-label={ariaLabel}
       onClick={() => pickerContext.setOpen((prev) => !prev)}
+      sx={{
+        fontWeight: 800,
+        fontSize: "1.15rem",
+        color: "#2b2b2b",
+        px: { xs: 2, sm: 4 },
+        borderRadius: "20px",
+        "&:hover": {
+          backgroundColor: "rgba(0, 0, 0, 0.04)",
+        },
+      }}
     >
-      {format(pickerContext.value, "yyyy/MM/dd")}
+      {format(pickerContext.value, "yyyy. MM. dd.")}
     </Button>
   );
 };
