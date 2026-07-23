@@ -1,1 +1,0 @@
-import{g as e}from"./index-CNT3_0Dv.js";async function t(){return{schedules:e.get(`/api/schedules`)}}export{t as loader};

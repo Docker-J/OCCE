@@ -1,0 +1,1 @@
+import{a as e}from"./useReducedMotion-BMSiv9BF.js";var t=e;export{t};

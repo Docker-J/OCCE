@@ -1,0 +1,1 @@
+import{v as e}from"./format-BWg8LcRN.js";function t(){return Object.assign({},e())}export{t};
