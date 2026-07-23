@@ -87,7 +87,7 @@ const YoungAdult = () => {
               age="18~40세"
               time="주일 오후 4시"
               place="Youth Room"
-              ask="김휘경 전도사"
+              ask="김휘경 목사"
               imgs={imgs}
             />
           </div>

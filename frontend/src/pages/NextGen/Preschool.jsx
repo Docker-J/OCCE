@@ -59,7 +59,7 @@ const Preschool = () => {
               age="만 5세(kindergarten)까지"
               time="주일 오후 4시"
               place="Preschool Room"
-              ask="김유정 전도사"
+              ask=""
               imgs={imgs}
             />
           </div>
