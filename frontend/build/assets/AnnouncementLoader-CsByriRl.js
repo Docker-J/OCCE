@@ -1,0 +1,1 @@
+import{g as e}from"./index-CNT3_0Dv.js";async function t({params:t}){return(await e.get(`/api/announcements/announcement/${t.announcementID}`)).data}export{t as loader};

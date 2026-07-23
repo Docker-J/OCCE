@@ -1,1 +1,0 @@
-import{g as e}from"./index-D3-wLIIs.js";async function t(){return{schedules:e.get(`/api/schedules`)}}export{t as loader};
