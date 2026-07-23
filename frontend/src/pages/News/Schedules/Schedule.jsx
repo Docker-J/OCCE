@@ -86,26 +86,26 @@ const Schedule = ({ events }) => {
                 overflow: "hidden",
                 borderRadius: "24px",
                 backgroundColor: "#ffffff",
-                boxShadow: "0 4px 20px rgba(255, 107, 0, 0.05), 0 1px 8px rgba(0, 0, 0, 0.03)",
-                border: "1px solid rgba(255, 107, 0, 0.1)",
+                boxShadow: "0 4px 20px rgba(255, 107, 0, 0.12), 0 1px 10px rgba(0, 0, 0, 0.06)",
+                border: "1px solid rgba(255, 107, 0, 0.3)",
                 transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                 "&:hover": {
                   transform: "translateY(-3px)",
-                  boxShadow: "0 12px 30px rgba(255, 107, 0, 0.12)",
-                  borderColor: "rgba(255, 107, 0, 0.3)",
+                  boxShadow: "0 12px 30px rgba(255, 107, 0, 0.2)",
+                  borderColor: "rgba(255, 107, 0, 0.5)",
                 },
               }}
             >
               <Box
                 sx={{
-                  backgroundColor: sunday ? "rgba(193, 18, 31, 0.06)" : "rgba(255, 107, 0, 0.06)",
+                  backgroundColor: sunday ? "rgba(193, 18, 31, 0.12)" : "rgba(255, 107, 0, 0.12)",
                   p: { xs: 1.5, sm: 2.5 },
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
                   width: { xs: "75px", sm: "90px" },
-                  borderRight: `1px solid ${sunday ? "rgba(193, 18, 31, 0.15)" : "rgba(255, 107, 0, 0.1)"}`,
+                  borderRight: `1px solid ${sunday ? "rgba(193, 18, 31, 0.25)" : "rgba(255, 107, 0, 0.25)"}`,
                 }}
               >
                 <Typography
