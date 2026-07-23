@@ -245,15 +245,15 @@ const Announcement = () => {
                   onClick={handleResetFont}
                   title="기본 크기로 초기화"
                   sx={{
-                    color: "#FF6B00",
-                    fontWeight: 700,
+                    color: "rgba(0, 0, 0, 0.2)",
+                    fontWeight: 400,
                     cursor: "pointer",
                     px: 0.75,
                     fontSize: "13px",
                     userSelect: "none",
                   }}
                 >
-                  {fontSize}px
+                  |
                 </Typography>
                 <Button
                   size="small"
