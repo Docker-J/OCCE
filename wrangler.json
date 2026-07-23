@@ -41,6 +41,22 @@
       "id": "33508149bdd44b2daf3bb45498e5b240"
     }
   ],
+  "queues": {
+    "producers": [
+      {
+        "binding": "FCM_QUEUE",
+        "queue": "fcm-notification-queue"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "fcm-notification-queue",
+        "max_batch_size": 1,
+        "max_batch_timeout": 5,
+        "max_retries": 3
+      }
+    ]
+  },
   "triggers": {
     "crons": ["1 6 * * *", "30 12 * * *"]
   }

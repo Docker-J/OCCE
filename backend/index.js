@@ -2,6 +2,8 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { subHours, format } from "date-fns";
 import schedule from "./data/schedule.json";
+import { DeleteItemCommand } from "@aws-sdk/client-dynamodb";
+import { getDocClient } from "./api/dynamodb.js";
 
 import user from "./routes/user.routes.js";
 import announcements from "./routes/announcements.routes.js";
@@ -38,6 +40,64 @@ app.route("/api/attendance", attendance);
 app.route("/api/bible291", bible291);
 
 export default {
+  /**
+   * Queue handler to process background tasks like FCM notifications.
+   */
+  async queue(batch, env, ctx) {
+    console.log(`Processing FCM Queue batch of ${batch.messages.length} messages`);
+    
+    // With max_batch_size=1, batch.messages.length is 1.
+    // Each message contains up to 20 tokens (tokens array).
+    const sendPromises = batch.messages.flatMap((msg) => {
+      const { tokens, payloadTemplate, accessToken, projectId } = msg.body;
+      
+      return tokens.map(async (token) => {
+        const payload = {
+          message: {
+            token: token,
+            ...payloadTemplate,
+          }
+        };
+
+        try {
+          const res = await fetch(
+            `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(payload),
+            }
+          );
+
+          if (!res.ok) {
+            const errText = await res.text();
+            console.error(`FCM send error for token ${token}:`, errText);
+            
+            if (errText.includes("UNREGISTERED") || errText.includes("NotRegistered")) {
+              console.log(`Token ${token} is unregistered. Deleting from DynamoDB...`);
+              const docClient = getDocClient(env);
+              const deleteCmd = new DeleteItemCommand({
+                TableName: "FCMToken",
+                Key: {
+                  token: { S: token }
+                }
+              });
+              await docClient.send(deleteCmd);
+              console.log(`Successfully deleted unregistered token: ${token}`);
+            }
+          }
+        } catch (err) {
+          console.error(`FCM network error for token ${token}:`, err);
+        }
+      });
+    });
+
+    await Promise.all(sendPromises);
+  },
+
   /**
    * Fetch handler to route HTTP requests through Hono.
    */

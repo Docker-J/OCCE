@@ -15,44 +15,40 @@ async function sendMessages(env, scanParam, message, accessToken, projectId) {
       return;
     }
 
-    // Chunk the requests to prevent socket exhaustion
-    const chunkSize = 50;
-    for (let i = 0; i < tokens.length; i += chunkSize) {
-      const chunk = tokens.slice(i, i + chunkSize);
+    // To save Queue operations cost, we pack 20 tokens into a single queue message.
+    // A single queue message will trigger 20 fetch requests + up to 20 delete requests in the consumer, 
+    // guaranteeing we stay under the strict 50 subrequests limit.
+    const tokensPerMessage = 20;
+    const messagesPerBatch = 100; // Cloudflare Queue sendBatch limit is 100
+    const tokensPerBatch = tokensPerMessage * messagesPerBatch; // 2000
 
-      const sendPromises = chunk.map(async (token) => {
-        const payload = {
-          message: {
-            token: token,
-            data: message.data,
-            android: message.android,
-            webpush: message.webpush,
-            apns: message.apns,
-          },
-        };
+    for (let i = 0; i < tokens.length; i += tokensPerBatch) {
+      const chunk = tokens.slice(i, i + tokensPerBatch);
+      const batchMessages = [];
 
-        try {
-          const res = await fetch(
-            `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`,
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(payload),
+      for (let j = 0; j < chunk.length; j += tokensPerMessage) {
+        const tokenGroup = chunk.slice(j, j + tokensPerMessage);
+        batchMessages.push({
+          body: {
+            tokens: tokenGroup, // Array of up to 20 tokens
+            payloadTemplate: {
+              data: message.data,
+              android: message.android,
+              webpush: message.webpush,
+              apns: message.apns,
             },
-          );
-          if (!res.ok) {
-            const errText = await res.text();
-            console.error(`FCM send error for token ${token}:`, errText);
-          }
-        } catch (err) {
-          console.error(`FCM network error for token ${token}:`, err);
-        }
-      });
+            accessToken: accessToken,
+            projectId: projectId,
+          },
+        });
+      }
 
-      await Promise.all(sendPromises);
+      try {
+        await env.FCM_QUEUE.sendBatch(batchMessages);
+        console.log(`Queued batch of ${batchMessages.length} FCM messages.`);
+      } catch (err) {
+        console.error("Failed to enqueue FCM messages:", err);
+      }
     }
 
     if (typeof result.LastEvaluatedKey !== "undefined") {
