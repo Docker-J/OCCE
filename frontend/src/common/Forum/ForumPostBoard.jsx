@@ -35,16 +35,16 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
             sx={{
               display: "flex",
               textDecoration: "none",
-              bgcolor: post?.pin ? "rgba(255, 107, 0, 0.04)" : "#ffffff",
+              bgcolor: post?.pin ? "rgba(255, 107, 0, 0.06)" : "#ffffff",
               my: 1.5,
               borderRadius: "24px",
-              boxShadow: "0 4px 20px rgba(255, 107, 0, 0.05), 0 1px 8px rgba(0, 0, 0, 0.03)",
-              border: "1px solid rgba(255, 107, 0, 0.1)",
+              boxShadow: "0 4px 20px rgba(255, 107, 0, 0.08), 0 1px 10px rgba(0, 0, 0, 0.05)",
+              border: "1px solid rgba(255, 107, 0, 0.2)",
               transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
               "&:hover": {
                 transform: "translateY(-3px)",
-                boxShadow: "0 12px 30px rgba(255, 107, 0, 0.12)",
-                borderColor: "rgba(255, 107, 0, 0.3)",
+                boxShadow: "0 12px 30px rgba(255, 107, 0, 0.16)",
+                borderColor: "rgba(255, 107, 0, 0.45)",
               },
             }}
           >
@@ -57,8 +57,8 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
                   width: { xs: "75px", sm: "90px" },
                   px: 1,
                   py: 2.5,
-                  bgcolor: "rgba(255, 107, 0, 0.06)",
-                  borderRight: "1px solid rgba(255, 107, 0, 0.1)",
+                  bgcolor: "rgba(255, 107, 0, 0.08)",
+                  borderRight: "1px solid rgba(255, 107, 0, 0.15)",
                   color: "#FF6B00",
                 }}
               >
@@ -126,7 +126,7 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
                 <p
                   style={{
                     fontSize: "14px",
-                    color: "#757575",
+                    color: "#555555",
                     lineHeight: "1.5",
                     height: "42px",
                     margin: 0,
@@ -155,8 +155,8 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
                   width: { xs: "75px", sm: "90px" },
                   px: 1,
                   py: 2.5,
-                  bgcolor: "rgba(255, 107, 0, 0.06)",
-                  borderLeft: "1px solid rgba(255, 107, 0, 0.1)",
+                  bgcolor: "rgba(255, 107, 0, 0.08)",
+                  borderLeft: "1px solid rgba(255, 107, 0, 0.15)",
                   color: "#FF6B00",
                 }}
               >
