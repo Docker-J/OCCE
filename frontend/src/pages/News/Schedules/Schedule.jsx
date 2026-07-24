@@ -55,18 +55,44 @@ const Schedule = ({ events }) => {
   return Object.entries(getEventsByMonthAndDate(events)).map(
     ([month, monthEvents]) => (
       <div key={month}>
-        <Typography
-          variant="h5"
+        <Box
           sx={{
-            fontWeight: 800,
-            color: "#2b2b2b",
-            mb: "16px",
-            mt: "8px",
-            pl: "4px"
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
+            mt: 3,
+            mb: 2.5,
+            px: 0.5,
           }}
         >
-          {month}
-        </Typography>
+          <Box
+            sx={{
+              width: "4px",
+              height: "22px",
+              borderRadius: "4px",
+              bgcolor: "#FF6B00",
+            }}
+          />
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 850,
+              color: "#1e1e1e",
+              fontSize: { xs: "20px", sm: "24px" },
+              letterSpacing: "-0.02em",
+            }}
+          >
+            {month}
+          </Typography>
+          <Box
+            sx={{
+              flex: 1,
+              height: "1px",
+              bgcolor: "rgba(0, 0, 0, 0.08)",
+              ml: 1,
+            }}
+          />
+        </Box>
 
         {Object.entries(monthEvents).map(([date, dateEvents]) => {
           const eventDate = parse(
