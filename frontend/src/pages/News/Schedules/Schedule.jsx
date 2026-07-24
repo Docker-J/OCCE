@@ -86,13 +86,21 @@ const Schedule = ({ events }) => {
                 overflow: "hidden",
                 borderRadius: "24px",
                 backgroundColor: "#ffffff",
-                boxShadow: "0 4px 20px rgba(255, 107, 0, 0.12), 0 1px 10px rgba(0, 0, 0, 0.06)",
-                border: "1px solid rgba(255, 107, 0, 0.3)",
+                boxShadow: sunday
+                  ? "0 4px 20px rgba(193, 18, 31, 0.12), 0 1px 10px rgba(0, 0, 0, 0.06)"
+                  : "0 4px 20px rgba(255, 107, 0, 0.12), 0 1px 10px rgba(0, 0, 0, 0.06)",
+                border: sunday
+                  ? "1px solid rgba(193, 18, 31, 0.3)"
+                  : "1px solid rgba(255, 107, 0, 0.3)",
                 transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                 "&:hover": {
                   transform: "translateY(-3px)",
-                  boxShadow: "0 12px 30px rgba(255, 107, 0, 0.2)",
-                  borderColor: "rgba(255, 107, 0, 0.5)",
+                  boxShadow: sunday
+                    ? "0 12px 30px rgba(193, 18, 31, 0.2)"
+                    : "0 12px 30px rgba(255, 107, 0, 0.2)",
+                  borderColor: sunday
+                    ? "rgba(193, 18, 31, 0.5)"
+                    : "rgba(255, 107, 0, 0.5)",
                 },
               }}
             >
