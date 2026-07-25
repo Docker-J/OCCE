@@ -81,8 +81,8 @@ const SignUpConfirmModal = ({ phone, isOpen, onClose }) => {
       <p>{phone}로 전송된 인증번호를 입력해주세요.</p>
 
       <Button
+        sx={{ width: "100%" }}
         disabled={seconds > 0}
-        sx={{ width: "90%" }}
         variant="outlined"
         onClick={onResendRequest}
       >
@@ -94,12 +94,12 @@ const SignUpConfirmModal = ({ phone, isOpen, onClose }) => {
       </div>
 
       <Button
-        sx={{ width: "90%" }}
+        sx={{ width: "100%", height: "3em" }}
         variant="outlined"
         onClick={onSubmit}
         disabled={confirmCode.length !== 6}
       >
-        Confirm
+        인증
       </Button>
     </CustomModal>
   );

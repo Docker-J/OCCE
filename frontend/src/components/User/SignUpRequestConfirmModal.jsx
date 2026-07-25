@@ -46,7 +46,7 @@ const SignUpRequestConfirmModal = ({ isOpen, onClose }) => {
       <h1 style={{ marginTop: 0 }}>전화번호 인증</h1>
 
       <PatternFormat
-        sx={{ width: "90%", mt: "1em" }}
+        sx={{ width: "100%", mt: "1em" }}
         label="전화번호"
         type="tel"
         format="(###) ###-####"
@@ -62,7 +62,7 @@ const SignUpRequestConfirmModal = ({ isOpen, onClose }) => {
       />
 
       <Button
-        sx={{ width: "90%", mt: "2em" }}
+        sx={{ width: "100%", mt: "2em", height: "3em" }}
         variant="outlined"
         onClick={handleSignUp}
         // Button only enables when exactly 10 digits are entered

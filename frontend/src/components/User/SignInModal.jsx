@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Button, Checkbox, FormControlLabel, TextField, Typography, CircularProgress } from "@mui/material";
+import {
+  Button,
+  Checkbox,
+  FormControlLabel,
+  TextField,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 import { signIn } from "../../api/user";
 import { useDispatch } from "react-redux";
 import { SET_TOKEN } from "../../store/Auth";
@@ -51,7 +58,10 @@ const SignInModal = ({ isOpen, onClose }) => {
   const handleSignIn = (data) => {
     // data.phoneNumber will contain the formatted string "(123) 456-7890"
     const PASSWORD_REGEX = /^(?=.*[\d])(?=.*[!@#$%^&*])[\w!@#$%^&*]/;
-    const isValid = data.password.length >= 8 && data.password.length <= 24 && PASSWORD_REGEX.test(data.password);
+    const isValid =
+      data.password.length >= 8 &&
+      data.password.length <= 24 &&
+      PASSWORD_REGEX.test(data.password);
 
     if (!isValid) {
       signInFail();
@@ -69,7 +79,7 @@ const SignInModal = ({ isOpen, onClose }) => {
       () => {
         setIsLoading(false);
         signInFail();
-      }
+      },
     );
   };
 
@@ -81,13 +91,14 @@ const SignInModal = ({ isOpen, onClose }) => {
   return (
     <CustomModal isOpen={isOpen} onClose={handleClose} maxWidth="400px">
       <h1 style={{ marginTop: 0 }}>로그인</h1>
-      <form style={{ width: "90%" }} onSubmit={handleSubmit(handleSignIn)}>
+      <form onSubmit={handleSubmit(handleSignIn)}>
         <Controller
           name="phoneNumber"
           control={control}
           rules={{
             required: "전화번호를 입력해주세요",
-            validate: (value) => value?.length === 10 || "올바른 전화번호 10자리를 입력해주세요",
+            validate: (value) =>
+              value?.length === 10 || "올바른 전화번호 10자리를 입력해주세요",
           }}
           render={({
             field: { onChange, name, value },
@@ -135,7 +146,11 @@ const SignInModal = ({ isOpen, onClose }) => {
               name="remember"
               control={control}
               render={({ field }) => (
-                <Checkbox {...field} checked={field.value} disabled={isLoading} />
+                <Checkbox
+                  {...field}
+                  checked={field.value}
+                  disabled={isLoading}
+                />
               )}
             />
           }
@@ -143,12 +158,16 @@ const SignInModal = ({ isOpen, onClose }) => {
         />
 
         <Button
-          sx={{ width: "100%", mt: "1em" }}
+          sx={{ width: "100%", mt: "1em", height: "3em" }}
           variant="outlined"
           type="submit"
           disabled={isLoading}
         >
-          {isLoading ? <CircularProgress size={24} color="inherit" /> : "로그인"}
+          {isLoading ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            "로그인"
+          )}
         </Button>
 
         <Typography

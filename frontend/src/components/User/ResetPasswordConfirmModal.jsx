@@ -102,12 +102,14 @@ const ResetPasswordConfirmModal = ({ phone, isOpen, onClose }) => {
     <CustomModal isOpen={isOpen} onClose={handleClose} maxWidth="400px">
       <h1 style={{ marginTop: 0, marginBottom: "0.2em" }}>비밀번호 재설정</h1>
       <p style={{ textAlign: "center", color: "#666" }}>
-        {phone}로 전송된 인증번호와<br />새로운 비밀번호를 입력해주세요.
+        {phone}로 전송된 인증번호와
+        <br />
+        새로운 비밀번호를 입력해주세요.
       </p>
 
       <Button
         disabled={seconds > 0}
-        sx={{ width: "90%", mt: "1em", mb: "1.5em" }}
+        sx={{ width: "100%", mb: "1.5em" }}
         variant="outlined"
         onClick={onResendRequest}
       >
@@ -115,10 +117,18 @@ const ResetPasswordConfirmModal = ({ phone, isOpen, onClose }) => {
       </Button>
 
       <div style={{ marginBottom: "1.5em" }}>
-        <VerificationInput autoFocus placeholder="" value={confirmCode} onChange={setConfirmCode} />
+        <VerificationInput
+          autoFocus
+          placeholder=""
+          value={confirmCode}
+          onChange={setConfirmCode}
+        />
       </div>
 
-      <form style={{ width: "90%" }} onSubmit={handleSubmit(handleConfirmReset)}>
+      <form
+        style={{ width: "100%" }}
+        onSubmit={handleSubmit(handleConfirmReset)}
+      >
         <TextField
           sx={{ width: "100%", mt: "1em" }}
           label="새 비밀번호"
@@ -155,7 +165,7 @@ const ResetPasswordConfirmModal = ({ phone, isOpen, onClose }) => {
         />
 
         <Button
-          sx={{ width: "100%", mt: "2em", mb: "1em" }}
+          sx={{ width: "100%", mt: "2em", height: "3em" }}
           variant="outlined"
           type="submit"
           disabled={!isValid || confirmCode.length !== 6}
