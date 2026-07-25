@@ -83,25 +83,12 @@ const Submenu = ({ page, scrolled }) => {
 
       {page.subpages && (
         <HoverMenu
-          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-          transformOrigin={{ vertical: "top", horizontal: "left" }}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          transformOrigin={{ vertical: "top", horizontal: "center" }}
           disableScrollLock
           {...bindMenu(popupState)}
-          PaperProps={{
-            elevation: 0,
-            sx: {
-              bgcolor: "rgba(255, 255, 255, 0.96)",
-              backdropFilter: "blur(24px)",
-              color: "#2b2b2b",
-              boxShadow: "0 12px 36px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(255, 107, 0, 0.08)",
-              border: "1px solid rgba(255, 107, 0, 0.18)",
-              borderRadius: "16px",
-              mt: 0.8,
-              py: 1,
-              minWidth: "180px",
-              overflow: "hidden",
-            },
-          }}
+          classes={{ paper: 'custom-submenu-paper' }}
+          PaperProps={{ elevation: 0 }}
         >
           {page.subpages.map((subpage) => (
             <MenuItem

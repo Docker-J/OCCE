@@ -13,6 +13,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
 import PersonIcon from "@mui/icons-material/Person";
 import MenuItem from "@mui/material/MenuItem";
+import Slide from "@mui/material/Slide";
 import FullScreenLoading from "../common/FullScreenLoading";
 
 import Submenu from "../components/Header/Submenu";
@@ -115,7 +116,7 @@ const ResponsiveAppBar = () => {
             left: { xs: "12px", md: "24px" },
             right: { xs: "12px", md: "24px" },
             width: { xs: "calc(100% - 24px)", md: "calc(100% - 48px)" },
-            borderRadius: "16px",
+            borderRadius: "24px",
           }),
           // Ensure transparency has correct bounds
           ...(!scrolled && {
@@ -216,21 +217,10 @@ const ResponsiveAppBar = () => {
                 }}
                 disableScrollLock
                 {...bindMenu(userPopupState)}
-                PaperProps={{
-                  elevation: 0,
-                  sx: {
-                    bgcolor: "rgba(255, 255, 255, 0.96)",
-                    backdropFilter: "blur(24px)",
-                    color: "#2b2b2b",
-                    boxShadow: "0 12px 36px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(255, 107, 0, 0.08)",
-                    border: "1px solid rgba(255, 107, 0, 0.18)",
-                    borderRadius: "16px",
-                    mt: 0.8,
-                    py: 1,
-                    minWidth: "160px",
-                    overflow: "hidden",
-                  },
-                }}
+                classes={{ paper: 'custom-submenu-paper' }}
+                PaperProps={{ elevation: 0 }}
+                TransitionComponent={Slide}
+                TransitionProps={{ direction: "left", timeout: 350 }}
               >
                 {(authenticated ? settings_signed : settings_not_signed).map(
                   (setting) => (
@@ -249,11 +239,12 @@ const ResponsiveAppBar = () => {
                         py: 1.2,
                         px: 2,
                         borderRadius: "10px",
+                        justifyContent: "flex-end",
                         transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
                         "&:hover": {
                           bgcolor: "rgba(255, 107, 0, 0.08)",
                           color: "#FF6B00",
-                          transform: "translateX(4px)",
+                          transform: "translateX(-4px)",
                         },
                       }}
                     >
