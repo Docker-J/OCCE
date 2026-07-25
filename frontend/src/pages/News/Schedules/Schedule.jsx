@@ -171,7 +171,8 @@ const Schedule = ({ events }) => {
                   flexDirection: "column",
                   justifyContent: "center",
                   py: 1.5,
-                  px: { xs: 1.5, sm: 2.5 }
+                  px: { xs: 1.5, sm: 2.5 },
+                  minWidth: 0,
                 }}
               >
                 {dateEvents.map((event, index) => (
