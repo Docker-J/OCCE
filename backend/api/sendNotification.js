@@ -93,11 +93,8 @@ const sendNotification = async (env, title, body, pathname) => {
       headers: {
         Urgency: "high",
       },
-      notification: {
-        title: title,
-        body: body,
-        icon: iconUrl,
-        badge: badgeUrl,
+      fcm_options: {
+        link: clickAction,
       },
     },
     apns: {
