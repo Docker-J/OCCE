@@ -1,6 +1,15 @@
 import { CircularProgress } from "@mui/material";
+import { useEffect } from "react";
 
 const FullScreenLoading = () => {
+  useEffect(() => {
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = originalStyle;
+    };
+  }, []);
+
   return (
     <div
       style={{
@@ -18,8 +27,17 @@ const FullScreenLoading = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        animation: "fadeIn 0.2s ease-out",
       }}
     >
+      <style>
+        {`
+          @keyframes fadeIn {
+            from { opacity: 0; backdrop-filter: blur(0px); }
+            to { opacity: 1; backdrop-filter: blur(8px); }
+          }
+        `}
+      </style>
       <CircularProgress sx={{ color: "#FF6B00" }} />
     </div>
   );

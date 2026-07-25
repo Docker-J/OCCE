@@ -12,6 +12,7 @@ import UserManager from "./manager/UserManager";
 import RequestManager from "./manager/RequestManager";
 import { ErrorBoundary } from "react-error-boundary";
 import FullScreenLoading from "./common/FullScreenLoading";
+import GlobalLoader from "./common/GlobalLoader";
 
 window.addEventListener("vite:preloadError", () => {
   const isRefreshed = window.sessionStorage.getItem("vite-preload-error-refreshed");
@@ -42,13 +43,6 @@ const Managers = () => {
   );
 };
 
-const GlobalLoader = () => {
-  const navigation = useNavigation();
-  if (navigation.state === "loading") {
-    return <LinearProgress sx={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 9999 }} color="primary" />;
-  }
-  return null;
-};
 
 const HeaderFooterWrapper = () => {
   return (

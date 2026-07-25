@@ -1,7 +1,6 @@
 import {
   Await,
   useLoaderData,
-  useNavigation,
   useRevalidator,
   useSearchParams,
 } from "react-router";
@@ -25,7 +24,6 @@ const Announcements = () => {
   let revalidator = useRevalidator();
 
   const data = useLoaderData();
-  const { state } = useNavigation();
   const [searchParams] = useSearchParams();
   const page = searchParams.get("page");
 
@@ -49,7 +47,15 @@ const Announcements = () => {
           </Typography>
         </div>
       </div>
-      <div className="container-wrapper" style={{ backgroundColor: "#fcfbf9", minHeight: "60vh", paddingTop: "20px", paddingBottom: "40px" }}>
+      <div
+        className="container-wrapper"
+        style={{
+          backgroundColor: "#fcfbf9",
+          minHeight: "60vh",
+          paddingTop: "20px",
+          paddingBottom: "40px",
+        }}
+      >
         <div
           className="container"
           style={{
@@ -76,8 +82,6 @@ const Announcements = () => {
                       width: "100%",
                     }}
                   >
-                    {state === "loading" && <FullScreenLoading />}
-
                     <ForumPostBoard
                       announcements={data.announcements}
                       dateFirst

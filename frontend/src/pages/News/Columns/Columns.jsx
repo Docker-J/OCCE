@@ -1,7 +1,6 @@
 import {
   Await,
   useLoaderData,
-  useNavigation,
   useRevalidator,
   useSearchParams,
 } from "react-router";
@@ -27,7 +26,6 @@ const Columns = () => {
   let revalidator = useRevalidator();
 
   const data = useLoaderData();
-  const { state } = useNavigation();
   const [searchParams] = useSearchParams();
   const page = searchParams.get("page");
 
@@ -51,7 +49,15 @@ const Columns = () => {
           </Typography>
         </div>
       </div>
-      <div className="container-wrapper" style={{ backgroundColor: "#fcfbf9", minHeight: "60vh", paddingTop: "20px", paddingBottom: "40px" }}>
+      <div
+        className="container-wrapper"
+        style={{
+          backgroundColor: "#fcfbf9",
+          minHeight: "60vh",
+          paddingTop: "20px",
+          paddingBottom: "40px",
+        }}
+      >
         <div
           className="container"
           style={{
@@ -78,8 +84,6 @@ const Columns = () => {
                       width: "100%",
                     }}
                   >
-                    {state === "loading" && <FullScreenLoading />}
-
                     <ForumPostBoard announcements={data.announcements} />
                     <BoardPagination
                       pages={Math.ceil(data.count / 10)}
