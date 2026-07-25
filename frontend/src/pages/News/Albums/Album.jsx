@@ -8,6 +8,8 @@ import AdminComponent from "../../../common/AdminComponent";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { deleteAlbum } from "../../../api/albums";
 import useSnackbar from "../../../util/useSnackbar";
+import CustomConfirmDialog from "../../../common/CustomConfirmDialog";
+import { useState } from "react";
 
 const titleBackground = {
   backgroundImage: 'url("/img/News/Albums/Albums.webp")',
@@ -22,10 +24,13 @@ const Album = () => {
   const { openSnackbar } = useSnackbar();
   const { title, images } = useLoaderData();
 
+  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState(false);
+
   const handleDeleteAlbum = async () => {
     console.log("try delete");
     await deleteAlbum(albumID);
     openSnackbar("success", "The album deleted successfully");
+    setDeleteConfirmDialog(false);
     navigate("/albums");
   };
 
@@ -73,10 +78,18 @@ const Album = () => {
         <Fab
           variant="primary"
           style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
-          onClick={handleDeleteAlbum}
+          onClick={() => setDeleteConfirmDialog(true)}
         >
           <DeleteIcon />
         </Fab>
+
+        <CustomConfirmDialog
+          title="삭제하시겠습니까?"
+          body={`"${title}" 앨범이 삭제됩니다.`}
+          isOpen={deleteConfirmDialog}
+          onClose={() => setDeleteConfirmDialog(false)}
+          onConfirm={handleDeleteAlbum}
+        />
       </AdminComponent>
     </>
   );

@@ -26,6 +26,7 @@ import FullScreenLoading from "../../../common/FullScreenLoading";
 
 import AdminComponent from "../../../common/AdminComponent";
 import useModals from "../../../util/useModal";
+import CustomConfirmDialog from "../../../common/CustomConfirmDialog";
 
 import {
   deleteAnnouncement,
@@ -35,7 +36,7 @@ import {
 import "./content-styles.css";
 
 const titleBackground = {
-  backgroundImage: 'url("/img/News/Announcements/Announcements.jpg")',
+  backgroundImage: 'url("/img/News/Announcements/Announcements.webp")',
 };
 
 const Announcement = () => {
@@ -46,10 +47,13 @@ const Announcement = () => {
   const { id, title, body, timestamp, pin } = useLoaderData();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState(false);
   const [fontSize, setFontSize] = useState(17);
 
-  const handleIncreaseFont = () => setFontSize((prev) => Math.min(prev + 2, 25));
-  const handleDecreaseFont = () => setFontSize((prev) => Math.max(prev - 2, 13));
+  const handleIncreaseFont = () =>
+    setFontSize((prev) => Math.min(prev + 2, 25));
+  const handleDecreaseFont = () =>
+    setFontSize((prev) => Math.max(prev - 2, 13));
   const handleResetFont = () => setFontSize(17);
 
   const onPin = async () => {
@@ -61,12 +65,12 @@ const Announcement = () => {
       revalidator.revalidate();
       openSnackbar(
         "success",
-        `The announcement is successfully ${pin ? "unpinned" : "pinned"}`
+        `The announcement is successfully ${pin ? "unpinned" : "pinned"}`,
       );
     } catch (error) {
       openSnackbar(
         "error",
-        "Error Occured. Please contact to the administrator."
+        "Error Occured. Please contact to the administrator.",
       );
     } finally {
       setIsLoading(false);
@@ -84,10 +88,11 @@ const Announcement = () => {
     } catch {
       openSnackbar(
         "error",
-        "Error Occured. Please contact to the administrator."
+        "Error Occured. Please contact to the administrator.",
       );
     } finally {
       setIsLoading(false);
+      setDeleteConfirmDialog(false);
     }
   };
 
@@ -113,7 +118,11 @@ const Announcement = () => {
       name: pin ? "Unpin" : "Pin",
       onClick: onPin,
     },
-    { icon: <DeleteIcon />, name: "Delete", onClick: onDelete },
+    {
+      icon: <DeleteIcon />,
+      name: "Delete",
+      onClick: () => setDeleteConfirmDialog(true),
+    },
   ];
 
   return (
@@ -136,13 +145,17 @@ const Announcement = () => {
           </Typography>
         </div>
       </div>
-      <div className="container-wrapper" style={{ backgroundColor: "#fcfbf9", minHeight: "60vh" }}>
+      <div
+        className="container-wrapper"
+        style={{ backgroundColor: "#fcfbf9", minHeight: "60vh" }}
+      >
         <Container maxWidth="md" sx={{ py: { xs: 3, md: 6 } }}>
           <Box
             sx={{
               backgroundColor: "#ffffff",
               borderRadius: "24px",
-              boxShadow: "0 10px 40px rgba(255, 107, 0, 0.05), 0 2px 10px rgba(0, 0, 0, 0.02)",
+              boxShadow:
+                "0 10px 40px rgba(255, 107, 0, 0.05), 0 2px 10px rgba(0, 0, 0, 0.02)",
               border: "1px solid rgba(255, 107, 0, 0.1)",
               p: { xs: 2.5, sm: 4, md: 5 },
               display: "flex",
@@ -153,7 +166,9 @@ const Announcement = () => {
             {pin === 1 && (
               <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
                 <Chip
-                  icon={<PushPinIcon style={{ color: "#FF6B00", fontSize: 16 }} />}
+                  icon={
+                    <PushPinIcon style={{ color: "#FF6B00", fontSize: 16 }} />
+                  }
                   label="고정 공지"
                   sx={{
                     backgroundColor: "rgba(255, 107, 0, 0.08)",
@@ -199,7 +214,10 @@ const Announcement = () => {
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <CalendarTodayIcon sx={{ fontSize: 16, color: "#FF6B00" }} />
-                <Typography variant="body2" sx={{ color: "#666", fontWeight: 500 }}>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#666", fontWeight: 500 }}
+                >
                   {format(new Date(timestamp), "yyyy년 M월 d일")}
                 </Typography>
               </Box>
@@ -219,7 +237,12 @@ const Announcement = () => {
               >
                 <Typography
                   variant="caption"
-                  sx={{ color: "#777", fontWeight: 600, mr: 0.5, fontSize: "12px" }}
+                  sx={{
+                    color: "#777",
+                    fontWeight: 600,
+                    mr: 0.5,
+                    fontSize: "12px",
+                  }}
                 >
                   글꼴 크기
                 </Typography>
@@ -306,6 +329,14 @@ const Announcement = () => {
                   />
                 ))}
               </SpeedDial>
+
+              <CustomConfirmDialog
+                title="삭제하시겠습니까?"
+                body={`"${title}" 공지사항이 삭제됩니다.`}
+                isOpen={deleteConfirmDialog}
+                onClose={() => setDeleteConfirmDialog(false)}
+                onConfirm={onDelete}
+              />
             </AdminComponent>
           </Box>
         </Container>
@@ -328,7 +359,8 @@ const Announcement = () => {
             py: 1,
             borderRadius: "30px",
             border: "1px solid rgba(255, 107, 0, 0.25)",
-            boxShadow: "0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(255, 107, 0, 0.15)",
+            boxShadow:
+              "0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(255, 107, 0, 0.15)",
             textTransform: "none",
             transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
             "&:hover": {

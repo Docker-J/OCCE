@@ -1,6 +1,6 @@
 import { Box, IconButton, Modal } from "@mui/material";
-
 import CloseIcon from "@mui/icons-material/Close";
+import "./CustomDialog.css";
 
 const style = {
   position: "absolute",
@@ -8,11 +8,7 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: "80vw",
-  bgcolor: "#ffffff",
-  boxShadow: 24,
-  borderRadius: "0.5em",
-  p: 1,
-  py: 5,
+  maxWidth: "500px",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
@@ -25,8 +21,14 @@ const CustomModal = ({ isOpen, onClose, children, ...props }) => {
     onClose();
   };
   return (
-    <Modal open={isOpen} onClose={handleClose}>
-      <Box sx={{ ...style, ...props }}>
+    <Modal 
+      open={isOpen} 
+      onClose={handleClose}
+      slotProps={{
+        backdrop: { className: 'custom-dialog-backdrop' }
+      }}
+    >
+      <Box className="custom-modal-box" sx={{ ...style, ...props }}>
         <IconButton
           onClick={onClose}
           sx={{ position: "absolute", top: 8, right: 8 }}

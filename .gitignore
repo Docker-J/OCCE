@@ -25,3 +25,7 @@ yarn-error.log*
 .wrangler
 .dev.vars
 backend/church-4385c-ceedf27e8d20.json
+
+/.agents
+db_backup.sql
+schema.sql

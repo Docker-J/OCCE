@@ -45,8 +45,10 @@ const Column = () => {
 
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState(false);
 
-  const handleIncreaseFont = () => setFontSize((prev) => Math.min(prev + 2, 25));
-  const handleDecreaseFont = () => setFontSize((prev) => Math.max(prev - 2, 13));
+  const handleIncreaseFont = () =>
+    setFontSize((prev) => Math.min(prev + 2, 25));
+  const handleDecreaseFont = () =>
+    setFontSize((prev) => Math.max(prev - 2, 13));
   const handleResetFont = () => setFontSize(17);
 
   const onDelete = async () => {
@@ -60,7 +62,7 @@ const Column = () => {
     } catch {
       openSnackbar(
         "error",
-        "Error Occured. Please contact to the administrator."
+        "Error Occured. Please contact to the administrator.",
       );
     } finally {
       setIsLoading(false);
@@ -112,13 +114,17 @@ const Column = () => {
           </Typography>
         </div>
       </div>
-      <div className="container-wrapper" style={{ backgroundColor: "#fcfbf9", minHeight: "60vh" }}>
+      <div
+        className="container-wrapper"
+        style={{ backgroundColor: "#fcfbf9", minHeight: "60vh" }}
+      >
         <Container maxWidth="md" sx={{ py: { xs: 3, md: 6 } }}>
           <Box
             sx={{
               backgroundColor: "#ffffff",
               borderRadius: "24px",
-              boxShadow: "0 10px 40px rgba(255, 107, 0, 0.05), 0 2px 10px rgba(0, 0, 0, 0.02)",
+              boxShadow:
+                "0 10px 40px rgba(255, 107, 0, 0.05), 0 2px 10px rgba(0, 0, 0, 0.02)",
               border: "1px solid rgba(255, 107, 0, 0.1)",
               p: { xs: 2.5, sm: 4, md: 5 },
               display: "flex",
@@ -158,7 +164,10 @@ const Column = () => {
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <CalendarTodayIcon sx={{ fontSize: 16, color: "#FF6B00" }} />
-                <Typography variant="body2" sx={{ color: "#666", fontWeight: 500 }}>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#666", fontWeight: 500 }}
+                >
                   {format(new Date(timestamp), "yyyy년 M월 d일")}
                 </Typography>
               </Box>
@@ -178,7 +187,12 @@ const Column = () => {
               >
                 <Typography
                   variant="caption"
-                  sx={{ color: "#777", fontWeight: 600, mr: 0.5, fontSize: "12px" }}
+                  sx={{
+                    color: "#777",
+                    fontWeight: 600,
+                    mr: 0.5,
+                    fontSize: "12px",
+                  }}
                 >
                   글꼴 크기
                 </Typography>
@@ -267,7 +281,7 @@ const Column = () => {
 
               <CustomConfirmDialog
                 title="삭제하시겠습니까?"
-                body={`${title} 목회칼럼이 삭제됩니다`}
+                body={`"${title}" 목회칼럼이 삭제됩니다`}
                 isOpen={deleteConfirmDialog}
                 onClose={() => setDeleteConfirmDialog(false)}
                 onConfirm={onDelete}
@@ -294,7 +308,8 @@ const Column = () => {
             py: 1,
             borderRadius: "30px",
             border: "1px solid rgba(255, 107, 0, 0.25)",
-            boxShadow: "0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(255, 107, 0, 0.15)",
+            boxShadow:
+              "0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(255, 107, 0, 0.15)",
             textTransform: "none",
             transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
             "&:hover": {
