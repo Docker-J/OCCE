@@ -7,7 +7,7 @@ import "./App.css";
 import ResponsiveAppBar from "./header/ResponsiveAppBar";
 
 import Footer from "./header/Footer";
-import NotificationManager from "./manager/NotificationManager";
+import { NotificationProvider } from "./context/NotificationContext";
 import UserManager from "./manager/UserManager";
 import RequestManager from "./manager/RequestManager";
 import { ErrorBoundary } from "react-error-boundary";
@@ -37,7 +37,6 @@ const Managers = () => {
   return (
     <>
       <UserManager />
-      <NotificationManager />
       <RequestManager />
     </>
   );
@@ -53,7 +52,7 @@ const GlobalLoader = () => {
 
 const HeaderFooterWrapper = () => {
   return (
-    <>
+    <NotificationProvider>
       <GlobalLoader />
       <Managers />
       <div
@@ -76,13 +75,13 @@ const HeaderFooterWrapper = () => {
         </div>
         <Footer />
       </div>
-    </>
+    </NotificationProvider>
   );
 };
 
 const HeaderWrapper = () => {
   return (
-    <>
+    <NotificationProvider>
       <GlobalLoader />
       <Managers />
       <div
@@ -104,7 +103,7 @@ const HeaderWrapper = () => {
           <Outlet />
         </div>
       </div>
-    </>
+    </NotificationProvider>
   );
 };
 

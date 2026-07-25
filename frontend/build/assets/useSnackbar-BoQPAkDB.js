@@ -1,0 +1,1 @@
+import{a as e}from"./rolldown-runtime-CNC7AqOf.js";import{O as t}from"./ckeditor-DKI7H046.js";var n=e(t()),r=(0,n.createContext)({}),i=(0,n.createContext)({open:()=>{},close:()=>{}});function a(){let{open:e,close:t}=(0,n.use)(i);return{openSnackbar:(t,n,r)=>{e(t,n,r)},closeSnackbar:()=>{t()}}}export{i as n,r,a as t};

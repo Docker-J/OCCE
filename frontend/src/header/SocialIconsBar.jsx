@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
 import YouTubeIcon from "@mui/icons-material/YouTube";
@@ -7,36 +6,17 @@ import EmailIcon from "@mui/icons-material/Email";
 import { Avatar } from "@mui/material";
 import useModals from "../util/useModal";
 import CustomConfirmDialog from "../common/CustomConfirmDialog";
+import { useNotification } from "../context/NotificationContext";
 
 const SocialIconsBar = () => {
   const { openModal } = useModals();
-  const [enabled, setEnabled] = useState(
-    () =>
-      "Notification" in window &&
-      Notification.permission === "granted" &&
-      localStorage.getItem("notifications_opt_out") !== "true"
-  );
-
-  useEffect(() => {
-    const handleStateChange = () => {
-      setEnabled(
-        "Notification" in window &&
-        Notification.permission === "granted" &&
-        localStorage.getItem("notifications_opt_out") !== "true"
-      );
-    };
-
-    window.addEventListener("notification-state-changed", handleStateChange);
-    return () => {
-      window.removeEventListener("notification-state-changed", handleStateChange);
-    };
-  }, []);
+  const { enabled, setupPush, disablePush } = useNotification();
 
   const handleNotificationClick = () => {
     const isDefault = !("Notification" in window) || Notification.permission === "default";
 
     if (isDefault) {
-      window.dispatchEvent(new CustomEvent("trigger-notification-setup"));
+      setupPush();
       return;
     }
 
@@ -45,7 +25,7 @@ const SocialIconsBar = () => {
         title: "알림 수신 거부",
         body: "정말로 알림 수신을 거부하시겠습니까? 더 이상 새 소식 알림을 받으실 수 없습니다.",
         onConfirm: () => {
-          window.dispatchEvent(new CustomEvent("trigger-notification-disable"));
+          disablePush();
         },
       });
     } else {
@@ -53,7 +33,7 @@ const SocialIconsBar = () => {
         title: "알림 수신 동의",
         body: "OCCE 새 소식 알림을 받으시겠습니까?",
         onConfirm: () => {
-          window.dispatchEvent(new CustomEvent("trigger-notification-setup"));
+          setupPush();
         },
       });
     }
