@@ -23,7 +23,6 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
         flexDirection: "column",
         width: "100%",
         maxWidth: "800px",
-        padding: "0 16px",
       }}
     >
       {posts.map((post, _) => (
@@ -36,9 +35,10 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
               display: "flex",
               textDecoration: "none",
               bgcolor: post?.pin ? "rgba(255, 107, 0, 0.1)" : "#ffffff",
-              my: 1.5,
+              mb: 3,
               borderRadius: "24px",
-              boxShadow: "0 4px 20px rgba(255, 107, 0, 0.12), 0 1px 10px rgba(0, 0, 0, 0.06)",
+              boxShadow:
+                "0 4px 20px rgba(255, 107, 0, 0.12), 0 1px 10px rgba(0, 0, 0, 0.06)",
               border: "1px solid rgba(255, 107, 0, 0.3)",
               transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
               "&:hover": {
@@ -74,7 +74,10 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
                 >
                   {format(new Date(post.timestamp), "MMM dd")}
                 </Typography>
-                <Typography variant="caption" sx={{ fontWeight: 600, color: "rgba(255, 107, 0, 0.7)" }}>
+                <Typography
+                  variant="caption"
+                  sx={{ fontWeight: 600, color: "rgba(255, 107, 0, 0.7)" }}
+                >
                   {format(new Date(post.timestamp), "yyyy")}
                 </Typography>
               </Stack>
@@ -141,8 +144,12 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
                 >
                   {getText(post.body)}
                 </p>
-                {post?.images && <PhotoOutlinedIcon sx={{ color: "#b0b0b0", fontSize: 20 }} />}
-                {post?.video && <MovieOutlinedIcon sx={{ color: "#b0b0b0", fontSize: 20 }} />}
+                {post?.images && (
+                  <PhotoOutlinedIcon sx={{ color: "#b0b0b0", fontSize: 20 }} />
+                )}
+                {post?.video && (
+                  <MovieOutlinedIcon sx={{ color: "#b0b0b0", fontSize: 20 }} />
+                )}
               </Stack>
             </Box>
 
@@ -172,7 +179,10 @@ const ForumPostBoard = ({ announcements: posts, dateFirst }) => {
                 >
                   {format(new Date(post.timestamp), "MMM dd")}
                 </Typography>
-                <Typography variant="caption" sx={{ fontWeight: 600, color: "rgba(255, 107, 0, 0.7)" }}>
+                <Typography
+                  variant="caption"
+                  sx={{ fontWeight: 600, color: "rgba(255, 107, 0, 0.7)" }}
+                >
                   {format(new Date(post.timestamp), "yyyy")}
                 </Typography>
               </Stack>
