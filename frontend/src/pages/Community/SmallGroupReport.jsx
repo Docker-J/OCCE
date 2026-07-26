@@ -32,7 +32,8 @@ import { getGardensAndMembers } from "../../api/attendance.js";
 import { useSearchParams, useSubmit, useActionData, useNavigation } from "react-router";
 import axios from "axios";
 import { format } from "date-fns";
-import ButtonDatePicker from "../../common/ButtonDatePicker";
+import { DatePicker, TimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 const titleBackground = {
   backgroundImage: 'url("/img/Community/SmallGroup.webp")',
@@ -104,7 +105,11 @@ const SmallGroupReport = () => {
   };
 
   const [gatheringDate, setGatheringDate] = useState(new Date());
-  const [gatheringTime, setGatheringTime] = useState("19:30");
+  const [gatheringTime, setGatheringTime] = useState(() => {
+    const d = new Date();
+    d.setHours(19, 30, 0, 0);
+    return d;
+  });
   const [gatheringLocation, setGatheringLocation] = useState("");
   const [gatheringNotes, setGatheringNotes] = useState("");
 
@@ -281,7 +286,7 @@ const SmallGroupReport = () => {
     if (reportType === "gathering") {
       const payload = {
         date: format(gatheringDate, "yyyy-MM-dd"),
-        time: gatheringTime,
+        time: format(gatheringTime, "HH:mm"),
         location: gatheringLocation,
         notes: gatheringNotes,
         gardenName: selectedGarden,
@@ -609,33 +614,28 @@ const SmallGroupReport = () => {
                         </Grid>
 
                         {/* Gathering Date */}
-                        <Grid
-                          size={{ xs: 12, sm: 6 }}
-                          sx={{ display: "flex", flexDirection: "column" }}
-                        >
-                          <Typography
-                            variant="caption"
-                            sx={{ color: "#666", mb: 0.5, fontWeight: 600 }}
-                          >
-                            모임 날짜
-                          </Typography>
-                          <ButtonDatePicker
-                            value={gatheringDate}
-                            onChange={setGatheringDate}
-                            sx={{ width: "100%" }}
-                          />
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                          <LocalizationProvider dateAdapter={AdapterDateFns}>
+                            <DatePicker
+                              label="모임 날짜"
+                              value={gatheringDate}
+                              onChange={setGatheringDate}
+                              sx={{ width: "100%" }}
+                              format="yyyy. MM. dd."
+                            />
+                          </LocalizationProvider>
                         </Grid>
 
                         {/* Gathering Time */}
                         <Grid size={{ xs: 12, sm: 6 }}>
-                          <TextField
-                            fullWidth
-                            label="모임 시간"
-                            type="time"
-                            value={gatheringTime}
-                            onChange={(e) => setGatheringTime(e.target.value)}
-                            slotProps={{ inputLabel: { shrink: true } }}
-                          />
+                          <LocalizationProvider dateAdapter={AdapterDateFns}>
+                            <TimePicker
+                              label="모임 시간"
+                              value={gatheringTime}
+                              onChange={setGatheringTime}
+                              sx={{ width: "100%" }}
+                            />
+                          </LocalizationProvider>
                         </Grid>
 
                         {/* Gathering Location */}
