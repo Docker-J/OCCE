@@ -36,11 +36,14 @@ const NewComersTimeline = () => {
           <TimelineDot variant="outlined" color="primary">
             <EditNoteIcon color="primary" />
           </TimelineDot>
-          <TimelineConnector sx={{ height: "30px" }} />
+          <TimelineConnector sx={{ height: "45px" }} />
         </TimelineSeparator>
-        <TimelineContent sx={{ py: "18px" }}>
+        <TimelineContent sx={{ py: "24px" }}>
           <Typography sx={{
-            fontWeight: 600
+            fontWeight: 700,
+            fontSize: "1.05rem",
+            color: "#2b2b2b",
+            letterSpacing: "-0.5px"
           }}>방문카드 작성</Typography>
         </TimelineContent>
       </TimelineItem>
@@ -49,17 +52,20 @@ const NewComersTimeline = () => {
           <TimelineDot variant="outlined" color="primary">
             <HowToRegIcon color="primary" />
           </TimelineDot>
-          <TimelineConnector sx={{ height: "30px" }} />
+          <TimelineConnector sx={{ height: "45px" }} />
         </TimelineSeparator>
-        <TimelineContent sx={{ py: "18px" }}>
+        <TimelineContent sx={{ py: "24px" }}>
           <Typography
             onMouseEnter={(e) => handlePopoverOpen(e, 1)}
             onMouseLeave={handlePopoverClose}
             sx={{
-              fontWeight: 600
+              fontWeight: 700,
+              fontSize: "1.05rem",
+              color: "#2b2b2b",
+              letterSpacing: "-0.5px"
             }}
           >
-            등록 <HelpOutlineIcon fontSize="small" color="primary" />
+            등록 <HelpOutlineIcon fontSize="small" color="primary" sx={{ verticalAlign: "middle", ml: 0.5 }} />
           </Typography>
 
           <Popover
@@ -92,17 +98,20 @@ const NewComersTimeline = () => {
           <TimelineDot variant="outlined" color="primary">
             <SchoolIcon color="primary" />
           </TimelineDot>
-          <TimelineConnector sx={{ height: "30px" }} />
+          <TimelineConnector sx={{ height: "45px" }} />
         </TimelineSeparator>
-        <TimelineContent sx={{ py: "18px" }}>
+        <TimelineContent sx={{ py: "24px" }}>
           <Typography
             onMouseEnter={(e) => handlePopoverOpen(e, 2)}
             onMouseLeave={handlePopoverClose}
             sx={{
-              fontWeight: 600
+              fontWeight: 700,
+              fontSize: "1.05rem",
+              color: "#2b2b2b",
+              letterSpacing: "-0.5px"
             }}
           >
-            새가족 교육 <HelpOutlineIcon fontSize="small" color="primary" />
+            새가족 교육 <HelpOutlineIcon fontSize="small" color="primary" sx={{ verticalAlign: "middle", ml: 0.5 }} />
           </Typography>
         </TimelineContent>
         <Popover
@@ -134,11 +143,14 @@ const NewComersTimeline = () => {
           <TimelineDot variant="outlined" color="primary">
             <LocalFloristIcon color="primary" />
           </TimelineDot>
-          <TimelineConnector sx={{ height: "30px" }} />
+          <TimelineConnector sx={{ height: "45px" }} />
         </TimelineSeparator>
-        <TimelineContent sx={{ py: "18px" }}>
+        <TimelineContent sx={{ py: "24px" }}>
           <Typography sx={{
-            fontWeight: 600
+            fontWeight: 700,
+            fontSize: "1.05rem",
+            color: "#2b2b2b",
+            letterSpacing: "-0.5px"
           }}>소그룹(정원) 배치</Typography>
         </TimelineContent>
       </TimelineItem>
@@ -148,9 +160,12 @@ const NewComersTimeline = () => {
             <CelebrationIcon color="primary" />
           </TimelineDot>
         </TimelineSeparator>
-        <TimelineContent sx={{ py: "18px" }}>
+        <TimelineContent sx={{ py: "24px" }}>
           <Typography sx={{
-            fontWeight: 600
+            fontWeight: 700,
+            fontSize: "1.05rem",
+            color: "#2b2b2b",
+            letterSpacing: "-0.5px"
           }}>새가족 환영회</Typography>
         </TimelineContent>
       </TimelineItem>
