@@ -52,15 +52,11 @@ const ForumPostBoard = ({
               overflow: "hidden",
               transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
               "&:hover": {
-                transform: "translateY(-4px) scale(1.01)",
-                boxShadow: `0 16px 40px ${themeBg}, 0 4px 12px rgba(0,0,0,0.05)`,
-                bgcolor: "rgba(255, 255, 255, 0.95)",
-                borderColor: themeColor,
+                transform: "translateY(-2px)",
+                boxShadow: "0 6px 24px rgba(0, 0, 0, 0.06)",
+                borderColor: "rgba(0, 0, 0, 0.12)",
                 "& .post-title": {
                   color: themeColor,
-                },
-                "& .hover-bar": {
-                  width: "100%",
                 }
               },
             }}
@@ -144,19 +140,7 @@ const ForumPostBoard = ({
               {getText(post.body)}
             </Typography>
             
-            {/* Hover Indicator Effect */}
-            <Box 
-              className="hover-bar"
-              sx={{
-                position: "absolute",
-                left: 0,
-                bottom: 0,
-                height: "4px",
-                width: "0%",
-                bgcolor: themeColor,
-                transition: "width 0.4s ease",
-              }}
-            />
+
           </Card>
         </div>
       ))}
