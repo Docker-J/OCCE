@@ -108,6 +108,7 @@ const Youth = () => {
           backgroundColor: "#fcfbf9",
           paddingBottom: "100px",
           paddingTop: "50px",
+          overflowX: "hidden"
         }}
       >
         <div

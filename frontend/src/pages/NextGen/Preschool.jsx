@@ -92,7 +92,7 @@ const Preschool = () => {
         `}
       </style>
 
-      <div className="container-wrapper" style={{ backgroundColor: "#fcfbf9", paddingBottom: "100px", paddingTop: "50px" }}>
+      <div className="container-wrapper" style={{ backgroundColor: "#fcfbf9", paddingBottom: "100px", paddingTop: "50px", overflowX: "hidden" }}>
         <div className="container" style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           
           {/* 1. Dashboard Ribbon */}
