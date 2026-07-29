@@ -84,7 +84,12 @@ const Columns = () => {
                       width: "100%",
                     }}
                   >
-                    <ForumPostBoard announcements={data.announcements} />
+                    <ForumPostBoard 
+                      announcements={data.announcements} 
+                      themeColor="#1a365d"
+                      themeBg="rgba(26, 54, 93, 0.08)"
+                      themeHover="rgba(26, 54, 93, 0.15)"
+                    />
                     <BoardPagination
                       pages={Math.ceil(data.count / 10)}
                       currentPage={page}

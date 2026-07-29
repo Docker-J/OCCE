@@ -77,7 +77,6 @@ const Announcements = () => {
             >
               <ForumPostBoard
                 announcements={data.announcements}
-                dateFirst
               />
               <BoardPagination
                 pages={Math.ceil(data.count / 10)}
