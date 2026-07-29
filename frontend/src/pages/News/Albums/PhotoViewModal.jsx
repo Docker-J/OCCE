@@ -17,8 +17,7 @@ const PhotoViewModal = ({ isOpen, onClose, photos, initialIndex }) => {
   const settings = {
     customPaging: (i) => {
       return (
-        <img
-          alt=""
+        <img loading="lazy" alt=""
           src={`https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${
             Object.values(photos)[i]
           }/MeditationON`}
@@ -51,8 +50,7 @@ const PhotoViewModal = ({ isOpen, onClose, photos, initialIndex }) => {
     >
       <Slider {...settings}>
         {Object.values(photos).map((photo) => (
-          <img
-            key={photo}
+          <img loading="lazy" key={photo}
             alt="church"
             src={`https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${photo}/MeditationON`}
           />

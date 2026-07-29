@@ -186,8 +186,7 @@ const Preschool = () => {
               <Slider {...sliderSettings}>
                 {imgs.map((img) => (
                   <Box key={uuidv4()} sx={{ position: "relative", paddingTop: "70%", borderRadius: "24px", overflow: "hidden", boxShadow: "0 12px 32px rgba(0,0,0,0.08)" }}>
-                    <img 
-                      src={img.src} 
+                    <img loading="lazy" src={img.src} 
                       alt="Preschool Activity" 
                       style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.5s ease" }}
                       onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}

@@ -124,7 +124,7 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
                 <Slider {...settings()}>
                   {imgs.map((img) => (
                     <div className={Styles["img-container"]} key={uuidv4()}>
-                      <img src={img.src} alt="" />
+                      <img loading="lazy" src={img.src} alt="" />
                     </div>
                   ))}
                 </Slider>

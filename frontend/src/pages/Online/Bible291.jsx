@@ -104,8 +104,7 @@ const Bible291 = () => {
           >
             <Slider {...sliderSettings}>
               <div>
-                <img
-                  style={{
+                <img loading="lazy" style={{
                     width: "100%",
                     display: "block",
                     borderRadius: "12px",
@@ -115,8 +114,7 @@ const Bible291 = () => {
                 />
               </div>
               <div>
-                <img
-                  style={{
+                <img loading="lazy" style={{
                     width: "100%",
                     display: "block",
                     borderRadius: "12px",
@@ -126,8 +124,7 @@ const Bible291 = () => {
                 />
               </div>
               <div>
-                <img
-                  style={{
+                <img loading="lazy" style={{
                     width: "100%",
                     display: "block",
                     borderRadius: "12px",
@@ -137,8 +134,7 @@ const Bible291 = () => {
                 />
               </div>
               <div>
-                <img
-                  style={{
+                <img loading="lazy" style={{
                     width: "100%",
                     display: "block",
                     borderRadius: "12px",

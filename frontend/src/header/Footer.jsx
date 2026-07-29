@@ -16,8 +16,7 @@ const Footer = () => {
       }}
     >
       <Link to="/">
-        <img
-          alt="Footer Logo"
+        <img loading="lazy" alt="Footer Logo"
           src="/img/HeaderLogoBW.png"
           style={{ width: "196.22px", height: "40px" }}
         />

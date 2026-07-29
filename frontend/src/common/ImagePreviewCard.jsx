@@ -95,8 +95,7 @@ const ImagePreviewCard = ({
         if (typeof setCoverImage === "function") setCoverImage(index);
       }}
     >
-      <img
-        src={image}
+      <img loading="lazy" src={image}
         alt="preview"
         style={{
           width: "auto",

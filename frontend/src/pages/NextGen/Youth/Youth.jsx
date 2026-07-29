@@ -384,8 +384,7 @@ const Youth = () => {
                       boxShadow: "0 12px 32px rgba(0,0,0,0.08)",
                     }}
                   >
-                    <img
-                      src={img.src}
+                    <img loading="lazy" src={img.src}
                       alt="Youth Activity"
                       style={{
                         position: "absolute",
