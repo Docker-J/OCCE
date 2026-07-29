@@ -118,11 +118,8 @@ const ForumPostBoard = ({
                 color: "#2b2b2b",
                 mb: 1.5,
                 lineHeight: 1.3,
-                wordBreak: "keep-all",
                 transition: "color 0.3s ease",
-                display: "-webkit-box",
-                WebkitBoxOrient: "vertical",
-                WebkitLineClamp: "2",
+                whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
               }}
