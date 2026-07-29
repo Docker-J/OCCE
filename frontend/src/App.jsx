@@ -24,15 +24,8 @@ window.addEventListener("vite:preloadError", () => {
   }
 });
 
-function ErrorFallback({ error, resetErrorBoundary }) {
-  return (
-    <div role="alert">
-      <p>Something went wrong:</p>
-      <pre>{error.message}</pre>
-      <button onClick={resetErrorBoundary}>Try again</button>
-    </div>
-  );
-}
+import ErrorFallback from "./pages/Error/ErrorFallback";
+import NotFound from "./pages/Error/NotFound";
 
 const Managers = () => {
   return (
@@ -273,6 +266,10 @@ const router = createBrowserRouter([
             lazy: async () => ({ Component: (await import("./pages/NextGen/YoungAdult")).default }),
           },
         ],
+      },
+      {
+        path: "*",
+        element: <NotFound />,
       },
     ],
   },
