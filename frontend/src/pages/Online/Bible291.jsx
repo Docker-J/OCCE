@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import { Typography, Box } from "@mui/material";
 import YoutubePlaylist from "./../../components/Online/YoutubePlaylist";
 import { useLoaderData } from "react-router";
 
@@ -55,9 +55,20 @@ const Bible291 = () => {
           {match ? (
             <>
               <Typography variant="h5" sx={{
-                fontWeight: 830
+                fontWeight: 830, lineHeight: 1.6
               }}>
-                오늘의 1독 말씀은 "{`${match.read}`}" 입니다.
+                오늘의 1독 말씀은 <br />
+                <Box component="span" sx={{ 
+                  color: "primary.main", 
+                  backgroundColor: "rgba(255, 107, 0, 0.1)", 
+                  px: 1.5, 
+                  py: 0.5, 
+                  borderRadius: 1,
+                  display: "inline-block",
+                  mt: 1
+                }}>
+                  "{match.read}"
+                </Box> 입니다.
               </Typography>
               <br />
               <YoutubePlaylist
