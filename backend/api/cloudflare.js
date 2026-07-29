@@ -1,12 +1,12 @@
 /**
  * Purges specific Cloudflare Cache prefixes.
- * Requires CF_ZONE_ID and CF_API_TOKEN to be set in the environment variables (c.env).
+ * Requires CLOUDFLARE_ZONE_ID and CLOUDFLARE_API_KEY to be set in the environment variables (c.env).
  * @param {any} env - Hono environment variables
  * @param {string[]} prefixes - Array of prefixes to purge (e.g., ["oncce.ca/api/announcements"])
  */
 export const purgeCache = async (env, prefixes) => {
-  if (!env.CF_ZONE_ID || !env.CF_API_TOKEN) {
-    console.warn("⚠️ CF_ZONE_ID or CF_API_TOKEN is missing. Skipping cache purge.");
+  if (!env.CLOUDFLARE_ZONE_ID || !env.CLOUDFLARE_API_KEY) {
+    console.warn("⚠️ CLOUDFLARE_ZONE_ID or CLOUDFLARE_API_KEY is missing. Skipping cache purge.");
     return;
   }
 
@@ -17,10 +17,10 @@ export const purgeCache = async (env, prefixes) => {
   console.log(`🧹 Triggering Cloudflare Cache Purge for prefixes: ${prefixes.join(", ")}`);
 
   try {
-    const res = await fetch(`https://api.cloudflare.com/client/v4/zones/${env.CF_ZONE_ID}/purge_cache`, {
+    const res = await fetch(`https://api.cloudflare.com/client/v4/zones/${env.CLOUDFLARE_ZONE_ID}/purge_cache`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${env.CF_API_TOKEN}`,
+        "Authorization": `Bearer ${env.CLOUDFLARE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ prefixes }),
