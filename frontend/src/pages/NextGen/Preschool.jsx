@@ -92,6 +92,7 @@ const Preschool = () => {
           }
           .slick-slide { padding: 0 12px; }
           .slick-list { margin: 0 -12px; }
+          .slick-default-dots li.slick-active span { background-color: #558b2f !important; }
         `}
       </style>
 

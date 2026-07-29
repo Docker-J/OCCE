@@ -102,6 +102,7 @@ const Youth = () => {
           }
           .slick-slide { padding: 0 12px; }
           .slick-list { margin: 0 -12px; }
+          .slick-default-dots li.slick-active span { background-color: #455a64 !important; }
         `}
       </style>
 

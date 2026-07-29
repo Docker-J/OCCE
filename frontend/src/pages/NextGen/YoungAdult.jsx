@@ -105,6 +105,7 @@ const YoungAdult = () => {
           .animate-fade {
             animation: slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
           }
+          .slick-default-dots li.slick-active span { background-color: #c62828 !important; }
         `}
       </style>
 

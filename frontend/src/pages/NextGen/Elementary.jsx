@@ -106,6 +106,7 @@ const Elementary = () => {
           }
           .slick-slide { padding: 0 12px; }
           .slick-list { margin: 0 -12px; }
+          .slick-default-dots li.slick-active span { background-color: #5d4037 !important; }
         `}
       </style>
 
