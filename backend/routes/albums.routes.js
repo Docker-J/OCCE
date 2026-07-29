@@ -10,8 +10,8 @@ import {
 
 const router = new Hono();
 
-router.get("/", cache({ cacheName: "occe-api", cacheControl: "max-age=60" }), getAlbumsController);
-router.get("/:id", cache({ cacheName: "occe-api", cacheControl: "max-age=60" }), getAlbumController);
+router.get("/", cache({ cacheName: "occe-api", cacheControl: "max-age=86400" }), getAlbumsController);
+router.get("/:id", cache({ cacheName: "occe-api", cacheControl: "max-age=86400" }), getAlbumController);
 router.delete("/:id", authStaff, deleteAlbumController);
 router.post("/", authStaff, postAlbumController);
 

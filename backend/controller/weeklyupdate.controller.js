@@ -1,5 +1,6 @@
 import sendNotification from "./../api/sendNotification.js";
 import { format, subMonths } from "date-fns";
+import { purgeCache } from "../api/cloudflare.js";
 
 async function getMostRecentFile(env) {
   const bucket = env.weeklyupdate;
@@ -151,6 +152,7 @@ export const uploadWeeklyUpdateController = async (c) => {
     )
   );
 
+  await purgeCache(c.env);
   return c.text(date);
 };
 
@@ -199,5 +201,6 @@ export const deleteWeeklyUpdateController = async (c) => {
     }
   }
   
+  await purgeCache(c.env);
   return c.text(newRecentDate || "");
 };

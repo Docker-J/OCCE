@@ -1,6 +1,7 @@
 import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { getDocClient } from "../api/dynamodb.js";
 import { uploadImage } from "./images.controller.js";
+import { purgeCache } from "../api/cloudflare.js";
 
 const TABLENAME = "MeditationON";
 const PAGE_SIZE = 12;
@@ -103,5 +104,6 @@ export const postMeditationONController = async (c) => {
   const response = await docClient.send(command);
   console.log(response);
 
+  await purgeCache(c.env);
   return c.body(null, 201);
 };

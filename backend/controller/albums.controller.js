@@ -1,6 +1,7 @@
 import { DeleteCommand, PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { getDocClient } from "../api/dynamodb.js";
 import { deleteImages, uploadImage } from "./images.controller.js";
+import { purgeCache } from "../api/cloudflare.js";
 
 const TABLENAME = "Albums";
 const PAGE_SIZE = 12;
@@ -108,6 +109,7 @@ export const postAlbumController = async (c) => {
   const response = await docClient.send(command);
   console.log(response);
 
+  await purgeCache(c.env);
   return c.body(null, 201);
 };
 
@@ -149,5 +151,6 @@ export const deleteAlbumController = async (c) => {
 
   await docClient.send(deleteAlbumCommand);
 
+  await purgeCache(c.env);
   return c.body(null, 200);
 };
