@@ -1,0 +1,1 @@
+import{a as e}from"./rolldown-runtime-CNC7AqOf.js";import{O as t}from"./ckeditor-DKI7H046.js";import{T as n,z as r}from"./createSimplePaletteValueFilter-JVTA6G-l.js";var i=e(t(),1);function a(e){return Object.keys(e).length===0}function o(e=null){let t=i.useContext(r);return!t||a(t)?e:t}var s=n();function c(e=s){return o(e)}export{o as n,c as t};

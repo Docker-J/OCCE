@@ -1,0 +1,1 @@
+import{a as e}from"./rolldown-runtime-CNC7AqOf.js";import{O as t}from"./ckeditor-DKI7H046.js";var n=e(t(),1),r=typeof window<`u`?n.useLayoutEffect:n.useEffect;export{r as t};

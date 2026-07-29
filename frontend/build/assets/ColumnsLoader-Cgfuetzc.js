@@ -1,0 +1,1 @@
+import{b as e}from"./reactVendor-By8zZfk0.js";import{t}from"./axios-C0bYvdnr.js";async function n({request:n}){let r=new URL(n.url).searchParams.get(`page`);return r===null?e(`?page=1`):{announcementsData:t.get(`/api/columns?page=${r}`)}}export{n as loader};
