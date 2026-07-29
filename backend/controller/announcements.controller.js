@@ -4,53 +4,33 @@ import { executeD1Query } from "../api/d1.js";
 const TABLENAME = "Announcements";
 const PAGE_SIZE = 10;
 
-var ANNOUNCEMENTS_COUNT;
-var PINNED_ANNOUNCEMENTS;
 
-export const getAnnouncementsCount = async (db) => {
-  const sql = `SELECT COUNT(id) AS count FROM ${TABLENAME} WHERE pin = 0`;
-  try {
-    const result = await executeD1Query(db, sql);
-    ANNOUNCEMENTS_COUNT = result.result[0].results[0].count;
-  } catch (error) {
-    console.error("Error getting announcements count:", error);
-  }
-};
-
-export const getPinnedAnnouncements = async (db) => {
-  const sql = `SELECT * FROM ${TABLENAME} WHERE pin = ? ORDER BY timestamp DESC`;
-  const params = [1];
-  try {
-    const result = await executeD1Query(db, sql, params);
-    PINNED_ANNOUNCEMENTS = result.result[0].results;
-  } catch (error) {
-    console.error("Error getting pinned announcements:", error);
-  }
-};
 
 export const getAnnouncementsController = async (c) => {
   const pageStr = c.req.query("page");
   const page = pageStr ? parseInt(pageStr, 10) : null;
   const db = c.env.DB;
 
-  // Lazily re-fetch in-memory cache if undefined
-  if (PINNED_ANNOUNCEMENTS == null) {
-    await getPinnedAnnouncements(db);
-  }
-  if (ANNOUNCEMENTS_COUNT == null) {
-    await getAnnouncementsCount(db);
-  }
-
-  const sql = `SELECT * FROM ${TABLENAME} WHERE pin = ? ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
+  const countSql = `SELECT COUNT(id) AS count FROM ${TABLENAME} WHERE pin = 0`;
+  const pinSql = `SELECT * FROM ${TABLENAME} WHERE pin = 1 ORDER BY timestamp DESC`;
+  const dataSql = `SELECT * FROM ${TABLENAME} WHERE pin = 0 ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
     page ? (page - 1) * PAGE_SIZE : 0
   }`;
-  const params = [0];
 
   try {
-    const result = await executeD1Query(db, sql, params);
-    const announcements = (PINNED_ANNOUNCEMENTS ?? []).concat(result.result[0].results);
+    const [countResult, pinResult, dataResult] = await Promise.all([
+      executeD1Query(db, countSql),
+      executeD1Query(db, pinSql),
+      executeD1Query(db, dataSql),
+    ]);
 
-    return c.json({ count: ANNOUNCEMENTS_COUNT ?? 0, announcements: announcements });
+    const count = countResult.result[0].results[0].count;
+    const pinned = pinResult.result[0].results || [];
+    const data = dataResult.result[0].results || [];
+
+    const announcements = pinned.concat(data);
+
+    return c.json({ count, announcements });
   } catch (error) {
     console.error("Get announcements error:", error);
     return c.body(null, 500);
@@ -90,9 +70,6 @@ export const postAnnouncementController = async (c) => {
 
   try {
     const result = await executeD1Query(db, sql, params);
-    if (ANNOUNCEMENTS_COUNT != null) {
-      ANNOUNCEMENTS_COUNT += 1;
-    }
     return c.json(result);
   } catch (error) {
     console.error("Post announcement error:", error);
@@ -160,9 +137,6 @@ export const deleteAnnouncementController = async (c) => {
     const deleteParams = [id];
     await executeD1Query(db, deleteSql, deleteParams);
 
-    await getAnnouncementsCount(db);
-    await getPinnedAnnouncements(db);
-
     return c.body(null, 200);
   } catch (error) {
     console.error("Delete announcement error:", error);
@@ -180,8 +154,6 @@ export const pinAnnouncementController = async (c) => {
 
   try {
     await executeD1Query(db, sql, params);
-    await getAnnouncementsCount(db);
-    await getPinnedAnnouncements(db);
     return c.body(null, 201);
   } catch (error) {
     console.error("Pin announcement error:", error);

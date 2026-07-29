@@ -4,36 +4,30 @@ import { executeD1Query } from "../api/d1.js";
 const TABLENAME = "Columns";
 const PAGE_SIZE = 10;
 
-var COLUMNS_COUNT;
 
-export const getColumnsCount = async (db) => {
-  const sql = `SELECT COUNT(id) AS count FROM ${TABLENAME}`;
-  try {
-    const result = await executeD1Query(db, sql);
-    COLUMNS_COUNT = result.result[0].results[0].count;
-  } catch (error) {
-    console.error("Error getting columns count:", error);
-  }
-};
 
 export const getColumnsController = async (c) => {
   const pageStr = c.req.query("page");
   const page = pageStr ? parseInt(pageStr, 10) : null;
   const db = c.env.DB;
 
-  if (COLUMNS_COUNT == null) {
-    await getColumnsCount(db);
-  }
-
-  const sql = `SELECT * FROM ${TABLENAME} ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
+  const countSql = `SELECT COUNT(id) AS count FROM ${TABLENAME}`;
+  const dataSql = `SELECT * FROM ${TABLENAME} ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
     page ? (page - 1) * PAGE_SIZE : 0
   }`;
+
   try {
-    const result = await executeD1Query(db, sql);
+    const [countResult, dataResult] = await Promise.all([
+      executeD1Query(db, countSql),
+      executeD1Query(db, dataSql),
+    ]);
+
+    const count = countResult.result[0].results[0].count;
+    const announcements = dataResult.result[0].results || [];
 
     return c.json({
-      count: COLUMNS_COUNT || 0,
-      announcements: result.result[0].results,
+      count,
+      announcements,
     });
   } catch (error) {
     console.error("Get columns error:", error);
@@ -72,9 +66,6 @@ export const postColumnController = async (c) => {
 
   try {
     const result = await executeD1Query(db, sql, params);
-    if (COLUMNS_COUNT != null) {
-      COLUMNS_COUNT += 1;
-    }
     return c.json(result);
   } catch (error) {
     console.error("Post column error:", error);
@@ -140,8 +131,6 @@ export const deleteColumnController = async (c) => {
     const deleteSql = `DELETE FROM ${TABLENAME} WHERE id = ?`;
     const deleteParams = [id];
     await executeD1Query(db, deleteSql, deleteParams);
-
-    await getColumnsCount(db);
 
     return c.body(null, 200);
   } catch (error) {
