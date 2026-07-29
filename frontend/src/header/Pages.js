@@ -53,15 +53,15 @@ if (import.meta.env.DEV) {
           to: "online/worship",
         },
         {
-          title: "새벽QT",
+          title: "새벽 QT",
           to: "online/dawnQT",
         },
         {
-          title: "기도ON",
+          title: "기도 ON",
           to: "online/prayON",
         },
         {
-          title: "묵상ON",
+          title: "묵상 ON",
           to: "online/meditationon",
         },
         {
