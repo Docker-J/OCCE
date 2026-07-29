@@ -12,8 +12,8 @@ import {
 
 const router = new Hono();
 
-router.get("/", cache({ cacheName: "occe-api", cacheControl: "max-age=86400" }), getAnnouncementsController);
-router.get("/announcement/:id", cache({ cacheName: "occe-api", cacheControl: "max-age=86400" }), getAnnouncementController);
+router.get("/", cache({ cacheName: "occe-api", cacheControl: "public, s-maxage=604800, max-age=0" }), getAnnouncementsController);
+router.get("/announcement/:id", cache({ cacheName: "occe-api", cacheControl: "public, s-maxage=604800, max-age=0" }), getAnnouncementController);
 router.put("/announcement", authStaff, postAnnouncementController);
 router.put("/announcement/:id", authStaff, editAnnouncementController);
 router.put("/announcement/:id/pin", authStaff, pinAnnouncementController);

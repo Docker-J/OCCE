@@ -10,8 +10,8 @@ import {
 
 const router = new Hono();
 
-router.get("/recent-date", cache({ cacheName: "occe-api", cacheControl: "max-age=86400" }), getRecentWeeklyUpdateDateController);
-router.get("/:date", cache({ cacheName: "occe-api", cacheControl: "max-age=86400" }), authUser, getWeeklyUpdateController);
+router.get("/recent-date", cache({ cacheName: "occe-api", cacheControl: "public, s-maxage=604800, max-age=0" }), getRecentWeeklyUpdateDateController);
+router.get("/:date", cache({ cacheName: "occe-api", cacheControl: "public, s-maxage=604800, max-age=0" }), authUser, getWeeklyUpdateController);
 router.put("/:date", authStaff, uploadWeeklyUpdateController);
 router.delete("/:date", authStaff, deleteWeeklyUpdateController);
 

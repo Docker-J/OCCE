@@ -9,8 +9,8 @@ import {
 
 const router = new Hono();
 
-router.get("/", cache({ cacheName: "occe-api", cacheControl: "max-age=86400" }), getMeditationONsController);
-router.get("/:id", cache({ cacheName: "occe-api", cacheControl: "max-age=86400" }), getMeditationONController);
+router.get("/", cache({ cacheName: "occe-api", cacheControl: "public, s-maxage=604800, max-age=0" }), getMeditationONsController);
+router.get("/:id", cache({ cacheName: "occe-api", cacheControl: "public, s-maxage=604800, max-age=0" }), getMeditationONController);
 router.post("/", authStaff, postMeditationONController);
 
 export default router;
