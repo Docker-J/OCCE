@@ -53,18 +53,19 @@ const Bible291 = () => {
           </Typography>
 
           {match ? (
-            <div style={{ marginTop: "24px", padding: "24px", backgroundColor: "#f9f9f9", borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
+            <>
               <Typography variant="h5" sx={{
-                fontWeight: 830, mb: 3, color: "primary.main"
+                fontWeight: 830
               }}>
                 오늘의 1독 말씀은 "{`${match.read}`}" 입니다.
               </Typography>
+              <br />
               <YoutubePlaylist
                 src={`https://www.youtube.com/embed/videoseries?list=PL-${
                   match.link.split("PL-")[1]
                 }`}
               />
-            </div>
+            </>
           ) : (
             <Typography variant="h5" sx={{
               fontWeight: 830
