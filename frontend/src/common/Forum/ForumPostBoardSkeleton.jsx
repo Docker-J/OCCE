@@ -31,7 +31,7 @@ const ForumPostBoardSkeleton = ({ count = 5 }) => {
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
               <Skeleton variant="rounded" width={110} height={28} sx={{ borderRadius: "10px" }} />
               
-              <Stack direction="row" spacing={1}>
+              <Stack direction="row" spacing={1.5}>
                 <Skeleton variant="circular" width={32} height={32} />
                 <Skeleton variant="circular" width={32} height={32} />
               </Stack>

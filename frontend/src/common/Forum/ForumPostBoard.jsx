@@ -63,7 +63,7 @@ const ForumPostBoard = ({
           >
             {/* Top Row: Badge & Icons */}
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-              <Stack direction="row" spacing={1} alignItems="center">
+              <Stack direction="row" spacing={1.5} alignItems="center">
                 {!!post?.pin && (
                   <Chip 
                     icon={<PushPinIcon sx={{ fontSize: "16px !important", color: "white !important" }} />}
@@ -93,7 +93,7 @@ const ForumPostBoard = ({
                 />
               </Stack>
               
-              <Stack direction="row" spacing={1} alignItems="center">
+              <Stack direction="row" spacing={1.5} alignItems="center">
                 {post?.images && (
                   <Box sx={{ width: 26, height: 26, borderRadius: "8px", bgcolor: "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <PhotoOutlinedIcon sx={{ color: "#777", fontSize: 16 }} />
