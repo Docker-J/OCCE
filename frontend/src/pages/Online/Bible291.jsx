@@ -38,37 +38,41 @@ const Bible291 = () => {
               fontWeight: 830,
               letterSpacing: "0.3em",
               pl: "0.4em",
-              color: "white"
-            }}>
+              color: "white",
+            }}
+          >
             291일 성경 1독
           </Typography>
         </div>
       </div>
       <div className="container-wrapper">
         <div className="container">
-          <Typography variant="h5" sx={{
-            fontWeight: 830
-          }}>
-            {today}
-          </Typography>
-
           {match ? (
             <>
-              <Typography variant="h5" sx={{
-                fontWeight: 830, lineHeight: 1.6
-              }}>
-                오늘의 1독 말씀은 <br />
-                <Box component="span" sx={{ 
-                  color: "primary.main", 
-                  backgroundColor: "rgba(255, 107, 0, 0.1)", 
-                  px: 1.5, 
-                  py: 0.5, 
-                  borderRadius: 1,
-                  display: "inline-block",
-                  mt: 1
-                }}>
+              <Typography
+                variant="h5"
+                sx={{
+                  fontWeight: 830,
+                  lineHeight: 1.6,
+                  wordBreak: "keep-all",
+                }}
+              >
+                {today} 오늘의 1독 말씀은 <br />
+                <Box
+                  component="span"
+                  sx={{
+                    color: "primary.main",
+                    backgroundColor: "rgba(255, 107, 0, 0.1)",
+                    px: 1.5,
+                    py: 0.5,
+                    borderRadius: 1,
+                    display: "inline-block",
+                    mt: 1,
+                  }}
+                >
                   "{match.read}"
-                </Box> 입니다.
+                </Box>{" "}
+                입니다.
               </Typography>
               <br />
               <YoutubePlaylist
@@ -81,16 +85,63 @@ const Bible291 = () => {
             <Typography variant="h5" sx={{
               fontWeight: 830
             }}>
-              오늘은 성경 1독을 쉬어가는 날입니다
+              {today} 오늘은 성경 1독을 쉬어가는 날입니다
             </Typography>
           )}
 
-          <div style={{ marginTop: "40px", paddingBottom: "40px", width: "100%", overflow: "hidden" }}>
+          <div
+            style={{
+              marginTop: "40px",
+              paddingBottom: "40px",
+              width: "100%",
+              overflow: "hidden",
+            }}
+          >
             <Slider {...sliderSettings}>
-              <div><img style={{ width: "100%", display: "block", borderRadius: "12px" }} src="/img/Online/291Bible/1.webp" alt="안내 1" /></div>
-              <div><img style={{ width: "100%", display: "block", borderRadius: "12px" }} src="/img/Online/291Bible/2.webp" alt="안내 2" /></div>
-              <div><img style={{ width: "100%", display: "block", borderRadius: "12px" }} src="/img/Online/291Bible/3.webp" alt="안내 3" /></div>
-              <div><img style={{ width: "100%", display: "block", borderRadius: "12px" }} src="/img/Online/291Bible/4.webp" alt="안내 4" /></div>
+              <div>
+                <img
+                  style={{
+                    width: "100%",
+                    display: "block",
+                    borderRadius: "12px",
+                  }}
+                  src="/img/Online/291Bible/1.webp"
+                  alt="안내 1"
+                />
+              </div>
+              <div>
+                <img
+                  style={{
+                    width: "100%",
+                    display: "block",
+                    borderRadius: "12px",
+                  }}
+                  src="/img/Online/291Bible/2.webp"
+                  alt="안내 2"
+                />
+              </div>
+              <div>
+                <img
+                  style={{
+                    width: "100%",
+                    display: "block",
+                    borderRadius: "12px",
+                  }}
+                  src="/img/Online/291Bible/3.webp"
+                  alt="안내 3"
+                />
+              </div>
+              <div>
+                <img
+                  style={{
+                    width: "100%",
+                    display: "block",
+                    borderRadius: "12px",
+                  }}
+                  src="/img/Online/291Bible/4.webp"
+                  alt="안내 4"
+                />
+              </div>
             </Slider>
           </div>
         </div>
