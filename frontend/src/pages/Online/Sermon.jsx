@@ -27,7 +27,7 @@ const Sermon = () => {
       </div>
       <div className="container-wrapper">
         <div className="container">
-          <YoutubePlaylist src="https://youtube.com/playlist?list=PL-MVshquUXWFkxA1rry9X2d4WAvR-kesH&si=k96Gp9ZSQyzgsl-8" />
+          <YoutubePlaylist src="https://www.youtube.com/embed/videoseries?list=PL-MVshquUXWFkxA1rry9X2d4WAvR-kesH" />
         </div>
       </div>
     </>
