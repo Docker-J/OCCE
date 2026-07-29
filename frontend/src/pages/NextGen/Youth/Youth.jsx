@@ -1,4 +1,4 @@
-import { Typography, Box, Grid, Card, CardContent, Stack } from "@mui/material";
+import { Typography, Box, Grid, Card, CardContent, Stack, useMediaQuery, useTheme } from "@mui/material";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -62,6 +62,9 @@ const sliderSettings = {
 };
 
 const Youth = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
   return (
     <>
       <title>중고등부 - OCCE</title>
@@ -373,7 +376,7 @@ const Youth = () => {
           {/* 3. Photo Gallery Carousel */}
           <Box className="animate-fade" sx={{ mb: 12, animationDelay: "0.2s" }}>
             <Box sx={{ mx: { xs: -2, md: 0 } }}>
-              <Slider {...sliderSettings}>
+              <Slider {...sliderSettings} slidesToShow={isMobile ? 1 : 2}>
                 {imgs.map((img) => (
                   <Box
                     key={uuidv4()}
