@@ -1,3 +1,4 @@
+import { cache } from "hono/cache";
 import { Hono } from "hono";
 import { authStaff } from "../middleware/auth.js";
 import {
@@ -11,8 +12,8 @@ import {
 
 const router = new Hono();
 
-router.get("/", getAnnouncementsController);
-router.get("/announcement/:id", getAnnouncementController);
+router.get("/", cache({ cacheName: "occe-api", cacheControl: "max-age=60" }), getAnnouncementsController);
+router.get("/announcement/:id", cache({ cacheName: "occe-api", cacheControl: "max-age=60" }), getAnnouncementController);
 router.put("/announcement", authStaff, postAnnouncementController);
 router.put("/announcement/:id", authStaff, editAnnouncementController);
 router.put("/announcement/:id/pin", authStaff, pinAnnouncementController);
