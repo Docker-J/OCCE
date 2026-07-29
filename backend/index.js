@@ -134,7 +134,7 @@ export default {
             if (match) {
               const title = "291일 성경 1독";
               const body = `${today}\n오늘의 1독 말씀은 "${match.read}" 입니다.`;
-              const link = match.link;
+              const link = "/online/bible291";
 
               await sendNotification(env, title, body, link);
               console.log(`✅ Daily Bible reading FCM sent successfully for date: ${today}`);
