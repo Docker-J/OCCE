@@ -1,5 +1,5 @@
 import { Box, Typography, Button, Container } from "@mui/material";
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlined';
 
 const ErrorFallback = ({ error, resetErrorBoundary }) => {
   return (
