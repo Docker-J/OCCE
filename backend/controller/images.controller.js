@@ -60,18 +60,13 @@ export const uploadImage = async (env, file) => {
 };
 
 export const uploadImageController = async (c) => {
-  try {
-    const formData = await c.req.formData();
-    const image = formData.get("image");
+  const formData = await c.req.formData();
+  const image = formData.get("image");
 
-    if (!image) {
-      return c.text("No image file provided", 400);
-    }
-
-    const result = await uploadImage(c.env, image);
-    return c.text(result);
-  } catch (error) {
-    console.error("Image upload controller error:", error);
-    return c.body(null, 500);
+  if (!image) {
+    return c.text("No image file provided", 400);
   }
+
+  const result = await uploadImage(c.env, image);
+  return c.text(result);
 };

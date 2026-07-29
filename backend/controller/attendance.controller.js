@@ -38,8 +38,7 @@ export const getGardensController = async (c) => {
     cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
   }
 
-  try {
-    const sheets = getSheetsClient(env);
+  const sheets = getSheetsClient(env);
 
     // 1. Read sheet metadata to get tab names
     const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
@@ -92,70 +91,63 @@ export const getGardensController = async (c) => {
       }
     }
 
-    const gardensData = {};
+  const gardensData = {};
 
-    if (isStaff) {
-      // Staff can see all gardens. Filter out metadata tabs.
-      const gardenTabs = sheetNames.filter(
-        (name) =>
-          name !== "정원지기" &&
-          name !== "종합통계" &&
-          name !== "출석부" &&
-          name !== "출석보고" &&
-          name !== "정원모임보고" &&
-          !/^\d{4}-\d{2}-\d{2}$/.test(name),
-      );
+  if (isStaff) {
+    // Staff can see all gardens. Filter out metadata tabs.
+    const gardenTabs = sheetNames.filter(
+      (name) =>
+        name !== "정원지기" &&
+        name !== "종합통계" &&
+        name !== "출석부" &&
+        name !== "출석보고" &&
+        name !== "정원모임보고" &&
+        !/^\d{4}-\d{2}-\d{2}$/.test(name),
+    );
 
-      if (gardenTabs.length > 0) {
-        // Use batchGet to fetch all garden member lists in one API request
-        const ranges = gardenTabs.map((name) => `${name}!A:A`);
-        const batchResponse = await sheets.spreadsheets.values.batchGet({
-          spreadsheetId,
-          ranges,
-        });
+    if (gardenTabs.length > 0) {
+      // Use batchGet to fetch all garden member lists in one API request
+      const ranges = gardenTabs.map((name) => `${name}!A:A`);
+      const batchResponse = await sheets.spreadsheets.values.batchGet({
+        spreadsheetId,
+        ranges,
+      });
 
-        batchResponse.data.valueRanges.forEach((vr, idx) => {
-          const gardenName = gardenTabs[idx];
-          const rows = vr.values || [];
-          // Filter out header row (like "이름") or empty values
-          const members = rows
-            .map((r) => r[0]?.toString().trim())
-            .filter((name) => name && name !== "이름");
-          gardensData[gardenName] = members;
-        });
-      }
-    } else {
-      // GardenKeeper can only see their assigned gardens
-      for (const garden of assignedGardens) {
-        if (!sheetNames.includes(garden)) {
-          console.warn(`Garden tab '${garden}' not found in spreadsheet.`);
-          continue;
-        }
-
-        const memberResponse = await sheets.spreadsheets.values.get({
-          spreadsheetId,
-          range: `${garden}!A:A`,
-        });
-        const rows = memberResponse.data.values || [];
+      batchResponse.data.valueRanges.forEach((vr, idx) => {
+        const gardenName = gardenTabs[idx];
+        const rows = vr.values || [];
+        // Filter out header row (like "이름") or empty values
         const members = rows
           .map((r) => r[0]?.toString().trim())
           .filter((name) => name && name !== "이름");
-        gardensData[garden] = members;
-      }
+        gardensData[gardenName] = members;
+      });
     }
+  } else {
+    // GardenKeeper can only see their assigned gardens
+    for (const garden of assignedGardens) {
+      if (!sheetNames.includes(garden)) {
+        console.warn(`Garden tab '${garden}' not found in spreadsheet.`);
+        continue;
+      }
 
-    return c.json({
-      isStaff,
-      assignedGarden: assignedGardens[0] || null, // Default to first assigned garden
-      gardens: gardensData,
-    });
-  } catch (error) {
-    console.error("Error in getGardensController:", error);
-    return c.json(
-      { error: "Failed to retrieve gardens and members data." },
-      500,
-    );
+      const memberResponse = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: `${garden}!A:A`,
+      });
+      const rows = memberResponse.data.values || [];
+      const members = rows
+        .map((r) => r[0]?.toString().trim())
+        .filter((name) => name && name !== "이름");
+      gardensData[garden] = members;
+    }
   }
+
+  return c.json({
+    isStaff,
+    assignedGarden: assignedGardens[0] || null, // Default to first assigned garden
+    gardens: gardensData,
+  });
 };
 
 export const postReportController = async (c) => {
@@ -185,9 +177,8 @@ export const postReportController = async (c) => {
     cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
   }
 
-  try {
-    const sheets = getSheetsClient(env);
-    const drive = getDriveClient(env);
+  const sheets = getSheetsClient(env);
+  const drive = getDriveClient(env);
 
     let assignedGardens = [];
     let reporterName = isStaff ? "목회자/스태프" : (user.name || "");
@@ -573,10 +564,6 @@ export const postReportController = async (c) => {
       `✅ Attendance reported successfully for ${gardenName} on ${date} (Weekly Sheet updated with native checkboxes and comments)`,
     );
     return c.body(null, 200);
-  } catch (error) {
-    console.error("Error in postReportController:", error);
-    return c.json({ error: "Failed to submit attendance report." }, 500);
-  }
 };
 
 export const postGatheringReportController = async (c) => {
@@ -605,9 +592,8 @@ export const postGatheringReportController = async (c) => {
     cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
   }
 
-  try {
-    const sheets = getSheetsClient(env);
-    const drive = getDriveClient(env);
+  const sheets = getSheetsClient(env);
+  const drive = getDriveClient(env);
 
     let assignedGardens = [];
     let reporterName = isStaff ? "목회자/스태프" : (user.name || "");
@@ -798,8 +784,4 @@ export const postGatheringReportController = async (c) => {
 
     console.log(`✅ Garden gathering report submitted successfully as separate file '${fileName}'`);
     return c.body(null, 200);
-  } catch (error) {
-    console.error("Error in postGatheringReportController:", error);
-    return c.json({ error: "Failed to submit garden gathering report." }, 500);
-  }
 };

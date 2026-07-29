@@ -16,23 +16,18 @@ export const getColumnsController = async (c) => {
     page ? (page - 1) * PAGE_SIZE : 0
   }`;
 
-  try {
-    const [countResult, dataResult] = await Promise.all([
-      executeD1Query(db, countSql),
-      executeD1Query(db, dataSql),
-    ]);
+  const [countResult, dataResult] = await Promise.all([
+    executeD1Query(db, countSql),
+    executeD1Query(db, dataSql),
+  ]);
 
-    const count = countResult.result[0].results[0].count;
-    const announcements = dataResult.result[0].results || [];
+  const count = countResult.result[0].results[0].count;
+  const announcements = dataResult.result[0].results || [];
 
-    return c.json({
-      count,
-      announcements,
-    });
-  } catch (error) {
-    console.error("Get columns error:", error);
-    return c.body(null, 500);
-  }
+  return c.json({
+    count,
+    announcements,
+  });
 };
 
 export const getColumnController = async (c) => {
@@ -40,16 +35,11 @@ export const getColumnController = async (c) => {
   const db = c.env.DB;
   const sql = `SELECT id, title, body, timestamp FROM ${TABLENAME} WHERE id = ?`;
   const params = [id];
-  try {
-    const result = await executeD1Query(db, sql, params);
-    if (!result.result[0].results || result.result[0].results.length === 0) {
-      return c.body(null, 404);
-    }
-    return c.json(result.result[0].results[0]);
-  } catch (error) {
-    console.error("Get column error:", error);
+  const result = await executeD1Query(db, sql, params);
+  if (!result.result[0].results || result.result[0].results.length === 0) {
     return c.body(null, 404);
   }
+  return c.json(result.result[0].results[0]);
 };
 
 export const postColumnController = async (c) => {
@@ -64,13 +54,8 @@ export const postColumnController = async (c) => {
     body.date,
   ];
 
-  try {
-    const result = await executeD1Query(db, sql, params);
-    return c.json(result);
-  } catch (error) {
-    console.error("Post column error:", error);
-    return c.body(null, 500);
-  }
+  const result = await executeD1Query(db, sql, params);
+  return c.json(result);
 };
 
 export const editColumnController = async (c) => {
@@ -81,19 +66,17 @@ export const editColumnController = async (c) => {
   const getSql = `SELECT images FROM ${TABLENAME} WHERE id = ?`;
   const getParams = [id];
 
-  try {
-    const result = await executeD1Query(db, getSql, getParams);
-    const images = result.result[0].results[0].images
-      ? result.result[0].results[0].images.split(",")
-      : [];
+  const result = await executeD1Query(db, getSql, getParams);
+  const images = result.result[0].results[0].images
+    ? result.result[0].results[0].images.split(",")
+    : [];
 
-    const missingImages = images.filter(
-      (item) => !body.images.includes(item)
-    );
+  const missingImages = images.filter(
+    (item) => !body.images.includes(item)
+  );
 
+  if (missingImages.length > 0) {
     await deleteImages(c.env, missingImages);
-  } catch (e) {
-    console.error("Error deleting old images:", e);
   }
 
   const sql = `UPDATE ${TABLENAME} SET title = ?, body = ?, images = ? WHERE id = ?`;
@@ -104,13 +87,8 @@ export const editColumnController = async (c) => {
     id,
   ];
 
-  try {
-    const result = await executeD1Query(db, sql, params);
-    return c.json(result);
-  } catch (error) {
-    console.error("Edit column error:", error);
-    return c.body(null, 500);
-  }
+  const updateResult = await executeD1Query(db, sql, params);
+  return c.json(updateResult);
 };
 
 export const deleteColumnController = async (c) => {
@@ -120,21 +98,18 @@ export const deleteColumnController = async (c) => {
   const getSql = `SELECT images FROM ${TABLENAME} WHERE id = ?`;
   const getParams = [id];
 
-  try {
-    const result = await executeD1Query(db, getSql, getParams);
-    const images = result.result[0].results[0].images
-      ? result.result[0].results[0].images.split(",")
-      : [];
+  const result = await executeD1Query(db, getSql, getParams);
+  const images = result.result[0].results[0].images
+    ? result.result[0].results[0].images.split(",")
+    : [];
 
+  if (images.length > 0) {
     await deleteImages(c.env, images);
-
-    const deleteSql = `DELETE FROM ${TABLENAME} WHERE id = ?`;
-    const deleteParams = [id];
-    await executeD1Query(db, deleteSql, deleteParams);
-
-    return c.body(null, 200);
-  } catch (error) {
-    console.error("Delete column error:", error);
-    return c.body(null, 500);
   }
+
+  const deleteSql = `DELETE FROM ${TABLENAME} WHERE id = ?`;
+  const deleteParams = [id];
+  await executeD1Query(db, deleteSql, deleteParams);
+
+  return c.body(null, 200);
 };

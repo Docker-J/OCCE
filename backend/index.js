@@ -23,6 +23,11 @@ import { linkPreviewMiddleware } from "./middleware/linkPreview.js";
 
 const app = new Hono();
 
+app.onError((err, c) => {
+  console.error(`[Global Error] ${c.req.method} ${c.req.url} -`, err);
+  return c.json({ error: "Internal Server Error", details: err.message }, 500);
+});
+
 app.use("*", cors());
 app.use("*", (c, next) => linkPreviewMiddleware(c, next, app));
 

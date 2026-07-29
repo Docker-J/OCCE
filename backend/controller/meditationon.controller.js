@@ -36,87 +36,72 @@ export const getMeditationONsController = async (c) => {
 
   const command = new QueryCommand(scanParam);
 
-  try {
-    const result = await docClient.send(command);
+  const result = await docClient.send(command);
 
-    const dataArray = [];
-    result.Items.forEach((data) => {
-      dataArray.push(data);
-    });
+  const dataArray = [];
+  result.Items.forEach((data) => {
+    dataArray.push(data);
+  });
 
-    return c.json(dataArray);
-  } catch (error) {
-    console.error("Get meditation list error:", error);
-    return c.body(null, 500);
-  }
+  return c.json(dataArray);
 };
 
 export const getMeditationONController = async (c) => {
   const id = c.req.param("id");
   const docClient = getDocClient(c.env);
 
-  try {
-    const scanParam = {
-      TableName: TABLENAME,
-      ProjectionExpression: "Images, #ts ",
-      KeyConditionExpression: "ID = :postID",
-      ExpressionAttributeValues: {
-        ":postID": id,
-      },
-      ExpressionAttributeNames: {
-        "#ts": "Timestamp",
-      },
-    };
+  const scanParam = {
+    TableName: TABLENAME,
+    ProjectionExpression: "Images, #ts ",
+    KeyConditionExpression: "ID = :postID",
+    ExpressionAttributeValues: {
+      ":postID": id,
+    },
+    ExpressionAttributeNames: {
+      "#ts": "Timestamp",
+    },
+  };
 
-    const command = new QueryCommand(scanParam);
-    const result = await docClient.send(command);
+  const command = new QueryCommand(scanParam);
+  const result = await docClient.send(command);
 
-    if (!result.Items || result.Items.length === 0) {
-      return c.body(null, 404);
-    }
-
-    return c.json(result.Items[0]);
-  } catch (error) {
-    console.error("Get meditation error:", error);
-    return c.body(null, 500);
+  if (!result.Items || result.Items.length === 0) {
+    return c.body(null, 404);
   }
+
+  return c.json(result.Items[0]);
 };
 
 export const postMeditationONController = async (c) => {
-  try {
-    const formData = await c.req.formData();
-    const images = formData.getAll("images"); // Array of File objects
-    const date = c.req.query("date");
+  const formData = await c.req.formData();
+  const images = formData.getAll("images"); // Array of File objects
+  const date = c.req.query("date");
 
-    if (images.length === 0) {
-      return c.text("No images provided", 400);
-    }
-
-    const docClient = getDocClient(c.env);
-
-    const ids = {};
-    for (const [index, image] of images.entries()) {
-      const result = await uploadImage(c.env, image);
-      ids[index] = result;
-    }
-
-    const command = new PutCommand({
-      TableName: TABLENAME,
-      Item: {
-        ID: crypto.randomUUID(), // Native crypto API in Cloudflare Workers
-        Timestamp: date,
-        Cover: ids[0],
-        Images: ids,
-        sort: 0,
-      },
-    });
-
-    const response = await docClient.send(command);
-    console.log(response);
-
-    return c.body(null, 201);
-  } catch (error) {
-    console.error("Post meditation error:", error);
-    return c.body(null, 500);
+  if (images.length === 0) {
+    return c.text("No images provided", 400);
   }
+
+  const docClient = getDocClient(c.env);
+
+  const ids = {};
+  for (const [index, image] of images.entries()) {
+    const result = await uploadImage(c.env, image);
+    ids[index] = result;
+  }
+
+  const command = new PutCommand({
+    TableName: TABLENAME,
+    Item: {
+      ID: crypto.randomUUID(), // Native crypto API in Cloudflare Workers
+      Timestamp: date,
+      Cover: ids[0],
+      Images: ids,
+      sort: 0,
+    },
+  });
+
+  const response = await docClient.send(command);
+  console.log(response);
+
+  return c.body(null, 201);
 };
