@@ -43,9 +43,9 @@ const ForumPostBoard = ({
               flexDirection: "column",
               textDecoration: "none",
               bgcolor: post?.pin ? themeBg : "#ffffff",
-              mb: 3,
-              p: { xs: 2.5, sm: 3.5 },
-              borderRadius: "24px",
+              mb: 2.5,
+              p: { xs: 2, sm: 2.5 },
+              borderRadius: "20px",
               boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
               border: "1px solid rgba(0, 0, 0, 0.08)",
               position: "relative",
@@ -109,10 +109,10 @@ const ForumPostBoard = ({
             <Typography
               className="post-title"
               sx={{
-                fontSize: { xs: "1.2rem", sm: "1.4rem" },
+                fontSize: { xs: "1.1rem", sm: "1.25rem" },
                 fontWeight: 800,
                 color: "#2b2b2b",
-                mb: 1.5,
+                mb: 1,
                 lineHeight: 1.3,
                 transition: "color 0.3s ease",
                 whiteSpace: "nowrap",
@@ -126,7 +126,7 @@ const ForumPostBoard = ({
             {/* Preview Text */}
             <Typography
               sx={{
-                fontSize: "15px",
+                fontSize: "14px",
                 color: "#666666",
                 lineHeight: "1.6",
                 display: "-webkit-box",

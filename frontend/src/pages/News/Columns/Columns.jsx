@@ -16,6 +16,7 @@ import useModals from "../../../util/useModal";
 import AdminComponent from "../../../common/AdminComponent";
 import { Suspense } from "react";
 import FullScreenLoading from "../../../common/FullScreenLoading";
+import ForumPostBoardSkeleton from "../../../common/Forum/ForumPostBoardSkeleton";
 
 const titleBackground = {
   backgroundImage: 'url("/img/News/Columns/Columns.webp")',
@@ -65,7 +66,7 @@ const Columns = () => {
             justifyContent: "center",
           }}
         >
-          <Suspense key={page} fallback={<CircularProgress />}>
+          <Suspense key={page} fallback={<ForumPostBoardSkeleton />}>
             <Await
               resolve={data.announcementsData}
               errorElement={<p>Error loading!</p>}

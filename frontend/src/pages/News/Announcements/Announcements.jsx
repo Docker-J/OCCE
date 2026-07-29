@@ -4,6 +4,8 @@ import { announcementsQuery } from "../../../route/AnnouncementsLoader";
 
 import { CircularProgress, Fab, Typography } from "@mui/material";
 
+import ForumPostBoardSkeleton from "../../../common/Forum/ForumPostBoardSkeleton";
+
 import AddIcon from "@mui/icons-material/Add";
 
 import BoardPagination from "../../../components/News/Announcement/BoardPagination";
@@ -59,7 +61,7 @@ const Announcements = () => {
           }}
         >
           {isLoading ? (
-            <CircularProgress />
+            <ForumPostBoardSkeleton />
           ) : isError ? (
             <p>Error loading!</p>
           ) : data.announcements.length === 0 ? (
