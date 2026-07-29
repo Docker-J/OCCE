@@ -55,6 +55,7 @@ const Bible291 = () => {
                   fontWeight: 830,
                   lineHeight: 1.6,
                   wordBreak: "keep-all",
+                  textAlign: "center",
                 }}
               >
                 {today} 오늘의 1독 말씀은 <br />
@@ -83,7 +84,8 @@ const Bible291 = () => {
             </>
           ) : (
             <Typography variant="h5" sx={{
-              fontWeight: 830
+              fontWeight: 830,
+              textAlign: "center"
             }}>
               {today} 오늘은 성경 1독을 쉬어가는 날입니다
             </Typography>
