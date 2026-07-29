@@ -42,20 +42,18 @@ const ForumPostBoard = ({
               display: "flex",
               flexDirection: "column",
               textDecoration: "none",
-              bgcolor: post?.pin ? themeBg : "rgba(255, 255, 255, 0.6)",
-              backdropFilter: "blur(12px)",
-              WebkitBackdropFilter: "blur(12px)",
+              bgcolor: post?.pin ? themeBg : "#ffffff",
               mb: 3,
               p: { xs: 2.5, sm: 3.5 },
               borderRadius: "24px",
-              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.04)",
-              border: "1px solid rgba(255, 255, 255, 0.4)",
+              boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+              border: "1px solid rgba(0, 0, 0, 0.08)",
               position: "relative",
               overflow: "hidden",
               transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
               "&:hover": {
                 transform: "translateY(-4px) scale(1.01)",
-                boxShadow: \`0 16px 40px \${themeBg}, 0 4px 12px rgba(0,0,0,0.05)\`,
+                boxShadow: `0 16px 40px ${themeBg}, 0 4px 12px rgba(0,0,0,0.05)`,
                 bgcolor: "rgba(255, 255, 255, 0.95)",
                 borderColor: themeColor,
                 "& .post-title": {
@@ -70,7 +68,7 @@ const ForumPostBoard = ({
             {/* Top Row: Badge & Icons */}
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
               <Stack direction="row" spacing={1} alignItems="center">
-                {post?.pin && (
+                {!!post?.pin && (
                   <Chip 
                     icon={<PushPinIcon sx={{ fontSize: "16px !important", color: "white !important" }} />}
                     label="중요"
@@ -84,7 +82,7 @@ const ForumPostBoard = ({
                   />
                 )}
                 <Chip
-                  icon={<CalendarTodayIcon sx={{ fontSize: "14px !important", color: \`\${themeColor} !important\` }} />}
+                  icon={<CalendarTodayIcon sx={{ fontSize: "14px !important", color: `${themeColor} !important` }} />}
                   label={format(new Date(post.timestamp), "yyyy. MM. dd")}
                   size="small"
                   sx={{
@@ -92,7 +90,7 @@ const ForumPostBoard = ({
                     color: themeColor,
                     fontWeight: 700,
                     borderRadius: "10px",
-                    border: \`1px solid \${themeHover}\`
+                    border: `1px solid ${themeHover}`
                   }}
                 />
               </Stack>
