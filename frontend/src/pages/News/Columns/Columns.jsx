@@ -94,6 +94,8 @@ const Columns = () => {
                     <BoardPagination
                       pages={Math.ceil(data.count / 10)}
                       currentPage={page}
+                      themeColor="#1a365d"
+                      themeBg="rgba(26, 54, 93, 0.08)"
                     />
                   </div>
                 );
