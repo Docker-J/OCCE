@@ -27,13 +27,12 @@ const ForumPostBoardSkeleton = ({ count = 5 }) => {
               border: "1px solid rgba(0, 0, 0, 0.06)",
             }}
           >
-            {/* Top Row: Badge & Icons */}
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-              <Skeleton variant="rounded" width={110} height={28} sx={{ borderRadius: "10px" }} />
-              
-              <Stack direction="row" spacing={1.5}>
-                <Skeleton variant="circular" width={32} height={32} />
-                <Skeleton variant="circular" width={32} height={32} />
+            {/* Top Row: Badges & Icons */}
+            <Stack direction="row" alignItems="center" sx={{ mb: 2, width: "100%" }}>
+              <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexWrap: "wrap" }}>
+                <Skeleton variant="rounded" width={110} height={26} sx={{ borderRadius: "8px" }} />
+                <Skeleton variant="rounded" width={26} height={26} sx={{ borderRadius: "8px" }} />
+                <Skeleton variant="rounded" width={26} height={26} sx={{ borderRadius: "8px" }} />
               </Stack>
             </Stack>
 

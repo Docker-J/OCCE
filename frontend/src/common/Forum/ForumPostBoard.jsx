@@ -61,9 +61,9 @@ const ForumPostBoard = ({
               },
             }}
           >
-            {/* Top Row: Badge & Icons */}
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-              <Stack direction="row" spacing={1.5} alignItems="center">
+            {/* Top Row: Badges & Icons */}
+            <Stack direction="row" alignItems="center" sx={{ mb: 2, width: "100%" }}>
+              <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexWrap: "wrap" }}>
                 {!!post?.pin && (
                   <Chip 
                     icon={<PushPinIcon sx={{ fontSize: "16px !important", color: "white !important" }} />}
@@ -91,9 +91,7 @@ const ForumPostBoard = ({
                     border: `1px solid ${themeHover}`
                   }}
                 />
-              </Stack>
-              
-              <Stack direction="row" spacing={1.5} alignItems="center">
+                
                 {post?.images && (
                   <Box sx={{ width: 26, height: 26, borderRadius: "8px", bgcolor: "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <PhotoOutlinedIcon sx={{ color: "#777", fontSize: 16 }} />
