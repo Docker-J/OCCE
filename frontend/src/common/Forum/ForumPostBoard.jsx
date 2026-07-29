@@ -73,7 +73,8 @@ const ForumPostBoard = ({
                       bgcolor: themeColor, 
                       color: "white", 
                       fontWeight: 800,
-                      borderRadius: "10px",
+                      borderRadius: "8px",
+                      height: "26px",
                     }} 
                   />
                 )}
@@ -85,21 +86,22 @@ const ForumPostBoard = ({
                     bgcolor: themeBg,
                     color: themeColor,
                     fontWeight: 700,
-                    borderRadius: "10px",
+                    borderRadius: "8px",
+                    height: "26px",
                     border: `1px solid ${themeHover}`
                   }}
                 />
               </Stack>
               
-              <Stack direction="row" spacing={1}>
+              <Stack direction="row" spacing={1} alignItems="center">
                 {post?.images && (
-                  <Box sx={{ p: 0.8, borderRadius: "50%", bgcolor: "#f5f5f5", display: "flex", alignItems: "center" }}>
-                    <PhotoOutlinedIcon sx={{ color: "#777", fontSize: 18 }} />
+                  <Box sx={{ width: 26, height: 26, borderRadius: "8px", bgcolor: "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <PhotoOutlinedIcon sx={{ color: "#777", fontSize: 16 }} />
                   </Box>
                 )}
                 {post?.video && (
-                  <Box sx={{ p: 0.8, borderRadius: "50%", bgcolor: "#f5f5f5", display: "flex", alignItems: "center" }}>
-                    <MovieOutlinedIcon sx={{ color: "#777", fontSize: 18 }} />
+                  <Box sx={{ width: 26, height: 26, borderRadius: "8px", bgcolor: "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <MovieOutlinedIcon sx={{ color: "#777", fontSize: 16 }} />
                   </Box>
                 )}
               </Stack>
