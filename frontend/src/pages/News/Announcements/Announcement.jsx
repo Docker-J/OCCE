@@ -12,6 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useLoaderData, useNavigate, useRevalidator } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import EditNoteIcon from "@mui/icons-material/EditNote";
@@ -45,6 +46,7 @@ const Announcement = () => {
   const { openModal } = useModals();
   const { openSnackbar } = useSnackbar();
   const { id, title, body, timestamp, pin } = useLoaderData();
+  const queryClient = useQueryClient();
 
   const [isLoading, setIsLoading] = useState(false);
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState(false);
@@ -62,6 +64,7 @@ const Announcement = () => {
     try {
       await pinAnnouncement(id, pin);
 
+      queryClient.invalidateQueries({ queryKey: ["announcements"] });
       revalidator.revalidate();
       openSnackbar(
         "success",
@@ -82,6 +85,8 @@ const Announcement = () => {
 
     try {
       await deleteAnnouncement(id);
+
+      queryClient.invalidateQueries({ queryKey: ["announcements"] });
 
       openSnackbar("success", "The announcement is successfully deleted!");
       navigate("/announcements");
