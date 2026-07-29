@@ -97,6 +97,7 @@ const HeaderWrapper = () => {
 const router = createBrowserRouter([
   {
     element: <HeaderFooterWrapper />,
+    errorElement: <ErrorFallback />,
     children: [
       {
         path: "/",
@@ -275,6 +276,7 @@ const router = createBrowserRouter([
   },
   {
     element: <HeaderWrapper />,
+    errorElement: <ErrorFallback />,
     children: [
       {
         path: "/albums",

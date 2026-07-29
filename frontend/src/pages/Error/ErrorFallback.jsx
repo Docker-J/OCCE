@@ -1,7 +1,13 @@
 import { Box, Typography, Button, Container } from "@mui/material";
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlined';
 
-const ErrorFallback = ({ error, resetErrorBoundary }) => {
+import { useRouteError } from "react-router";
+
+const ErrorFallback = ({ error: propError, resetErrorBoundary }) => {
+  const routeError = useRouteError();
+  const error = propError || routeError;
+  const handleReset = resetErrorBoundary || (() => window.location.reload());
+
   return (
     <Box sx={{ width: "100%", display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       {/* Hero Section for Header Visibility */}
@@ -51,7 +57,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }) => {
             variant="contained"
             color="primary"
             size="large"
-            onClick={resetErrorBoundary}
+            onClick={handleReset}
             sx={{ borderRadius: 2 }}
           >
             다시 시도하기
