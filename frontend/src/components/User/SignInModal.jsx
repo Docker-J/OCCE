@@ -8,8 +8,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { signIn } from "../../api/user";
-import { useDispatch } from "react-redux";
-import { SET_TOKEN } from "../../store/Auth";
+import useAuthStore from "../../store/useAuthStore";
 import useSnackbar from "../../util/useSnackbar";
 import { useForm, Controller } from "react-hook-form"; // Added Controller
 import { PatternFormat } from "react-number-format"; // Added PatternFormat
@@ -18,7 +17,7 @@ import useModals from "../../util/useModal";
 import ResetPasswordRequestModal from "./ResetPasswordRequestModal";
 
 const SignInModal = ({ isOpen, onClose }) => {
-  const dispatch = useDispatch();
+  const setToken = useAuthStore((state) => state.setToken);
   const { openModal } = useModals();
 
   // We use control and handleSubmit for the third-party input integration
@@ -39,7 +38,7 @@ const SignInModal = ({ isOpen, onClose }) => {
       groups: [result.group],
     };
 
-    dispatch(SET_TOKEN(data));
+    setToken(data);
 
     if (getValues("remember")) {
       localStorage.setItem("refreshToken", result.refreshToken);

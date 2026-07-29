@@ -1,10 +1,10 @@
 import { memo, useCallback, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import useAuthStore from "../store/useAuthStore";
 import { refreshTokenSignIn } from "../api/user";
-import { DELETE_TOKEN, SET_TOKEN } from "../store/Auth";
 
 const UserManager = memo(() => {
-  const dispatch = useDispatch();
+  const setToken = useAuthStore((state) => state.setToken);
+  const deleteToken = useAuthStore((state) => state.deleteToken);
 
   const signInSuccess = useCallback(
     (result) => {
@@ -13,17 +13,17 @@ const UserManager = memo(() => {
         groups: [result.group],
       };
 
-      dispatch(SET_TOKEN(data));
+      setToken(data);
     },
-    [dispatch]
+    [setToken]
   );
 
   const signInfail = useCallback(() => {
-    dispatch(DELETE_TOKEN());
+    deleteToken();
     sessionStorage.removeItem("refreshToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("remember");
-  }, [dispatch]);
+  }, [deleteToken]);
 
   useEffect(() => {
     const refreshToken =

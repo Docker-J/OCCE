@@ -1,9 +1,9 @@
 import axios from "axios";
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
+import useAuthStore from "../store/useAuthStore";
 
 const RequestManager = () => {
-  const accessToken = useSelector((state) => state.authToken?.accessToken);
+  const accessToken = useAuthStore((state) => state.accessToken);
 
   useEffect(() => {
     const requestInterceptor = axios.interceptors.request.use((request) => {

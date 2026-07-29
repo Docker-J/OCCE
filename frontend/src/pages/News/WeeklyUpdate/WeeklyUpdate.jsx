@@ -29,7 +29,7 @@ import {
 import "./WeeklyUpdate.css";
 import useModals from "../../../util/useModal";
 import { deleteWeeklyUpdate, getWeeklyUpdate } from "../../../api/weeklyupdate";
-import { useSelector } from "react-redux";
+import useAuthStore from "../../../store/useAuthStore";
 import { MIN_DATE } from "../../../constants/WeeklyUpdate";
 import CustomConfirmDialog from "../../../common/CustomConfirmDialog";
 
@@ -40,7 +40,7 @@ const titleBackground = {
 const WeeklyUpdate = () => {
   const { openModal } = useModals();
   const navigate = useNavigate();
-  const authenticated = useSelector((state) => state.authToken.authenticated);
+  const authenticated = useAuthStore((state) => state.authenticated);
 
   const { maxDate, queryDate } = useLoaderData();
 

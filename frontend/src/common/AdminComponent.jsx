@@ -1,7 +1,7 @@
-import { useSelector } from "react-redux";
+import useAuthStore from "../store/useAuthStore";
 
 const AdminComponent = (props) => {
-  const user = useSelector((state) => state.authToken.admin);
+  const user = useAuthStore((state) => state.admin);
 
   return user && props.children;
 };

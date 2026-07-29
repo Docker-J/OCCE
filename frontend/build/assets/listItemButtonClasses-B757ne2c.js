@@ -1,1 +1,0 @@
-import{S as e,x as t}from"./createSimplePaletteValueFilter-C0gThBJK.js";function n(t){return e(`MuiListItemButton`,t)}var r=t(`MuiListItemButton`,[`root`,`focusVisible`,`dense`,`alignItemsFlexStart`,`disabled`,`divider`,`gutters`,`selected`]);export{r as n,n as t};

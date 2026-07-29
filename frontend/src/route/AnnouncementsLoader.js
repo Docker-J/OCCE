@@ -1,5 +1,14 @@
 import axios from "axios";
 import { redirect } from "react-router";
+import { queryClient } from "../index";
+
+export const announcementsQuery = (page) => ({
+  queryKey: ["announcements", page],
+  queryFn: async () => {
+    const { data } = await axios.get(`/api/announcements?page=${page}`);
+    return data;
+  },
+});
 
 export async function loader({ request }) {
   const page = new URL(request.url).searchParams.get("page");
@@ -7,7 +16,8 @@ export async function loader({ request }) {
     return redirect("?page=1");
   }
 
-  const getAnnouncements = axios.get(`/api/announcements?page=${page}`);
+  // Pre-fetch the query so it's ready in the cache or currently fetching when the component renders
+  queryClient.prefetchQuery(announcementsQuery(page));
 
-  return { announcementsData: getAnnouncements };
+  return null;
 }

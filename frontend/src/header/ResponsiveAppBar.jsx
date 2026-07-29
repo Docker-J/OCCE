@@ -19,9 +19,8 @@ import FullScreenLoading from "../common/FullScreenLoading";
 import Submenu from "../components/Header/Submenu";
 import SubmenuMobileDrawer from "../components/Header/SubmenuMobileDrawer";
 
+import useAuthStore from "../store/useAuthStore";
 import { signOut } from "../api/user.js";
-import { useDispatch, useSelector } from "react-redux";
-import { DELETE_TOKEN } from "../store/Auth.js";
 import {
   bindMenu,
   bindTrigger,
@@ -36,8 +35,8 @@ const ResponsiveAppBar = () => {
   const { openModal } = useModals();
   const { openSnackbar } = useSnackbar();
 
-  const dispatch = useDispatch();
-  const authenticated = useSelector((state) => state.authToken?.authenticated);
+  const authenticated = useAuthStore((state) => state.authenticated);
+  const deleteToken = useAuthStore((state) => state.deleteToken);
 
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -91,7 +90,7 @@ const ResponsiveAppBar = () => {
   ];
 
   const signOutSuccess = () => {
-    dispatch(DELETE_TOKEN());
+    deleteToken();
     sessionStorage.removeItem("refreshToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("remember");

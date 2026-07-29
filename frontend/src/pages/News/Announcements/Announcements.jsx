@@ -1,9 +1,6 @@
-import {
-  Await,
-  useLoaderData,
-  useRevalidator,
-  useSearchParams,
-} from "react-router";
+import { useSearchParams } from "react-router";
+import { useQuery } from "@tanstack/react-query";
+import { announcementsQuery } from "../../../route/AnnouncementsLoader";
 
 import { CircularProgress, Fab, Typography } from "@mui/material";
 
@@ -12,8 +9,7 @@ import AddIcon from "@mui/icons-material/Add";
 import BoardPagination from "../../../components/News/Announcement/BoardPagination";
 import useModals from "../../../util/useModal";
 import AdminComponent from "../../../common/AdminComponent";
-import { Suspense } from "react";
-import FullScreenLoading from "../../../common/FullScreenLoading";
+
 import ForumPostBoard from "../../../common/Forum/ForumPostBoard";
 
 const titleBackground = {
@@ -21,11 +17,10 @@ const titleBackground = {
 };
 
 const Announcements = () => {
-  let revalidator = useRevalidator();
-
-  const data = useLoaderData();
   const [searchParams] = useSearchParams();
-  const page = searchParams.get("page");
+  const page = searchParams.get("page") || "1";
+
+  const { data, isLoading, isError, refetch } = useQuery(announcementsQuery(page));
 
   const { openModal } = useModals();
 
@@ -63,38 +58,33 @@ const Announcements = () => {
             justifyContent: "center",
           }}
         >
-          <Suspense key={page} fallback={<CircularProgress />}>
-            <Await
-              resolve={data.announcementsData}
-              errorElement={<p>Error loading!</p>}
-            >
-              {({ data }) => {
-                return data.announcements.length === 0 ? (
-                  <Typography align="center">
-                    게시물이 존재하지 않습니다.
-                  </Typography>
-                ) : (
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      width: "100%",
-                    }}
-                  >
-                    <ForumPostBoard
-                      announcements={data.announcements}
-                      dateFirst
-                    />
-                    <BoardPagination
-                      pages={Math.ceil(data.count / 10)}
-                      currentPage={page}
-                    />
-                  </div>
-                );
+          {isLoading ? (
+            <CircularProgress />
+          ) : isError ? (
+            <p>Error loading!</p>
+          ) : data.announcements.length === 0 ? (
+            <Typography align="center">
+              게시물이 존재하지 않습니다.
+            </Typography>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                width: "100%",
               }}
-            </Await>
-          </Suspense>
+            >
+              <ForumPostBoard
+                announcements={data.announcements}
+                dateFirst
+              />
+              <BoardPagination
+                pages={Math.ceil(data.count / 10)}
+                currentPage={page}
+              />
+            </div>
+          )}
         </div>
       </div>
       <AdminComponent>
@@ -106,7 +96,7 @@ const Announcements = () => {
             );
 
             openModal(AnnouncementPostModalComponent, {
-              revalidator: revalidator.revalidate,
+              revalidator: refetch,
               origTitle: "",
               origBody: "",
             });

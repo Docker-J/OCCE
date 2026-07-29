@@ -1,6 +1,6 @@
 import { Typography, Button, Box, Card, CardContent, Grid, Divider } from "@mui/material";
 import { Link } from "react-router";
-import { useSelector } from "react-redux";
+import useAuthStore from "../../store/useAuthStore";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import NatureIcon from "@mui/icons-material/Nature";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
@@ -14,7 +14,7 @@ const titleBackground = {
 };
 
 const SmallGroup = () => {
-  const isLeader = useSelector((state) => state.authToken?.isLeader);
+  const isLeader = useAuthStore((state) => state.isLeader);
 
   return (
     <>

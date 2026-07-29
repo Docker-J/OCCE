@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useSelector } from "react-redux";
+import useAuthStore from "../../store/useAuthStore";
 import {
   Typography,
   Box,
@@ -75,7 +75,7 @@ const SmallGroupReport = () => {
   const { openModal } = useModals();
   const { openSnackbar } = useSnackbar();
 
-  const authenticated = useSelector((state) => state.authToken?.authenticated);
+  const authenticated = useAuthStore((state) => state.authenticated);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

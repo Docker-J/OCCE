@@ -1,1 +1,0 @@
-import{a as e}from"./rolldown-runtime-CNC7AqOf.js";import{O as t}from"./ckeditor-DKI7H046.js";var n=e(t(),1);function r(e,t){return n.isValidElement(e)&&t.indexOf(e.type.muiName??e.type?._payload?.value?.muiName)!==-1}var i=r;export{r as n,i as t};

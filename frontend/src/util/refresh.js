@@ -1,27 +1,23 @@
 import { getCookieToken } from "../storage/Cookie";
-import { useDispatch, useSelector } from "react-redux";
+import useAuthStore from "../store/useAuthStore";
 import { axios } from "axios";
 
 const refresh = async () => {
-  const user = useSelector((state) => state.authToken);
-  const dispatch = useDispatch();
+  const setToken = useAuthStore.getState().setToken;
   const refreshToken = getCookieToken();
 
   if (refreshToken) {
-    if (user.accessToken) {
-      // Do Nothing
-    }
     //Get Access Token using Refresh Token
     const res = await axios.get("/api/user/refreshAccessToken", {
       params: { refreshToken: refreshToken },
     });
 
     const data = {
-      accessToken: result.getAccessToken().getJwtToken(),
-      groups: result.getAccessToken().payload["cognito:groups"],
+      accessToken: res.data.getAccessToken().getJwtToken(),
+      groups: res.data.getAccessToken().payload["cognito:groups"],
     };
 
-    dispatch(SET_TOKEN(data));
+    setToken(data);
   }
 };
 
