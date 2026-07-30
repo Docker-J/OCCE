@@ -109,7 +109,7 @@ export const postAlbumController = async (c) => {
   const response = await docClient.send(command);
   console.log(response);
 
-  await purgeCache(c.env);
+  await purgeCache(c.env, ["oncce.ca/api/albums"]);
   return c.body(null, 201);
 };
 
@@ -151,6 +151,6 @@ export const deleteAlbumController = async (c) => {
 
   await docClient.send(deleteAlbumCommand);
 
-  await purgeCache(c.env);
+  await purgeCache(c.env, ["oncce.ca/api/albums"]);
   return c.body(null, 200);
 };

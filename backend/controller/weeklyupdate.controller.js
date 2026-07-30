@@ -152,7 +152,7 @@ export const uploadWeeklyUpdateController = async (c) => {
     )
   );
 
-  await purgeCache(c.env);
+  await purgeCache(c.env, ["oncce.ca/api/weekly-update"]);
   return c.text(date);
 };
 
@@ -201,6 +201,6 @@ export const deleteWeeklyUpdateController = async (c) => {
     }
   }
   
-  await purgeCache(c.env);
+  await purgeCache(c.env, ["oncce.ca/api/weekly-update"]);
   return c.text(newRecentDate || "");
 };
