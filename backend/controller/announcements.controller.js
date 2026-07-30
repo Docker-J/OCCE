@@ -12,9 +12,9 @@ export const getAnnouncementsController = async (c) => {
   const page = pageStr ? parseInt(pageStr, 10) : null;
   const db = c.env.DB;
 
-  const countSql = `SELECT COUNT(id) AS count FROM ${TABLENAME} WHERE pin = 0`;
+  const countSql = `SELECT COUNT(id) AS count FROM ${TABLENAME} WHERE pin = 0 OR pin IS NULL`;
   const pinSql = `SELECT * FROM ${TABLENAME} WHERE pin = 1 ORDER BY timestamp DESC`;
-  const dataSql = `SELECT * FROM ${TABLENAME} WHERE pin = 0 ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
+  const dataSql = `SELECT * FROM ${TABLENAME} WHERE pin = 0 OR pin IS NULL ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
     page ? (page - 1) * PAGE_SIZE : 0
   }`;
 
@@ -49,7 +49,7 @@ export const getAnnouncementController = async (c) => {
 export const postAnnouncementController = async (c) => {
   const body = await c.req.json();
   const db = c.env.DB;
-  const sql = `INSERT INTO ${TABLENAME} (id, title, body, images, timestamp, video) VALUES (?, ?, ?, ?, ?, ?)`;
+  const sql = `INSERT INTO ${TABLENAME} (id, title, body, images, timestamp, video, pin) VALUES (?, ?, ?, ?, ?, ?, 0)`;
   const params = [
     crypto.randomUUID(), // Native crypto API in Cloudflare Workers
     body.title,
