@@ -1,20 +1,15 @@
 /**
- * Purges specific Cloudflare Cache prefixes.
+ * Purges the entire Cloudflare Cache.
  * Requires CLOUDFLARE_ZONE_ID and CLOUDFLARE_API_KEY to be set in the environment variables (c.env).
  * @param {any} env - Hono environment variables
- * @param {string[]} prefixes - Array of prefixes to purge (e.g., ["oncce.ca/api/announcements"])
  */
-export const purgeCache = async (env, prefixes) => {
+export const purgeCache = async (env) => {
   if (!env.CLOUDFLARE_ZONE_ID || !env.CLOUDFLARE_API_KEY) {
     console.warn("⚠️ CLOUDFLARE_ZONE_ID or CLOUDFLARE_API_KEY is missing. Skipping cache purge.");
     return;
   }
 
-  if (!prefixes || prefixes.length === 0) {
-    return;
-  }
-
-  console.log(`🧹 Triggering Cloudflare Cache Purge for prefixes: ${prefixes.join(", ")}`);
+  console.log(`🧹 Triggering Cloudflare Cache Purge (Purge Everything)`);
 
   try {
     const res = await fetch(`https://api.cloudflare.com/client/v4/zones/${env.CLOUDFLARE_ZONE_ID}/purge_cache`, {
@@ -23,7 +18,7 @@ export const purgeCache = async (env, prefixes) => {
         "Authorization": `Bearer ${env.CLOUDFLARE_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ prefixes }),
+      body: JSON.stringify({ purge_everything: true }),
     });
 
     if (!res.ok) {

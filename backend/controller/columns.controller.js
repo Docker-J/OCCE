@@ -56,7 +56,7 @@ export const postColumnController = async (c) => {
   ];
 
   const result = await executeD1Query(db, sql, params);
-  await purgeCache(c.env, ["oncce.ca/api/columns"]);
+  await purgeCache(c.env);
   return c.json(result);
 };
 
@@ -90,7 +90,7 @@ export const editColumnController = async (c) => {
   ];
 
   const updateResult = await executeD1Query(db, sql, params);
-  await purgeCache(c.env, ["oncce.ca/api/columns"]);
+  await purgeCache(c.env);
   return c.json(updateResult);
 };
 
@@ -114,6 +114,6 @@ export const deleteColumnController = async (c) => {
   const deleteParams = [id];
   await executeD1Query(db, deleteSql, deleteParams);
 
-  await purgeCache(c.env, ["oncce.ca/api/columns"]);
+  await purgeCache(c.env);
   return c.body(null, 200);
 };
