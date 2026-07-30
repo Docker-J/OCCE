@@ -104,6 +104,6 @@ export const postMeditationONController = async (c) => {
   const response = await docClient.send(command);
   console.log(response);
 
-  await purgeCache(c.env, ["oncce.ca/api/meditation-on"]);
+  await purgeCache(c.env);
   return c.body(null, 201);
 };

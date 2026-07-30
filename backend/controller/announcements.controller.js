@@ -60,7 +60,7 @@ export const postAnnouncementController = async (c) => {
   ];
 
   const result = await executeD1Query(db, sql, params);
-  await purgeCache(c.env, ["oncce.ca/api/announcements"]);
+  await purgeCache(c.env);
   return c.json(result);
 };
 
@@ -96,7 +96,7 @@ export const editAnnouncementController = async (c) => {
   ];
 
   const updateResult = await executeD1Query(db, sql, params);
-  await purgeCache(c.env, ["oncce.ca/api/announcements"]);
+  await purgeCache(c.env);
   return c.json(updateResult);
 };
 
@@ -120,7 +120,7 @@ export const deleteAnnouncementController = async (c) => {
   const deleteParams = [id];
   await executeD1Query(db, deleteSql, deleteParams);
   
-  await purgeCache(c.env, ["oncce.ca/api/announcements"]);
+  await purgeCache(c.env);
   return c.body(null, 200);
 };
 
@@ -133,6 +133,6 @@ export const pinAnnouncementController = async (c) => {
   const params = [body.pin, id];
 
   await executeD1Query(db, sql, params);
-  await purgeCache(c.env, ["oncce.ca/api/announcements"]);
+  await purgeCache(c.env);
   return c.body(null, 201);
 };
