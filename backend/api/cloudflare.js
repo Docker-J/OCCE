@@ -1,29 +1,20 @@
 /**
- * Purges specific Cloudflare Cache URLs (files) to bypass prefix restrictions on Free/Pro tiers.
+ * Purges specific Cloudflare Cache prefixes.
  * Requires CLOUDFLARE_ZONE_ID and CLOUDFLARE_API_KEY to be set in the environment variables (c.env).
  * @param {any} env - Hono environment variables
- * @param {string[]} baseUrls - Array of base URLs to purge (e.g., ["https://oncce.ca/api/announcements"])
+ * @param {string[]} prefixes - Array of prefixes to purge (e.g., ["oncce.ca/api/announcements"])
  */
-export const purgeCache = async (env, baseUrls) => {
+export const purgeCache = async (env, prefixes) => {
   if (!env.CLOUDFLARE_ZONE_ID || !env.CLOUDFLARE_API_KEY) {
     console.warn("⚠️ CLOUDFLARE_ZONE_ID or CLOUDFLARE_API_KEY is missing. Skipping cache purge.");
     return;
   }
 
-  if (!baseUrls || baseUrls.length === 0) {
+  if (!prefixes || prefixes.length === 0) {
     return;
   }
 
-  // Generate exact URLs to purge, including common pagination parameters
-  const files = [];
-  for (const url of baseUrls) {
-    files.push(url); // e.g. /api/announcements
-    for (let i = 1; i <= 10; i++) {
-      files.push(`${url}?page=${i}`);
-    }
-  }
-
-  console.log(`🧹 Triggering Cloudflare Cache Purge for exactly ${files.length} URLs (files).`);
+  console.log(`🧹 Triggering Cloudflare Cache Purge for prefixes: ${prefixes.join(", ")}`);
 
   try {
     const res = await fetch(`https://api.cloudflare.com/client/v4/zones/${env.CLOUDFLARE_ZONE_ID}/purge_cache`, {
@@ -32,7 +23,7 @@ export const purgeCache = async (env, baseUrls) => {
         "Authorization": `Bearer ${env.CLOUDFLARE_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ files }),
+      body: JSON.stringify({ prefixes }),
     });
 
     if (!res.ok) {
