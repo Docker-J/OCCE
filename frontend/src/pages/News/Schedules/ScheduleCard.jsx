@@ -33,7 +33,6 @@ const MarqueeText = ({ children, typographyProps, boxProps }) => {
   const textRef = useRef(null);
   const [isOverflowing, setIsOverflowing] = useState(false);
   const [overflowAmount, setOverflowAmount] = useState(0);
-  const [isClicked, setIsClicked] = useState(false);
 
   useEffect(() => {
     const checkOverflow = () => {
@@ -55,33 +54,16 @@ const MarqueeText = ({ children, typographyProps, boxProps }) => {
     return () => window.removeEventListener("resize", checkOverflow);
   }, [children]);
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (containerRef.current && !containerRef.current.contains(e.target)) {
-        setIsClicked(false);
-      }
-    };
-    document.addEventListener("touchstart", handleClickOutside);
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("touchstart", handleClickOutside);
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
   return (
     <Box 
       ref={containerRef} 
-      onClick={() => isOverflowing && setIsClicked(!isClicked)}
       {...boxProps}
-      className={isClicked ? "is-clicked" : ""}
       sx={{ 
         overflow: "hidden", 
         width: "100%", 
         minWidth: 0, 
-        cursor: isOverflowing ? "pointer" : "inherit",
         ...boxProps?.sx,
-        "&:hover .marquee-text, &.is-clicked .marquee-text": isOverflowing ? {
+        ".schedule-card:hover & .marquee-text, .schedule-card.is-clicked & .marquee-text": isOverflowing ? {
           display: "inline-block",
           width: "max-content",
           overflow: "visible",
@@ -115,6 +97,8 @@ const MarqueeText = ({ children, typographyProps, boxProps }) => {
 
 const ScheduleCard = ({ date, event, sunday, isLast }) => {
   const allday = event.allday;
+  const [isClicked, setIsClicked] = useState(false);
+  const cardRef = useRef(null);
 
   const start = parseISO(allday ? event.start.date : event.start.dateTime);
   const end = parseISO(allday ? event.end.date : event.end.dateTime);
@@ -125,14 +109,32 @@ const ScheduleCard = ({ date, event, sunday, isLast }) => {
 
   const sameDay = isSameDayEvent(start, end, endTime);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (cardRef.current && !cardRef.current.contains(e.target)) {
+        setIsClicked(false);
+      }
+    };
+    document.addEventListener("touchstart", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("touchstart", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <Box
+      ref={cardRef}
+      className={`schedule-card ${isClicked ? "is-clicked" : ""}`}
+      onClick={() => setIsClicked(!isClicked)}
       sx={{
         py: 1.5,
         px: 1.5,
         my: 0.5,
         borderRadius: "12px",
         minWidth: 0,
+        cursor: "pointer",
         borderBottom: isLast ? "none" : "1px solid rgba(0, 0, 0, 0.04)",
         transition: "background-color 0.2s, transform 0.2s",
         "&:hover": {
