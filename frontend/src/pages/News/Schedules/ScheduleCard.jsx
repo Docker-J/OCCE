@@ -101,14 +101,25 @@ const ScheduleCard = ({ date, event, sunday, isLast }) => {
     <Box
       sx={{
         py: 1.5,
+        px: 1.5,
+        my: 0.5,
+        borderRadius: "12px",
         minWidth: 0,
-        borderBottom: isLast ? "none" : "1px solid rgba(0, 0, 0, 0.05)",
+        borderBottom: isLast ? "none" : "1px solid rgba(0, 0, 0, 0.04)",
+        transition: "background-color 0.2s, transform 0.2s",
+        "&:hover": {
+          backgroundColor: "rgba(0, 0, 0, 0.02)",
+        },
         ...(allday && {
           borderLeft: `4px solid ${sunday ? "#c1121f" : "#FF6B00"}`,
+          borderBottom: "none",
           pl: 2,
           my: 1,
-          bgcolor: sunday ? "rgba(193, 18, 31, 0.02)" : "rgba(255, 107, 0, 0.02)",
-          borderRadius: "0 8px 8px 0"
+          bgcolor: sunday ? "rgba(193, 18, 31, 0.03)" : "rgba(255, 107, 0, 0.03)",
+          borderRadius: "4px 12px 12px 4px",
+          "&:hover": {
+            backgroundColor: sunday ? "rgba(193, 18, 31, 0.06)" : "rgba(255, 107, 0, 0.06)",
+          }
         }),
       }}
     >

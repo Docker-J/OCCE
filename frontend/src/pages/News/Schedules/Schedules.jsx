@@ -35,7 +35,16 @@ const Schedules = () => {
           </Typography>
         </div>
       </div>
-      <div className="container-wrapper" style={{ backgroundColor: "#fcfbf9", minHeight: "60vh", paddingTop: "20px", paddingBottom: "40px" }}>
+      <div 
+        className="container-wrapper" 
+        style={{ 
+          backgroundColor: "#fcfbf9", 
+          backgroundImage: "radial-gradient(at 0% 0%, hsla(28,100%,74%,0.08) 0px, transparent 50%), radial-gradient(at 100% 0%, hsla(349,100%,71%,0.05) 0px, transparent 50%)",
+          minHeight: "60vh", 
+          paddingTop: "20px", 
+          paddingBottom: "40px" 
+        }}
+      >
         <div
           className="container"
           style={{ display: "flex", justifyContent: "center" }}

@@ -59,27 +59,19 @@ const Schedule = ({ events }) => {
           sx={{
             display: "flex",
             alignItems: "center",
-            gap: 1.5,
-            mt: 3,
-            mb: 2.5,
-            px: 0.5,
+            gap: 2,
+            mt: 5,
+            mb: 3,
+            px: 1,
           }}
         >
-          <Box
-            sx={{
-              width: "4px",
-              height: "22px",
-              borderRadius: "4px",
-              bgcolor: "#FF6B00",
-            }}
-          />
           <Typography
-            variant="h5"
+            variant="h4"
             sx={{
-              fontWeight: 850,
-              color: "#1e1e1e",
-              fontSize: { xs: "20px", sm: "24px" },
+              fontWeight: 700,
+              fontSize: { xs: "24px", sm: "30px" },
               letterSpacing: "-0.02em",
+              color: "#2b2b2b",
             }}
           >
             {month}
@@ -87,9 +79,9 @@ const Schedule = ({ events }) => {
           <Box
             sx={{
               flex: 1,
-              height: "1px",
-              bgcolor: "rgba(0, 0, 0, 0.08)",
-              ml: 1,
+              height: "2px",
+              background: "linear-gradient(90deg, rgba(0, 0, 0, 0.1) 0%, transparent 100%)",
+              borderRadius: "2px",
             }}
           />
         </Box>
@@ -107,39 +99,43 @@ const Schedule = ({ events }) => {
               key={date}
               elevation={0}
               sx={{
-                mb: 2,
+                mb: 2.5,
                 display: "flex",
                 overflow: "hidden",
                 borderRadius: "24px",
-                backgroundColor: "#ffffff",
+                backgroundColor: "rgba(255, 255, 255, 0.75)",
+                backdropFilter: "blur(20px)",
+                WebkitBackdropFilter: "blur(20px)",
                 boxShadow: sunday
-                  ? "0 4px 20px rgba(193, 18, 31, 0.12), 0 1px 10px rgba(0, 0, 0, 0.06)"
-                  : "0 4px 20px rgba(255, 107, 0, 0.12), 0 1px 10px rgba(0, 0, 0, 0.06)",
+                  ? "0 10px 40px rgba(193, 18, 31, 0.06), inset 0 0 0 1px rgba(255,255,255,0.5)"
+                  : "0 10px 40px rgba(255, 107, 0, 0.06), inset 0 0 0 1px rgba(255,255,255,0.5)",
                 border: sunday
-                  ? "1px solid rgba(193, 18, 31, 0.3)"
-                  : "1px solid rgba(255, 107, 0, 0.3)",
-                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  ? "1px solid rgba(193, 18, 31, 0.15)"
+                  : "1px solid rgba(255, 107, 0, 0.15)",
+                transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                 "&:hover": {
-                  transform: "translateY(-3px)",
+                  transform: "translateY(-4px)",
                   boxShadow: sunday
-                    ? "0 12px 30px rgba(193, 18, 31, 0.2)"
-                    : "0 12px 30px rgba(255, 107, 0, 0.2)",
+                    ? "0 15px 50px rgba(193, 18, 31, 0.12), inset 0 0 0 1px rgba(255,255,255,0.8)"
+                    : "0 15px 50px rgba(255, 107, 0, 0.12), inset 0 0 0 1px rgba(255,255,255,0.8)",
                   borderColor: sunday
-                    ? "rgba(193, 18, 31, 0.5)"
-                    : "rgba(255, 107, 0, 0.5)",
+                    ? "rgba(193, 18, 31, 0.3)"
+                    : "rgba(255, 107, 0, 0.3)",
                 },
               }}
             >
               <Box
                 sx={{
-                  backgroundColor: sunday ? "rgba(193, 18, 31, 0.12)" : "rgba(255, 107, 0, 0.12)",
+                  background: sunday 
+                    ? "linear-gradient(145deg, rgba(193, 18, 31, 0.15), rgba(193, 18, 31, 0.05))" 
+                    : "linear-gradient(145deg, rgba(255, 107, 0, 0.15), rgba(255, 107, 0, 0.05))",
                   p: { xs: 1.5, sm: 2.5 },
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
                   width: { xs: "75px", sm: "90px" },
-                  borderRight: `1px solid ${sunday ? "rgba(193, 18, 31, 0.25)" : "rgba(255, 107, 0, 0.25)"}`,
+                  borderRight: `1px solid ${sunday ? "rgba(193, 18, 31, 0.15)" : "rgba(255, 107, 0, 0.15)"}`,
                 }}
               >
                 <Typography
