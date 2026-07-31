@@ -33,6 +33,7 @@ const MarqueeText = ({ children, typographyProps, boxProps }) => {
   const textRef = useRef(null);
   const [isOverflowing, setIsOverflowing] = useState(false);
   const [overflowAmount, setOverflowAmount] = useState(0);
+  const [isClicked, setIsClicked] = useState(false);
 
   useEffect(() => {
     const checkOverflow = () => {
@@ -40,7 +41,7 @@ const MarqueeText = ({ children, typographyProps, boxProps }) => {
         const textWidth = textRef.current.offsetWidth;
         const containerWidth = containerRef.current.clientWidth;
         if (textWidth > containerWidth) {
-          setOverflowAmount(textWidth - containerWidth + 4);
+          setOverflowAmount(textWidth - containerWidth + 10);
           setIsOverflowing(true);
         } else {
           setIsOverflowing(false);
@@ -54,23 +55,50 @@ const MarqueeText = ({ children, typographyProps, boxProps }) => {
     return () => window.removeEventListener("resize", checkOverflow);
   }, [children]);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setIsClicked(false);
+      }
+    };
+    document.addEventListener("touchstart", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("touchstart", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <Box 
       ref={containerRef} 
+      onClick={() => isOverflowing && setIsClicked(!isClicked)}
       {...boxProps}
-      sx={{ overflow: "hidden", width: "100%", minWidth: 0, ...boxProps?.sx }}
+      className={isClicked ? "is-clicked" : ""}
+      sx={{ 
+        overflow: "hidden", 
+        width: "100%", 
+        minWidth: 0, 
+        cursor: isOverflowing ? "pointer" : "inherit",
+        ...boxProps?.sx,
+        "&:hover .marquee-text, &.is-clicked .marquee-text": isOverflowing ? {
+          display: "inline-block",
+          width: "max-content",
+          overflow: "visible",
+          textOverflow: "clip",
+          animation: `${marquee} 6s linear infinite`,
+        } : {}
+      }}
       style={isOverflowing ? { "--overflow-amount": `${overflowAmount}px`, ...boxProps?.style } : boxProps?.style}
     >
       <Box
+        className="marquee-text"
         sx={{
-          display: isOverflowing ? "inline-block" : "block",
+          display: "block",
+          width: "100%",
           whiteSpace: "nowrap",
-          overflow: isOverflowing ? "visible" : "hidden",
-          textOverflow: isOverflowing ? "clip" : "ellipsis",
-          animation: isOverflowing ? `${marquee} 8s ease-in-out infinite` : "none",
-          "&:hover": {
-            animationPlayState: "paused",
-          },
+          overflow: "hidden",
+          textOverflow: "ellipsis",
         }}
       >
         <Typography
