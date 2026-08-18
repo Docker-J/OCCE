@@ -1,1 +1,0 @@
-import{y as e}from"./format-BWg8LcRN.js";function t(t,n){return e(t,n?.in).getDay()===0}export{t};

@@ -1,1 +1,0 @@
-import{y as e}from"./createSimplePaletteValueFilter-JVTA6G-l.js";var t=e();export{t};

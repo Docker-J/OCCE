@@ -26,6 +26,24 @@ export default defineConfig(() => {
             ) {
               return "reactVendor";
             }
+            if (
+              id.includes("node_modules/@mui/material") ||
+              id.includes("node_modules/@emotion")
+            ) {
+              return "mui";
+            }
+            if (id.includes("node_modules/@mui/icons-material")) {
+              return "muiIcons";
+            }
+            if (
+              id.includes("node_modules/date-fns") ||
+              id.includes("node_modules/date-fns-tz")
+            ) {
+              return "dateFns";
+            }
+            if (id.includes("node_modules/@tanstack/react-query")) {
+              return "tanstackQuery";
+            }
           },
         },
       },
