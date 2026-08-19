@@ -16,7 +16,7 @@
     "@tanstack/react-query-devtools": "^5.101.4",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
-    "@testing-library/user-event": "^14.6.1",
+    "@testing-library/user-event": "^14.6.4",
     "@uidotdev/usehooks": "^2.4.1",
     "@vis.gl/react-google-maps": "^1.9.0",
     "axios": "^1.18.1",
