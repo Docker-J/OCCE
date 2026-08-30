@@ -1,5 +1,40 @@
 import { google } from "googleapis";
+import {
+  CognitoIdentityProviderClient,
+  GetUserCommand,
+} from "@aws-sdk/client-cognito-identity-provider";
 import { getGoogleAuth } from "../api/googleAuth.js";
+
+// Helper to get Cognito client
+const getCognitoClient = (env) => {
+  return new CognitoIdentityProviderClient({
+    region: env.AWS_REGION || "us-west-2",
+    credentials: {
+      accessKeyId: env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+    },
+  });
+};
+
+// Helper to fetch user attributes from Cognito using Access Token
+const getCognitoUserAttributes = async (c) => {
+  try {
+    const authHeader = c.req.header("Authorization");
+    if (!authHeader) return {};
+    const token = authHeader.split(" ")[1];
+    const client = getCognitoClient(c.env);
+    const command = new GetUserCommand({ AccessToken: token });
+    const response = await client.send(command);
+    const attributes = {};
+    for (const attr of response.UserAttributes || []) {
+      attributes[attr.Name] = attr.Value;
+    }
+    return attributes;
+  } catch (err) {
+    console.error("Failed to get Cognito user attributes:", err);
+    return {};
+  }
+};
 
 // Helper to get Google Sheets client
 const getSheetsClient = (env) => {
@@ -9,8 +44,6 @@ const getSheetsClient = (env) => {
   ]);
   return google.sheets({ version: "v4", auth });
 };
-
-// Helper to get Google Sheets client
 
 // Helper to get Google Drive client
 const getDriveClient = (env) => {
@@ -35,61 +68,68 @@ export const getGardensController = async (c) => {
 
   // Only non-staff need to verify mapping against '정원지기' tab
   if (!isStaff) {
-    cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
+    const userAttributes = await getCognitoUserAttributes(c);
+    const rawPhone = userAttributes.phone_number || "";
+    cleanUserPhone = rawPhone.replace(/\D/g, "");
+    console.log("GardenKeeper Phone (raw):", rawPhone, "Clean:", cleanUserPhone);
   }
 
   const sheets = getSheetsClient(env);
 
-    // 1. Read sheet metadata to get tab names
-    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
-    const sheetNames = spreadsheet.data.sheets.map((s) => s.properties.title);
+  // 1. Read sheet metadata to get tab names
+  const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+  const sheetNames = spreadsheet.data.sheets.map((s) => s.properties.title);
 
-    let assignedGardens = [];
+  let assignedGardens = [];
 
-    if (!isStaff) {
-      // 2. Read Garden Keepers mapping sheet
-      if (!sheetNames.includes("정원지기")) {
-        return c.json(
-          { error: "'정원지기' tab not found in the spreadsheet." },
-          500,
-        );
-      }
+  if (!isStaff) {
+    // 2. Read Garden Keepers mapping sheet
+    if (!sheetNames.includes("정원지기")) {
+      return c.json(
+        { error: "'정원지기' tab not found in the spreadsheet." },
+        500,
+      );
+    }
 
-      const keepersResponse = await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: "정원지기!A:D",
-      });
-      const keeperRows = keepersResponse.data.values || [];
+    const keepersResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "정원지기!A:D",
+    });
+    const keeperRows = keepersResponse.data.values || [];
 
-      // Dynamically skip header if it exists
-      const startIdx =
-        keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
+    // Dynamically skip header if it exists
+    const startIdx =
+      keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
 
-      for (const row of keeperRows.slice(startIdx)) {
-        const phone = row[2]?.toString().replace(/\D/g, "") || "";
-        const gardensStr = row[3]?.toString().trim() || "";
+    for (const row of keeperRows.slice(startIdx)) {
+      const phone = row[2]?.toString().replace(/\D/g, "") || "";
+      const gardensStr = row[3]?.toString().trim() || "";
 
-        if (phone.slice(-10) === cleanUserPhone.slice(-10)) {
-          assignedGardens = gardensStr
-            .split(",")
-            .map((g) => g.trim())
-            .filter(Boolean);
-          break;
-        }
-      }
-
-      // Authorization: Non-staff users must be mapped to at least one garden
-      if (assignedGardens.length === 0) {
-        return c.json(
-          {
-            error: "NotAssignedLeader",
-            message:
-              "이 계정의 전화번호가 스프레드시트의 '정원지기' 명단에 존재하지 않거나 정원이 매핑되지 않았습니다.",
-          },
-          403,
-        );
+      if (
+        cleanUserPhone.length >= 10 &&
+        phone.length >= 10 &&
+        phone.slice(-10) === cleanUserPhone.slice(-10)
+      ) {
+        assignedGardens = gardensStr
+          .split(",")
+          .map((g) => g.trim())
+          .filter(Boolean);
+        break;
       }
     }
+
+    // Authorization: Non-staff users must be mapped to at least one garden
+    if (assignedGardens.length === 0) {
+      return c.json(
+        {
+          error: "NotAssignedLeader",
+          message:
+            "이 계정의 전화번호가 스프레드시트의 '정원지기' 명단에 존재하지 않거나 정원이 매핑되지 않았습니다.",
+        },
+        403,
+      );
+    }
+  }
 
   const gardensData = {};
 
@@ -116,29 +156,30 @@ export const getGardensController = async (c) => {
       batchResponse.data.valueRanges.forEach((vr, idx) => {
         const gardenName = gardenTabs[idx];
         const rows = vr.values || [];
-        // Filter out header row (like "이름") or empty values
+        // Filter out header row (like "이름", "성명") or empty values
         const members = rows
           .map((r) => r[0]?.toString().trim())
-          .filter((name) => name && name !== "이름");
+          .filter((name) => name && name !== "이름" && name !== "성명");
         gardensData[gardenName] = members;
       });
     }
   } else {
     // GardenKeeper can only see their assigned gardens
     for (const garden of assignedGardens) {
-      if (!sheetNames.includes(garden)) {
+      const matchedTab = sheetNames.find((s) => s.trim() === garden.trim());
+      if (!matchedTab) {
         console.warn(`Garden tab '${garden}' not found in spreadsheet.`);
         continue;
       }
 
       const memberResponse = await sheets.spreadsheets.values.get({
         spreadsheetId,
-        range: `${garden}!A:A`,
+        range: `${matchedTab}!A:A`,
       });
       const rows = memberResponse.data.values || [];
       const members = rows
         .map((r) => r[0]?.toString().trim())
-        .filter((name) => name && name !== "이름");
+        .filter((name) => name && name !== "이름" && name !== "성명");
       gardensData[garden] = members;
     }
   }
@@ -171,262 +212,206 @@ export const postReportController = async (c) => {
 
   const isStaff = user["cognito:groups"]?.includes("Staff") || false;
   let cleanUserPhone = "";
+  let reporterName = isStaff ? "목회자/스태프" : "";
 
   // Only non-staff need to verify mapping against '정원지기' tab
   if (!isStaff) {
-    cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
+    const userAttributes = await getCognitoUserAttributes(c);
+    const rawPhone = userAttributes.phone_number || "";
+    cleanUserPhone = rawPhone.replace(/\D/g, "");
+    reporterName = userAttributes.name || user.name || "";
   }
 
   const sheets = getSheetsClient(env);
   const drive = getDriveClient(env);
 
-    let assignedGardens = [];
-    let reporterName = isStaff ? "목회자/스태프" : (user.name || "");
+  let assignedGardens = [];
 
-    if (!isStaff) {
-      // 1. Read keepers mapping from the master spreadsheet to check authorization and get reporterName
-      const keepersResponse = await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: "정원지기!A:D",
-      });
-      const keeperRows = keepersResponse.data.values || [];
-      const startIdx =
-        keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
+  if (!isStaff) {
+    // 1. Read keepers mapping from the master spreadsheet to check authorization and get reporterName
+    const keepersResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "정원지기!A:D",
+    });
+    const keeperRows = keepersResponse.data.values || [];
+    const startIdx =
+      keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
 
-      for (const row of keeperRows.slice(startIdx)) {
-        const phone = row[2]?.toString().replace(/\D/g, "") || "";
-        const name = row[0]?.toString().trim();
-        const gardensStr = row[3]?.toString().trim() || "";
+    for (const row of keeperRows.slice(startIdx)) {
+      const phone = row[2]?.toString().replace(/\D/g, "") || "";
+      const name = row[0]?.toString().trim();
+      const gardensStr = row[3]?.toString().trim() || "";
 
-        if (phone.slice(-10) === cleanUserPhone.slice(-10)) {
-          assignedGardens = gardensStr
-            .split(",")
-            .map((g) => g.trim())
-            .filter(Boolean);
-          reporterName = name || user.name || "";
-          break;
-        }
-      }
-
-      // Security check for non-staff
-      if (!assignedGardens.includes(gardenName)) {
-        return c.json(
-          {
-            error: "UnauthorizedGardenReport",
-            message: "본인이 담당하지 않은 정원의 출석을 보고할 수 없습니다.",
-          },
-          403,
-        );
+      if (
+        cleanUserPhone.length >= 10 &&
+        phone.length >= 10 &&
+        phone.slice(-10) === cleanUserPhone.slice(-10)
+      ) {
+        assignedGardens = gardensStr
+          .split(",")
+          .map((g) => g.trim())
+          .filter(Boolean);
+        reporterName = name || reporterName || "";
+        break;
       }
     }
 
-    // 2. Search for existing weekly file named 'OCCE_정원출석부_[date]' in DRIVE_FOLDER_ID
-    const fileName = `OCCE_정원출석부_${date}`;
-    console.log(
-      `Searching for file '${fileName}' in Shared Drive folder '${folderId}'...`,
-    );
-    const searchResponse = await drive.files.list({
-      q: `'${folderId}' in parents and name = '${fileName}' and trashed = false`,
-      spaces: "drive",
-      fields: "files(id, name)",
-      supportsAllDrives: true,
-      includeItemsFromAllDrives: true,
-    });
-    const filesList = searchResponse.data.files || [];
-    let weeklySpreadsheetId = null;
-
-    if (filesList.length > 0) {
-      weeklySpreadsheetId = filesList[0].id;
-      console.log(`Found existing weekly spreadsheet: ${weeklySpreadsheetId}`);
-    } else {
-      // 3. File does not exist: Copy master spreadsheet to folderId
-      console.log(
-        `Weekly spreadsheet not found. Copying master spreadsheet ${spreadsheetId}...`,
-      );
-      const copyResponse = await drive.files.copy({
-        fileId: spreadsheetId,
-        requestBody: {
-          name: fileName,
-          parents: [folderId],
-        },
-        supportsAllDrives: true,
-      });
-      weeklySpreadsheetId = copyResponse.data.id;
-      console.log(
-        `Master spreadsheet copied successfully. New ID: ${weeklySpreadsheetId}`,
-      );
-
-      // 4. Initialize the copied weekly spreadsheet: Add '종합통계' tab and configure all garden tabs
-      const weeklySpreadsheetInfo = await sheets.spreadsheets.get({
-        spreadsheetId: weeklySpreadsheetId,
-      });
-      const weeklySheetNames = weeklySpreadsheetInfo.data.sheets.map(
-        (s) => s.properties.title,
-      );
-
-      // Find '정원지기' tab to delete
-      const keepersSheet = weeklySpreadsheetInfo.data.sheets.find(
-        (s) => s.properties.title === "정원지기",
-      );
-      const keepersSheetId = keepersSheet
-        ? keepersSheet.properties.sheetId
-        : null;
-
-      // Create '종합통계' sheet tab at index 0 and delete '정원지기' sheet tab
-      console.log("Creating '종합통계' tab and deleting '정원지기' tab...");
-      const batchRequests = [
+    // Security check for non-staff
+    if (!assignedGardens.map((g) => g.trim()).includes(gardenName.trim())) {
+      return c.json(
         {
-          addSheet: {
-            properties: {
-              title: "종합통계",
-              index: 0,
-            },
-          },
+          error: "UnauthorizedGardenReport",
+          message: "본인이 담당하지 않은 정원의 출석을 보고할 수 없습니다.",
         },
-      ];
-      if (keepersSheetId) {
-        batchRequests.push({
-          deleteSheet: {
-            sheetId: keepersSheetId,
-          },
-        });
-      }
-
-      const batchResponseUpdate = await sheets.spreadsheets.batchUpdate({
-        spreadsheetId: weeklySpreadsheetId,
-        requestBody: {
-          requests: batchRequests,
-        },
-      });
-
-      const summarySheetId = batchResponseUpdate.data.replies[0].addSheet.properties.sheetId;
-
-      // Filter to get only garden tabs
-      const gardenTabs = weeklySheetNames.filter(
-        (name) =>
-          name !== "정원지기" &&
-          name !== "종합통계" &&
-          name !== "정원모임보고" &&
-          !/^\d{4}-\d{2}-\d{2}$/.test(name),
+        403,
       );
+    }
+  }
 
-      // Fetch members count of all garden tabs to populate '종합통계' and initialize checkboxes
-      const ranges = gardenTabs.map((name) => `${name}!A:A`);
-      const batchResponse = await sheets.spreadsheets.values.batchGet({
-        spreadsheetId: weeklySpreadsheetId,
-        ranges,
-      });
+  // 2. Search for existing weekly file named 'OCCE_정원출석부_[date]' in DRIVE_FOLDER_ID
+  const fileName = `OCCE_정원출석부_${date}`;
+  console.log(
+    `Searching for file '${fileName}' in Shared Drive folder '${folderId}'...`,
+  );
+  const searchResponse = await drive.files.list({
+    q: `'${folderId}' in parents and name = '${fileName}' and trashed = false`,
+    spaces: "drive",
+    fields: "files(id, name)",
+    supportsAllDrives: true,
+    includeItemsFromAllDrives: true,
+  });
+  const filesList = searchResponse.data.files || [];
+  let weeklySpreadsheetId = null;
 
-      const summaryRows = [
-        ["보고여부", "정원", "총원", "출석", "결석", "출석율"],
-      ];
+  if (filesList.length > 0) {
+    weeklySpreadsheetId = filesList[0].id;
+    console.log(`Found existing weekly spreadsheet: ${weeklySpreadsheetId}`);
+  } else {
+    // 3. File does not exist: Copy master spreadsheet to folderId
+    console.log(
+      `Weekly spreadsheet not found. Copying master spreadsheet ${spreadsheetId}...`,
+    );
+    const copyResponse = await drive.files.copy({
+      fileId: spreadsheetId,
+      requestBody: {
+        name: fileName,
+        parents: [folderId],
+      },
+      supportsAllDrives: true,
+    });
+    weeklySpreadsheetId = copyResponse.data.id;
+    console.log(
+      `Master spreadsheet copied successfully. New ID: ${weeklySpreadsheetId}`,
+    );
 
-      const validationRequests = [];
-      const updateValueRequests = [];
+    // 4. Initialize the copied weekly spreadsheet: Add '종합통계' tab and configure all garden tabs
+    const weeklySpreadsheetInfo = await sheets.spreadsheets.get({
+      spreadsheetId: weeklySpreadsheetId,
+    });
+    const weeklySheetNames = weeklySpreadsheetInfo.data.sheets.map(
+      (s) => s.properties.title,
+    );
 
-      gardenTabs.forEach((gardenTabName, idx) => {
-        const vr = batchResponse.data.valueRanges[idx];
-        const rows = vr.values || [];
-        const members = rows
-          .map((r) => r[0]?.toString().trim())
-          .filter((name) => name && name !== "이름" && name !== "성명");
+    // Find '정원지기' tab to delete
+    const keepersSheet = weeklySpreadsheetInfo.data.sheets.find(
+      (s) => s.properties.title === "정원지기",
+    );
+    const keepersSheetId = keepersSheet
+      ? keepersSheet.properties.sheetId
+      : null;
 
-        const memberCount = members.length;
-        const rowIdx = idx + 2; // 1-based index (header is 1)
-
-        summaryRows.push([
-          false,
-          gardenTabName,
-          `=COUNTA('${gardenTabName}'!A1:A200)`,
-          `=COUNTIF('${gardenTabName}'!B1:B200, TRUE)`,
-          `=COUNTIF('${gardenTabName}'!B1:B200, FALSE)`,
-          `=IFERROR(D${rowIdx}/C${rowIdx}, 0)`,
-        ]);
-
-        const currentTab = weeklySpreadsheetInfo.data.sheets.find(
-          (s) => s.properties.title === gardenTabName,
-        );
-        const currentTabId = currentTab ? currentTab.properties.sheetId : null;
-
-        if (currentTabId && memberCount > 0) {
-          const falseValues = Array(memberCount).fill([false]);
-          updateValueRequests.push({
-            range: `${gardenTabName}!B1:B${memberCount}`,
-            values: falseValues,
-          });
-
-          validationRequests.push({
-            setDataValidation: {
-              range: {
-                sheetId: currentTabId,
-                startRowIndex: 0,
-                endRowIndex: memberCount,
-                startColumnIndex: 1,
-                endColumnIndex: 2,
-              },
-              rule: {
-                condition: {
-                  type: "BOOLEAN",
-                },
-                showCustomUi: true,
-              },
-            },
-          });
-        }
-      });
-
-      // Write '종합통계' values
-      await sheets.spreadsheets.values.update({
-        spreadsheetId: weeklySpreadsheetId,
-        range: "종합통계!A1",
-        valueInputOption: "USER_ENTERED",
-        requestBody: {
-          values: summaryRows,
+    // Create '종합통계' sheet tab at index 0 and delete '정원지기' sheet tab
+    console.log("Creating '종합통계' tab and deleting '정원지기' tab...");
+    const batchRequests = [
+      {
+        addSheet: {
+          properties: {
+            title: "종합통계",
+            index: 0,
+          },
+        },
+      },
+    ];
+    if (keepersSheetId) {
+      batchRequests.push({
+        deleteSheet: {
+          sheetId: keepersSheetId,
         },
       });
+    }
 
-      // Initialize checkbox values in each garden tab
-      if (updateValueRequests.length > 0) {
-        await sheets.spreadsheets.values.batchUpdate({
-          spreadsheetId: weeklySpreadsheetId,
-          requestBody: {
-            valueInputOption: "USER_ENTERED",
-            data: updateValueRequests,
-          },
-        });
-      }
+    const batchResponseUpdate = await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: weeklySpreadsheetId,
+      requestBody: {
+        requests: batchRequests,
+      },
+    });
 
-      // Add '종합통계' percentage formatting and column-wide checkbox data validation
-      if (summarySheetId && gardenTabs.length > 0) {
-        validationRequests.push({
-          repeatCell: {
-            range: {
-              sheetId: summarySheetId,
-              startRowIndex: 1,
-              endRowIndex: gardenTabs.length + 1,
-              startColumnIndex: 5,
-              endColumnIndex: 6,
-            },
-            cell: {
-              userEnteredFormat: {
-                numberFormat: {
-                  type: "PERCENT",
-                  pattern: "0%",
-                },
-              },
-            },
-            fields: "userEnteredFormat.numberFormat",
-          },
+    const summarySheetId =
+      batchResponseUpdate.data.replies[0].addSheet.properties.sheetId;
+
+    // Filter to get only garden tabs
+    const gardenTabs = weeklySheetNames.filter(
+      (name) =>
+        name !== "정원지기" &&
+        name !== "종합통계" &&
+        name !== "정원모임보고" &&
+        !/^\d{4}-\d{2}-\d{2}$/.test(name),
+    );
+
+    // Fetch members count of all garden tabs to populate '종합통계' and initialize checkboxes
+    const ranges = gardenTabs.map((name) => `${name}!A:A`);
+    const batchResponse = await sheets.spreadsheets.values.batchGet({
+      spreadsheetId: weeklySpreadsheetId,
+      ranges,
+    });
+
+    const summaryRows = [
+      ["보고여부", "정원", "총원", "출석", "결석", "출석율"],
+    ];
+
+    const validationRequests = [];
+    const updateValueRequests = [];
+
+    gardenTabs.forEach((gardenTabName, idx) => {
+      const vr = batchResponse.data.valueRanges[idx];
+      const rows = vr.values || [];
+      const members = rows
+        .map((r) => r[0]?.toString().trim())
+        .filter((name) => name && name !== "이름" && name !== "성명");
+
+      const memberCount = members.length;
+      const rowIdx = idx + 2; // 1-based index (header is 1)
+
+      summaryRows.push([
+        false,
+        gardenTabName,
+        `=COUNTA('${gardenTabName}'!A1:A200)`,
+        `=COUNTIF('${gardenTabName}'!B1:B200, TRUE)`,
+        `=COUNTIF('${gardenTabName}'!B1:B200, FALSE)`,
+        `=IFERROR(D${rowIdx}/C${rowIdx}, 0)`,
+      ]);
+
+      const currentTab = weeklySpreadsheetInfo.data.sheets.find(
+        (s) => s.properties.title === gardenTabName,
+      );
+      const currentTabId = currentTab ? currentTab.properties.sheetId : null;
+
+      if (currentTabId && memberCount > 0) {
+        const falseValues = Array(memberCount).fill([false]);
+        updateValueRequests.push({
+          range: `${gardenTabName}!B1:B${memberCount}`,
+          values: falseValues,
         });
 
         validationRequests.push({
           setDataValidation: {
             range: {
-              sheetId: summarySheetId,
-              startRowIndex: 1,
-              endRowIndex: gardenTabs.length + 1,
-              startColumnIndex: 0,
-              endColumnIndex: 1,
+              sheetId: currentTabId,
+              startRowIndex: 0,
+              endRowIndex: memberCount,
+              startColumnIndex: 1,
+              endColumnIndex: 2,
             },
             rule: {
               condition: {
@@ -437,133 +422,197 @@ export const postReportController = async (c) => {
           },
         });
       }
-
-      // Apply batch validations and formatting
-      if (validationRequests.length > 0) {
-        await sheets.spreadsheets.batchUpdate({
-          spreadsheetId: weeklySpreadsheetId,
-          requestBody: {
-            requests: validationRequests,
-          },
-        });
-      }
-    }
-
-    // 5. Update reported garden attendance in its tab & update '보고여부' in '종합통계' sheet in a single batch
-    console.log(`Updating attendance in tab '${gardenName}'...`);
-    const spreadsheetInfo = await sheets.spreadsheets.get({
-      spreadsheetId: weeklySpreadsheetId,
     });
-    const targetTab = spreadsheetInfo.data.sheets.find(
-      (s) => s.properties.title === gardenName,
-    );
-    if (!targetTab) {
-      return c.json(
-        {
-          error: "GardenTabNotFound",
-          message: `'${gardenName}' 탭이 스프레드시트에 존재하지 않습니다.`,
+
+    // Write '종합통계' values
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: weeklySpreadsheetId,
+      range: "종합통계!A1",
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: summaryRows,
+      },
+    });
+
+    // Initialize checkbox values in each garden tab
+    if (updateValueRequests.length > 0) {
+      await sheets.spreadsheets.values.batchUpdate({
+        spreadsheetId: weeklySpreadsheetId,
+        requestBody: {
+          valueInputOption: "USER_ENTERED",
+          data: updateValueRequests,
         },
-        404,
-      );
-    }
-    const targetTabId = targetTab.properties.sheetId;
-
-    const summaryTab = spreadsheetInfo.data.sheets.find(
-      (s) => s.properties.title === "종합통계",
-    );
-    const summaryTabId = summaryTab ? summaryTab.properties.sheetId : null;
-
-    const batchGetResp = await sheets.spreadsheets.values.batchGet({
-      spreadsheetId: weeklySpreadsheetId,
-      ranges: [`${gardenName}!A:A`, "종합통계!A:F"],
-    });
-    const rowsList = batchGetResp.data.valueRanges[0].values || [];
-    const summaryRowsData = batchGetResp.data.valueRanges[1].values || [];
-
-    const members = rowsList
-      .map((r) => r[0]?.toString().trim())
-      .filter((name) => name && name !== "이름" && name !== "성명");
-
-    let gardenRowIdx = -1;
-    for (let i = 1; i < summaryRowsData.length; i++) {
-      if (summaryRowsData[i][1]?.toString().trim() === gardenName.trim()) {
-        gardenRowIdx = i; // 0-based index
-        break;
-      }
+      });
     }
 
-    const updateRequests = [];
-
-    if (members.length > 0) {
-      const rowsData = members.map((name) => {
-        const isPresent = attendees.includes(name);
-        const reason = absenceReasons?.[name] || "";
-        return {
-          values: [
-            {
-              userEnteredValue: {
-                boolValue: isPresent,
+    // Add '종합통계' percentage formatting and column-wide checkbox data validation
+    if (summarySheetId && gardenTabs.length > 0) {
+      validationRequests.push({
+        repeatCell: {
+          range: {
+            sheetId: summarySheetId,
+            startRowIndex: 1,
+            endRowIndex: gardenTabs.length + 1,
+            startColumnIndex: 5,
+            endColumnIndex: 6,
+          },
+          cell: {
+            userEnteredFormat: {
+              numberFormat: {
+                type: "PERCENT",
+                pattern: "0%",
               },
-              note: !isPresent && reason ? reason : "",
             },
-          ],
-        };
-      });
-
-      updateRequests.push({
-        updateCells: {
-          rows: rowsData,
-          fields: "userEnteredValue,note",
-          range: {
-            sheetId: targetTabId,
-            startRowIndex: 0,
-            endRowIndex: members.length,
-            startColumnIndex: 1,
-            endColumnIndex: 2,
           },
+          fields: "userEnteredFormat.numberFormat",
         },
       });
-    }
 
-    if (summaryTabId && gardenRowIdx !== -1) {
-      updateRequests.push({
-        updateCells: {
-          rows: [
-            {
-              values: [
-                {
-                  userEnteredValue: {
-                    boolValue: true,
-                  },
-                },
-              ],
-            },
-          ],
-          fields: "userEnteredValue",
+      validationRequests.push({
+        setDataValidation: {
           range: {
-            sheetId: summaryTabId,
-            startRowIndex: gardenRowIdx,
-            endRowIndex: gardenRowIdx + 1,
+            sheetId: summarySheetId,
+            startRowIndex: 1,
+            endRowIndex: gardenTabs.length + 1,
             startColumnIndex: 0,
             endColumnIndex: 1,
           },
+          rule: {
+            condition: {
+              type: "BOOLEAN",
+            },
+            showCustomUi: true,
+          },
         },
       });
     }
 
-    if (updateRequests.length > 0) {
+    // Apply batch validations and formatting
+    if (validationRequests.length > 0) {
       await sheets.spreadsheets.batchUpdate({
         spreadsheetId: weeklySpreadsheetId,
         requestBody: {
-          requests: updateRequests,
+          requests: validationRequests,
         },
       });
     }
+  }
 
-    console.log(
-      `✅ Attendance reported successfully for ${gardenName} on ${date} (Weekly Sheet updated with native checkboxes and comments)`,
+  // 5. Update reported garden attendance in its tab & update '보고여부' in '종합통계' sheet in a single batch
+  console.log(`Updating attendance in tab '${gardenName}'...`);
+  const spreadsheetInfo = await sheets.spreadsheets.get({
+    spreadsheetId: weeklySpreadsheetId,
+  });
+  const targetTab = spreadsheetInfo.data.sheets.find(
+    (s) => s.properties.title === gardenName,
+  );
+  if (!targetTab) {
+    return c.json(
+      {
+        error: "GardenTabNotFound",
+        message: `'${gardenName}' 탭이 스프레드시트에 존재하지 않습니다.`,
+      },
+      404,
     );
-    return c.body(null, 200);
+  }
+  const targetTabId = targetTab.properties.sheetId;
+
+  const summaryTab = spreadsheetInfo.data.sheets.find(
+    (s) => s.properties.title === "종합통계",
+  );
+  const summaryTabId = summaryTab ? summaryTab.properties.sheetId : null;
+
+  const batchGetResp = await sheets.spreadsheets.values.batchGet({
+    spreadsheetId: weeklySpreadsheetId,
+    ranges: [`${gardenName}!A:A`, "종합통계!A:F"],
+  });
+  const rowsList = batchGetResp.data.valueRanges[0].values || [];
+  const summaryRowsData = batchGetResp.data.valueRanges[1].values || [];
+
+  const members = rowsList
+    .map((r) => r[0]?.toString().trim())
+    .filter((name) => name && name !== "이름" && name !== "성명");
+
+  let gardenRowIdx = -1;
+  for (let i = 1; i < summaryRowsData.length; i++) {
+    if (summaryRowsData[i][1]?.toString().trim() === gardenName.trim()) {
+      gardenRowIdx = i; // 0-based index
+      break;
+    }
+  }
+
+  const updateRequests = [];
+
+  if (members.length > 0) {
+    const rowsData = members.map((name) => {
+      const isPresent = attendees.includes(name);
+      const reason = absenceReasons?.[name] || "";
+      return {
+        values: [
+          {
+            userEnteredValue: {
+              boolValue: isPresent,
+            },
+            note: !isPresent && reason ? reason : "",
+          },
+        ],
+      };
+    });
+
+    updateRequests.push({
+      updateCells: {
+        rows: rowsData,
+        fields: "userEnteredValue,note",
+        range: {
+          sheetId: targetTabId,
+          startRowIndex: 0,
+          endRowIndex: members.length,
+          startColumnIndex: 1,
+          endColumnIndex: 2,
+        },
+      },
+    });
+  }
+
+  if (summaryTabId && gardenRowIdx !== -1) {
+    updateRequests.push({
+      updateCells: {
+        rows: [
+          {
+            values: [
+              {
+                userEnteredValue: {
+                  boolValue: true,
+                },
+              },
+            ],
+          },
+        ],
+        fields: "userEnteredValue",
+        range: {
+          sheetId: summaryTabId,
+          startRowIndex: gardenRowIdx,
+          endRowIndex: gardenRowIdx + 1,
+          startColumnIndex: 0,
+          endColumnIndex: 1,
+        },
+      },
+    });
+  }
+
+  if (updateRequests.length > 0) {
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: weeklySpreadsheetId,
+      requestBody: {
+        requests: updateRequests,
+      },
+    });
+  }
+
+  console.log(
+    `✅ Attendance reported successfully for ${gardenName} on ${date} (Weekly Sheet updated with native checkboxes and comments)`,
+  );
+  return c.body(null, 200);
 };
 
 export const postGatheringReportController = async (c) => {
@@ -580,208 +629,230 @@ export const postGatheringReportController = async (c) => {
   }
 
   const body = await c.req.json();
-  const { date, time, location, notes, gardenName, attendees, absentees } = body;
+  const { date, time, location, notes, gardenName, attendees, absentees } =
+    body;
   if (!date || !gardenName || !attendees || !absentees) {
     return c.json({ error: "Missing required fields." }, 400);
   }
 
   const isStaff = user["cognito:groups"]?.includes("Staff") || false;
   let cleanUserPhone = "";
+  let reporterName = isStaff ? "목회자/스태프" : "";
 
   if (!isStaff) {
-    cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
+    const userAttributes = await getCognitoUserAttributes(c);
+    const rawPhone = userAttributes.phone_number || "";
+    cleanUserPhone = rawPhone.replace(/\D/g, "");
+    reporterName = userAttributes.name || user.name || "";
   }
 
   const sheets = getSheetsClient(env);
   const drive = getDriveClient(env);
 
-    let assignedGardens = [];
-    let reporterName = isStaff ? "목회자/스태프" : (user.name || "");
+  let assignedGardens = [];
 
-    if (!isStaff) {
-      // 1. Read keepers mapping from the master spreadsheet to check authorization and get reporterName
-      const keepersResponse = await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: "정원지기!A:D",
-      });
-      const keeperRows = keepersResponse.data.values || [];
-      const startIdx =
-        keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
+  if (!isStaff) {
+    // 1. Read keepers mapping from the master spreadsheet to check authorization and get reporterName
+    const keepersResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "정원지기!A:D",
+    });
+    const keeperRows = keepersResponse.data.values || [];
+    const startIdx =
+      keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
 
-      for (const row of keeperRows.slice(startIdx)) {
-        const phone = row[2]?.toString().replace(/\D/g, "") || "";
-        const name = row[0]?.toString().trim();
-        const gardensStr = row[3]?.toString().trim() || "";
+    for (const row of keeperRows.slice(startIdx)) {
+      const phone = row[2]?.toString().replace(/\D/g, "") || "";
+      const name = row[0]?.toString().trim();
+      const gardensStr = row[3]?.toString().trim() || "";
 
-        if (phone.slice(-10) === cleanUserPhone.slice(-10)) {
-          assignedGardens = gardensStr
-            .split(",")
-            .map((g) => g.trim())
-            .filter(Boolean);
-          reporterName = name || user.name || "";
-          break;
-        }
-      }
-
-      // Security check for non-staff
-      if (!assignedGardens.includes(gardenName)) {
-        return c.json(
-          {
-            error: "UnauthorizedGardenReport",
-            message: "본인이 담당하지 않은 정원의 출석을 보고할 수 없습니다.",
-          },
-          403,
-        );
+      if (
+        cleanUserPhone.length >= 10 &&
+        phone.length >= 10 &&
+        phone.slice(-10) === cleanUserPhone.slice(-10)
+      ) {
+        assignedGardens = gardensStr
+          .split(",")
+          .map((g) => g.trim())
+          .filter(Boolean);
+        reporterName = name || reporterName || "";
+        break;
       }
     }
 
-    // 2. Search for existing file named '[GardenName]_[Date]' in DRIVE_FOLDER_ID
-    const fileName = `${gardenName}_${date}`;
-    console.log(`Searching for existing file '${fileName}' in Shared Drive folder '${folderId}'...`);
-    const searchResponse = await drive.files.list({
-      q: `name = '${fileName}' and '${folderId}' in parents and trashed = false`,
-      spaces: "drive",
-      fields: "files(id, name)",
-      supportsAllDrives: true,
-      includeItemsFromAllDrives: true,
-    });
-    const filesList = searchResponse.data.files || [];
+    // Security check for non-staff
+    if (!assignedGardens.map((g) => g.trim()).includes(gardenName.trim())) {
+      return c.json(
+        {
+          error: "UnauthorizedGardenReport",
+          message: "본인이 담당하지 않은 정원의 출석을 보고할 수 없습니다.",
+        },
+        403,
+      );
+    }
+  }
 
-    // Trash existing files with the same name if any
-    if (filesList.length > 0) {
-      for (const file of filesList) {
-        console.log(`Trashing existing file: ${file.name} (${file.id})`);
-        try {
-          await drive.files.update({
-            fileId: file.id,
-            requestBody: { trashed: true },
-            supportsAllDrives: true,
-          });
-        } catch (err) {
-          console.warn(`Failed to trash file ${file.id}:`, err.message);
-        }
+  // 2. Search for existing file named '[GardenName]_[Date]' in DRIVE_FOLDER_ID
+  const fileName = `${gardenName}_${date}`;
+  console.log(
+    `Searching for existing file '${fileName}' in Shared Drive folder '${folderId}'...`,
+  );
+  const searchResponse = await drive.files.list({
+    q: `name = '${fileName}' and '${folderId}' in parents and trashed = false`,
+    spaces: "drive",
+    fields: "files(id, name)",
+    supportsAllDrives: true,
+    includeItemsFromAllDrives: true,
+  });
+  const filesList = searchResponse.data.files || [];
+
+  // Trash existing files with the same name if any
+  if (filesList.length > 0) {
+    for (const file of filesList) {
+      console.log(`Trashing existing file: ${file.name} (${file.id})`);
+      try {
+        await drive.files.update({
+          fileId: file.id,
+          requestBody: { trashed: true },
+          supportsAllDrives: true,
+        });
+      } catch (err) {
+        console.warn(`Failed to trash file ${file.id}:`, err.message);
       }
     }
+  }
 
-    // 3. Copy master spreadsheet to folderId
-    console.log(`Copying master spreadsheet ${spreadsheetId} to file '${fileName}'...`);
-    const copyResponse = await drive.files.copy({
-      fileId: spreadsheetId,
-      requestBody: {
-        name: fileName,
-        parents: [folderId],
-      },
-      supportsAllDrives: true,
+  // 3. Copy master spreadsheet to folderId
+  console.log(
+    `Copying master spreadsheet ${spreadsheetId} to file '${fileName}'...`,
+  );
+  const copyResponse = await drive.files.copy({
+    fileId: spreadsheetId,
+    requestBody: {
+      name: fileName,
+      parents: [folderId],
+    },
+    supportsAllDrives: true,
+  });
+  const weeklySpreadsheetId = copyResponse.data.id;
+  console.log(
+    `Spreadsheet copied successfully. New ID: ${weeklySpreadsheetId}`,
+  );
+
+  // 4. Initialize the copied spreadsheet: Add '모임정보' tab, keep only 'gardenName' tab
+  const weeklySpreadsheetInfo = await sheets.spreadsheets.get({
+    spreadsheetId: weeklySpreadsheetId,
+  });
+  const weeklySheetNames = weeklySpreadsheetInfo.data.sheets.map(
+    (s) => s.properties.title,
+  );
+
+  const currentTab = weeklySpreadsheetInfo.data.sheets.find(
+    (s) => s.properties.title === gardenName,
+  );
+  const currentTabId = currentTab ? currentTab.properties.sheetId : null;
+
+  const batchRequests = [
+    { addSheet: { properties: { title: "모임정보", index: 0 } } },
+  ];
+
+  // Queue deletion of all other tabs except the active gardenName
+  weeklySpreadsheetInfo.data.sheets.forEach((sheet) => {
+    const title = sheet.properties.title;
+    const id = sheet.properties.sheetId;
+    if (title !== gardenName) {
+      batchRequests.push({ deleteSheet: { sheetId: id } });
+    }
+  });
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: weeklySpreadsheetId,
+    requestBody: { requests: batchRequests },
+  });
+
+  // 5. Get current members from column A of the garden tab to count and update checkboxes
+  const membersResponse = await sheets.spreadsheets.values.get({
+    spreadsheetId: weeklySpreadsheetId,
+    range: `${gardenName}!A:A`,
+  });
+  const rows = membersResponse.data.values || [];
+  const members = rows
+    .map((r) => r[0]?.toString().trim())
+    .filter((name) => name && name !== "이름" && name !== "성명");
+  const memberCount = members.length;
+
+  // 6. Write gathering info to '모임정보' tab and attendance checkboxes in a single batch values update
+  const localNow = new Date();
+  // Adjust to local timezone KST (UTC+9)
+  const kstOffset = 9 * 60 * 60 * 1000;
+  const kstNow = new Date(localNow.getTime() + kstOffset);
+  const timestamp = kstNow.toISOString().replace("T", " ").substring(0, 16);
+  const gatheringDateTime = `${date} ${time}`;
+
+  const infoRows = [
+    ["구분", "내용"],
+    ["모임정원", gardenName],
+    ["모임일시", gatheringDateTime],
+    ["모임장소", location || ""],
+    ["총원", `=COUNTA('${gardenName}'!A1:A200)`],
+    ["참석", `=COUNTIF('${gardenName}'!B1:B200, TRUE)`],
+    ["결석", `=COUNTIF('${gardenName}'!B1:B200, FALSE)`],
+    ["모임내용 및 기도제목", notes || ""],
+    ["보고일시", timestamp],
+  ];
+
+  const checkboxValues = members.map((name) => [attendees.includes(name)]);
+
+  const updateData = [
+    {
+      range: "모임정보!A1",
+      values: infoRows,
+    },
+  ];
+
+  if (memberCount > 0) {
+    updateData.push({
+      range: `${gardenName}!B1:B${memberCount}`,
+      values: checkboxValues,
     });
-    const weeklySpreadsheetId = copyResponse.data.id;
-    console.log(`Spreadsheet copied successfully. New ID: ${weeklySpreadsheetId}`);
+  }
 
-    // 4. Initialize the copied spreadsheet: Add '모임정보' tab, keep only 'gardenName' tab
-    const weeklySpreadsheetInfo = await sheets.spreadsheets.get({
-      spreadsheetId: weeklySpreadsheetId,
-    });
-    const weeklySheetNames = weeklySpreadsheetInfo.data.sheets.map((s) => s.properties.title);
+  await sheets.spreadsheets.values.batchUpdate({
+    spreadsheetId: weeklySpreadsheetId,
+    requestBody: {
+      valueInputOption: "USER_ENTERED",
+      data: updateData,
+    },
+  });
 
-    const currentTab = weeklySpreadsheetInfo.data.sheets.find((s) => s.properties.title === gardenName);
-    const currentTabId = currentTab ? currentTab.properties.sheetId : null;
-
-    const batchRequests = [{ addSheet: { properties: { title: "모임정보", index: 0 } } }];
-
-    // Queue deletion of all other tabs except the active gardenName
-    weeklySpreadsheetInfo.data.sheets.forEach((sheet) => {
-      const title = sheet.properties.title;
-      const id = sheet.properties.sheetId;
-      if (title !== gardenName) {
-        batchRequests.push({ deleteSheet: { sheetId: id } });
-      }
-    });
-
+  // 7. Update column-wide checkbox data validation in a single batchUpdate
+  if (currentTabId && memberCount > 0) {
     await sheets.spreadsheets.batchUpdate({
       spreadsheetId: weeklySpreadsheetId,
-      requestBody: { requests: batchRequests },
-    });
-
-    // 5. Get current members from column A of the garden tab to count and update checkboxes
-    const membersResponse = await sheets.spreadsheets.values.get({
-      spreadsheetId: weeklySpreadsheetId,
-      range: `${gardenName}!A:A`,
-    });
-    const rows = membersResponse.data.values || [];
-    const members = rows
-      .map((r) => r[0]?.toString().trim())
-      .filter((name) => name && name !== "이름" && name !== "성명");
-    const memberCount = members.length;
-
-    // 6. Write gathering info to '모임정보' tab and attendance checkboxes in a single batch values update
-    const localNow = new Date();
-    // Adjust to local timezone KST (UTC+9)
-    const kstOffset = 9 * 60 * 60 * 1000;
-    const kstNow = new Date(localNow.getTime() + kstOffset);
-    const timestamp = kstNow.toISOString().replace("T", " ").substring(0, 16);
-    const gatheringDateTime = `${date} ${time}`;
-
-    const infoRows = [
-      ["구분", "내용"],
-      ["모임정원", gardenName],
-      ["모임일시", gatheringDateTime],
-      ["모임장소", location || ""],
-      ["총원", `=COUNTA('${gardenName}'!A1:A200)`],
-      ["참석", `=COUNTIF('${gardenName}'!B1:B200, TRUE)`],
-      ["결석", `=COUNTIF('${gardenName}'!B1:B200, FALSE)`],
-      ["모임내용 및 기도제목", notes || ""],
-      ["보고일시", timestamp],
-    ];
-
-    const checkboxValues = members.map((name) => [attendees.includes(name)]);
-
-    const updateData = [
-      {
-        range: "모임정보!A1",
-        values: infoRows,
-      },
-    ];
-
-    if (memberCount > 0) {
-      updateData.push({
-        range: `${gardenName}!B1:B${memberCount}`,
-        values: checkboxValues,
-      });
-    }
-
-    await sheets.spreadsheets.values.batchUpdate({
-      spreadsheetId: weeklySpreadsheetId,
       requestBody: {
-        valueInputOption: "USER_ENTERED",
-        data: updateData,
-      },
-    });
-
-    // 7. Update column-wide checkbox data validation in a single batchUpdate
-    if (currentTabId && memberCount > 0) {
-      await sheets.spreadsheets.batchUpdate({
-        spreadsheetId: weeklySpreadsheetId,
-        requestBody: {
-          requests: [
-            {
-              setDataValidation: {
-                range: {
-                  sheetId: currentTabId,
-                  startRowIndex: 0,
-                  endRowIndex: memberCount,
-                  startColumnIndex: 1,
-                  endColumnIndex: 2,
-                },
-                rule: {
-                  condition: { type: "BOOLEAN" },
-                  showCustomUi: true,
-                },
+        requests: [
+          {
+            setDataValidation: {
+              range: {
+                sheetId: currentTabId,
+                startRowIndex: 0,
+                endRowIndex: memberCount,
+                startColumnIndex: 1,
+                endColumnIndex: 2,
+              },
+              rule: {
+                condition: { type: "BOOLEAN" },
+                showCustomUi: true,
               },
             },
-          ],
-        },
-      });
-    }
+          },
+        ],
+      },
+    });
+  }
 
-    console.log(`✅ Garden gathering report submitted successfully as separate file '${fileName}'`);
-    return c.body(null, 200);
+  console.log(
+    `✅ Garden gathering report submitted successfully as separate file '${fileName}'`,
+  );
+  return c.body(null, 200);
 };
