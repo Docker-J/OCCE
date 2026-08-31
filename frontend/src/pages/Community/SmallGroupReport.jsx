@@ -1207,7 +1207,7 @@ const SmallGroupReport = () => {
                 <Typography variant="body2" sx={{ mb: 0.5 }}>
                   <b>모임 일시:</b>{" "}
                   {gatheringDate ? format(gatheringDate, "yyyy-MM-dd") : ""}{" "}
-                  {gatheringTime}
+                  {gatheringTime ? format(gatheringTime, "HH:mm") : ""}
                 </Typography>
                 <Typography variant="body2" sx={{ mb: 0.5 }}>
                   <b>모임 장소:</b> {gatheringLocation || "미기입"}
