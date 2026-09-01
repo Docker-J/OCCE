@@ -16,6 +16,8 @@ export const deleteImages = async (env, images) => {
       if (!res.ok) {
         const errText = await res.text();
         console.error(`Failed to delete Cloudflare image ${image}:`, errText);
+      } else {
+        await res.body?.cancel();
       }
     });
 

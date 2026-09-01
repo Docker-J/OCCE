@@ -30,6 +30,7 @@ export const purgeCache = async (env, prefixes) => {
       const errText = await res.text();
       console.error("❌ Failed to purge Cloudflare cache:", errText);
     } else {
+      await res.body?.cancel();
       console.log("✅ Cloudflare Cache purged successfully.");
     }
   } catch (error) {

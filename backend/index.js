@@ -93,6 +93,9 @@ export default {
               await docClient.send(deleteCmd);
               console.log(`Successfully deleted unregistered token: ${token}`);
             }
+          } else {
+            // Must consume or cancel response body to release HTTP socket and prevent deadlock in Cloudflare Workers
+            await res.body?.cancel();
           }
         } catch (err) {
           console.error(`FCM network error for token ${token}:`, err);
