@@ -113,6 +113,35 @@ const SmallGroupReport = () => {
   const [gatheringLocation, setGatheringLocation] = useState("");
   const [gatheringNotes, setGatheringNotes] = useState("");
 
+  // Determine if the user has unsaved inputs in the current form
+  const isDirty = useMemo(() => {
+    if (reportType === "gathering") {
+      return (
+        gatheringNotes.trim().length > 0 ||
+        gatheringLocation.trim().length > 0
+      );
+    } else {
+      return Object.values(absenceReasons).some(
+        (reason) => (reason || "").trim().length > 0,
+      );
+    }
+  }, [reportType, gatheringNotes, gatheringLocation, absenceReasons]);
+
+  // Prevent accidental page refresh / tab close when form has unsaved inputs
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isDirty]);
+
   // Sync reportType with searchParams
   useEffect(() => {
     const type = searchParams.get("type");
@@ -124,8 +153,29 @@ const SmallGroupReport = () => {
   }, [searchParams]);
 
   const handleReportTypeChange = (type) => {
+    if (type === reportType) return;
+    if (isDirty) {
+      const confirmLeave = window.confirm(
+        "작성 중인 내용이 있습니다. 탭을 전환하면 입력한 내용이 사라질 수 있습니다. 계속 진행하시겠습니까?",
+      );
+      if (!confirmLeave) return;
+    }
     setReportType(type);
     setSearchParams({ type });
+  };
+
+  const handleGardenChange = (newGarden) => {
+    if (newGarden === selectedGarden) return;
+    if (isDirty) {
+      const confirmChange = window.confirm(
+        "작성 중인 내용이 있습니다. 정원을 변경하면 작성 중인 내용이 초기화됩니다. 변경하시겠습니까?",
+      );
+      if (!confirmChange) return;
+    }
+    setSelectedGarden(newGarden);
+    setGatheringNotes("");
+    setGatheringLocation("");
+    setAbsenceReasons({});
   };
 
   // Generate recent Sundays for the date dropdown
@@ -584,7 +634,7 @@ const SmallGroupReport = () => {
                                 value={selectedGarden}
                                 label="정원 선택"
                                 onChange={(e) =>
-                                  setSelectedGarden(e.target.value)
+                                  handleGardenChange(e.target.value)
                                 }
                               >
                                 {Object.keys(gardens).map((name) => (
@@ -903,7 +953,7 @@ const SmallGroupReport = () => {
                                 value={selectedGarden}
                                 label="정원 선택"
                                 onChange={(e) =>
-                                  setSelectedGarden(e.target.value)
+                                  handleGardenChange(e.target.value)
                                 }
                               >
                                 {Object.keys(gardens).map((name) => (
