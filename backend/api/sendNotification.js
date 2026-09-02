@@ -1,14 +1,33 @@
 import { ScanCommand } from "@aws-sdk/client-dynamodb";
-import { getDocClient } from "./dynamodb.js";
+import { getDocClient, resetDocClient } from "./dynamodb.js";
 import { getGoogleAuth } from "./googleAuth.js";
 
 const TABLENAME = "FCMToken";
 
+async function scanTokensWithRetry(env, scanParam, maxRetries = 3) {
+  let attempt = 0;
+  while (attempt < maxRetries) {
+    attempt++;
+    try {
+      const docClient = getDocClient(env);
+      const command = new ScanCommand(scanParam);
+      return await docClient.send(command);
+    } catch (err) {
+      console.warn(`⚠️ DynamoDB Scan attempt ${attempt}/${maxRetries} failed:`, err.message);
+      // Reset the cached client to discard stale socket connections
+      resetDocClient();
+      if (attempt >= maxRetries) {
+        throw err;
+      }
+      // Wait before retrying (1s, 2s, 3s...)
+      await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
+    }
+  }
+}
+
 async function sendMessages(env, scanParam, message, accessToken, projectId) {
   try {
-    const docClient = getDocClient(env);
-    const command = new ScanCommand(scanParam);
-    const result = await docClient.send(command);
+    const result = await scanTokensWithRetry(env, scanParam);
     const tokens = result.Items ? result.Items.map((item) => item.token.S) : [];
 
     if (tokens.length <= 0) {
@@ -57,6 +76,7 @@ async function sendMessages(env, scanParam, message, accessToken, projectId) {
     }
   } catch (err) {
     console.error("FCM Send Messages Error:", err);
+    throw err;
   }
 }
 

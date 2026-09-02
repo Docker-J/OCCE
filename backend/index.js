@@ -131,21 +131,30 @@ export default {
           }
         } else if (event.cron === "30 12 * * *") {
           console.log("🕒 Triggering daily Bible reading FCM...");
-          try {
-            const today = format(subHours(new Date(), 6), "M월 d일");
-            const match = schedule.find((item) => item.date === today);
-            if (match) {
-              const title = "291일 성경 1독";
-              const body = `${today}\n오늘의 1독 말씀은 "${match.read}" 입니다.`;
-              const link = "/online/bible291";
+          const today = format(subHours(new Date(), 6), "M월 d일");
+          const match = schedule.find((item) => item.date === today);
+          if (match) {
+            const title = "291일 성경 1독";
+            const body = `${today}\n오늘의 1독 말씀은 "${match.read}" 입니다.`;
+            const link = "/online/bible291";
 
-              await sendNotification(env, title, body, link);
-              console.log(`✅ Daily Bible reading FCM sent successfully for date: ${today}`);
-            } else {
-              console.log(`ℹ️ No Bible reading schedule found for today (${today}) - likely rest day.`);
+            let attempts = 0;
+            let success = false;
+            while (!success && attempts < 3) {
+              attempts++;
+              try {
+                await sendNotification(env, title, body, link);
+                console.log(`✅ Daily Bible reading FCM sent successfully for date: ${today}`);
+                success = true;
+              } catch (error) {
+                console.error(`❌ Attempt ${attempts}/3 failed to process daily Bible reading FCM:`, error);
+                if (attempts < 3) {
+                  await new Promise((r) => setTimeout(r, 3000));
+                }
+              }
             }
-          } catch (error) {
-            console.error("❌ Failed to process daily Bible reading FCM:", error);
+          } else {
+            console.log(`ℹ️ No Bible reading schedule found for today (${today}) - likely rest day.`);
           }
         }
         // else if (event.cron === "30 14 * * 0") {

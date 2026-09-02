@@ -3,6 +3,10 @@ import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 
 let cachedDocClient = null;
 
+export const resetDocClient = () => {
+  cachedDocClient = null;
+};
+
 /**
  * Dynamically gets the DynamoDB Document Client using environment variables.
  * Uses a singleton pattern to cache the connection in the worker isolate.
@@ -20,6 +24,7 @@ export const getDocClient = (env) => {
 
   const client = new DynamoDBClient({
     region: env.AWS_REGION || "us-west-2",
+    maxAttempts: 3,
     credentials: {
       accessKeyId: env.AWS_ACCESS_KEY_ID,
       secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
