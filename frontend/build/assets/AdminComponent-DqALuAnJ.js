@@ -1,0 +1,1 @@
+import{u as e}from"./index-BGQ-yQ9s.js";var t=t=>e(e=>e.admin)&&t.children;export{t};

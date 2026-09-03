@@ -1,10 +1,22 @@
 import axios from "axios";
 
-export const signIn = async (phone, password, success, fail) => {
+export const signIn = async (phone, password, remember, success, fail) => {
+  let isRemember = false;
+  let successCb = success;
+  let failCb = fail;
+
+  if (typeof remember === "function") {
+    successCb = remember;
+    failCb = success;
+    isRemember = false;
+  } else {
+    isRemember = !!remember;
+  }
+
   try {
     const res = await axios.post(
       "/api/user/sign-in",
-      {},
+      { remember: isRemember },
       {
         auth: {
           username: phone,
@@ -13,20 +25,35 @@ export const signIn = async (phone, password, success, fail) => {
       },
     );
 
-    success(res.data);
+    if (successCb) successCb(res.data);
   } catch (error) {
     console.log(error);
-    fail();
+    if (failCb) failCb();
   }
 };
 
-export const refreshTokenSignIn = async (refreshToken, success, fail) => {
-  try {
-    const res = await axios.post("/api/user/refresh-sign-in", { refreshToken });
+export const refreshTokenSignIn = async (arg1, arg2, arg3) => {
+  let success, fail, refreshToken;
+  if (typeof arg1 === "function") {
+    // New signature: refreshTokenSignIn(success, fail)
+    success = arg1;
+    fail = arg2;
+  } else {
+    // Backward-compatible signature: refreshTokenSignIn(refreshToken, success, fail)
+    refreshToken = arg1;
+    success = arg2;
+    fail = arg3;
+  }
 
-    success(res.data);
+  try {
+    const res = await axios.post(
+      "/api/user/refresh-sign-in",
+      refreshToken ? { refreshToken } : {}
+    );
+
+    if (success) success(res.data);
   } catch (error) {
-    fail();
+    if (fail) fail(error);
   }
 };
 

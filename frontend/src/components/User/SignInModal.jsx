@@ -40,12 +40,11 @@ const SignInModal = ({ isOpen, onClose }) => {
 
     setToken(data);
 
-    if (getValues("remember")) {
-      localStorage.setItem("refreshToken", result.refreshToken);
-      localStorage.setItem("remember", true);
-    } else {
-      sessionStorage.setItem("refreshToken", result.refreshToken);
-    }
+    // Clean up legacy tokens from Web Storage since we now use secure HttpOnly cookies
+    localStorage.removeItem("refreshToken");
+    sessionStorage.removeItem("refreshToken");
+    localStorage.removeItem("remember");
+
     openSnackbar("success", "Signed In Successfully!");
     handleClose();
   };
@@ -71,6 +70,7 @@ const SignInModal = ({ isOpen, onClose }) => {
     signIn(
       data.phoneNumber,
       data.password,
+      getValues("remember"),
       (result) => {
         setIsLoading(false);
         signInSuccess(result);

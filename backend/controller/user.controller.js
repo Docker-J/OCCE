@@ -8,7 +8,9 @@ import {
   AdminGetUserCommand,
   ForgotPasswordCommand,
   ConfirmForgotPasswordCommand,
+  RevokeTokenCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
+import { getCookie, setCookie, deleteCookie } from "hono/cookie";
 import { google } from "googleapis";
 import * as XLSX from "xlsx";
 import { getGoogleAuth } from "../api/googleAuth.js";
@@ -24,10 +26,31 @@ const getCognitoClient = (env) => {
   });
 };
 
+const getRefreshTokenCookieOptions = (remember = false) => {
+  const options = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "Lax",
+    path: "/",
+  };
+  if (remember) {
+    options.maxAge = 30 * 24 * 60 * 60; // 30 days
+  }
+  return options;
+};
+
 export const signInController = async (c) => {
   const authHeader = c.req.header("Authorization");
   if (!authHeader) {
     return c.text("Unauthorized", 401);
+  }
+
+  let remember = false;
+  try {
+    const body = await c.req.json();
+    remember = !!body.remember;
+  } catch {
+    // Body might be empty, ignore
   }
 
   const auth = new Buffer.from(
@@ -67,6 +90,15 @@ export const signInController = async (c) => {
     );
     const group = payload["cognito:groups"]?.[0] || null;
 
+    if (refreshToken) {
+      setCookie(c, "refreshToken", refreshToken, getRefreshTokenCookieOptions(remember));
+      if (remember) {
+        setCookie(c, "remember", "true", getRefreshTokenCookieOptions(true));
+      } else {
+        deleteCookie(c, "remember", { path: "/" });
+      }
+    }
+
     return c.json({
       accessToken: accessToken,
       refreshToken: refreshToken,
@@ -79,8 +111,22 @@ export const signInController = async (c) => {
 };
 
 export const refreshSignInController = async (c) => {
-  console.log("Sign In requested");
-  const body = await c.req.json();
+  console.log("Refresh Sign In requested");
+  const cookieRefreshToken = getCookie(c, "refreshToken");
+  let bodyRefreshToken = null;
+
+  try {
+    const body = await c.req.json();
+    bodyRefreshToken = body?.refreshToken;
+  } catch {
+    // Body might be empty, which is expected when using cookies
+  }
+
+  const tokenToUse = cookieRefreshToken || bodyRefreshToken;
+
+  if (!tokenToUse) {
+    return c.json({ error: "No refresh token provided" }, 401);
+  }
 
   const env = c.env;
   const AWS_COGNITO_CLIENT_ID = env.AWS_COGNITO_CLIENT_ID;
@@ -90,7 +136,7 @@ export const refreshSignInController = async (c) => {
     AuthFlow: "REFRESH_TOKEN_AUTH",
     ClientId: AWS_COGNITO_CLIENT_ID,
     AuthParameters: {
-      REFRESH_TOKEN: body.refreshToken,
+      REFRESH_TOKEN: tokenToUse,
     },
   };
 
@@ -105,9 +151,13 @@ export const refreshSignInController = async (c) => {
         "cognito:groups"
       ]?.[0] || null;
 
+    const isRemembered = getCookie(c, "remember") === "true";
+    const tokenToPersist = newRefreshToken || tokenToUse;
+    setCookie(c, "refreshToken", tokenToPersist, getRefreshTokenCookieOptions(isRemembered));
+
     return c.json({
       accessToken: accessToken,
-      refreshToken: newRefreshToken,
+      refreshToken: tokenToPersist,
       group: group,
     });
   } catch (error) {
@@ -323,25 +373,26 @@ export const requestConfirmController = async (c) => {
 };
 
 export const signOutController = async (c) => {
-  const authHeader = c.req.header("Authorization");
-  if (!authHeader) {
-    return c.body(null, 401);
-  }
-
   const env = c.env;
   const cognitoClient = getCognitoClient(env);
+  const refreshToken = getCookie(c, "refreshToken");
 
-  const command = new GlobalSignOutCommand({
-    AccessToken: authHeader.split(" ")[1],
-  });
-
-  try {
-    await cognitoClient.send(command);
-    return c.body(null, 200);
-  } catch (error) {
-    console.log(error);
-    return c.json(error);
+  if (refreshToken) {
+    try {
+      const command = new RevokeTokenCommand({
+        ClientId: env.AWS_COGNITO_CLIENT_ID,
+        Token: refreshToken,
+      });
+      await cognitoClient.send(command);
+    } catch (error) {
+      console.warn("RevokeToken warning:", error.message);
+    }
   }
+
+  deleteCookie(c, "refreshToken", { path: "/" });
+  deleteCookie(c, "remember", { path: "/" });
+
+  return c.body(null, 200);
 };
 
 export const forgotPasswordController = async (c) => {

@@ -26,28 +26,23 @@ const UserManager = memo(() => {
   }, [deleteToken]);
 
   useEffect(() => {
-    const refreshToken =
+    const legacyToken =
       localStorage.getItem("refreshToken") ||
       sessionStorage.getItem("refreshToken");
-    const remember = localStorage.getItem("remember");
 
-    if (!refreshToken) {
-      return;
-    }
-
-    if (remember && localStorage.getItem("refreshToken")) {
-      refreshTokenSignIn(
-        localStorage.getItem("refreshToken"),
-        signInSuccess,
-        signInfail
-      );
-    } else if (sessionStorage.getItem("refreshToken")) {
-      refreshTokenSignIn(
-        sessionStorage.getItem("refreshToken"),
-        signInSuccess,
-        signInfail
-      );
-    }
+    refreshTokenSignIn(
+      (result) => {
+        signInSuccess(result);
+        // Clear legacy storage after successful migration to cookie
+        localStorage.removeItem("refreshToken");
+        sessionStorage.removeItem("refreshToken");
+        localStorage.removeItem("remember");
+      },
+      () => {
+        signInfail();
+      },
+      legacyToken
+    );
   }, [signInSuccess, signInfail]);
 });
 
