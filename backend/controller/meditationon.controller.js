@@ -74,36 +74,53 @@ export const getMeditationONController = async (c) => {
 };
 
 export const postMeditationONController = async (c) => {
-  const formData = await c.req.formData();
-  const images = formData.getAll("images"); // Array of File objects
-  const date = c.req.query("date");
+  try {
+    const formData = await c.req.formData();
+    const images = formData.getAll("images"); // Array of File objects
+    const date = c.req.query("date");
 
-  if (images.length === 0) {
-    return c.text("No images provided", 400);
+    if (!images || images.length === 0) {
+      return c.json({ error: "No images provided" }, 400);
+    }
+
+    if (!date) {
+      return c.json({ error: "Date parameter is required" }, 400);
+    }
+
+    const docClient = getDocClient(c.env);
+
+    const results = await Promise.all(
+      images.map((image) => uploadImage(c.env, image))
+    );
+
+    const ids = {};
+    results.forEach((result, index) => {
+      ids[index] = result;
+    });
+
+    const command = new PutCommand({
+      TableName: TABLENAME,
+      Item: {
+        ID: crypto.randomUUID(), // Native crypto API in Cloudflare Workers
+        Timestamp: date,
+        Cover: ids[0] || "",
+        Images: ids,
+        sort: 0,
+      },
+    });
+
+    const response = await docClient.send(command);
+    console.log("MeditationON created:", response);
+
+    await purgeCache(c.env, ["oncce.ca/api/meditation-on"]);
+    return c.body(null, 201);
+  } catch (error) {
+    console.error("postMeditationONController error:", error);
+    return c.json(
+      {
+        error: error.message || "Unknown error occurred while uploading MeditationON",
+      },
+      500
+    );
   }
-
-  const docClient = getDocClient(c.env);
-
-  const ids = {};
-  for (const [index, image] of images.entries()) {
-    const result = await uploadImage(c.env, image);
-    ids[index] = result;
-  }
-
-  const command = new PutCommand({
-    TableName: TABLENAME,
-    Item: {
-      ID: crypto.randomUUID(), // Native crypto API in Cloudflare Workers
-      Timestamp: date,
-      Cover: ids[0],
-      Images: ids,
-      sort: 0,
-    },
-  });
-
-  const response = await docClient.send(command);
-  console.log(response);
-
-  await purgeCache(c.env, ["oncce.ca/api/meditation-on"]);
-  return c.body(null, 201);
 };

@@ -55,10 +55,10 @@ const MeditationONModal = ({ isOpen, onClose }) => {
       openSnackbar("success", "Uploaded Succesfully!");
       handleClose();
     } catch (error) {
-      console.log(error);
+      console.error("MeditationON upload error:", error);
       openSnackbar(
         "error",
-        "Error Occured. Please contact to the administrator."
+        error.message || "Error Occured. Please contact to the administrator."
       );
     } finally {
       setLoading(false);

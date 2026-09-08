@@ -31,7 +31,7 @@ export const uploadImages = async (form, date) => {
         date: date,
       },
     });
-  } catch {
-    throw new Error();
+  } catch (err) {
+    throw new Error(err.response?.data?.error || err.message || "Failed to upload images");
   }
 };
