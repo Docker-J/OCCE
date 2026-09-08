@@ -5,7 +5,7 @@ let staffVerifierInstance;
 let userVerifierInstance;
 let leaderVerifierInstance;
 
-const getStaffVerifier = (env) => {
+export const getStaffVerifier = (env) => {
   if (!staffVerifierInstance) {
     staffVerifierInstance = CognitoJwtVerifier.create({
       userPoolId: env.AWS_COGNITO_USER_POOL_ID,
@@ -17,7 +17,7 @@ const getStaffVerifier = (env) => {
   return staffVerifierInstance;
 };
 
-const getUserVerifier = (env) => {
+export const getUserVerifier = (env) => {
   if (!userVerifierInstance) {
     userVerifierInstance = CognitoJwtVerifier.create({
       userPoolId: env.AWS_COGNITO_USER_POOL_ID,
@@ -28,7 +28,7 @@ const getUserVerifier = (env) => {
   return userVerifierInstance;
 };
 
-const getLeaderVerifier = (env) => {
+export const getLeaderVerifier = (env) => {
   if (!leaderVerifierInstance) {
     leaderVerifierInstance = CognitoJwtVerifier.create({
       userPoolId: env.AWS_COGNITO_USER_POOL_ID,
