@@ -13,7 +13,7 @@ import ImagePreviews from "../../../common/ImagePreviews";
 import ButtonDatePicker from "../../../common/ButtonDatePicker";
 import { MIN_DATE } from "../../../constants/WeeklyUpdate";
 
-const MeditationONModal = ({ isOpen, onClose }) => {
+const MeditationONModal = ({ isOpen, onClose, onSuccess }) => {
   const { openSnackbar } = useSnackbar();
 
   const handleClose = () => {
@@ -53,6 +53,9 @@ const MeditationONModal = ({ isOpen, onClose }) => {
       await uploadImages(form, edmontonTimestamp.toISOString());
 
       openSnackbar("success", "Uploaded Succesfully!");
+      if (onSuccess) {
+        onSuccess();
+      }
       handleClose();
     } catch (error) {
       console.error("MeditationON upload error:", error);

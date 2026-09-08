@@ -47,6 +47,22 @@ const MeditationON = () => {
     }
   };
 
+  const refreshPosts = async () => {
+    sessionStorage.removeItem("posts");
+    setEnd(false);
+    try {
+      const result = await getPosts([]);
+      if (result.data.length > 0) {
+        setPosts(result.data);
+      } else {
+        setPosts([]);
+        setEnd(true);
+      }
+    } catch (err) {
+      console.error("Failed to refresh posts:", err);
+    }
+  };
+
   useEffect(() => {
     if (posts.length % PAGE_SIZE !== 0) {
       setEnd(true);
@@ -54,24 +70,25 @@ const MeditationON = () => {
   }, [posts]);
 
   useEffect(() => {
-    console.log(navType);
-    if (
-      navType === "POP" &&
-      JSON.parse(sessionStorage.getItem("posts")).length > 0
-    ) {
-      setPosts(JSON.parse(sessionStorage.getItem("posts")));
-    } else {
-      // setRestored(false);
-      console.log("get");
-      onLoad();
+    if (navType === "POP" && sessionStorage.getItem("posts")) {
+      try {
+        const cached = JSON.parse(sessionStorage.getItem("posts"));
+        if (Array.isArray(cached) && cached.length > 0) {
+          setPosts(cached);
+          return;
+        }
+      } catch {}
     }
+    onLoad();
   }, []);
 
   useEffect(() => {
     return () => {
-      sessionStorage.setItem("posts", JSON.stringify(posts));
+      if (posts.length > 0) {
+        sessionStorage.setItem("posts", JSON.stringify(posts));
+      }
     };
-  });
+  }, [posts]);
 
   const scrollRef = useRef();
 
@@ -166,7 +183,9 @@ const MeditationON = () => {
               "../../../components/Online/MeditationON/MeditationONModal" // Use the correct path
             );
 
-            openModal(MeditationONModalComponent, {});
+            openModal(MeditationONModalComponent, {
+              onSuccess: refreshPosts,
+            });
           }}
         >
           <AddIcon />
