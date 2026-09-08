@@ -39,6 +39,19 @@ const getRefreshTokenCookieOptions = (remember = false) => {
   return options;
 };
 
+const getRememberCookieOptions = (remember = false) => {
+  const options = {
+    httpOnly: false,
+    secure: true,
+    sameSite: "Lax",
+    path: "/",
+  };
+  if (remember) {
+    options.maxAge = 30 * 24 * 60 * 60; // 30 days
+  }
+  return options;
+};
+
 export const signInController = async (c) => {
   const authHeader = c.req.header("Authorization");
   if (!authHeader) {
@@ -94,7 +107,7 @@ export const signInController = async (c) => {
     if (refreshToken) {
       setCookie(c, "refreshToken", refreshToken, getRefreshTokenCookieOptions(remember));
       if (remember) {
-        setCookie(c, "remember", "true", getRefreshTokenCookieOptions(true));
+        setCookie(c, "remember", "true", getRememberCookieOptions(true));
       } else {
         deleteCookie(c, "remember", { path: "/" });
       }
@@ -105,6 +118,7 @@ export const signInController = async (c) => {
       idToken: idToken,
       refreshToken: refreshToken,
       group: group,
+      remember: !!remember,
     });
   } catch (error) {
     console.log(error);
@@ -157,12 +171,16 @@ export const refreshSignInController = async (c) => {
     const isRemembered = getCookie(c, "remember") === "true";
     const tokenToPersist = newRefreshToken || tokenToUse;
     setCookie(c, "refreshToken", tokenToPersist, getRefreshTokenCookieOptions(isRemembered));
+    if (isRemembered) {
+      setCookie(c, "remember", "true", getRememberCookieOptions(true));
+    }
 
     return c.json({
       accessToken: accessToken,
       idToken: idToken,
       refreshToken: tokenToPersist,
       group: group,
+      remember: isRemembered,
     });
   } catch (error) {
     console.log(error);

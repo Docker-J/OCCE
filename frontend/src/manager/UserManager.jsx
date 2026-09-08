@@ -12,6 +12,7 @@ const UserManager = memo(() => {
         accessToken: result.accessToken,
         idToken: result.idToken,
         groups: [result.group],
+        remember: result.remember ?? false,
       };
 
       setToken(data);

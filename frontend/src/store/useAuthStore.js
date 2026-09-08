@@ -22,6 +22,7 @@ const useAuthStore = create((set) => ({
   authenticated: false,
   admin: false,
   isLeader: false,
+  isRemembered: false,
   accessToken: null,
   idToken: null,
   userProfile: null,
@@ -45,6 +46,7 @@ const useAuthStore = create((set) => ({
         payload.groups?.some(
           (group) => group === "Staff" || group === "GardenKeeper"
         ) || false,
+      isRemembered: payload.remember ?? false,
       accessToken: payload.accessToken,
       idToken: payload.idToken || null,
       userProfile: userProfile,
@@ -57,6 +59,7 @@ const useAuthStore = create((set) => ({
       authenticated: false,
       admin: false,
       isLeader: false,
+      isRemembered: false,
       accessToken: null,
       idToken: null,
       userProfile: null,

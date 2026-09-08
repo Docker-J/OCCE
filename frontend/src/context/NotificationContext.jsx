@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { registerToken, unregisterToken, unlinkTokenRole } from "../api/notification";
 import useAuthStore from "../store/useAuthStore";
 import useSnackbar from "../util/useSnackbar";
@@ -147,6 +147,8 @@ export const NotificationProvider = ({ children }) => {
   const authenticated = useAuthStore((state) => state.authenticated);
   const isLeader = useAuthStore((state) => state.isLeader);
   const admin = useAuthStore((state) => state.admin);
+  const isRememberedStore = useAuthStore((state) => state.isRemembered);
+  const prevAuthRef = useRef(authenticated);
 
   useEffect(() => {
     initPushOptions(false);
@@ -173,8 +175,10 @@ export const NotificationProvider = ({ children }) => {
 
         if (authenticated) {
           const isRemembered =
+            isRememberedStore ||
             document.cookie.includes("remember=true") ||
             localStorage.getItem("remember") === "true";
+
           if (isRemembered && (isLeader || admin)) {
             console.log("Syncing role to FCM token for trusted personal device...");
             await registerToken(token, true);
@@ -183,18 +187,20 @@ export const NotificationProvider = ({ children }) => {
             console.log("Unlinking roles from FCM token (not leader/admin or not remembered)...");
             await unlinkTokenRole(token);
           }
-        } else {
-          // Logged out: unlink roles from this device
+        } else if (prevAuthRef.current === true) {
+          // Explicitly logged out from an authenticated session
           console.log("Unlinking roles from FCM token on logout...");
           await unlinkTokenRole(token);
         }
       } catch (err) {
         console.warn("FCM token role sync warning:", err);
+      } finally {
+        prevAuthRef.current = authenticated;
       }
     };
 
     syncRole();
-  }, [authenticated, isLeader, admin]);
+  }, [authenticated, isLeader, admin, isRememberedStore]);
 
   const setupPush = async () => {
     localStorage.removeItem("notifications_opt_out");
