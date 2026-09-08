@@ -84,6 +84,7 @@ export const signInController = async (c) => {
     const response = await cognitoClient.send(command);
     const accessToken = response.AuthenticationResult.AccessToken;
     const refreshToken = response.AuthenticationResult.RefreshToken;
+    const idToken = response.AuthenticationResult.IdToken;
 
     const payload = JSON.parse(
       Buffer.from(accessToken.split(".")[1], "base64"),
@@ -101,6 +102,7 @@ export const signInController = async (c) => {
 
     return c.json({
       accessToken: accessToken,
+      idToken: idToken,
       refreshToken: refreshToken,
       group: group,
     });
@@ -146,6 +148,7 @@ export const refreshSignInController = async (c) => {
     const response = await cognitoClient.send(command);
     const accessToken = response.AuthenticationResult.AccessToken;
     const newRefreshToken = response.AuthenticationResult.RefreshToken;
+    const idToken = response.AuthenticationResult.IdToken;
     const group =
       JSON.parse(Buffer.from(accessToken.split(".")[1], "base64"))[
         "cognito:groups"
@@ -157,6 +160,7 @@ export const refreshSignInController = async (c) => {
 
     return c.json({
       accessToken: accessToken,
+      idToken: idToken,
       refreshToken: tokenToPersist,
       group: group,
     });

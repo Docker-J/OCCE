@@ -16,11 +16,12 @@ const getCognitoClient = (env) => {
   });
 };
 
-// Helper to fetch user attributes from Cognito using Access Token
+// Helper to fetch user attributes from Cognito using Access Token (fallback)
 const getCognitoUserAttributes = async (c) => {
   try {
     const authHeader = c.req.header("Authorization");
     if (!authHeader) return {};
+
     const token = authHeader.split(" ")[1];
     const client = getCognitoClient(c.env);
     const command = new GetUserCommand({ AccessToken: token });
@@ -75,9 +76,12 @@ export const getGardensController = async (c) => {
 
     // Only non-staff need to verify mapping against '정원지기' tab
     if (!isStaff) {
-      const userAttributes = await getCognitoUserAttributes(c);
-      const rawPhone = userAttributes.phone_number || "";
-      cleanUserPhone = rawPhone.replace(/\D/g, "");
+      cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
+      if (!cleanUserPhone || cleanUserPhone.length < 10) {
+        const userAttributes = await getCognitoUserAttributes(c);
+        const rawPhone = userAttributes.phone_number || "";
+        cleanUserPhone = rawPhone.replace(/\D/g, "");
+      }
     }
 
     const sheets = getSheetsClient(env);
@@ -185,7 +189,8 @@ export const getGardensController = async (c) => {
       {
         error: "GetGardensError",
         message:
-          error.message || "정원 및 교인 목록을 불러오는 중 오류가 발생했습니다.",
+          error.message ||
+          "정원 및 교인 목록을 불러오는 중 오류가 발생했습니다.",
       },
       500,
     );
@@ -224,7 +229,8 @@ export const postReportController = async (c) => {
       return c.json(
         {
           error: "MissingRequiredFields",
-          message: "필수 입력 항목(날짜, 정원명, 출석/결석 명단)이 누락되었습니다.",
+          message:
+            "필수 입력 항목(날짜, 정원명, 출석/결석 명단)이 누락되었습니다.",
         },
         400,
       );
@@ -236,10 +242,14 @@ export const postReportController = async (c) => {
 
     // Only non-staff need to verify mapping against '정원지기' tab
     if (!isStaff) {
-      const userAttributes = await getCognitoUserAttributes(c);
-      const rawPhone = userAttributes.phone_number || "";
-      cleanUserPhone = rawPhone.replace(/\D/g, "");
-      reporterName = userAttributes.name || user.name || "";
+      cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
+      if (!cleanUserPhone || cleanUserPhone.length < 10) {
+        const userAttributes = await getCognitoUserAttributes(c);
+        cleanUserPhone = (userAttributes.phone_number || "").replace(/\D/g, "");
+        reporterName = userAttributes.name || user.name || "";
+      } else {
+        reporterName = user.name || "";
+      }
     }
 
     const sheets = getSheetsClient(env);
@@ -690,7 +700,8 @@ export const postGatheringReportController = async (c) => {
       return c.json(
         {
           error: "MissingRequiredFields",
-          message: "필수 입력 항목(날짜, 정원명, 출석/결석 명단)이 누락되었습니다.",
+          message:
+            "필수 입력 항목(날짜, 정원명, 출석/결석 명단)이 누락되었습니다.",
         },
         400,
       );
@@ -701,10 +712,14 @@ export const postGatheringReportController = async (c) => {
     let reporterName = isStaff ? "목회자/스태프" : "";
 
     if (!isStaff) {
-      const userAttributes = await getCognitoUserAttributes(c);
-      const rawPhone = userAttributes.phone_number || "";
-      cleanUserPhone = rawPhone.replace(/\D/g, "");
-      reporterName = userAttributes.name || user.name || "";
+      cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
+      if (!cleanUserPhone || cleanUserPhone.length < 10) {
+        const userAttributes = await getCognitoUserAttributes(c);
+        cleanUserPhone = (userAttributes.phone_number || "").replace(/\D/g, "");
+        reporterName = userAttributes.name || user.name || "";
+      } else {
+        reporterName = user.name || "";
+      }
     }
 
     const sheets = getSheetsClient(env);
@@ -785,7 +800,10 @@ export const postGatheringReportController = async (c) => {
               supportsAllDrives: true,
             });
           } catch (err) {
-            console.warn(`Failed to clean duplicate file ${extraFile.id}:`, err.message);
+            console.warn(
+              `Failed to clean duplicate file ${extraFile.id}:`,
+              err.message,
+            );
           }
         }
       }
@@ -932,7 +950,8 @@ export const postGatheringReportController = async (c) => {
       {
         error: "PostGatheringReportError",
         message:
-          error.message || "정원 모임 보고서를 제출하는 중 오류가 발생했습니다.",
+          error.message ||
+          "정원 모임 보고서를 제출하는 중 오류가 발생했습니다.",
       },
       500,
     );

@@ -9,7 +9,7 @@ const getStaffVerifier = (env) => {
   if (!staffVerifierInstance) {
     staffVerifierInstance = CognitoJwtVerifier.create({
       userPoolId: env.AWS_COGNITO_USER_POOL_ID,
-      tokenUse: "access",
+      tokenUse: null,
       clientId: env.AWS_COGNITO_CLIENT_ID,
       groups: "Staff",
     });
@@ -21,7 +21,7 @@ const getUserVerifier = (env) => {
   if (!userVerifierInstance) {
     userVerifierInstance = CognitoJwtVerifier.create({
       userPoolId: env.AWS_COGNITO_USER_POOL_ID,
-      tokenUse: "access",
+      tokenUse: null,
       clientId: env.AWS_COGNITO_CLIENT_ID,
     });
   }
@@ -32,7 +32,7 @@ const getLeaderVerifier = (env) => {
   if (!leaderVerifierInstance) {
     leaderVerifierInstance = CognitoJwtVerifier.create({
       userPoolId: env.AWS_COGNITO_USER_POOL_ID,
-      tokenUse: "access",
+      tokenUse: null,
       clientId: env.AWS_COGNITO_CLIENT_ID,
       groups: ["Staff", "GardenKeeper"],
     });

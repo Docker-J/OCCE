@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { registerToken, unregisterToken } from "../api/notification";
+import { registerToken, unregisterToken, unlinkTokenRole } from "../api/notification";
+import useAuthStore from "../store/useAuthStore";
 import useSnackbar from "../util/useSnackbar";
 import { IconButton } from "@mui/material";
 import { useNavigate } from "react-router";
@@ -105,7 +106,10 @@ export const NotificationProvider = ({ children }) => {
 
           if (shouldRefreshTTL) {
             console.log("Refreshing FCM token TTL in database...");
-            await registerToken(token);
+            const isRemembered =
+              document.cookie.includes("remember=true") ||
+              localStorage.getItem("remember") === "true";
+            await registerToken(token, isRemembered);
             localStorage.setItem("last_fcm_token_refresh", now.toString());
           }
 
@@ -140,10 +144,57 @@ export const NotificationProvider = ({ children }) => {
     [action, openSnackbar]
   );
 
+  const authenticated = useAuthStore((state) => state.authenticated);
+  const isLeader = useAuthStore((state) => state.isLeader);
+  const admin = useAuthStore((state) => state.admin);
+
   useEffect(() => {
     initPushOptions(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    // Automatically sync roles or unlink upon login/logout state changes
+    const syncRole = async () => {
+      if (!("Notification" in window) || Notification.permission !== "granted") return;
+      if (localStorage.getItem("notifications_opt_out") === "true") return;
+
+      try {
+        const { getMessaging, getToken } = await import("firebase/messaging");
+        const { firebaseInstance } = await import("../api/firebase");
+        const messaging = getMessaging(firebaseInstance);
+        const registration = await navigator.serviceWorker.ready;
+        const token = await getToken(messaging, {
+          vapidKey: "BOLDzFLzljc4HkyVktgjo4-_QoXFxx__XZS6xBmGouvsisXHHe--2dSUUJtQ2cerl3v7ONBhrAPM661xRbpQcqo",
+          serviceWorkerRegistration: registration,
+        });
+
+        if (!token) return;
+
+        if (authenticated) {
+          const isRemembered =
+            document.cookie.includes("remember=true") ||
+            localStorage.getItem("remember") === "true";
+          if (isRemembered && (isLeader || admin)) {
+            console.log("Syncing role to FCM token for trusted personal device...");
+            await registerToken(token, true);
+          } else {
+            // Demoted from leader/admin, or logged in without Remember Me
+            console.log("Unlinking roles from FCM token (not leader/admin or not remembered)...");
+            await unlinkTokenRole(token);
+          }
+        } else {
+          // Logged out: unlink roles from this device
+          console.log("Unlinking roles from FCM token on logout...");
+          await unlinkTokenRole(token);
+        }
+      } catch (err) {
+        console.warn("FCM token role sync warning:", err);
+      }
+    };
+
+    syncRole();
+  }, [authenticated, isLeader, admin]);
 
   const setupPush = async () => {
     localStorage.removeItem("notifications_opt_out");

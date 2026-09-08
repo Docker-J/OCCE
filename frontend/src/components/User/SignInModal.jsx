@@ -35,6 +35,7 @@ const SignInModal = ({ isOpen, onClose }) => {
   const signInSuccess = (result) => {
     const data = {
       accessToken: result.accessToken,
+      idToken: result.idToken,
       groups: [result.group],
     };
 

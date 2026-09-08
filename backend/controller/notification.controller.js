@@ -1,5 +1,6 @@
 import { getDocClient } from "../api/dynamodb.js";
-import { PutCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
+import { PutCommand, DeleteCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { getUserVerifier } from "../middleware/auth.js";
 
 const TABLENAME = "FCMToken";
 
@@ -13,11 +14,30 @@ export const registerController = async (c) => {
   try {
     const body = await c.req.json();
     const docClient = getDocClient(c.env);
+    let roles = [];
+
+    // Only assign roles if explicitly requested for a trusted personal device (isRemembered === true)
+    if (body.isRemembered) {
+      const authHeader = c.req.header("Authorization");
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        try {
+          const token = authHeader.split(" ")[1];
+          const verifier = getUserVerifier(c.env);
+          const payload = await verifier.verify(token);
+          const groups = payload["cognito:groups"] || [];
+          // Filter only valid system roles
+          roles = groups.filter((g) => ["GardenKeeper", "Staff"].includes(g));
+        } catch (authErr) {
+          console.warn("FCM register auth token verification skipped:", authErr.message);
+        }
+      }
+    }
 
     const command = new PutCommand({
       TableName: TABLENAME,
       Item: {
         token: body.token,
+        roles: roles,
         expiresAt: getExpirationEpoch(),
       },
     });
@@ -26,6 +46,36 @@ export const registerController = async (c) => {
     return c.body(null, 200);
   } catch (err) {
     console.error("Register notification token error:", err);
+    return c.body(null, 500);
+  }
+};
+
+export const unlinkRoleController = async (c) => {
+  try {
+    const body = await c.req.json();
+    if (!body?.token) {
+      return c.body(null, 400);
+    }
+    const docClient = getDocClient(c.env);
+
+    const command = new UpdateCommand({
+      TableName: TABLENAME,
+      Key: {
+        token: body.token,
+      },
+      UpdateExpression: "SET #roles = :emptyRoles",
+      ExpressionAttributeNames: {
+        "#roles": "roles",
+      },
+      ExpressionAttributeValues: {
+        ":emptyRoles": [],
+      },
+    });
+
+    await docClient.send(command);
+    return c.body(null, 200);
+  } catch (err) {
+    console.error("Unlink notification token role error:", err);
     return c.body(null, 500);
   }
 };
@@ -53,7 +103,7 @@ export const unregisterController = async (c) => {
 export const broadcastController = async (c) => {
   try {
     const body = await c.req.json();
-    const { title, body: notificationBody, pathname } = body;
+    const { title, body: notificationBody, pathname, targetRole } = body;
 
     if (!title || !notificationBody) {
       return c.json({ error: "Title and body are required" }, 400);
@@ -61,7 +111,13 @@ export const broadcastController = async (c) => {
 
     // Import sendNotification dynamically or call it
     const { default: sendNotification } = await import("../api/sendNotification.js");
-    await sendNotification(c.env, title, notificationBody, pathname || "");
+    await sendNotification(
+      c.env,
+      title,
+      notificationBody,
+      pathname || "",
+      targetRole || "all"
+    );
 
     return c.json({ success: true }, 200);
   } catch (err) {

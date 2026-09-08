@@ -80,13 +80,21 @@ async function sendMessages(env, scanParam, message, accessToken, projectId) {
   }
 }
 
-const sendNotification = async (env, title, body, pathname) => {
+const sendNotification = async (env, title, body, pathname, targetRole = "all") => {
   const scanParam = {
     TableName: TABLENAME,
     ProjectionExpression: "#tkn",
     ExpressionAttributeNames: { "#tkn": "token" },
     Limit: 499,
   };
+
+  if (targetRole && targetRole !== "all") {
+    scanParam.FilterExpression = "contains(#roles, :role)";
+    scanParam.ExpressionAttributeNames["#roles"] = "roles";
+    scanParam.ExpressionAttributeValues = {
+      ":role": { S: targetRole },
+    };
+  }
 
   const clickAction = pathname.startsWith("http")
     ? pathname
