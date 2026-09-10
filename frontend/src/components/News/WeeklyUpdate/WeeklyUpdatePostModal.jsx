@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, CircularProgress } from "@mui/material";
 import ButtonDatePicker from "../../../common/ButtonDatePicker";
 import { Document, Page } from "react-pdf";
-import { add, endOfWeek, format, isSunday } from "date-fns";
+import { add, endOfWeek, format, isSunday, startOfDay } from "date-fns";
 import useSnackbar from "../../../util/useSnackbar";
 import { uploadWeeklyUpdate } from "../../../api/weeklyupdate";
 import { MIN_DATE } from "../../../constants/WeeklyUpdate";
@@ -14,7 +14,7 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
   const { openSnackbar } = useSnackbar();
 
   const [selectedDate, setSelectedDate] = useState(
-    add(endOfWeek(new Date()), { days: 1 })
+    startOfDay(add(endOfWeek(new Date()), { days: 1 }))
   );
   const [weeklyUpdate, setWeeklyUpdate] = useState(null);
   const [memberWeeklyUpdate, setMemberWeeklyUpdate] = useState(null);

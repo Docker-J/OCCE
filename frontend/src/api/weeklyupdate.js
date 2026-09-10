@@ -1,11 +1,13 @@
 import axios from "axios";
 import { format } from "date-fns";
 
-export const getRecentWeelyUpdateDate = async () => {
+export const getRecentWeeklyUpdateDate = async () => {
   try {
     return await axios.get("/api/weekly-update/recent-date");
   } catch {}
 };
+
+export const getRecentWeelyUpdateDate = getRecentWeeklyUpdateDate;
 
 export const getWeeklyUpdate = async (selectedDate) => {
   try {

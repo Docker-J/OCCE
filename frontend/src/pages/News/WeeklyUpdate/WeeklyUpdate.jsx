@@ -41,6 +41,7 @@ const WeeklyUpdate = () => {
   const { openModal } = useModals();
   const navigate = useNavigate();
   const authenticated = useAuthStore((state) => state.authenticated);
+  const authInitialized = useAuthStore((state) => state.authInitialized);
 
   const { maxDate, queryDate } = useLoaderData();
 
@@ -68,8 +69,17 @@ const WeeklyUpdate = () => {
   }, [selectedDate]);
 
   const deleteFile = async () => {
-    const result = await deleteWeeklyUpdate(selectedDate);
-    setSelectedDate(parse(JSON.stringify(result.data), "yyyyMMdd", new Date()));
+    try {
+      const result = await deleteWeeklyUpdate(selectedDate);
+      const rawDate = typeof result?.data === "string" ? result.data.trim() : "";
+      if (rawDate) {
+        setSelectedDate(parse(rawDate, "yyyyMMdd", new Date()));
+      } else {
+        previousSunday();
+      }
+    } catch (err) {
+      console.error("Failed to delete weekly update:", err);
+    }
   };
 
   const previousSunday = () => {
@@ -87,9 +97,13 @@ const WeeklyUpdate = () => {
   };
 
   useEffect(() => {
+    if (!authInitialized) return;
+
     loadFile();
-    navigate("/weeklyupdate/" + format(selectedDate, "yyyyMMdd"));
-  }, [selectedDate, authenticated, loadFile, navigate]);
+    navigate("/weeklyupdate/" + format(selectedDate, "yyyyMMdd"), {
+      replace: true,
+    });
+  }, [selectedDate, authenticated, authInitialized, loadFile, navigate]);
 
   const [documentDimension, setDocumentDimension] = useState({
     width: null,

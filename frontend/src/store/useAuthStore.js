@@ -18,8 +18,23 @@ const parseJwt = (token) => {
   }
 };
 
+const getInitialSessionHint = () => {
+  try {
+    return (
+      typeof window !== "undefined" &&
+      localStorage.getItem("hasSession") === "true"
+    );
+  } catch {
+    return false;
+  }
+};
+
+const hasSessionHint = getInitialSessionHint();
+
 const useAuthStore = create((set) => ({
   authenticated: false,
+  // If there's no session hint, the user is an anonymous visitor: initialize immediately!
+  authInitialized: !hasSessionHint,
   admin: false,
   isLeader: false,
   isRemembered: false,
@@ -29,6 +44,10 @@ const useAuthStore = create((set) => ({
   expireTime: null,
 
   setToken: (payload) => {
+    try {
+      localStorage.setItem("hasSession", "true");
+    } catch {}
+
     const idPayload = payload.idToken ? parseJwt(payload.idToken) : null;
     const userProfile = idPayload
       ? {
@@ -41,6 +60,7 @@ const useAuthStore = create((set) => ({
 
     set({
       authenticated: true,
+      authInitialized: true,
       admin: payload.groups?.some((group) => group === "Staff") || false,
       isLeader:
         payload.groups?.some(
@@ -54,9 +74,14 @@ const useAuthStore = create((set) => ({
     });
   },
 
-  deleteToken: () =>
+  deleteToken: () => {
+    try {
+      localStorage.removeItem("hasSession");
+    } catch {}
+
     set({
       authenticated: false,
+      authInitialized: true,
       admin: false,
       isLeader: false,
       isRemembered: false,
@@ -64,7 +89,8 @@ const useAuthStore = create((set) => ({
       idToken: null,
       userProfile: null,
       expireTime: null,
-    }),
+    });
+  },
 }));
 
 export default useAuthStore;

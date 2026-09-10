@@ -29,7 +29,7 @@ import SendIcon from "@mui/icons-material/Send";
 import useModals from "../../util/useModal.js";
 import useSnackbar from "../../util/useSnackbar.js";
 import { getGardensAndMembers } from "../../api/attendance.js";
-import { useSearchParams, useSubmit, useActionData, useNavigation } from "react-router";
+import { useSearchParams, useSubmit, useActionData, useNavigation, Link } from "react-router";
 import axios from "axios";
 import { format } from "date-fns";
 import { DatePicker, TimePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -76,6 +76,8 @@ const SmallGroupReport = () => {
   const { openSnackbar } = useSnackbar();
 
   const authenticated = useAuthStore((state) => state.authenticated);
+  const authInitialized = useAuthStore((state) => state.authInitialized);
+  const isLeader = useAuthStore((state) => state.isLeader);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -187,9 +189,9 @@ const SmallGroupReport = () => {
     }
   }, [recentSundays]);
 
-  // Fetch gardens and members when user is authenticated
+  // Fetch gardens and members when user is authenticated and has leader role
   const fetchData = () => {
-    if (!authenticated) return;
+    if (!authenticated || !isLeader) return;
     setLoading(true);
     setError(null);
     getGardensAndMembers(
@@ -218,8 +220,9 @@ const SmallGroupReport = () => {
   };
 
   useEffect(() => {
+    if (!authInitialized || !authenticated || !isLeader) return;
     fetchData();
-  }, [authenticated]);
+  }, [authInitialized, authenticated, isLeader]);
 
   // Handle selected garden members initialization
   useEffect(() => {
@@ -410,7 +413,22 @@ const SmallGroupReport = () => {
             padding: "24px 16px",
           }}
         >
-          {!authenticated ? (
+          {!authInitialized ? (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                py: 8,
+              }}
+            >
+              <CircularProgress sx={{ color: "#dc2626", mb: 2 }} />
+              <Typography variant="body1" sx={{ color: "#666" }}>
+                정원 및 멤버 정보를 불러오는 중입니다...
+              </Typography>
+            </Box>
+          ) : !authenticated ? (
             // 1. Unauthenticated View
             <Card
               sx={{
@@ -434,8 +452,7 @@ const SmallGroupReport = () => {
                   variant="body1"
                   sx={{ color: "#555", mb: 4, lineHeight: 1.6 }}
                 >
-                  정원 보고는 온교회 등록 정원지기 및 목회자만 작성하실 수
-                  있습니다.
+                  정원 보고서는 온교회 정원지기 및 목회자만 작성하실 수 있습니다.
                   <br />
                   가입은 교인 등록 명부에 등록된 성명과 전화번호 정보가 일치해야
                   가능합니다.
@@ -456,6 +473,51 @@ const SmallGroupReport = () => {
                   }}
                 >
                   로그인하기
+                </Button>
+              </CardContent>
+            </Card>
+          ) : !isLeader ? (
+            // 2. Unauthorized View (Authenticated but not Staff/GardenKeeper)
+            <Card
+              sx={{
+                background: "rgba(255, 255, 255, 0.8)",
+                backdropFilter: "blur(12px)",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
+                borderRadius: "16px",
+                boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.08)",
+                textAlign: "center",
+                p: 4,
+              }}
+            >
+              <CardContent>
+                <Typography
+                  variant="h5"
+                  sx={{ fontWeight: 700, mb: 2, color: "#dc2626" }}
+                >
+                  접근 권한이 없습니다
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{ color: "#555", mb: 4, lineHeight: 1.6 }}
+                >
+                  정원 보고서는 온교회 정원지기 및 목회자만 작성하실 수 있습니다.
+                </Typography>
+                <Button
+                  component={Link}
+                  to="/community/smallgroup"
+                  variant="contained"
+                  size="large"
+                  sx={{
+                    backgroundColor: "#dc2626",
+                    "&:hover": { backgroundColor: "#b91c1c" },
+                    borderRadius: "24px",
+                    px: 4,
+                    py: 1.5,
+                    fontWeight: 700,
+                    textTransform: "none",
+                  }}
+                >
+                  소그룹 페이지로 돌아가기
                 </Button>
               </CardContent>
             </Card>

@@ -22,18 +22,26 @@ const UserManager = memo(() => {
 
   const signInfail = useCallback(() => {
     deleteToken();
-    sessionStorage.removeItem("refreshToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("remember");
+    try {
+      sessionStorage.removeItem("refreshToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("remember");
+      localStorage.removeItem("hasSession");
+    } catch {}
   }, [deleteToken]);
 
   useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      signInfail();
+    }, 3000);
+
     const legacyToken =
       localStorage.getItem("refreshToken") ||
       sessionStorage.getItem("refreshToken");
 
     refreshTokenSignIn(
       (result) => {
+        clearTimeout(timeoutId);
         signInSuccess(result);
         // Clear legacy storage after successful migration to cookie
         localStorage.removeItem("refreshToken");
@@ -41,10 +49,13 @@ const UserManager = memo(() => {
         localStorage.removeItem("remember");
       },
       () => {
+        clearTimeout(timeoutId);
         signInfail();
       },
       legacyToken
     );
+
+    return () => clearTimeout(timeoutId);
   }, [signInSuccess, signInfail]);
 });
 

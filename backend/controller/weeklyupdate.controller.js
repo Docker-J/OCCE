@@ -89,6 +89,16 @@ export const getWeeklyUpdateController = async (c) => {
     return c.json({ error: "R2 bucket binding 'weeklyupdate' is missing." }, 500);
   }
 
+  const setResponseHeaders = () => {
+    c.header("Content-Type", "application/pdf");
+    c.header("Vary", "Authorization");
+    if (authenticated) {
+      c.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
+    } else {
+      c.header("Cache-Control", "public, s-maxage=604800, max-age=0");
+    }
+  };
+
   const object = await bucket.get(key);
 
   if (!object) {
@@ -98,13 +108,13 @@ export const getWeeklyUpdateController = async (c) => {
       if (!retryObject) {
         return c.body(null, 404);
       }
-      c.header("Content-Type", "application/pdf");
+      setResponseHeaders();
       return c.body(retryObject.body);
     }
     return c.body(null, 404);
   }
 
-  c.header("Content-Type", "application/pdf");
+  setResponseHeaders();
   return c.body(object.body);
 };
 
