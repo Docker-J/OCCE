@@ -15,19 +15,25 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url,
 ).toString();
 
+const MIN_SCALE = 1.0;
+const MAX_SCALE = 2.4;
+const SCALE_STEP = 0.2;
+
 function PDFReader({ file, loading = false, documentDimension }) {
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
-  const [scale, setScale] = useState(1);
+  const [scale, setScale] = useState(MIN_SCALE);
 
   const add = () => {
-    setScale((prev) => prev + 0.2);
+    setScale((prev) =>
+      Math.min(MAX_SCALE, Math.round((prev + SCALE_STEP) * 10) / 10)
+    );
   };
 
   const minus = () => {
-    if (scale !== 1) {
-      setScale((prev) => prev - 0.2);
-    }
+    setScale((prev) =>
+      Math.max(MIN_SCALE, Math.round((prev - SCALE_STEP) * 10) / 10)
+    );
   };
 
   function onDocumentLoadSuccess({ numPages }) {
@@ -48,6 +54,7 @@ function PDFReader({ file, loading = false, documentDimension }) {
 
   useEffect(() => {
     setPageNumber(1);
+    setScale(MIN_SCALE);
   }, [file]);
 
   if (loading) {
@@ -139,7 +146,8 @@ function PDFReader({ file, loading = false, documentDimension }) {
       >
         <IconButton
           onClick={minus}
-          disabled={scale <= 1}
+          disabled={scale <= MIN_SCALE}
+          aria-label="주보 축소"
           sx={{
             color: "#757575",
             "&:hover": { color: "#FF6B00", bgcolor: "rgba(255,107,0,0.08)" },
@@ -149,6 +157,8 @@ function PDFReader({ file, loading = false, documentDimension }) {
         </IconButton>
         <IconButton
           onClick={add}
+          disabled={scale >= MAX_SCALE}
+          aria-label="주보 확대"
           sx={{
             color: "#757575",
             "&:hover": { color: "#FF6B00", bgcolor: "rgba(255,107,0,0.08)" },
@@ -166,6 +176,7 @@ function PDFReader({ file, loading = false, documentDimension }) {
         <IconButton
           onClick={previousPage}
           disabled={pageNumber <= 1}
+          aria-label="이전 페이지"
           sx={{
             color: "#FF6B00",
             "&:hover": { bgcolor: "rgba(255,107,0,0.08)" },
@@ -188,6 +199,7 @@ function PDFReader({ file, loading = false, documentDimension }) {
         <IconButton
           onClick={nextPage}
           disabled={pageNumber >= numPages}
+          aria-label="다음 페이지"
           sx={{
             color: "#FF6B00",
             "&:hover": { bgcolor: "rgba(255,107,0,0.08)" },

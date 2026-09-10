@@ -105,33 +105,35 @@ const WeeklyUpdate = () => {
     });
   }, [selectedDate, authenticated, authInitialized, loadFile, navigate]);
 
-  const [documentDimension, setDocumentDimension] = useState({
-    width: null,
-    height: null,
-  });
+  const calculateDimensions = () => {
+    if (typeof window === "undefined") {
+      return { width: null, height: null };
+    }
+    const width = isMobile
+      ? document.documentElement.clientWidth
+      : window.innerWidth;
+    const height = isMobile
+      ? document.documentElement.clientHeight
+      : window.innerHeight;
+
+    const aspectRatio = height / width;
+    const isPortrait = aspectRatio >= 16 / 10;
+
+    return {
+      width: isPortrait ? width - 30 : null,
+      height: isPortrait ? null : height,
+    };
+  };
+
+  const [documentDimension, setDocumentDimension] = useState(calculateDimensions);
 
   useEffect(() => {
-    const updateDimensions = () => {
-      const width = isMobile
-        ? document.documentElement.clientWidth
-        : window.innerWidth;
-      const height = isMobile
-        ? document.documentElement.clientHeight
-        : window.innerHeight;
-
-      const aspectRatio = height / width;
-      const isPortrait = aspectRatio >= 16 / 10;
-
-      setDocumentDimension({
-        width: isPortrait ? width - 30 : null,
-        height: isPortrait ? null : height,
-      });
+    const handleResize = () => {
+      setDocumentDimension(calculateDimensions());
     };
 
-    updateDimensions(); // Initial calculation
-    window.addEventListener("resize", updateDimensions); // Update on resize
-
-    return () => window.removeEventListener("resize", updateDimensions); // Clean up
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
