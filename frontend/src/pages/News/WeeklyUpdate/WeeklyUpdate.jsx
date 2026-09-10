@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-import { Box, CircularProgress, Fab, IconButton, Typography } from "@mui/material";
+import { Box, Fab, IconButton, Typography } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import UploadIcon from "@mui/icons-material/Upload";
@@ -54,6 +54,7 @@ const WeeklyUpdate = () => {
   // Get Bulletin from Firestore
   const loadFile = useCallback(async () => {
     setLoading(true);
+    setBulletin(null);
     try {
       const result = await getWeeklyUpdate(selectedDate);
 
@@ -151,7 +152,8 @@ const WeeklyUpdate = () => {
               backdropFilter: "blur(12px)",
               WebkitBackdropFilter: "blur(12px)",
               borderRadius: "40px",
-              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 10px rgba(0, 0, 0, 0.05)",
+              boxShadow:
+                "0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 10px rgba(0, 0, 0, 0.05)",
               border: "1px solid rgba(0, 0, 0, 0.15)",
               px: 1,
               py: 0.5,
@@ -167,7 +169,10 @@ const WeeklyUpdate = () => {
                 isBefore(selectedDate, MIN_DATE) ||
                 loading
               }
-              sx={{ color: "#FF6B00", "&:hover": { backgroundColor: "rgba(255, 107, 0, 0.1)" } }}
+              sx={{
+                color: "#FF6B00",
+                "&:hover": { backgroundColor: "rgba(255, 107, 0, 0.1)" },
+              }}
             >
               <ArrowBackIosIcon sx={{ fontSize: "1.1rem", ml: 0.5 }} />
             </IconButton>
@@ -191,19 +196,20 @@ const WeeklyUpdate = () => {
                 isAfter(selectedDate, maxDate) ||
                 loading
               }
-              sx={{ color: "#FF6B00", "&:hover": { backgroundColor: "rgba(255, 107, 0, 0.1)" } }}
+              sx={{
+                color: "#FF6B00",
+                "&:hover": { backgroundColor: "rgba(255, 107, 0, 0.1)" },
+              }}
             >
               <ArrowForwardIosIcon sx={{ fontSize: "1.1rem" }} />
             </IconButton>
           </Box>
 
-          {loading ? (
-            <div style={{ height: "100vh" }}>
-              <CircularProgress sx={{ mt: 2 }} />
-            </div>
-          ) : (
-            <PDFReader file={bulletin} documentDimension={documentDimension} />
-          )}
+          <PDFReader
+            file={bulletin}
+            loading={loading}
+            documentDimension={documentDimension}
+          />
         </div>
       </div>
       <AdminComponent>

@@ -1,77 +1,74 @@
 {
-	"name": "oncce",
-	"main": "./backend/index.js",
-	"compatibility_date": "2026-07-02",
-	"compatibility_flags": [
-		"nodejs_compat"
-	],
-	"observability": {
-		"enabled": false,
-		"head_sampling_rate": 1,
-		"logs": {
-			"enabled": true,
-			"head_sampling_rate": 1,
-			"persist": true,
-			"invocation_logs": true
-		},
-		"traces": {
-			"enabled": false,
-			"persist": true,
-			"head_sampling_rate": 1
-		}
-	},
-	"assets": {
-		"directory": "./frontend/build",
-		"binding": "ASSETS",
-		"not_found_handling": "single-page-application"
-	},
-	"d1_databases": [
-		{
-			"binding": "DB",
-			"database_id": "1de4220d-820c-4074-ae4f-b4aabeacf83e"
-		}
-	],
-	"r2_buckets": [
-		{
-			"binding": "weeklyupdate",
-			"bucket_name": "weeklyupdate"
-		}
-	],
-	"kv_namespaces": [
-		{
-			"binding": "weeklyupdate_kv",
-			"id": "33508149bdd44b2daf3bb45498e5b240"
-		}
-	],
-	"queues": {
-		"producers": [
-			{
-				"binding": "FCM_QUEUE",
-				"queue": "fcm-notification-queue"
-			}
-		],
-		"consumers": [
-			{
-				"queue": "fcm-notification-queue",
-				"max_batch_size": 1,
-				"max_batch_timeout": 5,
-				"max_retries": 3
-			}
-		]
-	},
-	"triggers": {
-		"crons": [
-			"1 6 * * *",
-			"30 12 * * *"
-		]
-	},
-	"routes": [
-		{
-			"pattern": "oncce.ca",
-			"zone_name": "oncce.ca",
-			"custom_domain": true,
-			"enabled": true,
-			"previews_enabled": false
-		}
-	]
+  "name": "oncce",
+  "main": "./backend/index.js",
+  "compatibility_date": "2026-07-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": false,
+    "head_sampling_rate": 1,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true,
+      "invocation_logs": true
+    },
+    "traces": {
+      "enabled": false,
+      "persist": true,
+      "head_sampling_rate": 1
+    }
+  },
+  "assets": {
+    "directory": "./frontend/build",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_id": "1de4220d-820c-4074-ae4f-b4aabeacf83e"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "weeklyupdate",
+      "bucket_name": "weeklyupdate",
+      "remote": true
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "weeklyupdate_kv",
+      "id": "33508149bdd44b2daf3bb45498e5b240",
+      "remote": true
+    }
+  ],
+  "queues": {
+    "producers": [
+      {
+        "binding": "FCM_QUEUE",
+        "queue": "fcm-notification-queue"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "fcm-notification-queue",
+        "max_batch_size": 1,
+        "max_batch_timeout": 5,
+        "max_retries": 3
+      }
+    ]
+  },
+  "triggers": {
+    "crons": ["1 6 * * *", "30 12 * * *"]
+  },
+  "routes": [
+    {
+      "pattern": "oncce.ca",
+      "zone_name": "oncce.ca",
+      "custom_domain": true,
+      "enabled": true,
+      "previews_enabled": false
+    }
+  ]
 }
