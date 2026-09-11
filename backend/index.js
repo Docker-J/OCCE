@@ -156,21 +156,30 @@ export default {
           } else {
             console.log(`ℹ️ No Bible reading schedule found for today (${today}) - likely rest day.`);
           }
+        } else if (event.cron === "0 22 * * 0") {
+          console.log("🕒 Triggering weekly Sunday garden attendance reminder for GardenKeepers...");
+          let attempts = 0;
+          let success = false;
+          while (!success && attempts < 3) {
+            attempts++;
+            try {
+              await sendNotification(
+                env,
+                "주일 출석 보고 리마인더",
+                "주일 출석 보고서를 제출해 주세요!",
+                "/community/smallgroup/report?type=sunday",
+                "GardenKeeper"
+              );
+              console.log("✅ Weekly attendance reminder push sent successfully to GardenKeepers.");
+              success = true;
+            } catch (error) {
+              console.error(`❌ Attempt ${attempts}/3 failed to send weekly attendance reminder push:`, error);
+              if (attempts < 3) {
+                await new Promise((r) => setTimeout(r, 3000));
+              }
+            }
+          }
         }
-        // else if (event.cron === "30 14 * * 0") {
-        //   console.log("🕒 Triggering weekly Sunday garden attendance reminder...");
-        //   try {
-        //     await sendNotification(
-        //       env,
-        //       "정원 출석 보고 리마인더",
-        //       "정원지기분들은 오늘 정원 모임 후 출석 상태를 보고해 주세요!",
-        //       "community/smallgroup/report"
-        //     );
-        //     console.log("✅ Weekly attendance reminder push sent successfully.");
-        //   } catch (error) {
-        //     console.error("❌ Failed to send weekly attendance reminder push:", error);
-        //   }
-        // }
       })(),
     );
   },

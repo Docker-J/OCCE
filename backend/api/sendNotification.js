@@ -89,16 +89,27 @@ const sendNotification = async (env, title, body, pathname, targetRole = "all") 
   };
 
   if (targetRole && targetRole !== "all") {
-    scanParam.FilterExpression = "contains(#roles, :role)";
     scanParam.ExpressionAttributeNames["#roles"] = "roles";
-    scanParam.ExpressionAttributeValues = {
-      ":role": { S: targetRole },
-    };
+    if (Array.isArray(targetRole)) {
+      scanParam.FilterExpression = targetRole
+        .map((_, idx) => `contains(#roles, :role${idx})`)
+        .join(" OR ");
+      scanParam.ExpressionAttributeValues = {};
+      targetRole.forEach((role, idx) => {
+        scanParam.ExpressionAttributeValues[`:role${idx}`] = { S: role };
+      });
+    } else {
+      scanParam.FilterExpression = "contains(#roles, :role)";
+      scanParam.ExpressionAttributeValues = {
+        ":role": { S: targetRole },
+      };
+    }
   }
 
+  const cleanPath = pathname.replace(/^\/+/, "");
   const clickAction = pathname.startsWith("http")
     ? pathname
-    : `https://oncce.ca/${pathname}`;
+    : `https://oncce.ca/${cleanPath}`;
 
   const iconUrl = "https://oncce.ca/favicons/android-icon-192x192.png";
   const badgeUrl = "https://oncce.ca/favicons/favicon-32x32.png";
