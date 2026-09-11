@@ -631,19 +631,12 @@ export const getGatheringReportController = async (c) => {
       }
     }
 
-    // 2. Search for existing file in garden subfolder first (if folder exists), then fallback to root folder
+    // 2. Search for existing file in garden subfolder (if folder exists)
     let gatheringSpreadsheetId = null;
     if (gardenFolderId) {
       gatheringSpreadsheetId = await findDriveFileId(
         drive,
         gardenFolderId,
-        fileName,
-      );
-    }
-    if (!gatheringSpreadsheetId) {
-      gatheringSpreadsheetId = await findDriveFileId(
-        drive,
-        folderId,
         fileName,
       );
     }
@@ -804,36 +797,21 @@ export const getGatheringHistoryController = async (c) => {
       }
     }
 
-    // 2. Query files in garden subfolder (if folder exists) and check for legacy files in root folder in parallel
-    const subfolderPromise = gardenFolderId
-      ? drive.files.list({
-          q: `'${gardenFolderId}' in parents and mimeType != 'application/vnd.google-apps.folder' and trashed = false`,
-          spaces: "drive",
-          fields: "files(id, name)",
-          supportsAllDrives: true,
-          includeItemsFromAllDrives: true,
-          pageSize: 100,
-        })
-      : Promise.resolve({ data: { files: [] } });
+    // 2. Query files in garden subfolder only (if folder exists)
+    if (!gardenFolderId) {
+      return c.json({ dates: [] });
+    }
 
-    const rootPromise = drive.files.list({
-      q: `'${folderId}' in parents and name contains '${gardenName.trim()}_' and trashed = false`,
+    const subfolderList = await drive.files.list({
+      q: `'${gardenFolderId}' in parents and mimeType != 'application/vnd.google-apps.folder' and trashed = false`,
       spaces: "drive",
       fields: "files(id, name)",
       supportsAllDrives: true,
       includeItemsFromAllDrives: true,
-      pageSize: 100,
+      pageSize: 500,
     });
 
-    const [subfolderList, rootList] = await Promise.all([
-      subfolderPromise,
-      rootPromise,
-    ]);
-
-    const allFiles = [
-      ...(subfolderList.data.files || []),
-      ...(rootList.data.files || []),
-    ];
+    const allFiles = subfolderList.data.files || [];
 
     const datePattern = new RegExp(`^${gardenName.trim()}_(\\d{4}-\\d{2}-\\d{2})`);
     const dateSet = new Set();
@@ -1458,18 +1436,6 @@ export const postGatheringReportController = async (c) => {
       includeItemsFromAllDrives: true,
     });
     let filesList = searchResponse.data.files || [];
-
-    // Fallback: check root folder for legacy files
-    if (filesList.length === 0) {
-      const rootSearchResponse = await drive.files.list({
-        q: `name = '${fileName}' and '${folderId}' in parents and trashed = false`,
-        spaces: "drive",
-        fields: "files(id, name)",
-        supportsAllDrives: true,
-        includeItemsFromAllDrives: true,
-      });
-      filesList = rootSearchResponse.data.files || [];
-    }
 
     let weeklySpreadsheetId = null;
 
