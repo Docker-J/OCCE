@@ -55,22 +55,16 @@ const getDriveClient = (env) => {
   return google.drive({ version: "v3", auth });
 };
 
-// Lightweight in-memory TTL cache for '정원지기!A:D' (3 minutes TTL)
-let cachedKeepers = null;
-let cachedKeepersExpiresAt = 0;
-
-const getKeepersData = async (sheets, spreadsheetId) => {
-  const now = Date.now();
-  if (cachedKeepers && now < cachedKeepersExpiresAt) {
-    return cachedKeepers;
+// Helper to extract assigned gardens for a user from JWT token or Cognito attributes
+const getUserAssignedGardens = async (c, user) => {
+  if (user && user["custom:garden"]) {
+    return user["custom:garden"].split(",").map((g) => g.trim()).filter(Boolean);
   }
-  const keepersResponse = await sheets.spreadsheets.values.get({
-    spreadsheetId,
-    range: "정원지기!A:D",
-  });
-  cachedKeepers = keepersResponse.data.values || [];
-  cachedKeepersExpiresAt = now + 3 * 60 * 1000;
-  return cachedKeepers;
+  const attrs = await getCognitoUserAttributes(c);
+  if (attrs && attrs["custom:garden"]) {
+    return attrs["custom:garden"].split(",").map((g) => g.trim()).filter(Boolean);
+  }
+  return [];
 };
 
 // In-memory cache for drive file IDs (3 minutes TTL): key = `${folderId}_${fileName}` -> fileId
@@ -232,78 +226,30 @@ export const getGardensController = async (c) => {
     }
 
     const isStaff = user["cognito:groups"]?.includes("Staff") || false;
-    let cleanUserPhone = "";
-
-    // Only non-staff need to verify mapping against '정원지기' tab
-    if (!isStaff) {
-      cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
-      if (!cleanUserPhone || cleanUserPhone.length < 10) {
-        const userAttributes = await getCognitoUserAttributes(c);
-        const rawPhone = userAttributes.phone_number || "";
-        cleanUserPhone = rawPhone.replace(/\D/g, "");
-      }
-    }
-
-    const sheets = getSheetsClient(env);
-
-    // 1. Read sheet metadata and keepers in PARALLEL with minimal fields
-    const [spreadsheet, keeperRows] = await Promise.all([
-      sheets.spreadsheets.get({
-        spreadsheetId,
-        fields: "sheets.properties.title",
-      }),
-      isStaff ? Promise.resolve([]) : getKeepersData(sheets, spreadsheetId),
-    ]);
-
-    const sheetNames = (spreadsheet.data.sheets || []).map((s) => s.properties.title);
-
     let assignedGardens = [];
 
     if (!isStaff) {
-      // 2. Read Garden Keepers mapping sheet
-      if (!sheetNames.includes("정원지기")) {
-        return c.json(
-          {
-            error: "SheetTabNotFound",
-            message: "스프레드시트에 '정원지기' 탭이 존재하지 않습니다.",
-          },
-          500,
-        );
-      }
-
-      // Dynamically skip header if it exists
-      const startIdx =
-        keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
-
-      for (const row of keeperRows.slice(startIdx)) {
-        const phone = row[2]?.toString().replace(/\D/g, "") || "";
-        const gardensStr = row[3]?.toString().trim() || "";
-
-        if (
-          cleanUserPhone.length >= 10 &&
-          phone.length >= 10 &&
-          phone.slice(-10) === cleanUserPhone.slice(-10)
-        ) {
-          assignedGardens = gardensStr
-            .split(",")
-            .map((g) => g.trim())
-            .filter(Boolean);
-          break;
-        }
-      }
-
-      // Authorization: Non-staff users must be mapped to at least one garden
+      assignedGardens = await getUserAssignedGardens(c, user);
       if (assignedGardens.length === 0) {
         return c.json(
           {
             error: "NotAssignedLeader",
-            message:
-              "이 계정의 전화번호가 스프레드시트의 '정원지기' 명단에 존재하지 않거나 담당 정원이 매핑되지 않았습니다.",
+            message: "계정에 배정된 소속 정원이 없습니다. 온교회 관리자(스태프)에게 문의해 주세요.",
           },
           403,
         );
       }
     }
+
+    const sheets = getSheetsClient(env);
+
+    // 1. Read sheet metadata (tab names) with minimal fields
+    const spreadsheet = await sheets.spreadsheets.get({
+      spreadsheetId,
+      fields: "sheets.properties.title",
+    });
+
+    const sheetNames = (spreadsheet.data.sheets || []).map((s) => s.properties.title);
 
     const gardensData = {};
 
@@ -390,48 +336,9 @@ export const getReportController = async (c) => {
     }
 
     const isStaff = user["cognito:groups"]?.includes("Staff") || false;
-    let cleanUserPhone = "";
 
     if (!isStaff) {
-      cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
-      if (!cleanUserPhone || cleanUserPhone.length < 10) {
-        const userAttributes = await getCognitoUserAttributes(c);
-        cleanUserPhone = (userAttributes.phone_number || "").replace(/\D/g, "");
-      }
-    }
-
-    const sheets = getSheetsClient(env);
-    const drive = getDriveClient(env);
-    const fileName = `OCCE_정원출석부_${date}`;
-
-    // 1. Parallelize authorization check & Drive file search!
-    const [keeperRows, weeklySpreadsheetId] = await Promise.all([
-      isStaff ? Promise.resolve([]) : getKeepersData(sheets, spreadsheetId),
-      findDriveFileId(drive, folderId, fileName),
-    ]);
-
-    if (!isStaff) {
-      const startIdx =
-        keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
-
-      let assignedGardens = [];
-      for (const row of keeperRows.slice(startIdx)) {
-        const phone = row[2]?.toString().replace(/\D/g, "") || "";
-        const gardensStr = row[3]?.toString().trim() || "";
-
-        if (
-          cleanUserPhone.length >= 10 &&
-          phone.length >= 10 &&
-          phone.slice(-10) === cleanUserPhone.slice(-10)
-        ) {
-          assignedGardens = gardensStr
-            .split(",")
-            .map((g) => g.trim())
-            .filter(Boolean);
-          break;
-        }
-      }
-
+      const assignedGardens = await getUserAssignedGardens(c, user);
       if (!assignedGardens.map((g) => g.trim()).includes(gardenName.trim())) {
         return c.json(
           {
@@ -442,6 +349,13 @@ export const getReportController = async (c) => {
         );
       }
     }
+
+    const sheets = getSheetsClient(env);
+    const drive = getDriveClient(env);
+    const fileName = `OCCE_정원출석부_${date}`;
+
+    // 1. Search for weekly spreadsheet in Drive
+    const weeklySpreadsheetId = await findDriveFileId(drive, folderId, fileName);
 
     if (!weeklySpreadsheetId) {
       return c.json({ reported: false });
@@ -575,13 +489,17 @@ export const getGatheringReportController = async (c) => {
     }
 
     const isStaff = user["cognito:groups"]?.includes("Staff") || false;
-    let cleanUserPhone = "";
 
     if (!isStaff) {
-      cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
-      if (!cleanUserPhone || cleanUserPhone.length < 10) {
-        const userAttributes = await getCognitoUserAttributes(c);
-        cleanUserPhone = (userAttributes.phone_number || "").replace(/\D/g, "");
+      const assignedGardens = await getUserAssignedGardens(c, user);
+      if (!assignedGardens.map((g) => g.trim()).includes(gardenName.trim())) {
+        return c.json(
+          {
+            error: "UnauthorizedGardenReport",
+            message: "본인이 담당하지 않은 정원의 모임 보고를 조회할 수 없습니다.",
+          },
+          403,
+        );
       }
     }
 
@@ -589,47 +507,10 @@ export const getGatheringReportController = async (c) => {
     const drive = getDriveClient(env);
     const fileName = `${gardenName}_${date}`;
 
-    // 1. Parallelize authorization check & Garden folder ID lookup (do NOT create folder on GET)
-    const [keeperRows, gardenFolderId] = await Promise.all([
-      isStaff ? Promise.resolve([]) : getKeepersData(sheets, spreadsheetId),
-      getGardenFolderId(drive, env, folderId, gardenName, {
-        createIfNotExists: false,
-      }),
-    ]);
-
-    if (!isStaff) {
-      const startIdx =
-        keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
-
-      let assignedGardens = [];
-      for (const row of keeperRows.slice(startIdx)) {
-        const phone = row[2]?.toString().replace(/\D/g, "") || "";
-        const gardensStr = row[3]?.toString().trim() || "";
-
-        if (
-          cleanUserPhone.length >= 10 &&
-          phone.length >= 10 &&
-          phone.slice(-10) === cleanUserPhone.slice(-10)
-        ) {
-          assignedGardens = gardensStr
-            .split(",")
-            .map((g) => g.trim())
-            .filter(Boolean);
-          break;
-        }
-      }
-
-      if (!assignedGardens.map((g) => g.trim()).includes(gardenName.trim())) {
-        return c.json(
-          {
-            error: "UnauthorizedGardenReport",
-            message:
-              "본인이 담당하지 않은 정원의 모임 보고를 조회할 수 없습니다.",
-          },
-          403,
-        );
-      }
-    }
+    // 1. Garden folder ID lookup (do NOT create folder on GET)
+    const gardenFolderId = await getGardenFolderId(drive, env, folderId, gardenName, {
+      createIfNotExists: false,
+    });
 
     // 2. Search for existing file in garden subfolder (if folder exists)
     let gatheringSpreadsheetId = null;
@@ -742,49 +623,9 @@ export const getGatheringHistoryController = async (c) => {
     }
 
     const isStaff = user["cognito:groups"]?.includes("Staff") || false;
-    let cleanUserPhone = "";
 
     if (!isStaff) {
-      cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
-      if (!cleanUserPhone || cleanUserPhone.length < 10) {
-        const userAttributes = await getCognitoUserAttributes(c);
-        cleanUserPhone = (userAttributes.phone_number || "").replace(/\D/g, "");
-      }
-    }
-
-    const sheets = getSheetsClient(env);
-    const drive = getDriveClient(env);
-
-    // 1. Parallelize authorization check & Garden folder ID lookup (do NOT create folder on GET)
-    const [keeperRows, gardenFolderId] = await Promise.all([
-      isStaff ? Promise.resolve([]) : getKeepersData(sheets, spreadsheetId),
-      getGardenFolderId(drive, env, folderId, gardenName, {
-        createIfNotExists: false,
-      }),
-    ]);
-
-    if (!isStaff) {
-      const startIdx =
-        keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
-
-      let assignedGardens = [];
-      for (const row of keeperRows.slice(startIdx)) {
-        const phone = row[2]?.toString().replace(/\D/g, "") || "";
-        const gardensStr = row[3]?.toString().trim() || "";
-
-        if (
-          cleanUserPhone.length >= 10 &&
-          phone.length >= 10 &&
-          phone.slice(-10) === cleanUserPhone.slice(-10)
-        ) {
-          assignedGardens = gardensStr
-            .split(",")
-            .map((g) => g.trim())
-            .filter(Boolean);
-          break;
-        }
-      }
-
+      const assignedGardens = await getUserAssignedGardens(c, user);
       if (!assignedGardens.map((g) => g.trim()).includes(gardenName.trim())) {
         return c.json(
           {
@@ -796,6 +637,13 @@ export const getGatheringHistoryController = async (c) => {
         );
       }
     }
+
+    const drive = getDriveClient(env);
+
+    // 1. Garden folder ID lookup (do NOT create folder on GET)
+    const gardenFolderId = await getGardenFolderId(drive, env, folderId, gardenName, {
+      createIfNotExists: false,
+    });
 
     // 2. Query files in garden subfolder only (if folder exists)
     if (!gardenFolderId) {
@@ -878,56 +726,15 @@ export const postReportController = async (c) => {
     }
 
     const isStaff = user["cognito:groups"]?.includes("Staff") || false;
-    let cleanUserPhone = "";
-    let reporterName = isStaff ? "목회자/스태프" : "";
+    let reporterName = isStaff ? "목회자/스태프" : (user.name || "");
 
-    // Only non-staff need to verify mapping against '정원지기' tab
     if (!isStaff) {
-      cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
-      if (!cleanUserPhone || cleanUserPhone.length < 10) {
+      if (!reporterName) {
         const userAttributes = await getCognitoUserAttributes(c);
-        cleanUserPhone = (userAttributes.phone_number || "").replace(/\D/g, "");
-        reporterName = userAttributes.name || user.name || "";
-      } else {
-        reporterName = user.name || "";
-      }
-    }
-
-    const sheets = getSheetsClient(env);
-    const drive = getDriveClient(env);
-
-    let assignedGardens = [];
-
-    if (!isStaff) {
-      // 1. Read keepers mapping from the master spreadsheet to check authorization and get reporterName
-      const keepersResponse = await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: "정원지기!A:D",
-      });
-      const keeperRows = keepersResponse.data.values || [];
-      const startIdx =
-        keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
-
-      for (const row of keeperRows.slice(startIdx)) {
-        const phone = row[2]?.toString().replace(/\D/g, "") || "";
-        const name = row[0]?.toString().trim();
-        const gardensStr = row[3]?.toString().trim() || "";
-
-        if (
-          cleanUserPhone.length >= 10 &&
-          phone.length >= 10 &&
-          phone.slice(-10) === cleanUserPhone.slice(-10)
-        ) {
-          assignedGardens = gardensStr
-            .split(",")
-            .map((g) => g.trim())
-            .filter(Boolean);
-          reporterName = name || reporterName || "";
-          break;
-        }
+        reporterName = userAttributes.name || "정원지기";
       }
 
-      // Security check for non-staff
+      const assignedGardens = await getUserAssignedGardens(c, user);
       if (!assignedGardens.map((g) => g.trim()).includes(gardenName.trim())) {
         return c.json(
           {
@@ -938,6 +745,9 @@ export const postReportController = async (c) => {
         );
       }
     }
+
+    const sheets = getSheetsClient(env);
+    const drive = getDriveClient(env);
 
     // 2. Search for existing weekly file named 'OCCE_정원출석부_[date]' in DRIVE_FOLDER_ID
     const fileName = `OCCE_정원출석부_${date}`;
@@ -1023,16 +833,8 @@ export const postReportController = async (c) => {
       }
       targetTabId = targetTab.properties.sheetId;
 
-      // Find '정원지기' tab to delete
-      const keepersSheet = weeklySheets.find(
-        (s) => s.properties.title === "정원지기",
-      );
-      const keepersSheetId = keepersSheet
-        ? keepersSheet.properties.sheetId
-        : null;
-
-      // Create '종합통계' sheet tab at index 0 and delete '정원지기' sheet tab
-      console.log("Creating '종합통계' tab and deleting '정원지기' tab...");
+      // Create '종합통계' sheet tab at index 0
+      console.log("Creating '종합통계' tab...");
       const batchRequests = [
         {
           addSheet: {
@@ -1043,13 +845,6 @@ export const postReportController = async (c) => {
           },
         },
       ];
-      if (keepersSheetId) {
-        batchRequests.push({
-          deleteSheet: {
-            sheetId: keepersSheetId,
-          },
-        });
-      }
 
       const batchResponseUpdate = await sheets.spreadsheets.batchUpdate({
         spreadsheetId: weeklySpreadsheetId,
@@ -1355,55 +1150,15 @@ export const postGatheringReportController = async (c) => {
     }
 
     const isStaff = user["cognito:groups"]?.includes("Staff") || false;
-    let cleanUserPhone = "";
-    let reporterName = isStaff ? "목회자/스태프" : "";
+    let reporterName = isStaff ? "목회자/스태프" : (user.name || "");
 
     if (!isStaff) {
-      cleanUserPhone = (user.phone_number || "").replace(/\D/g, "");
-      if (!cleanUserPhone || cleanUserPhone.length < 10) {
+      if (!reporterName) {
         const userAttributes = await getCognitoUserAttributes(c);
-        cleanUserPhone = (userAttributes.phone_number || "").replace(/\D/g, "");
-        reporterName = userAttributes.name || user.name || "";
-      } else {
-        reporterName = user.name || "";
-      }
-    }
-
-    const sheets = getSheetsClient(env);
-    const drive = getDriveClient(env);
-
-    let assignedGardens = [];
-
-    if (!isStaff) {
-      // 1. Read keepers mapping from the master spreadsheet to check authorization and get reporterName
-      const keepersResponse = await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: "정원지기!A:D",
-      });
-      const keeperRows = keepersResponse.data.values || [];
-      const startIdx =
-        keeperRows[0]?.[0] === "이름" || keeperRows[0]?.[0] === "성명" ? 1 : 0;
-
-      for (const row of keeperRows.slice(startIdx)) {
-        const phone = row[2]?.toString().replace(/\D/g, "") || "";
-        const name = row[0]?.toString().trim();
-        const gardensStr = row[3]?.toString().trim() || "";
-
-        if (
-          cleanUserPhone.length >= 10 &&
-          phone.length >= 10 &&
-          phone.slice(-10) === cleanUserPhone.slice(-10)
-        ) {
-          assignedGardens = gardensStr
-            .split(",")
-            .map((g) => g.trim())
-            .filter(Boolean);
-          reporterName = name || reporterName || "";
-          break;
-        }
+        reporterName = userAttributes.name || "정원지기";
       }
 
-      // Security check for non-staff
+      const assignedGardens = await getUserAssignedGardens(c, user);
       if (!assignedGardens.map((g) => g.trim()).includes(gardenName.trim())) {
         return c.json(
           {
@@ -1414,6 +1169,9 @@ export const postGatheringReportController = async (c) => {
         );
       }
     }
+
+    const sheets = getSheetsClient(env);
+    const drive = getDriveClient(env);
 
     // 2. Search for existing file named '[GardenName]_[Date]' in garden subfolder or root folder
     const fileName = `${gardenName}_${date}`;

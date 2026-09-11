@@ -14,6 +14,7 @@ import schedules from "./routes/schedules.routes.js";
 import images from "./routes/images.routes.js";
 import attendance from "./routes/attendance.routes.js";
 import bible291 from "./routes/bible291.routes.js";
+import admin from "./routes/admin.routes.js";
 
 import { handleScheduled } from "./jobs/scheduled.js";
 import { linkPreviewMiddleware } from "./middleware/linkPreview.js";
@@ -40,6 +41,7 @@ app.route("/api/notification", notification);
 app.route("/api/images", images);
 app.route("/api/attendance", attendance);
 app.route("/api/bible291", bible291);
+app.route("/api/admin", admin);
 
 export default {
   /**

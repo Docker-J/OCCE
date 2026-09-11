@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 import "./ResponsiveAppBar.css";
 
@@ -32,10 +32,12 @@ import useModals from "../util/useModal.js";
 import useSnackbar from "../util/useSnackbar.js";
 
 const ResponsiveAppBar = () => {
+  const navigate = useNavigate();
   const { openModal } = useModals();
   const { openSnackbar } = useSnackbar();
 
   const authenticated = useAuthStore((state) => state.authenticated);
+  const admin = useAuthStore((state) => state.admin);
   const deleteToken = useAuthStore((state) => state.deleteToken);
 
   const [scrolled, setScrolled] = useState(false);
@@ -56,6 +58,16 @@ const ResponsiveAppBar = () => {
   });
 
   const settings_signed = [
+    ...(admin
+      ? [
+          {
+            title: "교인 관리",
+            onClick: () => {
+              navigate("/admin/members");
+            },
+          },
+        ]
+      : []),
     {
       title: "로그아웃",
       onClick: () => {

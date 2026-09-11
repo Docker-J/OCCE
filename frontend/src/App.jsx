@@ -183,6 +183,10 @@ const router = createBrowserRouter([
         lazy: async () => ({ Component: (await import("./pages/News/NewComers/NewComers")).default }),
       },
       {
+        path: "/admin/members",
+        lazy: async () => ({ Component: (await import("./pages/Admin/MemberManagement")).default }),
+      },
+      {
         path: "/community",
         children: [
           {

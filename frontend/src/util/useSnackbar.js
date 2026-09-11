@@ -1,15 +1,19 @@
-import { use } from "react";
+import { use, useCallback, useMemo } from "react";
 import { SnackBarDispatchContext } from "./SnackBarContext";
 
 export default function useSnackbar() {
   const { open, close } = use(SnackBarDispatchContext);
 
-  const openSnackbar = (severity, message, action) => {
+  const openSnackbar = useCallback((severity, message, action) => {
     open(severity, message, action);
-  };
-  const closeSnackbar = () => {
-    close();
-  };
+  }, [open]);
 
-  return { openSnackbar, closeSnackbar };
+  const closeSnackbar = useCallback(() => {
+    close();
+  }, [close]);
+
+  return useMemo(
+    () => ({ openSnackbar, closeSnackbar }),
+    [openSnackbar, closeSnackbar]
+  );
 }
