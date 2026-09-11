@@ -1,7 +1,5 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { subHours, format } from "date-fns";
-import schedule from "./data/schedule.json";
 import { DeleteItemCommand } from "@aws-sdk/client-dynamodb";
 import { getDocClient } from "./api/dynamodb.js";
 
@@ -17,8 +15,7 @@ import images from "./routes/images.routes.js";
 import attendance from "./routes/attendance.routes.js";
 import bible291 from "./routes/bible291.routes.js";
 
-import { getSchedules } from "./controller/schedules.controller.js";
-import sendNotification from "./api/sendNotification.js";
+import { handleScheduled } from "./jobs/scheduled.js";
 import { linkPreviewMiddleware } from "./middleware/linkPreview.js";
 
 const app = new Hono();
@@ -114,73 +111,11 @@ export default {
   },
 
   /**
-   * Scheduled handler to perform daily schedule refreshes and
-   * weekly push notifications natively via Cloudflare Cron Triggers.
+   * Scheduled handler to perform background cron tasks
+   * delegated to backend/jobs/scheduled.js.
    */
   async scheduled(event, env, ctx) {
     console.log(`[Wrangler Scheduled Trigger] Cron: ${event.cron}`);
-    ctx.waitUntil(
-      (async () => {
-        if (event.cron === "1 6 * * *") {
-          console.log("🕒 Triggering daily schedule refresh...");
-          try {
-            await getSchedules(env);
-            console.log("✅ Schedule refreshed successfully.");
-          } catch (error) {
-            console.error("❌ Failed to refresh schedule:", error);
-          }
-        } else if (event.cron === "30 12 * * *") {
-          console.log("🕒 Triggering daily Bible reading FCM...");
-          const today = format(subHours(new Date(), 6), "M월 d일");
-          const match = schedule.find((item) => item.date === today);
-          if (match) {
-            const title = "291일 성경 1독";
-            const body = `${today}\n오늘의 1독 말씀은 "${match.read}" 입니다.`;
-            const link = "/online/bible291";
-
-            let attempts = 0;
-            let success = false;
-            while (!success && attempts < 3) {
-              attempts++;
-              try {
-                await sendNotification(env, title, body, link);
-                console.log(`✅ Daily Bible reading FCM sent successfully for date: ${today}`);
-                success = true;
-              } catch (error) {
-                console.error(`❌ Attempt ${attempts}/3 failed to process daily Bible reading FCM:`, error);
-                if (attempts < 3) {
-                  await new Promise((r) => setTimeout(r, 3000));
-                }
-              }
-            }
-          } else {
-            console.log(`ℹ️ No Bible reading schedule found for today (${today}) - likely rest day.`);
-          }
-        } else if (event.cron === "0 22 * * 0") {
-          console.log("🕒 Triggering weekly Sunday garden attendance reminder for GardenKeepers...");
-          let attempts = 0;
-          let success = false;
-          while (!success && attempts < 3) {
-            attempts++;
-            try {
-              await sendNotification(
-                env,
-                "주일 출석 보고 리마인더",
-                "주일 출석 보고서를 제출해 주세요!",
-                "/community/smallgroup/report?type=sunday",
-                "GardenKeeper"
-              );
-              console.log("✅ Weekly attendance reminder push sent successfully to GardenKeepers.");
-              success = true;
-            } catch (error) {
-              console.error(`❌ Attempt ${attempts}/3 failed to send weekly attendance reminder push:`, error);
-              if (attempts < 3) {
-                await new Promise((r) => setTimeout(r, 3000));
-              }
-            }
-          }
-        }
-      })(),
-    );
+    ctx.waitUntil(handleScheduled(event, env, ctx));
   },
 };
