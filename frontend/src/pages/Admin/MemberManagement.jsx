@@ -5,11 +5,9 @@ import useModals from "../../util/useModal";
 import {
   getAdminUsers,
   updateUserRole,
-  updateUserStatus,
   deleteUser,
 } from "../../api/admin";
 import { getGardensAndMembers } from "../../api/attendance";
-import { format } from "date-fns";
 import { Link } from "react-router";
 
 import {
@@ -27,7 +25,6 @@ import {
   TableRow,
   Paper,
   Chip,
-  Switch,
   IconButton,
   Tooltip,
   Dialog,
@@ -55,7 +52,6 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
 import LoginIcon from "@mui/icons-material/Login";
 import ForestIcon from "@mui/icons-material/Forest";
-import BlockIcon from "@mui/icons-material/Block";
 import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import CheckIcon from "@mui/icons-material/Check";
 import AddIcon from "@mui/icons-material/Add";
@@ -98,11 +94,10 @@ const MemberManagement = () => {
   // Search, Filter, Sort and Pagination states
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all"); // 'all' | 'staff' | 'keeper' | 'member'
-  const [statusFilter, setStatusFilter] = useState("all"); // 'all' | 'active' | 'disabled'
+  const [gardenFilter, setGardenFilter] = useState("all");
   const [notificationFilter, setNotificationFilter] = useState("all"); // 'all' | 'enabled' | 'disabled'
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [sortField, setSortField] = useState("name"); // 'name' | 'createdAt'
   const [sortDirection, setSortDirection] = useState("asc"); // 'asc' | 'desc'
 
   // Action states
@@ -258,35 +253,6 @@ const MemberManagement = () => {
     }
   };
 
-  // Handle Account Enable/Disable Status Toggle
-  const handleToggleStatus = async (user) => {
-    const newEnabled = !user.enabled;
-    setActionLoadingUser(user.username);
-    try {
-      await updateUserStatus(user.username, newEnabled);
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.username === user.username ? { ...u, enabled: newEnabled } : u,
-        ),
-      );
-      openSnackbar(
-        "success",
-        `${user.name || "교인"}님의 계정이 ${
-          newEnabled ? "활성화" : "비활성화"
-        }되었습니다.`,
-      );
-    } catch (error) {
-      console.error("Status update failed:", error);
-      openSnackbar(
-        "error",
-        error.response?.data?.message ||
-          "계정 상태 변경 중 오류가 발생했습니다.",
-      );
-    } finally {
-      setActionLoadingUser(null);
-    }
-  };
-
   // Open Delete Confirmation Dialog
   const handleOpenDeleteDialog = (user) => {
     setUserToDelete(user);
@@ -320,16 +286,11 @@ const MemberManagement = () => {
   // Reset page when filter, search, or sort changes
   useEffect(() => {
     setPage(0);
-  }, [searchTerm, roleFilter, statusFilter, notificationFilter, sortField, sortDirection]);
+  }, [searchTerm, roleFilter, gardenFilter, notificationFilter, sortDirection]);
 
   // Request sort column/direction
-  const handleRequestSort = (field) => {
-    if (sortField === field) {
-      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
+  const handleRequestSort = () => {
+    setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
     setPage(0);
   };
 
@@ -347,9 +308,14 @@ const MemberManagement = () => {
       if (roleFilter === "keeper" && !u.isGardenKeeper) return false;
       if (roleFilter === "member" && (u.isGardenKeeper || u.isStaff)) return false;
 
-      // 3. Status filter
-      if (statusFilter === "active" && !u.enabled) return false;
-      if (statusFilter === "disabled" && u.enabled) return false;
+      // 3. Garden filter
+      if (gardenFilter !== "all") {
+        const assigned = (u.garden || "")
+          .split(",")
+          .map((g) => g.trim())
+          .filter(Boolean);
+        if (!assigned.includes(gardenFilter)) return false;
+      }
 
       // 4. Notification filter
       if (notificationFilter === "enabled" && !u.hasNotification) return false;
@@ -358,24 +324,16 @@ const MemberManagement = () => {
       return true;
     });
 
-    // 5. Sort
+    // 5. Sort by name
     list.sort((a, b) => {
-      if (sortField === "name") {
-        const nameA = (a.name || "").trim();
-        const nameB = (b.name || "").trim();
-        const cmp = nameA.localeCompare(nameB, "ko");
-        if (cmp !== 0) return sortDirection === "asc" ? cmp : -cmp;
-        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-      } else if (sortField === "createdAt") {
-        const dateA = new Date(a.createdAt || 0).getTime();
-        const dateB = new Date(b.createdAt || 0).getTime();
-        return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
-      }
-      return 0;
+      const nameA = (a.name || "").trim();
+      const nameB = (b.name || "").trim();
+      const cmp = nameA.localeCompare(nameB, "ko");
+      return sortDirection === "asc" ? cmp : -cmp;
     });
 
     return list;
-  }, [users, searchTerm, roleFilter, statusFilter, notificationFilter, sortField, sortDirection]);
+  }, [users, searchTerm, roleFilter, gardenFilter, notificationFilter, sortDirection]);
 
   // Paginated users for table display
   const paginatedUsers = useMemo(() => {
@@ -389,8 +347,7 @@ const MemberManagement = () => {
     const staffCount = users.filter((u) => u.isStaff).length;
     const keepers = users.filter((u) => u.isGardenKeeper).length;
     const notificationEnabled = users.filter((u) => u.hasNotification).length;
-    const disabled = users.filter((u) => !u.enabled).length;
-    return { total, staffCount, keepers, notificationEnabled, disabled };
+    return { total, staffCount, keepers, notificationEnabled };
   }, [users]);
 
   const handleLoginClick = async () => {
@@ -554,7 +511,7 @@ const MemberManagement = () => {
                   gridTemplateColumns: {
                     xs: "1fr",
                     sm: "repeat(2, 1fr)",
-                    md: "repeat(5, 1fr)",
+                    md: "repeat(4, 1fr)",
                   },
                   gap: 2,
                   mb: 3.5,
@@ -707,43 +664,6 @@ const MemberManagement = () => {
                     </Typography>
                   </Box>
                 </Paper>
-
-                {/* Disabled Accounts */}
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: 2.5,
-                    borderRadius: "16px",
-                    border: "1px solid rgba(0, 0, 0, 0.08)",
-                    backgroundColor: "#ffffff",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 2,
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: "12px",
-                      backgroundColor: "rgba(220, 38, 38, 0.1)",
-                      color: "#dc2626",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <BlockIcon fontSize="medium" />
-                  </Box>
-                  <Box>
-                    <Typography variant="caption" sx={{ color: "#666", fontWeight: 600 }}>
-                      비활성 계정
-                    </Typography>
-                    <Typography variant="h5" sx={{ fontWeight: 800, color: "#dc2626" }}>
-                      {metrics.disabled}명
-                    </Typography>
-                  </Box>
-                </Paper>
               </Box>
 
               {/* Main Card: Controls & Table */}
@@ -822,20 +742,25 @@ const MemberManagement = () => {
                       </Select>
                     </FormControl>
 
-                    <FormControl size="small" sx={{ minWidth: 120, backgroundColor: "#fff" }}>
-                      <InputLabel id="status-filter-label">상태 필터</InputLabel>
-                      <Select
-                        labelId="status-filter-label"
-                        value={statusFilter}
-                        label="상태 필터"
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        sx={{ borderRadius: "12px" }}
-                      >
-                        <MenuItem value="all">전체 상태</MenuItem>
-                        <MenuItem value="active">활성 계정</MenuItem>
-                        <MenuItem value="disabled">비활성 계정</MenuItem>
-                      </Select>
-                    </FormControl>
+                    {availableGardens.length > 0 && (
+                      <FormControl size="small" sx={{ minWidth: 120, backgroundColor: "#fff" }}>
+                        <InputLabel id="garden-filter-label">정원 필터</InputLabel>
+                        <Select
+                          labelId="garden-filter-label"
+                          value={gardenFilter}
+                          label="정원 필터"
+                          onChange={(e) => setGardenFilter(e.target.value)}
+                          sx={{ borderRadius: "12px" }}
+                        >
+                          <MenuItem value="all">전체 정원</MenuItem>
+                          {availableGardens.map((g) => (
+                            <MenuItem key={g} value={g}>
+                              {g}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    )}
 
                     <FormControl size="small" sx={{ minWidth: 125, backgroundColor: "#fff" }}>
                       <InputLabel id="notification-filter-label">알림 필터</InputLabel>
@@ -856,19 +781,13 @@ const MemberManagement = () => {
                       <InputLabel id="sort-select-label">정렬 기준</InputLabel>
                       <Select
                         labelId="sort-select-label"
-                        value={`${sortField}-${sortDirection}`}
+                        value={sortDirection}
                         label="정렬 기준"
-                        onChange={(e) => {
-                          const [field, dir] = e.target.value.split("-");
-                          setSortField(field);
-                          setSortDirection(dir);
-                        }}
+                        onChange={(e) => setSortDirection(e.target.value)}
                         sx={{ borderRadius: "12px" }}
                       >
-                        <MenuItem value="name-asc">이름순 (가나다)</MenuItem>
-                        <MenuItem value="name-desc">이름 역순 (하파타)</MenuItem>
-                        <MenuItem value="createdAt-desc">최신 가입순</MenuItem>
-                        <MenuItem value="createdAt-asc">오래된 가입순</MenuItem>
+                        <MenuItem value="asc">이름순 (가나다)</MenuItem>
+                        <MenuItem value="desc">이름 역순 (하파타)</MenuItem>
                       </Select>
                     </FormControl>
 
@@ -915,7 +834,7 @@ const MemberManagement = () => {
                 ) : filteredUsers.length === 0 ? (
                   <Box sx={{ textAlign: "center", py: 8 }}>
                     <Typography variant="body1" sx={{ color: "#888", fontWeight: 500 }}>
-                      {searchTerm || roleFilter !== "all" || statusFilter !== "all" || notificationFilter !== "all"
+                      {searchTerm || roleFilter !== "all" || gardenFilter !== "all" || notificationFilter !== "all"
                         ? "검색 조건에 일치하는 교인이 없습니다."
                         : "등록된 교인이 없습니다."}
                     </Typography>
@@ -928,9 +847,9 @@ const MemberManagement = () => {
                         <TableRow>
                           <TableCell sx={{ fontWeight: 700, color: "#555", py: 1.8 }}>
                             <TableSortLabel
-                              active={sortField === "name"}
-                              direction={sortField === "name" ? sortDirection : "asc"}
-                              onClick={() => handleRequestSort("name")}
+                              active={true}
+                              direction={sortDirection}
+                              onClick={handleRequestSort}
                               sx={{
                                 fontWeight: 700,
                                 "&.Mui-active": { color: "#ea580c" },
@@ -953,27 +872,13 @@ const MemberManagement = () => {
                             align="center"
                             sx={{ fontWeight: 700, color: "#555", py: 1.8, whiteSpace: "nowrap" }}
                           >
-                            알림
+                            정원
                           </TableCell>
                           <TableCell
                             align="center"
-                            sx={{ fontWeight: 700, color: "#555", py: 1.8 }}
+                            sx={{ fontWeight: 700, color: "#555", py: 1.8, whiteSpace: "nowrap" }}
                           >
-                            계정 상태
-                          </TableCell>
-                          <TableCell sx={{ fontWeight: 700, color: "#555", py: 1.8 }}>
-                            <TableSortLabel
-                              active={sortField === "createdAt"}
-                              direction={sortField === "createdAt" ? sortDirection : "asc"}
-                              onClick={() => handleRequestSort("createdAt")}
-                              sx={{
-                                fontWeight: 700,
-                                "&.Mui-active": { color: "#ea580c" },
-                                "& .MuiTableSortLabel-icon": { color: "#ea580c !important" },
-                              }}
-                            >
-                              가입일시
-                            </TableSortLabel>
+                            알림
                           </TableCell>
                           <TableCell
                             align="center"
@@ -987,25 +892,12 @@ const MemberManagement = () => {
                         {paginatedUsers.map((user) => {
                           const isProcessing = actionLoadingUser === user.username;
 
-                          let formattedDate = "-";
-                          if (user.createdAt) {
-                            try {
-                              formattedDate = format(
-                                new Date(user.createdAt),
-                                "yyyy. MM. dd",
-                              );
-                            } catch {
-                              formattedDate = user.createdAt.slice(0, 10);
-                            }
-                          }
-
                           return (
                             <TableRow
                               key={user.username}
                               hover
                               sx={{
                                 "&:last-child td, &:last-child th": { border: 0 },
-                                opacity: !user.enabled ? 0.65 : 1,
                                 transition: "all 0.2s ease",
                               }}
                             >
@@ -1112,63 +1004,37 @@ const MemberManagement = () => {
                                   </Tooltip>
                                 ) : user.isGardenKeeper ? (
                                   /* Non-Staff: GardenKeeper */
-                                  <Box sx={{ display: "inline-flex", flexDirection: "column", alignItems: "center" }}>
-                                    <Tooltip
-                                      title={
-                                        user.garden
-                                          ? `담당 정원: ${user.garden} (클릭하여 수정 또는 해제)`
-                                          : "클릭하여 담당 정원 배정 또는 해제"
+                                  <Tooltip title="클릭하여 정원지기 및 담당 정원 수정 또는 해제">
+                                    <Chip
+                                      icon={
+                                        <ForestIcon
+                                          sx={{ fontSize: "1.15rem !important", color: "inherit !important" }}
+                                        />
                                       }
-                                    >
-                                      <Chip
-                                        icon={
-                                          <ForestIcon
-                                            sx={{ fontSize: "1.15rem !important", color: "inherit !important" }}
-                                          />
-                                        }
-                                        label="정원지기"
-                                        clickable
-                                        onClick={() => handleOpenRoleModal(user)}
-                                        sx={{
-                                          fontWeight: 700,
-                                          fontSize: "0.875rem",
-                                          height: 34,
-                                          width: 115,
-                                          minWidth: 115,
-                                          justifyContent: "center",
-                                          borderRadius: "10px",
-                                          backgroundColor: "rgba(234, 88, 12, 0.12)",
-                                          color: "#ea580c",
-                                          border: "1px solid rgba(234, 88, 12, 0.3)",
-                                          cursor: "pointer",
-                                          transition: "all 0.18s ease-in-out",
-                                          "&:hover": {
-                                            backgroundColor: "rgba(234, 88, 12, 0.22)",
-                                            transform: "translateY(-1px)",
-                                            boxShadow: "0 2px 6px rgba(234, 88, 12, 0.2)",
-                                          },
-                                        }}
-                                      />
-                                    </Tooltip>
-                                    {user.garden && (
-                                      <Typography
-                                        variant="caption"
-                                        sx={{
-                                          display: "block",
-                                          color: "#c2410c",
-                                          fontWeight: 700,
-                                          fontSize: "0.78rem",
-                                          mt: 0.5,
-                                          textAlign: "center",
-                                          maxWidth: 130,
-                                          whiteSpace: "normal",
-                                          wordBreak: "keep-all",
-                                        }}
-                                      >
-                                        {user.garden}
-                                      </Typography>
-                                    )}
-                                  </Box>
+                                      label="정원지기"
+                                      clickable
+                                      onClick={() => handleOpenRoleModal(user)}
+                                      sx={{
+                                        fontWeight: 700,
+                                        fontSize: "0.875rem",
+                                        height: 34,
+                                        width: 115,
+                                        minWidth: 115,
+                                        justifyContent: "center",
+                                        borderRadius: "10px",
+                                        backgroundColor: "rgba(234, 88, 12, 0.12)",
+                                        color: "#ea580c",
+                                        border: "1px solid rgba(234, 88, 12, 0.3)",
+                                        cursor: "pointer",
+                                        transition: "all 0.18s ease-in-out",
+                                        "&:hover": {
+                                          backgroundColor: "rgba(234, 88, 12, 0.22)",
+                                          transform: "translateY(-1px)",
+                                          boxShadow: "0 2px 6px rgba(234, 88, 12, 0.2)",
+                                        },
+                                      }}
+                                    />
+                                  </Tooltip>
                                 ) : (
                                   /* Non-Staff: No assigned role (-) */
                                   <Tooltip title="클릭하여 정원지기 임명 및 정원 배정">
@@ -1198,6 +1064,48 @@ const MemberManagement = () => {
                                       }}
                                     />
                                   </Tooltip>
+                                )}
+                              </TableCell>
+
+                              {/* Garden */}
+                              <TableCell align="center" sx={{ py: 2, whiteSpace: "nowrap" }}>
+                                {user.garden ? (
+                                  <Box sx={{ display: "inline-flex", flexWrap: "wrap", justifyContent: "center", gap: 0.6, maxWidth: 180 }}>
+                                    {user.garden
+                                      .split(",")
+                                      .map((g) => g.trim())
+                                      .filter(Boolean)
+                                      .map((gardenName) => (
+                                        <Chip
+                                          key={gardenName}
+                                          label={gardenName}
+                                          size="small"
+                                          clickable
+                                          onClick={() => handleOpenRoleModal(user)}
+                                          sx={{
+                                            fontWeight: 700,
+                                            fontSize: "0.8rem",
+                                            height: 26,
+                                            borderRadius: "8px",
+                                            backgroundColor: "rgba(234, 88, 12, 0.08)",
+                                            color: "#c2410c",
+                                            border: "1px solid rgba(234, 88, 12, 0.25)",
+                                            cursor: "pointer",
+                                            "&:hover": {
+                                              backgroundColor: "rgba(234, 88, 12, 0.18)",
+                                              transform: "translateY(-1px)",
+                                            },
+                                          }}
+                                        />
+                                      ))}
+                                  </Box>
+                                ) : (
+                                  <Typography
+                                    variant="body2"
+                                    sx={{ color: "#bbb", fontWeight: 500, fontSize: "0.9rem" }}
+                                  >
+                                    -
+                                  </Typography>
                                 )}
                               </TableCell>
 
@@ -1248,55 +1156,6 @@ const MemberManagement = () => {
                                     />
                                   </Tooltip>
                                 )}
-                              </TableCell>
-
-                              {/* Account Enabled/Disabled Switch */}
-                              <TableCell align="center" sx={{ py: 2 }}>
-                                <Tooltip
-                                  title={
-                                    user.enabled
-                                      ? "활성화 상태 (클릭 시 비활성화)"
-                                      : "비활성화 상태 (클릭 시 활성화)"
-                                  }
-                                >
-                                  <Box
-                                    sx={{
-                                      display: "inline-flex",
-                                      alignItems: "center",
-                                      gap: 0.5,
-                                    }}
-                                  >
-                                    <Switch
-                                      size="small"
-                                      checked={user.enabled}
-                                      disabled={isProcessing}
-                                      onChange={() => handleToggleStatus(user)}
-                                      sx={{
-                                        "& .MuiSwitch-switchBase.Mui-checked": {
-                                          color: "#16a34a",
-                                        },
-                                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
-                                          {
-                                            backgroundColor: "#16a34a",
-                                          },
-                                      }}
-                                    />
-                                    <Typography
-                                      variant="caption"
-                                      sx={{
-                                        fontWeight: 600,
-                                        color: user.enabled ? "#16a34a" : "#dc2626",
-                                      }}
-                                    >
-                                      {user.enabled ? "활성" : "정지"}
-                                    </Typography>
-                                  </Box>
-                                </Tooltip>
-                              </TableCell>
-
-                              {/* Created At */}
-                              <TableCell sx={{ py: 2, color: "#666", fontSize: "0.9rem" }}>
-                                {formattedDate}
                               </TableCell>
 
                               {/* Delete Action */}
