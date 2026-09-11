@@ -59,6 +59,8 @@ import BlockIcon from "@mui/icons-material/Block";
 import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import CheckIcon from "@mui/icons-material/Check";
 import AddIcon from "@mui/icons-material/Add";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
 
 const titleBackground = {
   backgroundImage: 'url("/img/Community/SmallGroup.webp")',
@@ -95,8 +97,9 @@ const MemberManagement = () => {
 
   // Search, Filter, Sort and Pagination states
   const [searchTerm, setSearchTerm] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all"); // 'all' | 'keeper' | 'member'
+  const [roleFilter, setRoleFilter] = useState("all"); // 'all' | 'staff' | 'keeper' | 'member'
   const [statusFilter, setStatusFilter] = useState("all"); // 'all' | 'active' | 'disabled'
+  const [notificationFilter, setNotificationFilter] = useState("all"); // 'all' | 'enabled' | 'disabled'
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [sortField, setSortField] = useState("name"); // 'name' | 'createdAt'
@@ -317,7 +320,7 @@ const MemberManagement = () => {
   // Reset page when filter, search, or sort changes
   useEffect(() => {
     setPage(0);
-  }, [searchTerm, roleFilter, statusFilter, sortField, sortDirection]);
+  }, [searchTerm, roleFilter, statusFilter, notificationFilter, sortField, sortDirection]);
 
   // Request sort column/direction
   const handleRequestSort = (field) => {
@@ -348,10 +351,14 @@ const MemberManagement = () => {
       if (statusFilter === "active" && !u.enabled) return false;
       if (statusFilter === "disabled" && u.enabled) return false;
 
+      // 4. Notification filter
+      if (notificationFilter === "enabled" && !u.hasNotification) return false;
+      if (notificationFilter === "disabled" && u.hasNotification) return false;
+
       return true;
     });
 
-    // 4. Sort
+    // 5. Sort
     list.sort((a, b) => {
       if (sortField === "name") {
         const nameA = (a.name || "").trim();
@@ -368,7 +375,7 @@ const MemberManagement = () => {
     });
 
     return list;
-  }, [users, searchTerm, roleFilter, statusFilter, sortField, sortDirection]);
+  }, [users, searchTerm, roleFilter, statusFilter, notificationFilter, sortField, sortDirection]);
 
   // Paginated users for table display
   const paginatedUsers = useMemo(() => {
@@ -381,8 +388,9 @@ const MemberManagement = () => {
     const total = users.length;
     const staffCount = users.filter((u) => u.isStaff).length;
     const keepers = users.filter((u) => u.isGardenKeeper).length;
+    const notificationEnabled = users.filter((u) => u.hasNotification).length;
     const disabled = users.filter((u) => !u.enabled).length;
-    return { total, staffCount, keepers, disabled };
+    return { total, staffCount, keepers, notificationEnabled, disabled };
   }, [users]);
 
   const handleLoginClick = async () => {
@@ -546,7 +554,7 @@ const MemberManagement = () => {
                   gridTemplateColumns: {
                     xs: "1fr",
                     sm: "repeat(2, 1fr)",
-                    md: "repeat(4, 1fr)",
+                    md: "repeat(5, 1fr)",
                   },
                   gap: 2,
                   mb: 3.5,
@@ -659,6 +667,43 @@ const MemberManagement = () => {
                     </Typography>
                     <Typography variant="h5" sx={{ fontWeight: 800, color: "#ea580c" }}>
                       {metrics.keepers}명
+                    </Typography>
+                  </Box>
+                </Paper>
+
+                {/* Notification Active */}
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 2.5,
+                    borderRadius: "16px",
+                    border: "1px solid rgba(0, 0, 0, 0.08)",
+                    backgroundColor: "#ffffff",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: "12px",
+                      backgroundColor: "rgba(22, 163, 74, 0.1)",
+                      color: "#16a34a",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <NotificationsActiveIcon fontSize="medium" />
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" sx={{ color: "#666", fontWeight: 600 }}>
+                      알림 수신
+                    </Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 800, color: "#16a34a" }}>
+                      {metrics.notificationEnabled}명
                     </Typography>
                   </Box>
                 </Paper>
@@ -792,6 +837,21 @@ const MemberManagement = () => {
                       </Select>
                     </FormControl>
 
+                    <FormControl size="small" sx={{ minWidth: 125, backgroundColor: "#fff" }}>
+                      <InputLabel id="notification-filter-label">알림 필터</InputLabel>
+                      <Select
+                        labelId="notification-filter-label"
+                        value={notificationFilter}
+                        label="알림 필터"
+                        onChange={(e) => setNotificationFilter(e.target.value)}
+                        sx={{ borderRadius: "12px" }}
+                      >
+                        <MenuItem value="all">전체 알림</MenuItem>
+                        <MenuItem value="enabled">알림 켜짐 (ON)</MenuItem>
+                        <MenuItem value="disabled">알림 미등록 (OFF)</MenuItem>
+                      </Select>
+                    </FormControl>
+
                     <FormControl size="small" sx={{ minWidth: 140, backgroundColor: "#fff" }}>
                       <InputLabel id="sort-select-label">정렬 기준</InputLabel>
                       <Select
@@ -855,7 +915,7 @@ const MemberManagement = () => {
                 ) : filteredUsers.length === 0 ? (
                   <Box sx={{ textAlign: "center", py: 8 }}>
                     <Typography variant="body1" sx={{ color: "#888", fontWeight: 500 }}>
-                      {searchTerm || roleFilter !== "all" || statusFilter !== "all"
+                      {searchTerm || roleFilter !== "all" || statusFilter !== "all" || notificationFilter !== "all"
                         ? "검색 조건에 일치하는 교인이 없습니다."
                         : "등록된 교인이 없습니다."}
                     </Typography>
@@ -888,6 +948,12 @@ const MemberManagement = () => {
                             sx={{ fontWeight: 700, color: "#555", py: 1.8, whiteSpace: "nowrap" }}
                           >
                             역할
+                          </TableCell>
+                          <TableCell
+                            align="center"
+                            sx={{ fontWeight: 700, color: "#555", py: 1.8, whiteSpace: "nowrap" }}
+                          >
+                            알림
                           </TableCell>
                           <TableCell
                             align="center"
@@ -1129,6 +1195,55 @@ const MemberManagement = () => {
                                           transform: "translateY(-1px)",
                                           boxShadow: "0 2px 6px rgba(0, 0, 0, 0.08)",
                                         },
+                                      }}
+                                    />
+                                  </Tooltip>
+                                )}
+                              </TableCell>
+
+                              {/* Notification Status */}
+                              <TableCell align="center" sx={{ py: 2, whiteSpace: "nowrap" }}>
+                                {user.hasNotification ? (
+                                  <Tooltip title="주일 리마인더 및 교회 소식 알림 수신 가능" arrow>
+                                    <Chip
+                                      icon={
+                                        <NotificationsActiveIcon
+                                          sx={{ fontSize: "1rem !important", color: "#16a34a !important" }}
+                                        />
+                                      }
+                                      label="수신중"
+                                      size="small"
+                                      sx={{
+                                        fontWeight: 700,
+                                        fontSize: "0.78rem",
+                                        height: 28,
+                                        borderRadius: "8px",
+                                        backgroundColor: "#f0fdf4",
+                                        color: "#16a34a",
+                                        border: "1px solid #bbf7d0",
+                                        px: 0.6,
+                                      }}
+                                    />
+                                  </Tooltip>
+                                ) : (
+                                  <Tooltip title="등록된 알림 기기가 없습니다" arrow>
+                                    <Chip
+                                      icon={
+                                        <NotificationsOffIcon
+                                          sx={{ fontSize: "1rem !important", color: "#9ca3af !important" }}
+                                        />
+                                      }
+                                      label="미등록"
+                                      size="small"
+                                      sx={{
+                                        fontWeight: 600,
+                                        fontSize: "0.78rem",
+                                        height: 28,
+                                        borderRadius: "8px",
+                                        backgroundColor: "#f3f4f6",
+                                        color: "#6b7280",
+                                        border: "1px solid #e5e7eb",
+                                        px: 0.6,
                                       }}
                                     />
                                   </Tooltip>

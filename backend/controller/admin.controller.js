@@ -10,6 +10,8 @@ import {
   AdminUpdateUserAttributesCommand,
   AdminDeleteUserAttributesCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
+import { getDocClient } from "../api/dynamodb.js";
+import { ScanCommand } from "@aws-sdk/lib-dynamodb";
 
 const getCognitoClient = (env) => {
   return new CognitoIdentityProviderClient({
@@ -85,12 +87,36 @@ export const listUsersController = async (c) => {
       return all;
     };
 
-    // Run user list and group lists (GardenKeeper & Staff) fetch in parallel
-    const [allCognitoUsers, allKeeperUsers, allStaffUsers] = await Promise.all([
-      fetchAllUsers(),
-      fetchAllGroupUsers("GardenKeeper"),
-      fetchAllGroupUsers("Staff"),
-    ]);
+    // Fetch active notification subscriptions from DynamoDB FCMToken table
+    const fetchActiveNotificationSubs = async () => {
+      try {
+        const docClient = getDocClient(env);
+        const res = await docClient.send(
+          new ScanCommand({
+            TableName: "FCMToken",
+            ProjectionExpression: "#sub",
+            ExpressionAttributeNames: { "#sub": "sub" },
+          }),
+        );
+        return new Set(
+          (res.Items || [])
+            .map((item) => (item.sub?.S ? item.sub.S : item.sub))
+            .filter(Boolean),
+        );
+      } catch (err) {
+        console.warn("Could not scan FCM tokens for user notification status:", err.message);
+        return new Set();
+      }
+    };
+
+    // Run user list, group lists (GardenKeeper & Staff), and active FCM tokens fetch in parallel
+    const [allCognitoUsers, allKeeperUsers, allStaffUsers, activeNotificationSubs] =
+      await Promise.all([
+        fetchAllUsers(),
+        fetchAllGroupUsers("GardenKeeper"),
+        fetchAllGroupUsers("Staff"),
+        fetchActiveNotificationSubs(),
+      ]);
 
     const keeperUsernames = new Set(allKeeperUsers.map((u) => u.Username));
     const staffUsernames = new Set(allStaffUsers.map((u) => u.Username));
@@ -111,6 +137,7 @@ export const listUsersController = async (c) => {
         sub: attrs.sub || "",
         isStaff: staffUsernames.has(u.Username),
         isGardenKeeper: keeperUsernames.has(u.Username),
+        hasNotification: activeNotificationSubs.has(attrs.sub),
         garden: attrs["custom:garden"] || "",
         enabled: u.Enabled ?? true,
         status: u.UserStatus,

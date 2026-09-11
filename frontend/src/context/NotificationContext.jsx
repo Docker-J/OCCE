@@ -102,10 +102,11 @@ export const NotificationProvider = ({ children }) => {
 
           const lastRefresh = localStorage.getItem("last_fcm_token_refresh");
           const now = Date.now();
-          const shouldRefreshTTL = !lastRefresh || (now - parseInt(lastRefresh, 10) > 259200000);
+          // Refresh token TTL every 1 hour (3,600,000ms)
+          const shouldRefreshTTL = !lastRefresh || (now - parseInt(lastRefresh, 10) > 3600000);
 
-          if (shouldRefreshTTL) {
-            console.log("Refreshing FCM token TTL in database...");
+          if (shouldRefreshTTL || forcePrompt) {
+            console.log("Registering / Refreshing FCM token in database...");
             const isRemembered =
               document.cookie.includes("remember=true") ||
               localStorage.getItem("remember") === "true";
@@ -179,17 +180,16 @@ export const NotificationProvider = ({ children }) => {
             document.cookie.includes("remember=true") ||
             localStorage.getItem("remember") === "true";
 
-          if (isRemembered && (isLeader || admin)) {
-            console.log("Syncing role to FCM token for trusted personal device...");
+          if (isRemembered) {
+            console.log("Syncing user identity and roles to FCM token for trusted device...");
             await registerToken(token, true);
           } else {
-            // Demoted from leader/admin, or logged in without Remember Me
-            console.log("Unlinking roles from FCM token (not leader/admin or not remembered)...");
+            console.log("Unlinking roles and identity from FCM token (not remembered)...");
             await unlinkTokenRole(token);
           }
         } else if (prevAuthRef.current === true) {
           // Explicitly logged out from an authenticated session
-          console.log("Unlinking roles from FCM token on logout...");
+          console.log("Unlinking roles and identity from FCM token on logout...");
           await unlinkTokenRole(token);
         }
       } catch (err) {

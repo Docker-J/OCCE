@@ -6,7 +6,7 @@ const TABLENAME = "FCMToken";
 
 function getExpirationEpoch() {
   const now = new Date();
-  now.setMonth(now.getMonth() + 1);
+  now.setMonth(now.getMonth() + 3); // 3 months expiration TTL
   return Math.floor(now.getTime() / 1000);
 }
 
@@ -15,31 +15,43 @@ export const registerController = async (c) => {
     const body = await c.req.json();
     const docClient = getDocClient(c.env);
     let roles = [];
+    let sub = null;
 
-    // Only assign roles if explicitly requested for a trusted personal device (isRemembered === true)
-    if (body.isRemembered) {
-      const authHeader = c.req.header("Authorization");
-      if (authHeader && authHeader.startsWith("Bearer ")) {
-        try {
-          const token = authHeader.split(" ")[1];
-          const verifier = getUserVerifier(c.env);
-          const payload = await verifier.verify(token);
+    // Check if an authenticated user session exists
+    const authHeader = c.req.header("Authorization");
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      try {
+        const token = authHeader.split(" ")[1];
+        const verifier = getUserVerifier(c.env);
+        const payload = await verifier.verify(token);
+
+        if (payload?.sub) {
+          sub = payload.sub;
+        }
+
+        // Only assign roles if explicitly requested for a trusted personal device (isRemembered === true)
+        if (body.isRemembered) {
           const groups = payload["cognito:groups"] || [];
           // Filter only valid system roles
           roles = groups.filter((g) => ["GardenKeeper", "Staff"].includes(g));
-        } catch (authErr) {
-          console.warn("FCM register auth token verification skipped:", authErr.message);
         }
+      } catch (authErr) {
+        console.warn("FCM register auth token verification skipped:", authErr.message);
       }
+    }
+
+    const item = {
+      token: body.token,
+      roles: roles,
+      expiresAt: getExpirationEpoch(),
+    };
+    if (sub) {
+      item.sub = sub;
     }
 
     const command = new PutCommand({
       TableName: TABLENAME,
-      Item: {
-        token: body.token,
-        roles: roles,
-        expiresAt: getExpirationEpoch(),
-      },
+      Item: item,
     });
 
     await docClient.send(command);
@@ -63,9 +75,10 @@ export const unlinkRoleController = async (c) => {
       Key: {
         token: body.token,
       },
-      UpdateExpression: "SET #roles = :emptyRoles",
+      UpdateExpression: "SET #roles = :emptyRoles REMOVE #sub",
       ExpressionAttributeNames: {
         "#roles": "roles",
+        "#sub": "sub",
       },
       ExpressionAttributeValues: {
         ":emptyRoles": [],
