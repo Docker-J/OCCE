@@ -90,7 +90,8 @@ export async function handleScheduled(event, env, ctx) {
       await handleDailyBibleReadingFCM(env);
       break;
 
-    case "0 22 * * 0":
+    case "0 22 * * SUN":
+    case "0 22 * * 1":
       await handleSundayAttendanceReminderFCM(env);
       break;
 
