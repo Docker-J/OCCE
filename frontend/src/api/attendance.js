@@ -83,3 +83,12 @@ export const submitGatheringReport = async (reportData, success, fail) => {
     fail(error.response?.data?.message || "정원 모임 보고 제출에 실패했습니다.");
   }
 };
+
+/**
+ * Fetch lightweight list of all garden names for filters/dropdowns
+ */
+export const getGardenNames = async () => {
+  const res = await axios.get("/api/attendance/gardens?namesOnly=true");
+  return res.data?.gardenNames || [];
+};
+

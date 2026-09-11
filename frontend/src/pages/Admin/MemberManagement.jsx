@@ -7,7 +7,7 @@ import {
   updateUserRole,
   deleteUser,
 } from "../../api/admin";
-import { getGardensAndMembers } from "../../api/attendance";
+import { getGardenNames } from "../../api/attendance";
 import { Link } from "react-router";
 
 import {
@@ -164,15 +164,13 @@ const MemberManagement = () => {
   useEffect(() => {
     if (authInitialized && authenticated && admin) {
       fetchUsers();
-      getGardensAndMembers(
-        (data) => {
-          if (data && data.gardens) {
-            const gardenList = Object.keys(data.gardens).sort();
-            setAvailableGardens(gardenList);
+      getGardenNames()
+        .then((names) => {
+          if (names && names.length > 0) {
+            setAvailableGardens(names.slice().sort());
           }
-        },
-        (err) => console.warn("Could not fetch gardens list:", err),
-      );
+        })
+        .catch((err) => console.warn("Could not fetch gardens list:", err));
     }
   }, [authInitialized, authenticated, admin]);
 
@@ -550,11 +548,9 @@ const MemberManagement = () => {
                 />
               </Tabs>
 
-              {adminTab === 1 ? (
-                <AttendanceDashboard />
-              ) : (
-                <>
-                  {/* Summary Cards */}
+              {/* Tab 0: 교인 계정 관리 */}
+              <Box sx={{ display: adminTab === 0 ? "block" : "none" }}>
+                {/* Summary Cards */}
                   <Box
                     sx={{
                       display: "grid",
@@ -1260,10 +1256,14 @@ const MemberManagement = () => {
                 </>
               )}
             </Card>
-            </>
-          )}
-          </>
-        )}
+          </Box>
+
+          {/* Tab 1: 출석 통계 대시보드 */}
+          <Box sx={{ display: adminTab === 1 ? "block" : "none" }}>
+            <AttendanceDashboard />
+          </Box>
+        </>
+      )}
         </div>
       </div>
 

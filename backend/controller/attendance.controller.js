@@ -1,9 +1,12 @@
-import { google } from "googleapis";
 import {
   CognitoIdentityProviderClient,
   GetUserCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
-import { getGoogleAuth } from "../api/googleAuth.js";
+import {
+  getSheetsClient,
+  getDriveClient,
+  findDriveFileId,
+} from "../api/googleClients.js";
 
 // Helper to get Cognito client
 const getCognitoClient = (env) => {
@@ -37,24 +40,6 @@ const getCognitoUserAttributes = async (c) => {
   }
 };
 
-// Helper to get Google Sheets client
-const getSheetsClient = (env) => {
-  const auth = getGoogleAuth(env, [
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive",
-  ]);
-  return google.sheets({ version: "v4", auth });
-};
-
-// Helper to get Google Drive client
-const getDriveClient = (env) => {
-  const auth = getGoogleAuth(env, [
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive",
-  ]);
-  return google.drive({ version: "v3", auth });
-};
-
 // Helper to extract assigned gardens for a user from JWT token or Cognito attributes
 const getUserAssignedGardens = async (c, user) => {
   if (user && user["custom:garden"]) {
@@ -65,34 +50,6 @@ const getUserAssignedGardens = async (c, user) => {
     return attrs["custom:garden"].split(",").map((g) => g.trim()).filter(Boolean);
   }
   return [];
-};
-
-// In-memory cache for drive file IDs (3 minutes TTL): key = `${folderId}_${fileName}` -> fileId
-const fileIdCache = new Map();
-
-const findDriveFileId = async (drive, folderId, fileName) => {
-  if (!folderId) return null;
-  const cacheKey = `${folderId}_${fileName}`;
-  const cached = fileIdCache.get(cacheKey);
-  const now = Date.now();
-  if (cached && now < cached.expiresAt) {
-    return cached.fileId;
-  }
-
-  const searchResponse = await drive.files.list({
-    q: `'${folderId}' in parents and name = '${fileName}' and trashed = false`,
-    spaces: "drive",
-    fields: "files(id, name)",
-    supportsAllDrives: true,
-    includeItemsFromAllDrives: true,
-  });
-  const filesList = searchResponse.data.files || [];
-  const fileId = filesList.length > 0 ? filesList[0].id : null;
-
-  if (fileId) {
-    fileIdCache.set(cacheKey, { fileId, expiresAt: now + 3 * 60 * 1000 });
-  }
-  return fileId;
 };
 
 // In-memory cache for garden subfolder IDs (10 minutes TTL): key = gardenName -> folderId
@@ -267,6 +224,17 @@ export const getGardensController = async (c) => {
       : assignedGardens
           .map((g) => sheetNames.find((s) => s.trim() === g.trim()))
           .filter(Boolean);
+
+    // If only garden names/tabs are needed, return immediately without loading member rosters
+    const namesOnly = c.req.query("namesOnly") === "true";
+    if (namesOnly) {
+      return c.json({
+        isStaff,
+        assignedGarden: assignedGardens[0] || null,
+        gardenNames: targetGardenTabs,
+        gardens: {},
+      });
+    }
 
     if (targetGardenTabs.length > 0) {
       const ranges = targetGardenTabs.map((name) => `${name}!A:A`);

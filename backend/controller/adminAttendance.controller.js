@@ -1,23 +1,8 @@
-import { google } from "googleapis";
-import { getGoogleAuth } from "../api/googleAuth.js";
-
-// Helper to get Google Sheets client
-const getSheetsClient = (env) => {
-  const auth = getGoogleAuth(env, [
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive",
-  ]);
-  return google.sheets({ version: "v4", auth });
-};
-
-// Helper to get Google Drive client
-const getDriveClient = (env) => {
-  const auth = getGoogleAuth(env, [
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive",
-  ]);
-  return google.drive({ version: "v3", auth });
-};
+import {
+  getSheetsClient,
+  getDriveClient,
+  findDriveFileId,
+} from "../api/googleClients.js";
 
 /**
  * Controller to fetch all recent weekly attendance statistics and trends for the Admin Dashboard
@@ -236,17 +221,9 @@ export const getGardenAttendanceDetailController = async (c) => {
     const sheets = getSheetsClient(env);
     const fileName = `OCCE_정원출석부_${date}`;
 
-    // Find the weekly file in Shared Drive
-    const searchResponse = await drive.files.list({
-      q: `'${folderId}' in parents and name = '${fileName}' and trashed = false`,
-      spaces: "drive",
-      fields: "files(id, name)",
-      supportsAllDrives: true,
-      includeItemsFromAllDrives: true,
-    });
-
-    const files = searchResponse.data.files || [];
-    if (files.length === 0) {
+    // Find the weekly file in Shared Drive (with caching)
+    const weeklySpreadsheetId = await findDriveFileId(drive, folderId, fileName);
+    if (!weeklySpreadsheetId) {
       return c.json(
         {
           error: "NotFound",
@@ -255,8 +232,6 @@ export const getGardenAttendanceDetailController = async (c) => {
         404,
       );
     }
-
-    const weeklySpreadsheetId = files[0].id;
 
     // Fetch '종합통계' and `${gardenName}` tab row data in one batch call
     let sheetResp;
