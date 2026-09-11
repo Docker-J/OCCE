@@ -22,17 +22,39 @@ import {
   Grid,
   Paper,
   Divider,
+  Alert,
+  Chip,
+  LinearProgress,
+  Badge,
+  useForkRef,
+  InputAdornment,
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlined";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import EditNoteIcon from "@mui/icons-material/EditNote";
 import LoginIcon from "@mui/icons-material/Login";
 import SendIcon from "@mui/icons-material/Send";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import useModals from "../../util/useModal.js";
 import useSnackbar from "../../util/useSnackbar.js";
-import { getGardensAndMembers } from "../../api/attendance.js";
+import {
+  getGardensAndMembers,
+  getAttendanceReport,
+  getGatheringReport,
+  getGatheringHistory,
+} from "../../api/attendance.js";
 import { useSearchParams, useSubmit, useActionData, useNavigation, Link } from "react-router";
 import axios from "axios";
-import { format } from "date-fns";
-import { DatePicker, TimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { format, isToday } from "date-fns";
+import {
+  DatePicker,
+  TimePicker,
+  LocalizationProvider,
+  PickerDay,
+  usePickerContext,
+  useSplitFieldProps,
+} from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 const titleBackground = {
@@ -71,6 +93,219 @@ const formatDateLabel = (date) => {
   return `${yyyy}년 ${mm}월 ${dd}일 주일`;
 };
 
+function GatheringCustomDay(props) {
+  const { day, outsideCurrentMonth, selected, historyDates = [], ...other } = props;
+  const dateStr =
+    day && !isNaN(new Date(day).getTime()) ? format(day, "yyyy-MM-dd") : "";
+  const isMarked =
+    !outsideCurrentMonth && dateStr && historyDates.includes(dateStr);
+
+  return (
+    <Box
+      component="span"
+      sx={{
+        position: "relative",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <PickerDay
+        {...other}
+        day={day}
+        selected={selected}
+        outsideCurrentMonth={outsideCurrentMonth}
+      />
+      {isMarked && (
+        <Box
+          component="span"
+          sx={{
+            position: "absolute",
+            bottom: "4px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "5px",
+            height: "5px",
+            borderRadius: "50%",
+            backgroundColor: selected ? "#ffffff" : "#ea580c",
+            pointerEvents: "none",
+            zIndex: 1,
+          }}
+        />
+      )}
+    </Box>
+  );
+}
+
+const GatheringDateButtonField = (props) => {
+  const { _, forwardedProps } = useSplitFieldProps(props, "date");
+  const pickerContext = usePickerContext();
+  const handleRef = useForkRef(pickerContext.triggerRef, pickerContext.rootRef);
+  const { disabled } = forwardedProps;
+
+  let displayDate = "";
+  if (pickerContext.value && !isNaN(new Date(pickerContext.value).getTime())) {
+    const d = new Date(pickerContext.value);
+    const dayOfWeekNames = ["일", "월", "화", "수", "목", "금", "토"];
+    displayDate = `${format(d, "yyyy. MM. dd.")} (${dayOfWeekNames[d.getDay()]})`;
+  }
+
+  return (
+    <TextField
+      fullWidth
+      ref={handleRef}
+      label="모임 날짜"
+      placeholder="날짜 선택"
+      value={displayDate}
+      disabled={disabled}
+      onClick={() => {
+        if (!disabled) {
+          pickerContext.setOpen((prev) => !prev);
+        }
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " " || e.key === "ArrowDown") {
+          e.preventDefault();
+          pickerContext.setOpen((prev) => !prev);
+        } else if (!e.ctrlKey && !e.metaKey && e.key.length === 1) {
+          e.preventDefault();
+        }
+      }}
+      slotProps={{
+        inputLabel: {
+          shrink: true,
+        },
+        input: {
+          readOnly: true,
+          endAdornment: (
+            <InputAdornment position="end">
+              <CalendarTodayIcon
+                sx={{
+                  color: "#ea580c",
+                  cursor: disabled ? "default" : "pointer",
+                }}
+              />
+            </InputAdornment>
+          ),
+          sx: {
+            cursor: disabled ? "default" : "pointer",
+            "& input": {
+              cursor: disabled ? "default" : "pointer",
+              fontWeight: 500,
+              color: "#222",
+              userSelect: "none",
+            },
+          },
+        },
+        htmlInput: {
+          readOnly: true,
+        },
+      }}
+      sx={{
+        "& .MuiOutlinedInput-root": {
+          cursor: disabled ? "default" : "pointer",
+          backgroundColor: "#fff",
+          "&:hover fieldset": {
+            borderColor: disabled ? undefined : "#ea580c",
+          },
+          "&.Mui-focused fieldset": {
+            borderColor: "#ea580c",
+          },
+        },
+        "& .MuiInputLabel-root.Mui-focused": {
+          color: "#ea580c",
+        },
+      }}
+    />
+  );
+};
+
+const GatheringTimeButtonField = (props) => {
+  const { _, forwardedProps } = useSplitFieldProps(props, "time");
+  const pickerContext = usePickerContext();
+  const handleRef = useForkRef(pickerContext.triggerRef, pickerContext.rootRef);
+  const { disabled } = forwardedProps;
+
+  let displayTime = "";
+  if (pickerContext.value && !isNaN(new Date(pickerContext.value).getTime())) {
+    const d = new Date(pickerContext.value);
+    const hours = d.getHours();
+    const minutes = String(d.getMinutes()).padStart(2, "0");
+    const ampm = hours < 12 ? "오전" : "오후";
+    const displayHours = hours % 12 === 0 ? 12 : hours % 12;
+    displayTime = `${ampm} ${displayHours}:${minutes}`;
+  }
+
+  return (
+    <TextField
+      fullWidth
+      ref={handleRef}
+      label="모임 시간"
+      placeholder="시간 선택"
+      value={displayTime}
+      disabled={disabled}
+      onClick={() => {
+        if (!disabled) {
+          pickerContext.setOpen((prev) => !prev);
+        }
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " " || e.key === "ArrowDown") {
+          e.preventDefault();
+          pickerContext.setOpen((prev) => !prev);
+        } else if (!e.ctrlKey && !e.metaKey && e.key.length === 1) {
+          e.preventDefault();
+        }
+      }}
+      slotProps={{
+        inputLabel: {
+          shrink: true,
+        },
+        input: {
+          readOnly: true,
+          endAdornment: (
+            <InputAdornment position="end">
+              <AccessTimeIcon
+                sx={{
+                  color: "#ea580c",
+                  cursor: disabled ? "default" : "pointer",
+                }}
+              />
+            </InputAdornment>
+          ),
+          sx: {
+            cursor: disabled ? "default" : "pointer",
+            "& input": {
+              cursor: disabled ? "default" : "pointer",
+              fontWeight: 500,
+              color: "#222",
+              userSelect: "none",
+            },
+          },
+        },
+        htmlInput: {
+          readOnly: true,
+        },
+      }}
+      sx={{
+        "& .MuiOutlinedInput-root": {
+          cursor: disabled ? "default" : "pointer",
+          backgroundColor: "#fff",
+          "&:hover fieldset": {
+            borderColor: disabled ? undefined : "#ea580c",
+          },
+          "&.Mui-focused fieldset": {
+            borderColor: "#ea580c",
+          },
+        },
+        "& .MuiInputLabel-root.Mui-focused": {
+          color: "#ea580c",
+        },
+      }}
+    />
+  );
+};
+
 const SmallGroupReport = () => {
   const { openModal } = useModals();
   const { openSnackbar } = useSnackbar();
@@ -88,6 +323,8 @@ const SmallGroupReport = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [checkedMembers, setCheckedMembers] = useState({});
   const [absenceReasons, setAbsenceReasons] = useState({});
+  const [isReported, setIsReported] = useState(false);
+  const [checkingReport, setCheckingReport] = useState(false);
   const submit = useSubmit();
   const actionData = useActionData();
   const navigation = useNavigation();
@@ -107,13 +344,19 @@ const SmallGroupReport = () => {
   };
 
   const [gatheringDate, setGatheringDate] = useState(new Date());
+  const gatheringDateStr = useMemo(() => {
+    if (!gatheringDate || isNaN(new Date(gatheringDate).getTime())) return "";
+    return format(gatheringDate, "yyyy-MM-dd");
+  }, [gatheringDate]);
   const [gatheringTime, setGatheringTime] = useState(() => {
-    const d = new Date();
-    d.setHours(19, 30, 0, 0);
-    return d;
+    const now = new Date();
+    const defaultTime = new Date();
+    defaultTime.setHours(19, 30, 0, 0);
+    return defaultTime > now ? now : defaultTime;
   });
   const [gatheringLocation, setGatheringLocation] = useState("");
   const [gatheringNotes, setGatheringNotes] = useState("");
+  const [gatheringHistoryDates, setGatheringHistoryDates] = useState([]);
 
   // Determine if the user has unsaved inputs in the current form
   const isDirty = useMemo(() => {
@@ -224,18 +467,146 @@ const SmallGroupReport = () => {
     fetchData();
   }, [authInitialized, authenticated, isLeader]);
 
-  // Handle selected garden members initialization
+  // Handle selected garden members and existing report check
   useEffect(() => {
-    if (selectedGarden && gardens[selectedGarden]) {
-      const initialChecked = {};
-      gardens[selectedGarden].forEach((member) => {
-        initialChecked[member] = true; // Present by default
-      });
-      setCheckedMembers(initialChecked);
-    } else {
+    if (!selectedGarden || !gardens[selectedGarden]) {
       setCheckedMembers({});
+      setIsReported(false);
+      return;
     }
-  }, [selectedGarden, gardens]);
+
+    const defaultChecked = {};
+    gardens[selectedGarden].forEach((member) => {
+      defaultChecked[member] = true;
+    });
+
+    let isMounted = true;
+
+    if (reportType === "gathering") {
+      if (!gatheringDateStr) {
+        setCheckedMembers(defaultChecked);
+        setIsReported(false);
+        return;
+      }
+
+      setCheckingReport(true);
+      getGatheringReport(
+        gatheringDateStr,
+        selectedGarden,
+        (data) => {
+          if (!isMounted) return;
+          setCheckingReport(false);
+          if (data && data.reported) {
+            setIsReported(true);
+            const restoredChecked = {};
+            const absenteesList = data.absentees || [];
+
+            gardens[selectedGarden].forEach((member) => {
+              if (absenteesList.includes(member)) {
+                restoredChecked[member] = false;
+              } else {
+                restoredChecked[member] = true;
+              }
+            });
+
+            setCheckedMembers(restoredChecked);
+            setGatheringLocation(data.location || "");
+            setGatheringNotes(data.notes || "");
+            if (data.time) {
+              const [hours, minutes] = data.time.split(":").map(Number);
+              if (!isNaN(hours) && !isNaN(minutes)) {
+                const newTime = new Date();
+                newTime.setHours(hours, minutes, 0, 0);
+                setGatheringTime(newTime);
+              }
+            }
+          } else {
+            setIsReported(false);
+            setCheckedMembers(defaultChecked);
+            setGatheringLocation("");
+            setGatheringNotes("");
+          }
+        },
+        () => {
+          if (!isMounted) return;
+          setCheckingReport(false);
+          setIsReported(false);
+          setCheckedMembers(defaultChecked);
+        }
+      );
+    } else {
+      if (!selectedDate) {
+        setCheckedMembers(defaultChecked);
+        setIsReported(false);
+        return;
+      }
+
+      setCheckingReport(true);
+      getAttendanceReport(
+        selectedDate,
+        selectedGarden,
+        (data) => {
+          if (!isMounted) return;
+          setCheckingReport(false);
+          if (data && data.reported) {
+            setIsReported(true);
+            const restoredChecked = {};
+            const absenteesList = data.absentees || [];
+
+            gardens[selectedGarden].forEach((member) => {
+              if (absenteesList.includes(member)) {
+                restoredChecked[member] = false;
+              } else {
+                restoredChecked[member] = true;
+              }
+            });
+
+            setCheckedMembers(restoredChecked);
+            setAbsenceReasons(data.absenceReasons || {});
+          } else {
+            setIsReported(false);
+            setCheckedMembers(defaultChecked);
+            setAbsenceReasons({});
+          }
+        },
+        () => {
+          if (!isMounted) return;
+          setCheckingReport(false);
+          setIsReported(false);
+          setCheckedMembers(defaultChecked);
+          setAbsenceReasons({});
+        }
+      );
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedGarden, selectedDate, gatheringDateStr, reportType, gardens]);
+
+  // Fetch gathering history dates for DatePicker badges and quick selection
+  useEffect(() => {
+    if (reportType !== "gathering" || !selectedGarden) {
+      setGatheringHistoryDates([]);
+      return;
+    }
+
+    let isMounted = true;
+    getGatheringHistory(
+      selectedGarden,
+      (data) => {
+        if (!isMounted) return;
+        setGatheringHistoryDates(data.dates || []);
+      },
+      (errMsg) => {
+        console.warn("Failed to fetch gathering history dates:", errMsg);
+      }
+    );
+
+    return () => {
+      isMounted = false;
+    };
+  }, [reportType, selectedGarden]);
 
   // Handle submission side effects from React Router Action
   useEffect(() => {
@@ -245,23 +616,22 @@ const SmallGroupReport = () => {
       openSnackbar(
         "success",
         actionData.reportType === "gathering"
-          ? `${selectedGarden} 정원 모임 보고가 완료되었습니다!`
+          ? isReported
+            ? `${selectedGarden} 정원 모임 보고서가 성공적으로 수정(업데이트)되었습니다!`
+            : `${selectedGarden} 정원 모임 보고가 완료되었습니다!`
+          : isReported
+          ? `${selectedGarden} 출석 보고서가 성공적으로 수정(업데이트)되었습니다!`
           : `${selectedGarden} 출석 보고가 완료되었습니다!`
       );
 
-      if (actionData.reportType === "gathering") {
-        setGatheringNotes("");
-        setGatheringLocation("");
-      } else {
-        setAbsenceReasons({});
-      }
+      setIsReported(true);
 
-      if (gardens[selectedGarden]) {
-        const resetChecked = {};
-        gardens[selectedGarden].forEach((member) => {
-          resetChecked[member] = true;
+      // Automatically add new gathering date to history dates if submitted
+      if (actionData.reportType === "gathering" && gatheringDateStr) {
+        setGatheringHistoryDates((prev) => {
+          if (prev.includes(gatheringDateStr)) return prev;
+          return [gatheringDateStr, ...prev].sort().reverse();
         });
-        setCheckedMembers(resetChecked);
       }
     } else if (actionData.error) {
       openSnackbar("error", actionData.error);
@@ -729,11 +1099,30 @@ const SmallGroupReport = () => {
                         <Grid size={{ xs: 12, sm: 6 }}>
                           <LocalizationProvider dateAdapter={AdapterDateFns}>
                             <DatePicker
-                              label="모임 날짜"
                               value={gatheringDate}
-                              onChange={setGatheringDate}
-                              sx={{ width: "100%" }}
-                              format="yyyy. MM. dd."
+                              onChange={(newVal) => {
+                                setGatheringDate(newVal);
+                                if (newVal && isToday(newVal)) {
+                                  setGatheringTime((prevTime) => {
+                                    const now = new Date();
+                                    if (prevTime && prevTime > now) {
+                                      return now;
+                                    }
+                                    return prevTime;
+                                  });
+                                }
+                              }}
+                              disabled={checkingReport}
+                              maxDate={new Date()}
+                              slots={{
+                                field: GatheringDateButtonField,
+                                day: GatheringCustomDay,
+                              }}
+                              slotProps={{
+                                day: {
+                                  historyDates: gatheringHistoryDates,
+                                },
+                              }}
                             />
                           </LocalizationProvider>
                         </Grid>
@@ -742,10 +1131,17 @@ const SmallGroupReport = () => {
                         <Grid size={{ xs: 12, sm: 6 }}>
                           <LocalizationProvider dateAdapter={AdapterDateFns}>
                             <TimePicker
-                              label="모임 시간"
                               value={gatheringTime}
                               onChange={setGatheringTime}
-                              sx={{ width: "100%" }}
+                              disabled={checkingReport}
+                              maxTime={
+                                gatheringDate && isToday(gatheringDate)
+                                  ? new Date()
+                                  : undefined
+                              }
+                              slots={{
+                                field: GatheringTimeButtonField,
+                              }}
                             />
                           </LocalizationProvider>
                         </Grid>
@@ -755,6 +1151,7 @@ const SmallGroupReport = () => {
                           <TextField
                             fullWidth
                             required
+                            disabled={checkingReport}
                             label="모임 장소"
                             placeholder="예: 정원지기 가정, 카페, 교회 등"
                             value={gatheringLocation}
@@ -763,9 +1160,158 @@ const SmallGroupReport = () => {
                             }
                           />
                         </Grid>
+
+                        {/* Past Gathering Dates Shortcut Chips */}
+                        {gatheringHistoryDates.length > 0 && (
+                          <Grid size={{ xs: 12 }}>
+                            <Box
+                              sx={{
+                                pt: 1.5,
+                                mt: 0.5,
+                                borderTop: "1px dashed rgba(234, 88, 12, 0.2)",
+                              }}
+                            >
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  color: "#c2410c",
+                                  fontWeight: 700,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 0.5,
+                                  mb: 1,
+                                }}
+                              >
+                                📅 이전 모임 보고 날짜 (클릭 시 해당 보고서 조회):
+                              </Typography>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexWrap: "wrap",
+                                  gap: 0.75,
+                                }}
+                              >
+                                {gatheringHistoryDates.slice(0, 8).map((dateStr) => {
+                                  const isCurrent = dateStr === gatheringDateStr;
+                                  const d = new Date(dateStr + "T00:00:00");
+                                  const dayOfWeekNames = [
+                                    "일",
+                                    "월",
+                                    "화",
+                                    "수",
+                                    "목",
+                                    "금",
+                                    "토",
+                                  ];
+                                  const dayLabel = !isNaN(d.getTime())
+                                    ? `${format(d, "yyyy. MM. dd")} (${
+                                        dayOfWeekNames[d.getDay()]
+                                      })`
+                                    : dateStr;
+
+                                  return (
+                                    <Chip
+                                      key={dateStr}
+                                      label={dayLabel}
+                                      size="small"
+                                      onClick={() => {
+                                        const [y, m, day] = dateStr
+                                          .split("-")
+                                          .map(Number);
+                                        setGatheringDate(
+                                          new Date(y, m - 1, day),
+                                        );
+                                      }}
+                                      variant={isCurrent ? "filled" : "outlined"}
+                                      sx={{
+                                        fontSize: "0.75rem",
+                                        fontWeight: isCurrent ? 700 : 500,
+                                        borderColor: isCurrent
+                                          ? "#ea580c"
+                                          : "rgba(234, 88, 12, 0.4)",
+                                        backgroundColor: isCurrent
+                                          ? "#ea580c"
+                                          : "rgba(234, 88, 12, 0.04)",
+                                        color: isCurrent ? "#ffffff" : "#c2410c",
+                                        "&:hover": {
+                                          backgroundColor: isCurrent
+                                            ? "#c2410c"
+                                            : "rgba(234, 88, 12, 0.12)",
+                                        },
+                                        cursor: "pointer",
+                                      }}
+                                    />
+                                  );
+                                })}
+                              </Box>
+                            </Box>
+                          </Grid>
+                        )}
                       </Grid>
                     </CardContent>
                   </Card>
+
+                  {checkingReport && (
+                    <LinearProgress
+                      sx={{
+                        borderRadius: "4px",
+                        backgroundColor: "rgba(234, 88, 12, 0.1)",
+                        "& .MuiLinearProgress-bar": {
+                          backgroundColor: "#ea580c",
+                        },
+                        my: 1,
+                      }}
+                    />
+                  )}
+
+                  {isReported && (
+                    <Alert
+                      severity="success"
+                      icon={<CheckCircleIcon sx={{ color: "#15803d", mt: 0.5 }} />}
+                      sx={{
+                        borderRadius: "16px",
+                        backgroundColor: "rgba(240, 253, 244, 0.95)",
+                        border: "1px solid rgba(34, 197, 94, 0.3)",
+                        boxShadow: "0 4px 16px rgba(34, 197, 94, 0.08)",
+                        p: { xs: 1.5, sm: 2 },
+                        "& .MuiAlert-message": { width: "100%" },
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          flexWrap: "wrap",
+                          gap: 1,
+                        }}
+                      >
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ fontWeight: 800, color: "#166534" }}
+                        >
+                          이미 제출된 정원 모임 보고서가 있습니다
+                        </Typography>
+                        <Chip
+                          label="기존 제출 내역 불러옴"
+                          size="small"
+                          sx={{
+                            backgroundColor: "#16a34a",
+                            color: "#ffffff",
+                            fontWeight: 700,
+                            fontSize: "0.75rem",
+                            height: "24px",
+                          }}
+                        />
+                      </Box>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "#15803d", mt: 0.5, lineHeight: 1.5 }}
+                      >
+                        기존에 제출하신 모임 일시, 장소, 참석 명단 및 나눔 내용을 불러왔습니다. 변경이 필요한 부분만 수정한 후 다시 제출하시면 업데이트됩니다.
+                      </Typography>
+                    </Alert>
+                  )}
 
                   {/* Members Checklist Card */}
                   <Card
@@ -845,10 +1391,14 @@ const SmallGroupReport = () => {
                             <Grid size={{ xs: 6, sm: 4, md: 3 }} key={member}>
                               <Paper
                                 variant="outlined"
-                                onClick={() => handleToggleMember(member)}
+                                onClick={() => {
+                                  if (!checkingReport) {
+                                    handleToggleMember(member);
+                                  }
+                                }}
                                 sx={{
                                   p: 1.5,
-                                  cursor: "pointer",
+                                  cursor: checkingReport ? "not-allowed" : "pointer",
                                   borderRadius: "8px",
                                   border: isChecked
                                     ? "1.2px solid #fdba74"
@@ -856,14 +1406,15 @@ const SmallGroupReport = () => {
                                   backgroundColor: isChecked
                                     ? "#fff7ed"
                                     : "#fafafa",
+                                  opacity: checkingReport ? 0.6 : 1,
                                   transition: "all 0.2s ease",
                                   "&:hover": {
-                                    borderColor: isChecked
-                                      ? "#ea580c"
-                                      : "#bdbdbd",
-                                    backgroundColor: isChecked
-                                      ? "#ffedd5"
-                                      : "#eeeeee",
+                                    borderColor: checkingReport
+                                      ? (isChecked ? "#fdba74" : "#e0e0e0")
+                                      : (isChecked ? "#ea580c" : "#bdbdbd"),
+                                    backgroundColor: checkingReport
+                                      ? (isChecked ? "#fff7ed" : "#fafafa")
+                                      : (isChecked ? "#ffedd5" : "#eeeeee"),
                                   },
                                   display: "flex",
                                   alignItems: "center",
@@ -885,6 +1436,7 @@ const SmallGroupReport = () => {
                                 <Checkbox
                                   size="small"
                                   checked={isChecked}
+                                  disabled={checkingReport}
                                   onClick={(e) => e.stopPropagation()}
                                   onChange={() => handleToggleMember(member)}
                                   sx={{
@@ -923,6 +1475,7 @@ const SmallGroupReport = () => {
                         fullWidth
                         multiline
                         rows={4}
+                        disabled={checkingReport}
                         placeholder="모임의 주요 나눔 내용이나 함께 나누고 싶은 기도제목을 적어주세요."
                         value={gatheringNotes}
                         onChange={(e) => setGatheringNotes(e.target.value)}
@@ -942,27 +1495,39 @@ const SmallGroupReport = () => {
                     <Button
                       variant="contained"
                       size="large"
-                      disabled={submitting || membersList.length === 0}
+                      disabled={
+                        submitting || checkingReport || membersList.length === 0
+                      }
                       onClick={handleFormSubmit}
                       startIcon={
                         submitting ? (
                           <CircularProgress size={20} color="inherit" />
+                        ) : isReported ? (
+                          <EditNoteIcon />
                         ) : (
                           <SendIcon />
                         )
                       }
                       sx={{
-                        backgroundColor: "#ea580c",
-                        "&:hover": { backgroundColor: "#c2410c" },
+                        backgroundColor: isReported ? "#2563eb" : "#ea580c",
+                        "&:hover": {
+                          backgroundColor: isReported ? "#1d4ed8" : "#c2410c",
+                        },
                         borderRadius: "28px",
                         px: 6,
                         py: 1.8,
                         fontWeight: 700,
                         fontSize: "1.05em",
-                        boxShadow: "0 4px 14px 0 rgba(234, 88, 12, 0.3)",
+                        boxShadow: isReported
+                          ? "0 4px 14px 0 rgba(37, 99, 235, 0.3)"
+                          : "0 4px 14px 0 rgba(234, 88, 12, 0.3)",
                       }}
                     >
-                      {submitting ? "제출 중..." : "정원 모임 보고 제출하기"}
+                      {submitting
+                        ? "제출 중..."
+                        : isReported
+                        ? "정원 모임 보고 수정(업데이트)하기"
+                        : "정원 모임 보고 제출하기"}
                     </Button>
                   </Box>
                 </>
@@ -1047,6 +1612,68 @@ const SmallGroupReport = () => {
                     </CardContent>
                   </Card>
 
+                  {checkingReport && (
+                    <LinearProgress
+                      sx={{
+                        borderRadius: "4px",
+                        backgroundColor: "rgba(220, 38, 38, 0.1)",
+                        "& .MuiLinearProgress-bar": {
+                          backgroundColor: "#dc2626",
+                        },
+                        my: 1,
+                      }}
+                    />
+                  )}
+
+                  {isReported && (
+                    <Alert
+                      severity="success"
+                      icon={<CheckCircleIcon sx={{ color: "#15803d", mt: 0.5 }} />}
+                      sx={{
+                        borderRadius: "16px",
+                        backgroundColor: "rgba(240, 253, 244, 0.95)",
+                        border: "1px solid rgba(34, 197, 94, 0.3)",
+                        boxShadow: "0 4px 16px rgba(34, 197, 94, 0.08)",
+                        p: { xs: 1.5, sm: 2 },
+                        "& .MuiAlert-message": { width: "100%" },
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          flexWrap: "wrap",
+                          gap: 1,
+                        }}
+                      >
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ fontWeight: 800, color: "#166534" }}
+                        >
+                          이미 제출된 출석 보고서가 있습니다
+                        </Typography>
+                        <Chip
+                          label="기존 제출 내역 불러옴"
+                          size="small"
+                          sx={{
+                            backgroundColor: "#16a34a",
+                            color: "#ffffff",
+                            fontWeight: 700,
+                            fontSize: "0.75rem",
+                            height: "24px",
+                          }}
+                        />
+                      </Box>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "#15803d", mt: 0.5, lineHeight: 1.5 }}
+                      >
+                        기존에 제출하신 출석/결석 및 사유를 불러왔습니다. 변경이 필요한 부분만 수정한 후 다시 제출하시면 업데이트됩니다.
+                      </Typography>
+                    </Alert>
+                  )}
+
                   {/* Members Checklist Card */}
                   <Card
                     sx={{
@@ -1125,10 +1752,14 @@ const SmallGroupReport = () => {
                             <Grid size={{ xs: 6, sm: 4, md: 3 }} key={member}>
                               <Paper
                                 variant="outlined"
-                                onClick={() => handleToggleMember(member)}
+                                onClick={() => {
+                                  if (!checkingReport) {
+                                    handleToggleMember(member);
+                                  }
+                                }}
                                 sx={{
                                   p: 1.5,
-                                  cursor: "pointer",
+                                  cursor: checkingReport ? "not-allowed" : "pointer",
                                   borderRadius: "8px",
                                   border: isChecked
                                     ? "1.2px solid #fca5a5"
@@ -1136,14 +1767,15 @@ const SmallGroupReport = () => {
                                   backgroundColor: isChecked
                                     ? "#fef2f2"
                                     : "#fafafa",
+                                  opacity: checkingReport ? 0.6 : 1,
                                   transition: "all 0.2s ease",
                                   "&:hover": {
-                                    borderColor: isChecked
-                                      ? "#dc2626"
-                                      : "#bdbdbd",
-                                    backgroundColor: isChecked
-                                      ? "#fee2e2"
-                                      : "#eeeeee",
+                                    borderColor: checkingReport
+                                      ? (isChecked ? "#fca5a5" : "#e0e0e0")
+                                      : (isChecked ? "#dc2626" : "#bdbdbd"),
+                                    backgroundColor: checkingReport
+                                      ? (isChecked ? "#fef2f2" : "#fafafa")
+                                      : (isChecked ? "#fee2e2" : "#eeeeee"),
                                   },
                                   display: "flex",
                                   alignItems: "center",
@@ -1165,6 +1797,7 @@ const SmallGroupReport = () => {
                                 <Checkbox
                                   size="small"
                                   checked={isChecked}
+                                  disabled={checkingReport}
                                   onClick={(e) => e.stopPropagation()}
                                   onChange={() => handleToggleMember(member)}
                                   sx={{
@@ -1231,6 +1864,7 @@ const SmallGroupReport = () => {
                               <TextField
                                 fullWidth
                                 size="small"
+                                disabled={checkingReport}
                                 placeholder="예: 개인 여행, 감기 몸살 등"
                                 value={absenceReasons[name] || ""}
                                 onChange={(e) =>
@@ -1259,27 +1893,39 @@ const SmallGroupReport = () => {
                     <Button
                       variant="contained"
                       size="large"
-                      disabled={submitting || membersList.length === 0}
+                      disabled={
+                        submitting || checkingReport || membersList.length === 0
+                      }
                       onClick={handleFormSubmit}
                       startIcon={
                         submitting ? (
                           <CircularProgress size={20} color="inherit" />
+                        ) : isReported ? (
+                          <EditNoteIcon />
                         ) : (
                           <SendIcon />
                         )
                       }
                       sx={{
-                        backgroundColor: "#dc2626",
-                        "&:hover": { backgroundColor: "#b91c1c" },
+                        backgroundColor: isReported ? "#2563eb" : "#dc2626",
+                        "&:hover": {
+                          backgroundColor: isReported ? "#1d4ed8" : "#b91c1c",
+                        },
                         borderRadius: "28px",
                         px: 6,
                         py: 1.8,
                         fontWeight: 700,
                         fontSize: "1.05em",
-                        boxShadow: "0 4px 14px 0 rgba(220, 38, 38, 0.3)",
+                        boxShadow: isReported
+                          ? "0 4px 14px 0 rgba(37, 99, 235, 0.3)"
+                          : "0 4px 14px 0 rgba(220, 38, 38, 0.3)",
                       }}
                     >
-                      {submitting ? "제출 중..." : "주일 출석 보고 제출하기"}
+                      {submitting
+                        ? "제출 중..."
+                        : isReported
+                        ? "주일 출석 보고 수정(업데이트)하기"
+                        : "주일 출석 보고 제출하기"}
                     </Button>
                   </Box>
                 </>
@@ -1298,17 +1944,30 @@ const SmallGroupReport = () => {
         <DialogTitle
           sx={{
             fontWeight: 700,
-            color: reportType === "gathering" ? "#ea580c" : "#dc2626",
+            color: isReported
+              ? "#2563eb"
+              : reportType === "gathering"
+              ? "#ea580c"
+              : "#dc2626",
           }}
         >
           {reportType === "gathering"
-            ? "정원 모임 보고 제출 확인"
+            ? isReported
+              ? "정원 모임 보고 수정(업데이트) 확인"
+              : "정원 모임 보고 제출 확인"
+            : isReported
+            ? "출석 보고 수정(업데이트) 확인"
             : "출석 보고 제출 확인"}
         </DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ mb: 2 }}>
-            작성하신 내용을 최종 제출하시겠습니까? 구글 스프레드시트의 해당 주차
-            시트에 실시간 기록됩니다.
+            {reportType === "gathering"
+              ? isReported
+                ? "수정하신 내용으로 모임 보고서를 업데이트하시겠습니까? 구글 스프레드시트에 실시간 반영됩니다."
+                : "작성하신 내용을 최종 제출하시겠습니까? 구글 스프레드시트에 실시간 기록됩니다."
+              : isReported
+              ? "수정하신 내용으로 출석 보고서를 업데이트하시겠습니까? 구글 스프레드시트의 해당 주차 시트에 실시간 반영됩니다."
+              : "작성하신 내용을 최종 제출하시겠습니까? 구글 스프레드시트의 해당 주차 시트에 실시간 기록됩니다."}
           </DialogContentText>
           <Box sx={{ backgroundColor: "#f9f9f9", p: 2, borderRadius: "8px" }}>
             <Typography variant="body2" sx={{ mb: 0.5 }}>
@@ -1350,20 +2009,26 @@ const SmallGroupReport = () => {
           <Button
             onClick={handleConfirmSubmit}
             variant="contained"
-            startIcon={<CheckCircleOutlineIcon />}
+            startIcon={isReported ? <EditNoteIcon /> : <CheckCircleOutlineIcon />}
             sx={{
-              backgroundColor:
-                reportType === "gathering" ? "#ea580c" : "#dc2626",
+              backgroundColor: isReported
+                ? "#2563eb"
+                : reportType === "gathering"
+                ? "#ea580c"
+                : "#dc2626",
               "&:hover": {
-                backgroundColor:
-                  reportType === "gathering" ? "#c2410c" : "#b91c1c",
+                backgroundColor: isReported
+                  ? "#1d4ed8"
+                  : reportType === "gathering"
+                  ? "#c2410c"
+                  : "#b91c1c",
               },
               borderRadius: "20px",
               px: 3,
               fontWeight: 600,
             }}
           >
-            제출 완료
+            {isReported ? "수정 완료" : "제출 완료"}
           </Button>
         </DialogActions>
       </Dialog>
