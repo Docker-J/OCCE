@@ -1191,7 +1191,7 @@ const SmallGroupReport = () => {
                                   gap: 0.75,
                                 }}
                               >
-                                {gatheringHistoryDates.slice(0, 8).map((dateStr) => {
+                                {gatheringHistoryDates.slice(0, 4).map((dateStr) => {
                                   const isCurrent = dateStr === gatheringDateStr;
                                   const d = new Date(dateStr + "T00:00:00");
                                   const dayOfWeekNames = [
