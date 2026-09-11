@@ -46,3 +46,23 @@ export const deleteUser = async (username) => {
   );
   return res.data;
 };
+
+/**
+ * Fetch weekly attendance summaries and historical trends
+ */
+export const getAdminAttendanceStats = async () => {
+  const res = await axios.get("/api/admin/attendance/summary");
+  return res.data;
+};
+
+/**
+ * Fetch detailed attendance list (attendees, absentees, notes) for a specific garden
+ * @param {string} gardenName
+ * @param {string} date - YYYY-MM-DD
+ */
+export const getAdminGardenAttendanceDetail = async (gardenName, date) => {
+  const res = await axios.get(
+    `/api/admin/attendance/gardens/${encodeURIComponent(gardenName)}/${encodeURIComponent(date)}`,
+  );
+  return res.data;
+};

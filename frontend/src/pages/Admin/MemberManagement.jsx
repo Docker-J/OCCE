@@ -44,6 +44,8 @@ import {
   useTheme,
   useMediaQuery,
   Divider,
+  Tabs,
+  Tab,
 } from "@mui/material";
 
 import SearchIcon from "@mui/icons-material/Search";
@@ -57,6 +59,10 @@ import CheckIcon from "@mui/icons-material/Check";
 import AddIcon from "@mui/icons-material/Add";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import PeopleIcon from "@mui/icons-material/People";
+
+import AttendanceDashboard from "./AttendanceDashboard";
 
 const titleBackground = {
   backgroundImage: 'url("/img/Community/SmallGroup.webp")',
@@ -86,6 +92,9 @@ const MemberManagement = () => {
   const authenticated = useAuthStore((state) => state.authenticated);
   const authInitialized = useAuthStore((state) => state.authInitialized);
   const admin = useAuthStore((state) => state.admin);
+
+  // Tab state: 0 = Member Management, 1 = Attendance Dashboard
+  const [adminTab, setAdminTab] = useState(0);
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -359,7 +368,9 @@ const MemberManagement = () => {
 
   return (
     <>
-      <title>교인 관리 대시보드 - OCCE</title>
+      <title>
+        {adminTab === 0 ? "교인 관리 대시보드 - OCCE" : "출석 통계 대시보드 - OCCE"}
+      </title>
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
@@ -371,7 +382,7 @@ const MemberManagement = () => {
               color: "white",
             }}
           >
-            교인 관리 대시보드
+            {adminTab === 0 ? "교인 관리 대시보드" : "출석 통계 대시보드"}
           </Typography>
           <Typography
             variant="h6"
@@ -382,7 +393,9 @@ const MemberManagement = () => {
               mt: "8px",
             }}
           >
-            온교회 등록 교인 계정 및 정원지기 역할을 관리합니다.
+            {adminTab === 0
+              ? "온교회 등록 교인 계정 및 정원지기 역할을 관리합니다."
+              : "구글 드라이브 주간 출석부의 실시간 출석 현황과 통계를 분석합니다."}
           </Typography>
         </div>
       </div>
@@ -504,10 +517,47 @@ const MemberManagement = () => {
           ) : (
             // 3. Authorized View (Staff Member Management Dashboard)
             <>
-              {/* Summary Cards */}
-              <Box
+              {/* Admin Navigation Tabs */}
+              <Tabs
+                value={adminTab}
+                onChange={(e, val) => setAdminTab(val)}
                 sx={{
-                  display: "grid",
+                  mb: 3.5,
+                  borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
+                  "& .MuiTab-root": {
+                    fontWeight: 700,
+                    fontSize: "1rem",
+                    py: 1.5,
+                    color: "#64748b",
+                    "&.Mui-selected": { color: "#ea580c" },
+                  },
+                  "& .MuiTabs-indicator": {
+                    backgroundColor: "#ea580c",
+                    height: 3,
+                    borderRadius: "3px 3px 0 0",
+                  },
+                }}
+              >
+                <Tab
+                  label="교인 계정 관리"
+                  icon={<PeopleIcon sx={{ fontSize: "1.2rem" }} />}
+                  iconPosition="start"
+                />
+                <Tab
+                  label="출석 통계 대시보드"
+                  icon={<BarChartIcon sx={{ fontSize: "1.2rem" }} />}
+                  iconPosition="start"
+                />
+              </Tabs>
+
+              {adminTab === 1 ? (
+                <AttendanceDashboard />
+              ) : (
+                <>
+                  {/* Summary Cards */}
+                  <Box
+                    sx={{
+                      display: "grid",
                   gridTemplateColumns: {
                     xs: "1fr",
                     sm: "repeat(2, 1fr)",
@@ -1212,6 +1262,8 @@ const MemberManagement = () => {
             </Card>
             </>
           )}
+          </>
+        )}
         </div>
       </div>
 
