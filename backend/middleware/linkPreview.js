@@ -48,13 +48,14 @@ const ROUTE_TITLES = {
   "/schedules": "교회일정 - OCCE",
   "/newcomers": "새가족 - OCCE",
   "/albums": "교회사진 - OCCE",
+  "/admin/members": "교인 관리 대시보드 - OCCE",
   "/online/sundayservice": "주일예배 - OCCE",
   "/online/sermon": "말씀 - OCCE",
   "/online/worship": "찬양 - OCCE",
-  "/online/dawnQT": "새벽QT - OCCE",
-  "/online/prayON": "기도ON - OCCE",
-  "/online/meditationon": "묵상ON - OCCE",
-  "/online/bible291": "291일 성경1독 - OCCE",
+  "/online/dawnqt": "새벽 QT - OCCE",
+  "/online/prayon": "기도 ON - OCCE",
+  "/online/meditationon": "묵상 ON - OCCE",
+  "/online/bible291": "291일 성경 1독 - OCCE",
   "/community/smallgroup": "소그룹 - OCCE",
   "/community/smallgroup/report": "소그룹 보고서 - OCCE",
   "/community/ministry": "사역 - OCCE",
@@ -77,11 +78,11 @@ export const linkPreviewMiddleware = async (c, next, app) => {
   const isStaticFile = /\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|webmanifest|json)$/i.test(cleanPath);
 
   if (isBot && !isApi && !isStaticFile) {
-    let title = ROUTE_TITLES[cleanPath] || "ON Community Church of Edmonton";
+    const cleanPathLower = cleanPath.toLowerCase();
+    let title = ROUTE_TITLES[cleanPathLower] || "ON Community Church of Edmonton";
 
     // Handle dynamic routing
     try {
-      const cleanPathLower = cleanPath.toLowerCase();
       if (cleanPathLower.startsWith("/announcements/")) {
         const id = cleanPath.split("/")[2];
         if (id && c.env.DB) {
