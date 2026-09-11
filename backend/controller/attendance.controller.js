@@ -1,23 +1,10 @@
-import {
-  CognitoIdentityProviderClient,
-  GetUserCommand,
-} from "@aws-sdk/client-cognito-identity-provider";
+import { GetUserCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { getCognitoClient } from "../api/cognito.js";
 import {
   getSheetsClient,
   getDriveClient,
   findDriveFileId,
 } from "../api/googleClients.js";
-
-// Helper to get Cognito client
-const getCognitoClient = (env) => {
-  return new CognitoIdentityProviderClient({
-    region: env.AWS_REGION || "us-west-2",
-    credentials: {
-      accessKeyId: env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
-    },
-  });
-};
 
 // Helper to fetch user attributes from Cognito using Access Token (fallback)
 const getCognitoUserAttributes = async (c) => {

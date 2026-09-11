@@ -1,5 +1,4 @@
 import {
-  CognitoIdentityProviderClient,
   ConfirmSignUpCommand,
   GlobalSignOutCommand,
   InitiateAuthCommand,
@@ -10,21 +9,11 @@ import {
   ConfirmForgotPasswordCommand,
   RevokeTokenCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
+import { getCognitoClient } from "../api/cognito.js";
 import { getCookie, setCookie, deleteCookie } from "hono/cookie";
 import { google } from "googleapis";
 import * as XLSX from "xlsx";
 import { getGoogleAuth } from "../api/googleAuth.js";
-
-// Helper to get Cognito Client dynamically
-const getCognitoClient = (env) => {
-  return new CognitoIdentityProviderClient({
-    region: env.AWS_REGION || "us-west-2",
-    credentials: {
-      accessKeyId: env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
-    },
-  });
-};
 
 const getRefreshTokenCookieOptions = (remember = false) => {
   const options = {

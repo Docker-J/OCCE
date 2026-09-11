@@ -1,5 +1,4 @@
 import {
-  CognitoIdentityProviderClient,
   ListUsersCommand,
   ListUsersInGroupCommand,
   AdminAddUserToGroupCommand,
@@ -10,18 +9,9 @@ import {
   AdminUpdateUserAttributesCommand,
   AdminDeleteUserAttributesCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
+import { getCognitoClient } from "../api/cognito.js";
 import { getDocClient } from "../api/dynamodb.js";
 import { ScanCommand } from "@aws-sdk/lib-dynamodb";
-
-const getCognitoClient = (env) => {
-  return new CognitoIdentityProviderClient({
-    region: env.AWS_REGION || "us-west-2",
-    credentials: {
-      accessKeyId: env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
-    },
-  });
-};
 
 /**
  * GET /api/admin/users
