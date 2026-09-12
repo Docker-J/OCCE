@@ -48,7 +48,7 @@ const ROUTE_TITLES = {
   "/schedules": "교회일정 - OCCE",
   "/newcomers": "새가족 - OCCE",
   "/albums": "교회사진 - OCCE",
-  "/admin/members": "교인 관리 대시보드 - OCCE",
+  "/admin/members": "교인 및 출석 관리 - OCCE",
   "/online/sundayservice": "주일예배 - OCCE",
   "/online/sermon": "말씀 - OCCE",
   "/online/worship": "찬양 - OCCE",

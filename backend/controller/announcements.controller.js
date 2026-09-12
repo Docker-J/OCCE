@@ -14,14 +14,13 @@ export const getAnnouncementsController = async (c) => {
 
   const countSql = `SELECT COUNT(id) AS count FROM ${TABLENAME} WHERE pin = 0 OR pin IS NULL`;
   const pinSql = `SELECT * FROM ${TABLENAME} WHERE pin = 1 ORDER BY timestamp DESC`;
-  const dataSql = `SELECT * FROM ${TABLENAME} WHERE pin = 0 OR pin IS NULL ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
-    page ? (page - 1) * PAGE_SIZE : 0
-  }`;
+  const dataSql = `SELECT * FROM ${TABLENAME} WHERE pin = 0 OR pin IS NULL ORDER BY timestamp DESC LIMIT ? OFFSET ?`;
+  const offset = page ? (page - 1) * PAGE_SIZE : 0;
 
   const [countResult, pinResult, dataResult] = await Promise.all([
     executeD1Query(db, countSql),
     executeD1Query(db, pinSql),
-    executeD1Query(db, dataSql),
+    executeD1Query(db, dataSql, [PAGE_SIZE, offset]),
   ]);
 
   const count = countResult.result[0].results[0].count;

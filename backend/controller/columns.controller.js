@@ -13,13 +13,12 @@ export const getColumnsController = async (c) => {
   const db = c.env.DB;
 
   const countSql = `SELECT COUNT(id) AS count FROM ${TABLENAME}`;
-  const dataSql = `SELECT * FROM ${TABLENAME} ORDER BY timestamp DESC LIMIT ${PAGE_SIZE} OFFSET ${
-    page ? (page - 1) * PAGE_SIZE : 0
-  }`;
+  const dataSql = `SELECT * FROM ${TABLENAME} ORDER BY timestamp DESC LIMIT ? OFFSET ?`;
+  const offset = page ? (page - 1) * PAGE_SIZE : 0;
 
   const [countResult, dataResult] = await Promise.all([
     executeD1Query(db, countSql),
-    executeD1Query(db, dataSql),
+    executeD1Query(db, dataSql, [PAGE_SIZE, offset]),
   ]);
 
   const count = countResult.result[0].results[0].count;

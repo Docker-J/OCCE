@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import {
-  confimrSignUpController,
+  confirmSignUpController,
   refreshSignInController,
   requestConfirmController,
   signInController,
@@ -15,7 +15,7 @@ const router = new Hono();
 router.post("/sign-in", signInController);
 router.post("/refresh-sign-in", refreshSignInController);
 router.post("/sign-up", signUpController);
-router.post("/confirm", confimrSignUpController);
+router.post("/confirm", confirmSignUpController);
 router.get("/resend-confirm", requestConfirmController);
 router.post("/sign-out", signOutController);
 router.post("/forgot-password", forgotPasswordController);

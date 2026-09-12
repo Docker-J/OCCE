@@ -1,6 +1,5 @@
 import {
   ConfirmSignUpCommand,
-  GlobalSignOutCommand,
   InitiateAuthCommand,
   ResendConfirmationCodeCommand,
   SignUpCommand,
@@ -55,10 +54,7 @@ export const signInController = async (c) => {
     // Body might be empty, ignore
   }
 
-  const auth = new Buffer.from(
-    authHeader.split(" ")[1],
-    "base64",
-  )
+  const auth = new Buffer.from(authHeader.split(" ")[1], "base64")
     .toString()
     .split(":");
   const phone = auth[0];
@@ -94,7 +90,12 @@ export const signInController = async (c) => {
     const group = payload["cognito:groups"]?.[0] || null;
 
     if (refreshToken) {
-      setCookie(c, "refreshToken", refreshToken, getRefreshTokenCookieOptions(remember));
+      setCookie(
+        c,
+        "refreshToken",
+        refreshToken,
+        getRefreshTokenCookieOptions(remember),
+      );
       if (remember) {
         setCookie(c, "remember", "true", getRememberCookieOptions(true));
       } else {
@@ -159,7 +160,12 @@ export const refreshSignInController = async (c) => {
 
     const isRemembered = getCookie(c, "remember") === "true";
     const tokenToPersist = newRefreshToken || tokenToUse;
-    setCookie(c, "refreshToken", tokenToPersist, getRefreshTokenCookieOptions(isRemembered));
+    setCookie(
+      c,
+      "refreshToken",
+      tokenToPersist,
+      getRefreshTokenCookieOptions(isRemembered),
+    );
     if (isRemembered) {
       setCookie(c, "remember", "true", getRememberCookieOptions(true));
     }
@@ -191,7 +197,9 @@ const checkUserInSheet = async (env, name, phone) => {
     rows = sheetCache.rows;
   } else {
     try {
-      const auth = getGoogleAuth(env, ["https://www.googleapis.com/auth/drive.readonly"]);
+      const auth = getGoogleAuth(env, [
+        "https://www.googleapis.com/auth/drive.readonly",
+      ]);
       const drive = google.drive({ version: "v3", auth });
       const fileId = "1Uk154FmBfVHIcv8xU5V_CuTBte4QXn6D";
 
@@ -290,12 +298,12 @@ export const signUpController = async (c) => {
         error: error.name,
         message: error.message,
       },
-      error.$metadata?.httpStatusCode || 400
+      error.$metadata?.httpStatusCode || 400,
     );
   }
 };
 
-export const confimrSignUpController = async (c) => {
+export const confirmSignUpController = async (c) => {
   const body = await c.req.json();
   const env = c.env;
   const AWS_COGNITO_CLIENT_ID = env.AWS_COGNITO_CLIENT_ID;
@@ -318,7 +326,7 @@ export const confimrSignUpController = async (c) => {
         error: error.name,
         message: error.message,
       },
-      error.$metadata?.httpStatusCode || 400
+      error.$metadata?.httpStatusCode || 400,
     );
   }
 };
@@ -345,7 +353,7 @@ export const requestConfirmController = async (c) => {
           error: "UserAlreadyConfirmedException",
           message: "이미 인증이 완료된 회원입니다.",
         },
-        400
+        400,
       );
     }
   } catch (error) {
@@ -355,7 +363,7 @@ export const requestConfirmController = async (c) => {
           error: "UserNotFoundException",
           message: "등록되지 않은 회원입니다.",
         },
-        404
+        404,
       );
     }
     console.error("Error checking user status:", error);
@@ -378,7 +386,7 @@ export const requestConfirmController = async (c) => {
         error: error.name,
         message: error.message,
       },
-      error.$metadata?.httpStatusCode || 400
+      error.$metadata?.httpStatusCode || 400,
     );
   }
 };
@@ -432,7 +440,7 @@ export const forgotPasswordController = async (c) => {
         error: error.name,
         message: error.message,
       },
-      error.$metadata?.httpStatusCode || 400
+      error.$metadata?.httpStatusCode || 400,
     );
   }
 };
@@ -467,7 +475,7 @@ export const confirmForgotPasswordController = async (c) => {
         error: error.name,
         message: error.message,
       },
-      error.$metadata?.httpStatusCode || 400
+      error.$metadata?.httpStatusCode || 400,
     );
   }
 };

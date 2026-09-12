@@ -91,7 +91,6 @@ export async function handleScheduled(event, env, ctx) {
       break;
 
     case "0 22 * * SUN":
-    case "0 22 * * 1":
       await handleSundayAttendanceReminderFCM(env);
       break;
 
