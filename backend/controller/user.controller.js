@@ -10,9 +10,8 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import { getCognitoClient } from "../api/cognito.js";
 import { getCookie, setCookie, deleteCookie } from "hono/cookie";
-import { google } from "googleapis";
+import { getDriveClient } from "../api/googleClients.js";
 import * as XLSX from "xlsx";
-import { getGoogleAuth } from "../api/googleAuth.js";
 
 const getRefreshTokenCookieOptions = (remember = false) => {
   const options = {
@@ -197,10 +196,9 @@ const checkUserInSheet = async (env, name, phone) => {
     rows = sheetCache.rows;
   } else {
     try {
-      const auth = getGoogleAuth(env, [
+      const drive = getDriveClient(env, [
         "https://www.googleapis.com/auth/drive.readonly",
       ]);
-      const drive = google.drive({ version: "v3", auth });
       const fileId = "1Uk154FmBfVHIcv8xU5V_CuTBte4QXn6D";
 
       // 1. Download the file as a buffer (binary data)

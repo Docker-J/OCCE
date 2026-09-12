@@ -1,6 +1,7 @@
 import { getDocClient } from "../api/dynamodb.js";
 import { PutCommand, DeleteCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { getUserVerifier } from "../middleware/auth.js";
+import sendNotification from "../api/sendNotification.js";
 
 const TABLENAME = "FCMToken";
 
@@ -122,8 +123,6 @@ export const broadcastController = async (c) => {
       return c.json({ error: "Title and body are required" }, 400);
     }
 
-    // Import sendNotification dynamically or call it
-    const { default: sendNotification } = await import("../api/sendNotification.js");
     await sendNotification(
       c.env,
       title,

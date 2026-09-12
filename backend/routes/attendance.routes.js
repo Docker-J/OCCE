@@ -3,11 +3,14 @@ import { authLeader } from "../middleware/auth.js";
 import {
   getGardensController,
   getReportController,
+  postReportController,
+} from "../controller/attendance.controller.js";
+
+import {
   getGatheringReportController,
   getGatheringHistoryController,
-  postReportController,
   postGatheringReportController,
-} from "../controller/attendance.controller.js";
+} from "../controller/gathering.controller.js";
 
 const router = new Hono();
 

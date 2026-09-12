@@ -60,3 +60,21 @@ export const findDriveFileId = async (drive, folderId, fileName) => {
   }
   return fileId;
 };
+
+/**
+ * Sets or updates a drive file ID in the in-memory cache
+ * @param {string} folderId
+ * @param {string} fileName
+ * @param {string} fileId
+ * @param {number} [ttlMs=180000] 3 minutes default
+ */
+export const setDriveFileIdCache = (
+  folderId,
+  fileName,
+  fileId,
+  ttlMs = 3 * 60 * 1000,
+) => {
+  if (!folderId || !fileName || !fileId) return;
+  const cacheKey = `${folderId}_${fileName}`;
+  fileIdCache.set(cacheKey, { fileId, expiresAt: Date.now() + ttlMs });
+};
