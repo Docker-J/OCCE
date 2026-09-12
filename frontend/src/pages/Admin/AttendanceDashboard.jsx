@@ -74,7 +74,7 @@ const AttendanceDashboard = () => {
       setErrorMsg("");
 
       try {
-        const res = await getAdminAttendanceStats();
+        const res = await getAdminAttendanceStats(isManualRefresh);
         setData(res);
         if (res.weeks && res.weeks.length > 0) {
           setSelectedDate((prev) => {

@@ -49,9 +49,12 @@ export const deleteUser = async (username) => {
 
 /**
  * Fetch weekly attendance summaries and historical trends
+ * @param {boolean} [refresh=false] - When true, forces a manual refresh
  */
-export const getAdminAttendanceStats = async () => {
-  const res = await axios.get("/api/admin/attendance/summary");
+export const getAdminAttendanceStats = async (refresh = false) => {
+  const res = await axios.get("/api/admin/attendance/summary", {
+    params: refresh ? { refresh: "true" } : {},
+  });
   return res.data;
 };
 
