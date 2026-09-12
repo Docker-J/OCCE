@@ -44,6 +44,12 @@ export default defineConfig(() => {
             if (id.includes("node_modules/@tanstack/react-query")) {
               return "tanstackQuery";
             }
+            if (
+              id.includes("node_modules/pdfjs-dist") ||
+              id.includes("node_modules/react-pdf")
+            ) {
+              return "pdfjs";
+            }
           },
         },
       },
