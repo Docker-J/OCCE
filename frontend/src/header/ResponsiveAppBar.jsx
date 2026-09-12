@@ -61,7 +61,7 @@ const ResponsiveAppBar = () => {
     ...(admin
       ? [
           {
-            title: "교인 관리",
+            title: "교인 및 출석 관리",
             onClick: () => {
               navigate("/admin/members");
             },
