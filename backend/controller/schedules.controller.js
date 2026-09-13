@@ -39,10 +39,10 @@ export const getSchedulesController = async (c) => {
   
   if (!force && kv) {
     try {
-      const cached = await kv.get("schedules");
+      const cached = await kv.get("schedules", "json");
       if (cached) {
         console.log("Loaded schedules from KV cache.");
-        return c.json(JSON.parse(cached));
+        return c.json(cached);
       }
     } catch (e) {
       console.error("Failed to read schedules from KV:", e);
