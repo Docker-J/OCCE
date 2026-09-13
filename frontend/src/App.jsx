@@ -37,68 +37,73 @@ const Managers = () => {
 };
 
 
-const HeaderFooterWrapper = () => {
+const RootLayout = () => {
   return (
     <NotificationProvider>
       <GlobalLoader />
       <Managers />
+      <Outlet />
+    </NotificationProvider>
+  );
+};
+
+const HeaderFooterWrapper = () => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        minHeight: "100vh",
+      }}
+    >
+      <ResponsiveAppBar />
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between",
-          minHeight: "100vh",
+          flexGrow: 1,
         }}
       >
-        <ResponsiveAppBar />
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            flexGrow: 1,
-          }}
-        >
-          <Outlet />
-        </div>
-        <Footer />
+        <Outlet />
       </div>
-    </NotificationProvider>
+      <Footer />
+    </div>
   );
 };
 
 const HeaderWrapper = () => {
   return (
-    <NotificationProvider>
-      <GlobalLoader />
-      <Managers />
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        minHeight: "100vh",
+      }}
+    >
+      <ResponsiveAppBar />
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between",
-          minHeight: "100vh",
+          flexGrow: 1,
         }}
       >
-        <ResponsiveAppBar />
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            flexGrow: 1,
-          }}
-        >
-          <Outlet />
-        </div>
+        <Outlet />
       </div>
-    </NotificationProvider>
+    </div>
   );
 };
 
 const router = createBrowserRouter([
   {
-    element: <HeaderFooterWrapper />,
+    element: <RootLayout />,
     errorElement: <ErrorFallback />,
     children: [
+      {
+        element: <HeaderFooterWrapper />,
+        children: [
       {
         path: "/",
         lazy: async () => ({ Component: (await import("./pages/Main/Main")).default }),
@@ -272,26 +277,27 @@ const router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: "*",
-        element: <NotFound />,
-      },
-    ],
-  },
-  {
-    element: <HeaderWrapper />,
-    errorElement: <ErrorFallback />,
-    children: [
-      {
-        path: "/albums",
-        lazy: async () => ({ Component: (await import("./pages/News/Albums/Albums")).default }),
-      },
-      {
-        path: "/online/meditationON",
-        lazy: async () => ({ Component: (await import("./pages/Online/MeditationON/MeditationON")).default }),
-      },
-    ],
-  },
+        {
+          path: "*",
+          element: <NotFound />,
+        },
+      ],
+    },
+    {
+      element: <HeaderWrapper />,
+      children: [
+        {
+          path: "/albums",
+          lazy: async () => ({ Component: (await import("./pages/News/Albums/Albums")).default }),
+        },
+        {
+          path: "/online/meditationON",
+          lazy: async () => ({ Component: (await import("./pages/Online/MeditationON/MeditationON")).default }),
+        },
+      ],
+    },
+  ],
+},
 ]);
 
 const App = () => {
