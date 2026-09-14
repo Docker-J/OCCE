@@ -7,7 +7,90 @@ import {
   Divider,
   Paper,
   Checkbox,
+  Button,
 } from "@mui/material";
+import DoneAllIcon from "@mui/icons-material/DoneAll";
+import RemoveDoneIcon from "@mui/icons-material/RemoveDone";
+
+const AttendanceChecklistItem = ({
+  member,
+  isChecked,
+  checkingReport,
+  themeColor,
+  lightBgColor,
+  borderColor,
+  hoverBorderColor,
+  hoverBgColor,
+  onToggle,
+}) => {
+  return (
+    <Grid size={{ xs: 6, sm: 4, md: 3 }}>
+      <Paper
+        variant="outlined"
+        onClick={() => {
+          if (!checkingReport) {
+            onToggle?.(member);
+          }
+        }}
+        sx={{
+          p: 1.5,
+          cursor: checkingReport ? "not-allowed" : "pointer",
+          borderRadius: "8px",
+          border: isChecked
+            ? `1.2px solid ${borderColor}`
+            : "1px solid #e0e0e0",
+          backgroundColor: isChecked ? lightBgColor : "#fafafa",
+          opacity: checkingReport ? 0.6 : 1,
+          transition: "all 0.15s ease",
+          "&:hover": {
+            borderColor: checkingReport
+              ? isChecked
+                ? borderColor
+                : "#e0e0e0"
+              : isChecked
+              ? hoverBorderColor
+              : "#bdbdbd",
+            backgroundColor: checkingReport
+              ? isChecked
+                ? lightBgColor
+                : "#fafafa"
+              : isChecked
+              ? hoverBgColor
+              : "#eeeeee",
+          },
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Typography
+          variant="body1"
+          sx={{
+            fontWeight: isChecked ? 600 : 400,
+            color: isChecked ? themeColor : "#9e9e9e",
+            textDecoration: isChecked ? "none" : "line-through",
+          }}
+        >
+          {member}
+        </Typography>
+        <Checkbox
+          size="small"
+          checked={isChecked}
+          disabled={checkingReport}
+          onClick={(e) => e.stopPropagation()}
+          onChange={() => onToggle?.(member)}
+          sx={{
+            color: "#bdbdbd",
+            "&.Mui-checked": {
+              color: themeColor,
+            },
+            p: 0,
+          }}
+        />
+      </Paper>
+    </Grid>
+  );
+};
 
 const AttendanceChecklist = ({
   title = "출석체크",
@@ -23,8 +106,12 @@ const AttendanceChecklist = ({
   membersList = [],
   checkedMembers = {},
   handleToggleMember,
+  handleCheckAll,
+  handleUncheckAll,
   checkingReport = false,
 }) => {
+  const isAllChecked = membersList.length > 0 && absenteesCount === 0;
+
   return (
     <Card
       sx={{
@@ -42,12 +129,13 @@ const AttendanceChecklist = ({
             alignItems: "center",
             mb: 2,
             flexWrap: "wrap",
-            gap: 1,
+            gap: 1.5,
           }}
         >
           <Typography variant="h6" sx={{ fontWeight: 700, color: themeColor }}>
             {title}
           </Typography>
+          {/* Status Badges */}
           <Box sx={{ display: "flex", gap: 1 }}>
             <Paper
               variant="outlined"
@@ -86,83 +174,81 @@ const AttendanceChecklist = ({
           </Box>
         </Box>
 
-        <Typography variant="body2" sx={{ color: "#666", mb: 3 }}>
-          {description}
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 2,
+            flexWrap: "wrap",
+            gap: 1.5,
+          }}
+        >
+          <Typography
+            variant="body2"
+            sx={{ color: "#666", flex: 1, minWidth: "220px" }}
+          >
+            {description}
+          </Typography>
+
+          {/* Single Smart Toggle Batch Action Button */}
+          {(handleCheckAll || handleUncheckAll) && (
+            <Button
+              size="small"
+              variant="text"
+              startIcon={
+                isAllChecked ? (
+                  <RemoveDoneIcon sx={{ fontSize: 16 }} />
+                ) : (
+                  <DoneAllIcon sx={{ fontSize: 16 }} />
+                )
+              }
+              disabled={checkingReport || membersList.length === 0}
+              onClick={isAllChecked ? handleUncheckAll : handleCheckAll}
+              sx={{
+                fontSize: "0.8rem",
+                fontWeight: 600,
+                color: isAllChecked ? "#64748b" : themeColor,
+                py: 0.4,
+                px: 1.2,
+                borderRadius: "8px",
+                backgroundColor: isAllChecked ? "#f1f5f9" : lightBgColor,
+                transition: "all 0.15s ease",
+                "&:hover": {
+                  backgroundColor: isAllChecked ? "#e2e8f0" : badgeBorderColor,
+                },
+              }}
+            >
+              {isAllChecked ? "전체 해제" : "전체 출석"}
+            </Button>
+          )}
+        </Box>
 
         <Divider sx={{ mb: 2 }} />
 
-        <Grid container spacing={1}>
-          {membersList.map((member) => {
-            const isChecked = checkedMembers[member] !== false;
-            return (
-              <Grid size={{ xs: 6, sm: 4, md: 3 }} key={member}>
-                <Paper
-                  variant="outlined"
-                  onClick={() => {
-                    if (!checkingReport) {
-                      handleToggleMember?.(member);
-                    }
-                  }}
-                  sx={{
-                    p: 1.5,
-                    cursor: checkingReport ? "not-allowed" : "pointer",
-                    borderRadius: "8px",
-                    border: isChecked
-                      ? `1.2px solid ${borderColor}`
-                      : "1px solid #e0e0e0",
-                    backgroundColor: isChecked ? lightBgColor : "#fafafa",
-                    opacity: checkingReport ? 0.6 : 1,
-                    transition: "all 0.2s ease",
-                    "&:hover": {
-                      borderColor: checkingReport
-                        ? isChecked
-                          ? borderColor
-                          : "#e0e0e0"
-                        : isChecked
-                        ? hoverBorderColor
-                        : "#bdbdbd",
-                      backgroundColor: checkingReport
-                        ? isChecked
-                          ? lightBgColor
-                          : "#fafafa"
-                        : isChecked
-                        ? hoverBgColor
-                        : "#eeeeee",
-                    },
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      fontWeight: isChecked ? 600 : 400,
-                      color: isChecked ? themeColor : "#9e9e9e",
-                      textDecoration: isChecked ? "none" : "line-through",
-                    }}
-                  >
-                    {member}
-                  </Typography>
-                  <Checkbox
-                    size="small"
-                    checked={isChecked}
-                    disabled={checkingReport}
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={() => handleToggleMember?.(member)}
-                    sx={{
-                      color: "#bdbdbd",
-                      "&.Mui-checked": {
-                        color: themeColor,
-                      },
-                      p: 0,
-                    }}
-                  />
-                </Paper>
-              </Grid>
-            );
-          })}
+        <Grid
+          container
+          spacing={1}
+          sx={{
+            opacity: checkingReport ? 0.6 : 1,
+            transition: "opacity 0.2s ease",
+            pointerEvents: checkingReport ? "none" : "auto",
+          }}
+        >
+          {membersList.map((member) => (
+            <AttendanceChecklistItem
+              key={member}
+              member={member}
+              isChecked={checkedMembers[member] !== false}
+              checkingReport={checkingReport}
+              themeColor={themeColor}
+              lightBgColor={lightBgColor}
+              borderColor={borderColor}
+              hoverBorderColor={hoverBorderColor}
+              hoverBgColor={hoverBgColor}
+              onToggle={handleToggleMember}
+            />
+          ))}
         </Grid>
       </CardContent>
     </Card>

@@ -99,6 +99,8 @@ const GatheringForm = ({
   absentees,
   checkedMembers,
   handleToggleMember,
+  handleCheckAll,
+  handleUncheckAll,
   handleFormSubmit,
   submitting,
   membersList,
@@ -306,6 +308,8 @@ const GatheringForm = ({
         membersList={gardens[selectedGarden] || []}
         checkedMembers={checkedMembers}
         handleToggleMember={handleToggleMember}
+        handleCheckAll={handleCheckAll}
+        handleUncheckAll={handleUncheckAll}
         checkingReport={checkingReport}
       />
 

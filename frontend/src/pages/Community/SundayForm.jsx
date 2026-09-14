@@ -82,6 +82,8 @@ const SundayForm = ({
   absentees,
   checkedMembers,
   handleToggleMember,
+  handleCheckAll,
+  handleUncheckAll,
   absenceReasons,
   handleAbsenceReasonChange,
   handleFormSubmit,
@@ -160,6 +162,8 @@ const SundayForm = ({
         membersList={gardens[selectedGarden] || []}
         checkedMembers={checkedMembers}
         handleToggleMember={handleToggleMember}
+        handleCheckAll={handleCheckAll}
+        handleUncheckAll={handleUncheckAll}
         checkingReport={checkingReport}
       />
 

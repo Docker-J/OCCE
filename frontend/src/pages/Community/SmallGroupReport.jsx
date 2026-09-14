@@ -217,6 +217,7 @@ const SmallGroupReport = () => {
       }
 
       setCheckingReport(true);
+      setIsReported(false);
       getGatheringReport(
         gatheringDateStr,
         selectedGarden,
@@ -269,6 +270,7 @@ const SmallGroupReport = () => {
       }
 
       setCheckingReport(true);
+      setIsReported(false);
       getAttendanceReport(
         selectedDate,
         selectedGarden,
@@ -399,6 +401,23 @@ const SmallGroupReport = () => {
   const membersList = gardens[selectedGarden] || [];
   const attendees = membersList.filter((m) => checkedMembers[m] !== false);
   const absentees = membersList.filter((m) => checkedMembers[m] === false);
+
+  const handleCheckAll = () => {
+    const updated = {};
+    membersList.forEach((member) => {
+      updated[member] = true;
+    });
+    setCheckedMembers(updated);
+    setAbsenceReasons({});
+  };
+
+  const handleUncheckAll = () => {
+    const updated = {};
+    membersList.forEach((member) => {
+      updated[member] = false;
+    });
+    setCheckedMembers(updated);
+  };
 
   const handleFormSubmit = () => {
     if (!selectedGarden) {
@@ -777,6 +796,8 @@ const SmallGroupReport = () => {
                   absentees={absentees}
                   checkedMembers={checkedMembers}
                   handleToggleMember={handleToggleMember}
+                  handleCheckAll={handleCheckAll}
+                  handleUncheckAll={handleUncheckAll}
                   handleFormSubmit={handleFormSubmit}
                   submitting={submitting}
                   membersList={membersList}
@@ -795,6 +816,8 @@ const SmallGroupReport = () => {
                   absentees={absentees}
                   checkedMembers={checkedMembers}
                   handleToggleMember={handleToggleMember}
+                  handleCheckAll={handleCheckAll}
+                  handleUncheckAll={handleUncheckAll}
                   absenceReasons={absenceReasons}
                   handleAbsenceReasonChange={handleAbsenceReasonChange}
                   handleFormSubmit={handleFormSubmit}
@@ -807,20 +830,22 @@ const SmallGroupReport = () => {
         </div>
       </div>
 
-      <ConfirmSubmitDialog
-        open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
-        onConfirm={handleConfirmSubmit}
-        reportType={reportType}
-        isReported={isReported}
-        selectedGarden={selectedGarden}
-        selectedDate={selectedDate}
-        gatheringDate={gatheringDate}
-        gatheringTime={gatheringTime}
-        gatheringLocation={gatheringLocation}
-        attendees={attendees}
-        absentees={absentees}
-      />
+      {confirmOpen && (
+        <ConfirmSubmitDialog
+          open={confirmOpen}
+          onClose={() => setConfirmOpen(false)}
+          onConfirm={handleConfirmSubmit}
+          reportType={reportType}
+          isReported={isReported}
+          selectedGarden={selectedGarden}
+          selectedDate={selectedDate}
+          gatheringDate={gatheringDate}
+          gatheringTime={gatheringTime}
+          gatheringLocation={gatheringLocation}
+          attendees={attendees}
+          absentees={absentees}
+        />
+      )}
     </>
   );
 };
