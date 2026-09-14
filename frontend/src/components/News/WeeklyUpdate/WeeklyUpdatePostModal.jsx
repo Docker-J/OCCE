@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useActionState } from "react";
 import { Button, CircularProgress } from "@mui/material";
 import ButtonDatePicker from "../../../common/ButtonDatePicker";
 import { Document, Page } from "react-pdf";
@@ -50,10 +50,8 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
     return () => window.removeEventListener("resize", updateDimensions); // Clean up
   }, []);
 
-  const uploadBulletin = async () => {
+  const [, formAction, isPending] = useActionState(async () => {
     try {
-      setLoading(true);
-
       const form = new FormData();
       form.append("pdfs", weeklyUpdate);
       form.append("pdfs", memberWeeklyUpdate);
@@ -63,18 +61,16 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
       openSnackbar("success", "Uploaded Succesfully!");
       setParentDate(selectedDate);
       handleClose();
+      return { success: true };
     } catch (error) {
-      console.log(error);
+      console.error(error);
       openSnackbar(
         "error",
         "Error Occured. Please contact to the administrator."
       );
-    } finally {
-      setLoading(false);
+      return { error };
     }
-  };
-
-  const [loading, setLoading] = useState(false);
+  }, null);
 
   return (
     <CustomModal
@@ -83,7 +79,7 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
       maxHeight="85vh"
       maxWidth="1300px"
     >
-      {loading ? (
+      {isPending ? (
         <CircularProgress />
       ) : (
         <>
@@ -170,8 +166,8 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
           <Button
             fullWidth
             variant="outlined"
-            onClick={uploadBulletin}
-            disabled={!weeklyUpdate || !memberWeeklyUpdate}
+            onClick={formAction}
+            disabled={isPending || !weeklyUpdate || !memberWeeklyUpdate}
             sx={{ mt: "1.5em" }}
           >
             Upload

@@ -1,5 +1,5 @@
 import { Button, CircularProgress, TextField } from "@mui/material";
-import { useState } from "react";
+import { useState, useActionState } from "react";
 import update from "immutability-helper";
 
 import useSnackbar from "../../../util/useSnackbar";
@@ -35,13 +35,13 @@ const AlbumUploadModal = ({ isOpen, onClose }) => {
     });
   };
 
-  const uploadImages = async () => {
+  const [, formAction, isPending] = useActionState(async () => {
     const form = new FormData();
 
     form.append("title", title);
     form.append("date", date.toISOString());
 
-    filesToUpload.forEach(async (image) => {
+    for (const image of filesToUpload) {
       try {
         const compressedImage =
           image.size >= 10 * 1024 * 1024
@@ -55,27 +55,24 @@ const AlbumUploadModal = ({ isOpen, onClose }) => {
       } catch (error) {
         console.error("Image compression failed:", error);
       }
-    });
+    }
 
     form.append("cover", coverImage);
 
     try {
-      setLoading(true);
-
       await uploadAlbum(form);
-
       openSnackbar("success", "Uploaded Succesfully!");
       handleClose();
+      return { success: true };
     } catch (error) {
-      console.log(error);
+      console.error(error);
       openSnackbar(
         "error",
         "Error Occured. Please contact to the administrator."
       );
-    } finally {
-      setLoading(false);
+      return { error };
     }
-  };
+  }, null);
 
   const removeAllImage = () => {
     imagesPreview.forEach((preview) => URL.revokeObjectURL(preview));
@@ -83,19 +80,15 @@ const AlbumUploadModal = ({ isOpen, onClose }) => {
     setImagesPreview([]);
   };
 
-  const [loading, setLoading] = useState(false);
-
   return (
     <CustomModal
       isOpen={isOpen}
       onClose={handleClose}
       height="85vh"
       maxWidth="1300px"
-      loading={loading}
-      // aria-labelledby="modal-modal-title"
-      // aria-describedby="modal-modal-description"
+      loading={isPending}
     >
-      {loading ? (
+      {isPending ? (
         <CircularProgress />
       ) : (
         <>
@@ -139,8 +132,8 @@ const AlbumUploadModal = ({ isOpen, onClose }) => {
           <div style={{ display: "flex", marginTop: "1.5em", width: "100%" }}>
             <Button
               variant="outlined"
-              disabled={title.trim() === "" || filesToUpload.length <= 0}
-              onClick={uploadImages}
+              disabled={isPending || title.trim() === "" || filesToUpload.length <= 0}
+              onClick={formAction}
               fullWidth
             >
               Submit
@@ -148,7 +141,7 @@ const AlbumUploadModal = ({ isOpen, onClose }) => {
             <Button
               variant="outlined"
               onClick={removeAllImage}
-              disabled={filesToUpload.length <= 0}
+              disabled={isPending || filesToUpload.length <= 0}
               fullWidth
             >
               Clear All

@@ -1,5 +1,5 @@
 import { Button, CircularProgress, TextField } from "@mui/material";
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState, useActionState, lazy, Suspense } from "react";
 
 const TextEditor = lazy(() => import("./TextEditor"));
 import useSnackbar from "../../../util/useSnackbar";
@@ -16,28 +16,25 @@ const AnnouncementPostModal = ({
 }) => {
   const { openSnackbar } = useSnackbar();
 
-  const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState(origTitle);
   const [body, setBody] = useState(origBody);
 
-  const onSubmit = async () => {
-    setLoading(true);
+  const [, formAction, isPending] = useActionState(async () => {
     try {
       await postAnnouncement(id, title, body);
-
       revalidator();
       openSnackbar("success", "The announcement is successfully posted!");
       handleClose();
+      return { success: true };
     } catch (error) {
-      console.log(error);
+      console.error(error);
       openSnackbar(
         "error",
         "Error Occured. Please contact to the administrator."
       );
-    } finally {
-      setLoading(false);
+      return { error };
     }
-  };
+  }, null);
 
   useEffect(() => {
     setTitle(origTitle);
@@ -57,7 +54,7 @@ const AnnouncementPostModal = ({
       maxWidth="1300px"
       maxHeight="90svh"
     >
-      {loading ? (
+      {isPending ? (
         <CircularProgress />
       ) : (
         <>
@@ -79,8 +76,8 @@ const AnnouncementPostModal = ({
 
           <Button
             variant="outlined"
-            disabled={title.trim() === "" || body.trim() === ""}
-            onClick={onSubmit}
+            disabled={isPending || title.trim() === "" || body.trim() === ""}
+            onClick={formAction}
             fullWidth
             sx={{ marginTop: "1.5em" }}
           >

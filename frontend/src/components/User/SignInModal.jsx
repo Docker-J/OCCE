@@ -37,7 +37,7 @@ const SignInModal = ({ isOpen, onClose }) => {
       accessToken: result.accessToken,
       idToken: result.idToken,
       groups: [result.group],
-      remember: result.remember ?? formik.values.remember ?? false,
+      remember: result.remember ?? getValues("remember") ?? false,
     };
 
     setToken(data);

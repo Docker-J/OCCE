@@ -1,5 +1,5 @@
 import { Button, CircularProgress } from "@mui/material";
-import { useState } from "react";
+import { useState, useActionState } from "react";
 import update from "immutability-helper";
 
 import { format } from "date-fns";
@@ -35,7 +35,7 @@ const MeditationONModal = ({ isOpen, onClose, onSuccess }) => {
     });
   };
 
-  const onSubmit = async () => {
+  const [, formAction, isPending] = useActionState(async () => {
     const form = new FormData();
 
     filesToUpload.forEach((image) => {
@@ -43,8 +43,6 @@ const MeditationONModal = ({ isOpen, onClose, onSuccess }) => {
     });
 
     try {
-      setLoading(true);
-
       const dateString = format(selectedDate, "yyyy-MM-dd");
       const edmontonTimestamp = fromZonedTime(
         `${dateString} 00:00`,
@@ -57,16 +55,16 @@ const MeditationONModal = ({ isOpen, onClose, onSuccess }) => {
         onSuccess();
       }
       handleClose();
+      return { success: true };
     } catch (error) {
       console.error("MeditationON upload error:", error);
       openSnackbar(
         "error",
         error.message || "Error Occured. Please contact to the administrator."
       );
-    } finally {
-      setLoading(false);
+      return { error };
     }
-  };
+  }, null);
 
   const removeAllImage = () => {
     imagesPreview.forEach((preview) => URL.revokeObjectURL(preview));
@@ -74,18 +72,14 @@ const MeditationONModal = ({ isOpen, onClose, onSuccess }) => {
     setImagesPreview([]);
   };
 
-  const [loading, setLoading] = useState(false);
-
   return (
     <CustomModal
       isOpen={isOpen}
       onClose={handleClose}
       maxHeight="85vh"
       maxWidth="1300px"
-      // aria-labelledby="modal-modal-title"
-      // aria-describedby="modal-modal-description"
     >
-      {loading ? (
+      {isPending ? (
         <CircularProgress />
       ) : (
         <>
@@ -117,8 +111,8 @@ const MeditationONModal = ({ isOpen, onClose, onSuccess }) => {
           <div style={{ display: "flex", marginTop: "1.5em", width: "100%" }}>
             <Button
               variant="outlined"
-              disabled={filesToUpload.length <= 0}
-              onClick={onSubmit}
+              disabled={isPending || filesToUpload.length <= 0}
+              onClick={formAction}
               fullWidth
             >
               Submit
@@ -126,7 +120,7 @@ const MeditationONModal = ({ isOpen, onClose, onSuccess }) => {
             <Button
               variant="outlined"
               onClick={removeAllImage}
-              disabled={filesToUpload.length <= 0}
+              disabled={isPending || filesToUpload.length <= 0}
               fullWidth
             >
               Clear All

@@ -44,7 +44,7 @@ const SignUpConfirmModal = ({ phone, isOpen, onClose }) => {
     handleClose();
   };
 
-  const confirmFail = () => {
+  const confirmFail = (error) => {
     let message;
     switch (error) {
       case "CodeMismatchException":

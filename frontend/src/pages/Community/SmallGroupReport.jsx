@@ -59,10 +59,12 @@ const SmallGroupReport = () => {
   const submit = useSubmit();
   const actionData = useActionData();
   const navigation = useNavigation();
-  const isSubmitting = navigation.state === "submitting";
+  const submitting = navigation.state === "submitting";
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const reportType = searchParams.get("type") || "sunday";
+  const initialType =
+    searchParams.get("type") === "gathering" ? "gathering" : "sunday";
+  const [reportType, setReportType] = useState(initialType);
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [gatheringHistoryLoading, setGatheringHistoryLoading] = useState(false);
