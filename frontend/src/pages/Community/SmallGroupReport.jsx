@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import useAuthStore from "../../store/useAuthStore";
 import {
   Typography,
@@ -59,26 +59,26 @@ const SmallGroupReport = () => {
   const submit = useSubmit();
   const actionData = useActionData();
   const navigation = useNavigation();
-  const submitting = navigation.state === "submitting";
-  const [confirmOpen, setConfirmOpen] = useState(false);
+  const isSubmitting = navigation.state === "submitting";
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialType =
-    searchParams.get("type") === "gathering" ? "gathering" : "sunday";
-  const [reportType, setReportType] = useState(initialType);
+  const reportType = searchParams.get("type") || "sunday";
 
-  const getTodayKST = () => {
-    const d = new Date();
-    const kstOffset = 9 * 60 * 60 * 1000;
-    const kstDate = new Date(d.getTime() + kstOffset);
-    return kstDate.toISOString().split("T")[0];
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [gatheringHistoryLoading, setGatheringHistoryLoading] = useState(false);
+
+  const handleOpenConfirm = () => {
+    setConfirmOpen(true);
+  };
+  const handleCloseConfirm = () => {
+    setConfirmOpen(false);
   };
 
   const [gatheringDate, setGatheringDate] = useState(new Date());
-  const gatheringDateStr = useMemo(() => {
-    if (!gatheringDate || isNaN(new Date(gatheringDate).getTime())) return "";
-    return format(gatheringDate, "yyyy-MM-dd");
-  }, [gatheringDate]);
+  const gatheringDateStr =
+    !gatheringDate || isNaN(new Date(gatheringDate).getTime())
+      ? ""
+      : format(gatheringDate, "yyyy-MM-dd");
   const [gatheringTime, setGatheringTime] = useState(() => {
     const now = new Date();
     const defaultTime = new Date();
@@ -90,17 +90,12 @@ const SmallGroupReport = () => {
   const [gatheringHistoryDates, setGatheringHistoryDates] = useState([]);
 
   // Determine if the user has unsaved inputs in the current form
-  const isDirty = useMemo(() => {
-    if (reportType === "gathering") {
-      return (
-        gatheringNotes.trim().length > 0 || gatheringLocation.trim().length > 0
-      );
-    } else {
-      return Object.values(absenceReasons).some(
-        (reason) => (reason || "").trim().length > 0,
-      );
-    }
-  }, [reportType, gatheringNotes, gatheringLocation, absenceReasons]);
+  const isDirty =
+    reportType === "gathering"
+      ? gatheringNotes.trim().length > 0 || gatheringLocation.trim().length > 0
+      : Object.values(absenceReasons).some(
+          (reason) => (reason || "").trim().length > 0,
+        );
 
   // Prevent accidental page refresh / tab close when form has unsaved inputs
   useEffect(() => {
@@ -154,7 +149,7 @@ const SmallGroupReport = () => {
   };
 
   // Generate recent Sundays for the date dropdown
-  const recentSundays = useMemo(() => getRecentSundays(), []);
+  const [recentSundays] = useState(() => getRecentSundays());
 
   useEffect(() => {
     if (recentSundays.length > 0) {
@@ -399,17 +394,9 @@ const SmallGroupReport = () => {
     }));
   };
 
-  const membersList = useMemo(() => {
-    return gardens[selectedGarden] || [];
-  }, [selectedGarden, gardens]);
-
-  const attendees = useMemo(() => {
-    return membersList.filter((m) => checkedMembers[m] !== false);
-  }, [membersList, checkedMembers]);
-
-  const absentees = useMemo(() => {
-    return membersList.filter((m) => checkedMembers[m] === false);
-  }, [membersList, checkedMembers]);
+  const membersList = gardens[selectedGarden] || [];
+  const attendees = membersList.filter((m) => checkedMembers[m] !== false);
+  const absentees = membersList.filter((m) => checkedMembers[m] === false);
 
   const handleFormSubmit = () => {
     if (!selectedGarden) {

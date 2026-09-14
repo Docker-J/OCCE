@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { useState } from "react";
 import {
   APIProvider,
   AdvancedMarker,
@@ -17,7 +17,7 @@ const defaultCenter = {
   lng: -113.47254286783863,
 };
 
-const GoogleMap = memo(() => {
+const GoogleMap = () => {
   const [markerRef, marker] = useAdvancedMarkerRef();
 
   const [infowindowShown, setInfowindowShown] = useState(false);
@@ -71,6 +71,6 @@ const GoogleMap = memo(() => {
       </APIProvider>
     </div>
   );
-});
+};
 
 export default GoogleMap;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Card,
@@ -64,55 +64,51 @@ const AttendanceDashboard = () => {
   const [sortField, setSortField] = useState("rate");
   const [sortDirection, setSortDirection] = useState("desc");
 
-  const fetchData = useCallback(
-    async (isManualRefresh = false) => {
-      if (isManualRefresh) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
-      setErrorMsg("");
+  const fetchData = async (isManualRefresh = false) => {
+    if (isManualRefresh) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
+    setErrorMsg("");
 
-      try {
-        const res = await getAdminAttendanceStats(isManualRefresh);
-        setData(res);
-        if (res.weeks && res.weeks.length > 0) {
-          setSelectedDate((prev) => {
-            const exists = res.weeks.some((w) => w.date === prev);
-            return exists ? prev : res.weeks[0].date;
-          });
-        }
-        if (isManualRefresh) {
-          openSnackbar("success", "출석 통계를 새로고침했습니다.");
-        }
-      } catch (err) {
-        console.error("Failed to fetch attendance stats:", err);
-        const msg =
-          err.response?.data?.message ||
-          "출석 통계를 불러오는 중 오류가 발생했습니다.";
-        setErrorMsg(msg);
-        openSnackbar("error", msg);
-      } finally {
-        setLoading(false);
-        setRefreshing(false);
+    try {
+      const res = await getAdminAttendanceStats(isManualRefresh);
+      setData(res);
+      if (res.weeks && res.weeks.length > 0) {
+        setSelectedDate((prev) => {
+          const exists = res.weeks.some((w) => w.date === prev);
+          return exists ? prev : res.weeks[0].date;
+        });
       }
-    },
-    [openSnackbar],
-  );
+      if (isManualRefresh) {
+        openSnackbar("success", "출석 통계를 새로고침했습니다.");
+      }
+    } catch (err) {
+      console.error("Failed to fetch attendance stats:", err);
+      const msg =
+        err.response?.data?.message ||
+        "출석 통계를 불러오는 중 오류가 발생했습니다.";
+      setErrorMsg(msg);
+      openSnackbar("error", msg);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, []);
 
   const handleDateChange = (newDate) => {
     setSelectedDate(newDate);
   };
 
   const weeks = data?.weeks || [];
-  const availableDates = useMemo(() => weeks.map((w) => w.date), [weeks]);
-  const currentWeek = useMemo(() => {
-    return weeks.find((w) => w.date === selectedDate) || weeks[0] || null;
-  }, [weeks, selectedDate]);
+  const availableDates = weeks.map((w) => w.date);
+  const currentWeek =
+    weeks.find((w) => w.date === selectedDate) || weeks[0] || null;
 
   const currentIndex = availableDates.indexOf(selectedDate);
   const hasPrevious = currentIndex < availableDates.length - 1; // older date
@@ -140,24 +136,19 @@ const AttendanceDashboard = () => {
   };
 
   // Sorted Garden Stats for currently selected week
-  const sortedGardenStats = useMemo(() => {
-    if (!currentWeek?.gardenStats) return [];
-    const list = [...currentWeek.gardenStats];
+  const sortedGardenStats = currentWeek?.gardenStats
+    ? [...currentWeek.gardenStats].sort((a, b) => {
+        let valA = a[sortField];
+        let valB = b[sortField];
 
-    list.sort((a, b) => {
-      let valA = a[sortField];
-      let valB = b[sortField];
+        if (typeof valA === "string") {
+          const cmp = valA.localeCompare(valB, "ko");
+          return sortDirection === "asc" ? cmp : -cmp;
+        }
 
-      if (typeof valA === "string") {
-        const cmp = valA.localeCompare(valB, "ko");
-        return sortDirection === "asc" ? cmp : -cmp;
-      }
-
-      return sortDirection === "asc" ? valA - valB : valB - valA;
-    });
-
-    return list;
-  }, [currentWeek?.gardenStats, sortField, sortDirection]);
+        return sortDirection === "asc" ? valA - valB : valB - valA;
+      })
+    : [];
 
   if (loading && !data) {
     return (

@@ -6,7 +6,6 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import "./CustomCarousel.css";
-import { memo } from "react";
 
 const Indicator = ({ isSelected, clickHandler }) => {
   return (
@@ -25,7 +24,7 @@ const Indicator = ({ isSelected, clickHandler }) => {
   );
 };
 
-const PrevArrow = memo(({ clickHandler, hasPrev }) => {
+const PrevArrow = ({ clickHandler, hasPrev }) => {
   return (
     <Avatar
       component={Paper}
@@ -49,9 +48,9 @@ const PrevArrow = memo(({ clickHandler, hasPrev }) => {
       />
     </Avatar>
   );
-});
+};
 
-const NextArrow = memo(({ clickHandler, hasNext }) => {
+const NextArrow = ({ clickHandler, hasNext }) => {
   return (
     <Avatar
       component={Paper}
@@ -75,7 +74,7 @@ const NextArrow = memo(({ clickHandler, hasNext }) => {
       />
     </Avatar>
   );
-});
+};
 
 const CustomCarousel = (props) => {
   return (

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { ModalsStateContext, ModalsDispatchContext } from "./ModalsContext";
 
 const ModalsProvider = ({ children }) => {
@@ -25,16 +25,14 @@ const ModalsProvider = ({ children }) => {
     });
   };
 
-  console.log(openedModals);
-
-  const dispatch = useMemo(() => ({ open, close }), []);
+  const dispatch = { open, close };
 
   return (
-    <ModalsDispatchContext.Provider value={dispatch}>
-      <ModalsStateContext.Provider value={openedModals}>
+    <ModalsDispatchContext value={dispatch}>
+      <ModalsStateContext value={openedModals}>
         {children}
-      </ModalsStateContext.Provider>
-    </ModalsDispatchContext.Provider>
+      </ModalsStateContext>
+    </ModalsDispatchContext>
   );
 };
 

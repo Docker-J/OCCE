@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   SnackBarDispatchContext,
   SnackBarStateContext,
@@ -14,16 +14,14 @@ const SnackbarProvider = ({ children }) => {
     setOpenedSnackBar({ isOpen: false });
   };
 
-  console.log(openedSnackBar);
-
-  const dispatch = useMemo(() => ({ open, close }), []);
+  const dispatch = { open, close };
 
   return (
-    <SnackBarDispatchContext.Provider value={dispatch}>
-      <SnackBarStateContext.Provider value={openedSnackBar}>
+    <SnackBarDispatchContext value={dispatch}>
+      <SnackBarStateContext value={openedSnackBar}>
         {children}
-      </SnackBarStateContext.Provider>
-    </SnackBarDispatchContext.Provider>
+      </SnackBarStateContext>
+    </SnackBarDispatchContext>
   );
 };
 

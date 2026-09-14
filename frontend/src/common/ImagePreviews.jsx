@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
@@ -11,61 +10,52 @@ const ImagePreviews = ({
   setImagesPreview,
   setFilesToUpload,
 }) => {
-  const movePhoto = useCallback(
-    (dragIndex, hoverIndex) => {
-      setFilesToUpload((prev) =>
-        update(prev, {
-          $splice: [
-            [dragIndex, 1],
-            [hoverIndex, 0, prev[dragIndex]],
-          ],
-        })
-      );
-      setImagesPreview((prev) =>
-        update(prev, {
-          $splice: [
-            [dragIndex, 1],
-            [hoverIndex, 0, prev[dragIndex]],
-          ],
-        })
-      );
-    },
-    [setFilesToUpload, setImagesPreview]
-  );
+  const movePhoto = (dragIndex, hoverIndex) => {
+    setFilesToUpload((prev) =>
+      update(prev, {
+        $splice: [
+          [dragIndex, 1],
+          [hoverIndex, 0, prev[dragIndex]],
+        ],
+      })
+    );
+    setImagesPreview((prev) =>
+      update(prev, {
+        $splice: [
+          [dragIndex, 1],
+          [hoverIndex, 0, prev[dragIndex]],
+        ],
+      })
+    );
+  };
 
-  const removeImage = useCallback(
-    (i) => {
-      URL.revokeObjectURL(imagesPreview[i]);
-      setFilesToUpload((prev) =>
-        update(prev, {
-          $splice: [[i, 1]],
-        })
-      );
-      setImagesPreview((prev) =>
-        update(prev, {
-          $splice: [[i, 1]],
-        })
-      );
-    },
-    [imagesPreview, setFilesToUpload, setImagesPreview]
-  );
+  const removeImage = (i) => {
+    URL.revokeObjectURL(imagesPreview[i]);
+    setFilesToUpload((prev) =>
+      update(prev, {
+        $splice: [[i, 1]],
+      })
+    );
+    setImagesPreview((prev) =>
+      update(prev, {
+        $splice: [[i, 1]],
+      })
+    );
+  };
 
-  const renderCard = useCallback(
-    (image, index) => {
-      return (
-        <ImagePreviewCard
-          key={index}
-          index={index}
-          image={image}
-          cover={index === cover}
-          setCoverImage={setCoverImage}
-          movePhoto={movePhoto}
-          removeImage={removeImage}
-        />
-      );
-    },
-    [cover, movePhoto, removeImage, setCoverImage]
-  );
+  const renderCard = (image, index) => {
+    return (
+      <ImagePreviewCard
+        key={index}
+        index={index}
+        image={image}
+        cover={index === cover}
+        setCoverImage={setCoverImage}
+        movePhoto={movePhoto}
+        removeImage={removeImage}
+      />
+    );
+  };
 
   return (
     <DndProvider backend={HTML5Backend}>

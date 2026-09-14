@@ -76,8 +76,10 @@
     ]
   },
   "devDependencies": {
+    "@rolldown/plugin-babel": "^0.2.4",
     "@vitejs/plugin-basic-ssl": "^2.3.0",
     "@vitejs/plugin-react": "^6.0.4",
+    "babel-plugin-react-compiler": "^1.0.0",
     "lightningcss": "^1.33.0",
     "vite": "^8.2.2",
     "vite-bundle-analyzer": "^1.3.9",

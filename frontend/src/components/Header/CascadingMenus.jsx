@@ -9,7 +9,7 @@ import {
   bindTrigger,
   usePopupState,
 } from "material-ui-popup-state/hooks";
-import { createContext, useCallback, use, useMemo } from "react";
+import { createContext, use } from "react";
 import { Link } from "react-router";
 
 const CascadingContext = createContext({
@@ -19,47 +19,38 @@ const CascadingContext = createContext({
 
 export const CascadingMenu = ({ popupState, ...props }) => {
   const { rootPopupState } = use(CascadingContext);
-  const context = useMemo(
-    () => ({
-      rootPopupState: rootPopupState || popupState,
-      popupState: popupState,
-    }),
-    [rootPopupState, popupState],
-  );
+  const context = {
+    rootPopupState: rootPopupState || popupState,
+    popupState: popupState,
+  };
 
   return (
-    <CascadingContext.Provider value={context}>
+    <CascadingContext value={context}>
       <Menu {...props} {...bindMenu(popupState)} />
-    </CascadingContext.Provider>
+    </CascadingContext>
   );
 };
 
 export const CascadingHoverMenu = ({ popupState, ...props }) => {
   const { rootPopupState } = use(CascadingContext);
-  const context = useMemo(
-    () => ({
-      rootPopupState: rootPopupState || popupState,
-      parentPopupState: popupState,
-    }),
-    [rootPopupState, popupState],
-  );
+  const context = {
+    rootPopupState: rootPopupState || popupState,
+    parentPopupState: popupState,
+  };
 
   return (
-    <CascadingContext.Provider value={context}>
+    <CascadingContext value={context}>
       <HoverMenu {...props} {...bindMenu(popupState)} />
-    </CascadingContext.Provider>
+    </CascadingContext>
   );
 };
 
 export const CascadingMenuItem = (props) => {
   const { rootPopupState } = use(CascadingContext);
   if (!rootPopupState) throw new Error("must be used inside a CascadingMenu");
-  const handleClick = useCallback(
-    (event) => {
-      rootPopupState.close(event);
-    },
-    [rootPopupState],
-  );
+  const handleClick = (event) => {
+    rootPopupState.close(event);
+  };
 
   return (
     <MenuItem

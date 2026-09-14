@@ -1,26 +1,23 @@
-import { memo, useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import useAuthStore from "../store/useAuthStore";
 import { refreshTokenSignIn } from "../api/user";
 
-const UserManager = memo(() => {
+const UserManager = () => {
   const setToken = useAuthStore((state) => state.setToken);
   const deleteToken = useAuthStore((state) => state.deleteToken);
 
-  const signInSuccess = useCallback(
-    (result) => {
-      const data = {
-        accessToken: result.accessToken,
-        idToken: result.idToken,
-        groups: [result.group],
-        remember: result.remember ?? false,
-      };
+  const signInSuccess = (result) => {
+    const data = {
+      accessToken: result.accessToken,
+      idToken: result.idToken,
+      groups: [result.group],
+      remember: result.remember ?? false,
+    };
 
-      setToken(data);
-    },
-    [setToken]
-  );
+    setToken(data);
+  };
 
-  const signInfail = useCallback(() => {
+  const signInfail = () => {
     deleteToken();
     try {
       sessionStorage.removeItem("refreshToken");
@@ -28,7 +25,7 @@ const UserManager = memo(() => {
       localStorage.removeItem("remember");
       localStorage.removeItem("hasSession");
     } catch {}
-  }, [deleteToken]);
+  };
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -56,7 +53,7 @@ const UserManager = memo(() => {
     );
 
     return () => clearTimeout(timeoutId);
-  }, [signInSuccess, signInfail]);
-});
+  }, []);
+};
 
 export default UserManager;

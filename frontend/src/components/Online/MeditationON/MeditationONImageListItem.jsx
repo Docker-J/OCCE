@@ -1,5 +1,4 @@
 import { ImageListItem } from "@mui/material";
-import { memo } from "react";
 import { Link } from "react-router";
 
 const MeditationONComp = ({ posts }) => {
@@ -14,4 +13,4 @@ const MeditationONComp = ({ posts }) => {
   ));
 };
 
-export const MemoizedMeditationONComp = memo(MeditationONComp);
+export const MemoizedMeditationONComp = MeditationONComp;

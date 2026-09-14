@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import react, { reactCompilerPreset } from "@vitejs/plugin-react";
+import babel from "@rolldown/plugin-babel";
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import { analyzer } from "vite-bundle-analyzer";
 
@@ -55,9 +56,14 @@ export default defineConfig(() => {
       },
     },
 
-    plugins: [react(), process.env.ANALYZE && analyzer(), basicSsl()].filter(
-      Boolean,
-    ),
+    plugins: [
+      babel({
+        presets: [reactCompilerPreset()],
+      }),
+      react(),
+      process.env.ANALYZE && analyzer(),
+      basicSsl(),
+    ].filter(Boolean),
 
     legacy: {
       inconsistentCjsInterop: true,

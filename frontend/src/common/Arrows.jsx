@@ -1,11 +1,9 @@
-import { memo } from "react";
-
 import { Avatar, Paper } from "@mui/material";
 
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
-export const PrevArrow = memo(({ onClick }) => {
+export const PrevArrow = ({ onClick }) => {
   return (
     <Avatar
       component={Paper}
@@ -29,9 +27,9 @@ export const PrevArrow = memo(({ onClick }) => {
       />
     </Avatar>
   );
-});
+};
 
-export const NextArrow = memo(({ onClick }) => {
+export const NextArrow = ({ onClick }) => {
   return (
     <Avatar
       component={Paper}
@@ -55,4 +53,4 @@ export const NextArrow = memo(({ onClick }) => {
       />
     </Avatar>
   );
-});
+};

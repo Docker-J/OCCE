@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import useAuthStore from "../../store/useAuthStore";
 import useSnackbar from "../../util/useSnackbar";
 import useModals from "../../util/useModal";
@@ -128,38 +128,35 @@ const MemberManagement = () => {
   const isFetchingRef = useRef(false);
 
   // Fetch users from backend
-  const fetchUsers = useCallback(
-    async (isManualRefresh = false) => {
-      if (!authenticated || !admin) return;
-      if (isFetchingRef.current) return;
-      isFetchingRef.current = true;
+  const fetchUsers = async (isManualRefresh = false) => {
+    if (!authenticated || !admin) return;
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
 
+    if (isManualRefresh) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
+
+    try {
+      const data = await getAdminUsers();
+      setUsers(data.users || []);
       if (isManualRefresh) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
+        openSnackbar("success", "교인 목록을 새로고침했습니다.");
       }
-
-      try {
-        const data = await getAdminUsers();
-        setUsers(data.users || []);
-        if (isManualRefresh) {
-          openSnackbar("success", "교인 목록을 새로고침했습니다.");
-        }
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-        openSnackbar(
-          "error",
-          error.response?.data?.message || "교인 목록을 불러오지 못했습니다.",
-        );
-      } finally {
-        setLoading(false);
-        setRefreshing(false);
-        isFetchingRef.current = false;
-      }
-    },
-    [authenticated, admin, openSnackbar],
-  );
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+      openSnackbar(
+        "error",
+        error.response?.data?.message || "교인 목록을 불러오지 못했습니다.",
+      );
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+      isFetchingRef.current = false;
+    }
+  };
 
   useEffect(() => {
     if (authInitialized && authenticated && admin) {
@@ -302,8 +299,8 @@ const MemberManagement = () => {
   };
 
   // Filtered & Sorted Users List
-  const filteredUsers = useMemo(() => {
-    const list = users.filter((u) => {
+  const filteredUsers = users
+    .filter((u) => {
       // 1. Search filter
       const search = searchTerm.trim().toLowerCase();
       const nameMatch = (u.name || "").toLowerCase().includes(search);
@@ -329,33 +326,25 @@ const MemberManagement = () => {
       if (notificationFilter === "disabled" && u.hasNotification) return false;
 
       return true;
-    });
-
-    // 5. Sort by name
-    list.sort((a, b) => {
+    })
+    .sort((a, b) => {
       const nameA = (a.name || "").trim();
       const nameB = (b.name || "").trim();
       const cmp = nameA.localeCompare(nameB, "ko");
       return sortDirection === "asc" ? cmp : -cmp;
     });
 
-    return list;
-  }, [users, searchTerm, roleFilter, gardenFilter, notificationFilter, sortDirection]);
-
   // Paginated users for table display
-  const paginatedUsers = useMemo(() => {
-    const start = page * rowsPerPage;
-    return filteredUsers.slice(start, start + rowsPerPage);
-  }, [filteredUsers, page, rowsPerPage]);
+  const start = page * rowsPerPage;
+  const paginatedUsers = filteredUsers.slice(start, start + rowsPerPage);
 
   // Aggregate Metrics
-  const metrics = useMemo(() => {
-    const total = users.length;
-    const staffCount = users.filter((u) => u.isStaff).length;
-    const keepers = users.filter((u) => u.isGardenKeeper).length;
-    const notificationEnabled = users.filter((u) => u.hasNotification).length;
-    return { total, staffCount, keepers, notificationEnabled };
-  }, [users]);
+  const metrics = {
+    total: users.length,
+    staffCount: users.filter((u) => u.isStaff).length,
+    keepers: users.filter((u) => u.isGardenKeeper).length,
+    notificationEnabled: users.filter((u) => u.hasNotification).length,
+  };
 
   const handleLoginClick = async () => {
     const { default: SignInModal } = await import(

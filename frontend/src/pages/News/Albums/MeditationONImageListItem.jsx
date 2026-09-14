@@ -4,11 +4,10 @@ import {
   ListSubheader,
   Typography,
 } from "@mui/material";
-import { memo } from "react";
 import { Link } from "react-router";
 import { format } from "date-fns";
 
-const MeditationONComp = ({ posts, cols }) => {
+export const MeditationONComp = ({ posts, cols }) => {
   const grouped = {};
   let currentYear = null;
   for (let post of posts) {
@@ -58,4 +57,4 @@ const MeditationONComp = ({ posts, cols }) => {
     ));
 };
 
-export const MemoizedMeditationONComp = memo(MeditationONComp);
+export const MemoizedMeditationONComp = MeditationONComp;
