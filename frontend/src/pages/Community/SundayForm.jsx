@@ -1,3 +1,5 @@
+import { useState, useEffect, useRef } from "react";
+import { flushSync } from "react-dom";
 import {
   Card,
   CardContent,
@@ -14,6 +16,58 @@ import GardenSelector from "./GardenSelector";
 import AttendanceChecklist from "./AttendanceChecklist";
 import ReportStatusBanner from "./ReportStatusBanner";
 import ReportSubmitButton from "./ReportSubmitButton";
+
+const AbsenceReasonField = ({ name, value, onChange, disabled }) => {
+  const [localVal, setLocalVal] = useState(value || "");
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    setLocalVal(value || "");
+  }, [value]);
+
+  const handleChange = (e) => {
+    const newVal = e.target.value;
+    setLocalVal(newVal);
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = setTimeout(() => {
+      onChange(name, newVal);
+    }, 300);
+  };
+
+  const handleBlur = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    if (localVal !== (value || "")) {
+      flushSync(() => {
+        onChange(name, localVal);
+      });
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <TextField
+      fullWidth
+      size="small"
+      disabled={disabled}
+      placeholder="예: 개인 여행, 감기 몸살 등"
+      value={localVal}
+      onChange={handleChange}
+      onBlur={handleBlur}
+    />
+  );
+};
 
 const SundayForm = ({
   gardens,
@@ -151,15 +205,11 @@ const SundayForm = ({
                   >
                     {name}
                   </Typography>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    disabled={checkingReport}
-                    placeholder="예: 개인 여행, 감기 몸살 등"
+                  <AbsenceReasonField
+                    name={name}
                     value={absenceReasons[name] || ""}
-                    onChange={(e) =>
-                      handleAbsenceReasonChange(name, e.target.value)
-                    }
+                    disabled={checkingReport}
+                    onChange={handleAbsenceReasonChange}
                   />
                 </Grid>
               ))}

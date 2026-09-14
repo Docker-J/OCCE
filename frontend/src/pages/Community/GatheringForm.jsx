@@ -1,3 +1,5 @@
+import { useState, useEffect, useRef } from "react";
+import { flushSync } from "react-dom";
 import {
   Box,
   Card,
@@ -23,6 +25,59 @@ import GardenSelector from "./GardenSelector";
 import AttendanceChecklist from "./AttendanceChecklist";
 import ReportStatusBanner from "./ReportStatusBanner";
 import ReportSubmitButton from "./ReportSubmitButton";
+
+const GatheringNotesField = ({ value, onChange, disabled }) => {
+  const [localVal, setLocalVal] = useState(value || "");
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    setLocalVal(value || "");
+  }, [value]);
+
+  const handleChange = (e) => {
+    const newVal = e.target.value;
+    setLocalVal(newVal);
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = setTimeout(() => {
+      onChange(newVal);
+    }, 300);
+  };
+
+  const handleBlur = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    if (localVal !== (value || "")) {
+      flushSync(() => {
+        onChange(localVal);
+      });
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <TextField
+      fullWidth
+      multiline
+      rows={4}
+      disabled={disabled}
+      placeholder="모임의 주요 나눔 내용이나 함께 나누고 싶은 기도제목을 적어주세요."
+      value={localVal}
+      onChange={handleChange}
+      onBlur={handleBlur}
+    />
+  );
+};
 
 const GatheringForm = ({
   gardens,
@@ -270,14 +325,10 @@ const GatheringForm = ({
           >
             모임 내용 및 나눔/기도제목
           </Typography>
-          <TextField
-            fullWidth
-            multiline
-            rows={4}
+          <GatheringNotesField
             disabled={checkingReport}
-            placeholder="모임의 주요 나눔 내용이나 함께 나누고 싶은 기도제목을 적어주세요."
             value={gatheringNotes}
-            onChange={(e) => setGatheringNotes(e.target.value)}
+            onChange={setGatheringNotes}
           />
         </CardContent>
       </Card>

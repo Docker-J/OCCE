@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useDeferredValue } from "react";
 import useAuthStore from "../../store/useAuthStore";
 import useSnackbar from "../../util/useSnackbar";
 import useModals from "../../util/useModal";
@@ -102,6 +102,8 @@ const MemberManagement = () => {
 
   // Search, Filter, Sort and Pagination states
   const [searchTerm, setSearchTerm] = useState("");
+  const deferredSearchTerm = useDeferredValue(searchTerm);
+  const isSearchPending = searchTerm !== deferredSearchTerm;
   const [roleFilter, setRoleFilter] = useState("all"); // 'all' | 'staff' | 'keeper' | 'member'
   const [gardenFilter, setGardenFilter] = useState("all");
   const [notificationFilter, setNotificationFilter] = useState("all"); // 'all' | 'enabled' | 'disabled'
@@ -290,7 +292,7 @@ const MemberManagement = () => {
   // Reset page when filter, search, or sort changes
   useEffect(() => {
     setPage(0);
-  }, [searchTerm, roleFilter, gardenFilter, notificationFilter, sortDirection]);
+  }, [deferredSearchTerm, roleFilter, gardenFilter, notificationFilter, sortDirection]);
 
   // Request sort column/direction
   const handleRequestSort = () => {
@@ -302,7 +304,7 @@ const MemberManagement = () => {
   const filteredUsers = users
     .filter((u) => {
       // 1. Search filter
-      const search = searchTerm.trim().toLowerCase();
+      const search = deferredSearchTerm.trim().toLowerCase();
       const nameMatch = (u.name || "").toLowerCase().includes(search);
       const phoneMatch = (u.phone || "").replace(/\D/g, "").includes(search);
       if (search && !nameMatch && !phoneMatch) return false;
@@ -876,7 +878,7 @@ const MemberManagement = () => {
                   </Box>
                 ) : (
                   <>
-                    <TableContainer component={Box}>
+                    <TableContainer component={Box} sx={{ opacity: isSearchPending ? 0.6 : 1, transition: "opacity 0.15s ease" }}>
                       <Table sx={{ minWidth: 700 }} aria-label="교인 목록 테이블">
                       <TableHead sx={{ backgroundColor: "#fbfbfb" }}>
                         <TableRow>
@@ -1248,9 +1250,11 @@ const MemberManagement = () => {
           </Box>
 
           {/* Tab 1: 출석 통계 대시보드 */}
-          <Box sx={{ display: adminTab === 1 ? "block" : "none" }}>
-            <AttendanceDashboard />
-          </Box>
+          {adminTab === 1 && (
+            <Box>
+              <AttendanceDashboard />
+            </Box>
+          )}
         </>
       )}
         </div>
