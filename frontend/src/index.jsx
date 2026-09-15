@@ -58,7 +58,7 @@ root.render(
         <SnackBar />
       </SnackbarProvider>
     </ThemeProvider>
-    <ReactQueryDevtools initialIsOpen={false} />
+    {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
   </QueryClientProvider>,
   // </React.StrictMode>
 );

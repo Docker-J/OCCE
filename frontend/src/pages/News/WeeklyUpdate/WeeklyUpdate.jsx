@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 
 import { Box, Fab, IconButton, Typography } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
@@ -9,7 +9,11 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { isMobile } from "react-device-detect";
 
 import ButtonDatePicker from "../../../common/ButtonDatePicker";
-import PDFReader from "../../../components/News/WeeklyUpdate/PDFReader";
+import BulletinSkeleton from "../../../components/News/WeeklyUpdate/BulletinSkeleton";
+
+const PDFReader = lazy(
+  () => import("../../../components/News/WeeklyUpdate/PDFReader"),
+);
 
 import { useLoaderData, useNavigate } from "react-router";
 import AdminComponent from "../../../common/AdminComponent";
@@ -221,11 +225,19 @@ const WeeklyUpdate = () => {
             </IconButton>
           </Box>
 
-          <PDFReader
-            file={bulletin}
-            loading={loading}
-            documentDimension={documentDimension}
-          />
+          <Suspense
+            fallback={
+              <BulletinSkeleton
+                documentDimension={documentDimension}
+              />
+            }
+          >
+            <PDFReader
+              file={bulletin}
+              loading={loading}
+              documentDimension={documentDimension}
+            />
+          </Suspense>
         </div>
       </div>
       <AdminComponent>

@@ -11,14 +11,8 @@ export default defineConfig(() => {
       rollupOptions: {
         output: {
           manualChunks(id) {
-            if (id.includes("node_modules/firebase")) {
-              return "firebase";
-            }
-            if (
-              id.includes("node_modules/@ckeditor") ||
-              id.includes("node_modules/ckeditor5")
-            ) {
-              return "ckeditor";
+            if (id.includes("vite/preload-helper")) {
+              return "reactVendor";
             }
             if (
               id.includes("node_modules/react/") ||
@@ -26,6 +20,15 @@ export default defineConfig(() => {
               id.includes("node_modules/react-router/")
             ) {
               return "reactVendor";
+            }
+            if (id.includes("node_modules/@ckeditor/ckeditor5-react")) {
+              return undefined;
+            }
+            if (
+              id.includes("node_modules/@ckeditor") ||
+              id.includes("node_modules/ckeditor5")
+            ) {
+              return "ckeditor";
             }
             if (
               id.includes("node_modules/@mui/material") ||
@@ -46,10 +49,13 @@ export default defineConfig(() => {
               return "tanstackQuery";
             }
             if (
-              id.includes("node_modules/pdfjs-dist") ||
-              id.includes("node_modules/react-pdf")
+              id.includes("node_modules/react-pdf") ||
+              id.includes("node_modules/pdfjs-dist")
             ) {
-              return "pdfjs";
+              return undefined;
+            }
+            if (id.includes("node_modules/firebase")) {
+              return "firebase";
             }
           },
         },
