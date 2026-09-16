@@ -62,8 +62,8 @@ const ForumPostBoard = ({
             }}
           >
             {/* Top Row: Badges & Icons */}
-            <Stack direction="row" alignItems="center" sx={{ mb: 2, width: "100%" }}>
-              <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexWrap: "wrap" }}>
+            <Stack direction="row" sx={{ alignItems: "center", mb: 2, width: "100%" }}>
+              <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", flexWrap: "wrap" }}>
                 {!!post?.pin && (
                   <Chip 
                     icon={<PushPinIcon sx={{ fontSize: "16px !important", color: "white !important" }} />}

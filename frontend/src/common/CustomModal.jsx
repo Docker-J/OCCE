@@ -15,7 +15,7 @@ const style = {
   justifyContent: "center",
 };
 
-const CustomModal = ({ isOpen, onClose, children, ...props }) => {
+const CustomModal = ({ isOpen, onClose, children, sx, ...props }) => {
   const handleClose = (_, reason) => {
     if (reason == "backdropClick") return;
     onClose();
@@ -28,7 +28,7 @@ const CustomModal = ({ isOpen, onClose, children, ...props }) => {
         backdrop: { className: 'custom-dialog-backdrop' }
       }}
     >
-      <Box className="custom-modal-box" sx={{ ...style, ...props }}>
+      <Box className="custom-modal-box" sx={{ ...style, ...props, ...sx }}>
         <IconButton
           onClick={onClose}
           sx={{ position: "absolute", top: 8, right: 8 }}

@@ -42,9 +42,11 @@ const PhotoViewModal = ({ isOpen, onClose, photos, initialIndex }) => {
     <CustomModal
       isOpen={isOpen}
       onClose={handleClose}
-      width="92svw"
-      height="85svh"
-      alignItems="normal"
+      sx={{
+        width: "92svw",
+        height: "85svh",
+        alignItems: "normal",
+      }}
       // aria-labelledby="modal-modal-title"
       // aria-describedby="modal-modal-description"
     >

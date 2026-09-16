@@ -88,7 +88,7 @@ const Submenu = ({ page, scrolled }) => {
           disableScrollLock
           {...bindMenu(popupState)}
           classes={{ paper: 'custom-submenu-paper' }}
-          PaperProps={{ elevation: 0 }}
+          slotProps={{ paper: { elevation: 0 } }}
         >
           {page.subpages.map((subpage) => (
             <MenuItem

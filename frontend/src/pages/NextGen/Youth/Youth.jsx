@@ -153,15 +153,19 @@ const Youth = () => {
               <Grid
                 container
                 spacing={3}
-                justifyContent="center"
-                alignItems="center"
+                sx={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
               >
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                   <Stack
                     direction="row"
                     spacing={2}
-                    alignItems="center"
-                    justifyContent={{ xs: "flex-start", md: "center" }}
+                    sx={{
+                      alignItems: "center",
+                      justifyContent: { xs: "flex-start", md: "center" },
+                    }}
                   >
                     <Box
                       sx={{
@@ -202,8 +206,10 @@ const Youth = () => {
                   <Stack
                     direction="row"
                     spacing={2}
-                    alignItems="center"
-                    justifyContent={{ xs: "flex-start", md: "center" }}
+                    sx={{
+                      alignItems: "center",
+                      justifyContent: { xs: "flex-start", md: "center" },
+                    }}
                   >
                     <Box
                       sx={{
@@ -244,8 +250,10 @@ const Youth = () => {
                   <Stack
                     direction="row"
                     spacing={2}
-                    alignItems="center"
-                    justifyContent={{ xs: "flex-start", md: "center" }}
+                    sx={{
+                      alignItems: "center",
+                      justifyContent: { xs: "flex-start", md: "center" },
+                    }}
                   >
                     <Box
                       sx={{
@@ -286,8 +294,10 @@ const Youth = () => {
                   <Stack
                     direction="row"
                     spacing={2}
-                    alignItems="center"
-                    justifyContent={{ xs: "flex-start", md: "center" }}
+                    sx={{
+                      alignItems: "center",
+                      justifyContent: { xs: "flex-start", md: "center" },
+                    }}
                   >
                     <Box
                       sx={{

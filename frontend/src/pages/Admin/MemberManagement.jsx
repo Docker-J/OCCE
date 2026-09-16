@@ -1264,8 +1264,18 @@ const MemberManagement = () => {
       <Dialog
         open={roleModalOpen}
         onClose={() => !updatingRole && setRoleModalOpen(false)}
-        PaperProps={{
-          sx: {
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: "18px",
+              p: 1,
+              maxWidth: "500px",
+              width: "100%",
+            },
+          },
+        }}
+        sx={{
+          "& .MuiDialog-paper": {
             borderRadius: "18px",
             p: 1,
             maxWidth: "500px",
@@ -1465,8 +1475,18 @@ const MemberManagement = () => {
       <Dialog
         open={deleteDialogOpen}
         onClose={() => !deleting && setDeleteDialogOpen(false)}
-        PaperProps={{
-          sx: {
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: "16px",
+              p: 1,
+              maxWidth: "460px",
+              width: "100%",
+            },
+          },
+        }}
+        sx={{
+          "& .MuiDialog-paper": {
             borderRadius: "16px",
             p: 1,
             maxWidth: "460px",

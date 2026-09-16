@@ -143,9 +143,9 @@ const YoungAdult = () => {
               모임 안내
             </Box>
             <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-              <Grid container spacing={3} justifyContent="center" alignItems="center">
+              <Grid container spacing={3} sx={{ justifyContent: "center", alignItems: "center" }}>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                  <Stack direction="row" spacing={2} alignItems="center" justifyContent={{ xs: "flex-start", md: "center" }}>
+                  <Stack direction="row" spacing={2} sx={{ alignItems: "center", justifyContent: { xs: "flex-start", md: "center" } }}>
                     <Box sx={{ width: 56, height: 56, borderRadius: "50%", backgroundColor: "#ffebee", color: "#c62828", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                       <GroupsIcon fontSize="large" />
                     </Box>
@@ -156,7 +156,7 @@ const YoungAdult = () => {
                   </Stack>
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                  <Stack direction="row" spacing={2} alignItems="center" justifyContent={{ xs: "flex-start", md: "center" }}>
+                  <Stack direction="row" spacing={2} sx={{ alignItems: "center", justifyContent: { xs: "flex-start", md: "center" } }}>
                     <Box sx={{ width: 56, height: 56, borderRadius: "50%", backgroundColor: "#ffebee", color: "#c62828", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                       <AccessTimeIcon fontSize="large" />
                     </Box>
@@ -167,7 +167,7 @@ const YoungAdult = () => {
                   </Stack>
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                  <Stack direction="row" spacing={2} alignItems="center" justifyContent={{ xs: "flex-start", md: "center" }}>
+                  <Stack direction="row" spacing={2} sx={{ alignItems: "center", justifyContent: { xs: "flex-start", md: "center" } }}>
                     <Box sx={{ width: 56, height: 56, borderRadius: "50%", backgroundColor: "#ffebee", color: "#c62828", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                       <PlaceIcon fontSize="large" />
                     </Box>
@@ -178,7 +178,7 @@ const YoungAdult = () => {
                   </Stack>
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                  <Stack direction="row" spacing={2} alignItems="center" justifyContent={{ xs: "flex-start", md: "center" }}>
+                  <Stack direction="row" spacing={2} sx={{ alignItems: "center", justifyContent: { xs: "flex-start", md: "center" } }}>
                     <Box sx={{ width: 56, height: 56, borderRadius: "50%", backgroundColor: "#ffebee", color: "#c62828", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                       <PersonIcon fontSize="large" />
                     </Box>

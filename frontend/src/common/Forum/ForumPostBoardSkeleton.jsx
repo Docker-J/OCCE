@@ -28,8 +28,8 @@ const ForumPostBoardSkeleton = ({ count = 5 }) => {
             }}
           >
             {/* Top Row: Badges & Icons */}
-            <Stack direction="row" alignItems="center" sx={{ mb: 2, width: "100%" }}>
-              <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexWrap: "wrap" }}>
+            <Stack direction="row" sx={{ alignItems: "center", mb: 2, width: "100%" }}>
+              <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", flexWrap: "wrap" }}>
                 <Skeleton variant="rounded" width={110} height={26} sx={{ borderRadius: "8px" }} />
                 <Skeleton variant="rounded" width={26} height={26} sx={{ borderRadius: "8px" }} />
                 <Skeleton variant="rounded" width={26} height={26} sx={{ borderRadius: "8px" }} />

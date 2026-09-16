@@ -13,10 +13,18 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 
 const ButtonField = (props) => {
   const { _, forwardedProps } = useSplitFieldProps(props, "date");
+  const {
+    buttonSx,
+    buttonVariant,
+    hideIcon,
+    slotProps,
+    inputRef,
+    slots,
+    ownerState,
+    ...buttonProps
+  } = forwardedProps;
   const pickerContext = usePickerContext();
-  const handleRef = useForkRef(pickerContext.triggerRef, pickerContext.rootRef);
-
-  const { buttonSx, buttonVariant, hideIcon, ...buttonProps } = forwardedProps;
+  const handleRef = useForkRef(pickerContext.triggerRef, pickerContext.rootRef, inputRef);
 
   return (
     <Button

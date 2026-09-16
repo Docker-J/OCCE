@@ -13,8 +13,9 @@ import {
   Divider,
   Paper,
   Stack,
-  LinearProgress,
+  IconButton,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutlined";
@@ -22,6 +23,7 @@ import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutlineOutlined
 import PersonIcon from "@mui/icons-material/Person";
 
 import { getAdminGardenAttendanceDetail } from "../../api/admin";
+import "../../common/CustomDialog.css";
 
 const GardenAttendanceDetailModal = ({ open, onClose, gardenName, date }) => {
   const [loading, setLoading] = useState(true);
@@ -72,16 +74,28 @@ const GardenAttendanceDetailModal = ({ open, onClose, gardenName, date }) => {
       onClose={onClose}
       maxWidth="sm"
       fullWidth
-      PaperProps={{
-        sx: {
-          borderRadius: "20px",
-          p: 1,
-          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+      slotProps={{
+        backdrop: { className: "custom-dialog-backdrop" },
+        paper: {
+          sx: {
+            borderRadius: "24px !important",
+            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15) !important",
+            border: "1px solid rgba(0, 0, 0, 0.08) !important",
+            overflow: "hidden !important",
+          },
+        },
+      }}
+      sx={{
+        "& .MuiDialog-paper": {
+          borderRadius: "24px !important",
+          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15) !important",
+          border: "1px solid rgba(0, 0, 0, 0.08) !important",
+          overflow: "hidden !important",
         },
       }}
     >
       {/* Header */}
-      <DialogTitle sx={{ pb: 1, pt: 2 }}>
+      <DialogTitle sx={{ pb: 1.5, pt: 2.5, px: { xs: 2.5, sm: 3 } }}>
         <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 1 }}>
           <Box>
             <Typography variant="h5" sx={{ fontWeight: 800, color: "#1e293b" }}>
@@ -92,26 +106,38 @@ const GardenAttendanceDetailModal = ({ open, onClose, gardenName, date }) => {
             </Typography>
           </Box>
 
-          {/* Status Badge */}
-          {detail && (
-            <Chip
-              icon={
-                reported ? (
-                  <CheckCircleIcon sx={{ fontSize: "1rem !important", color: "#16a34a !important" }} />
-                ) : (
-                  <ErrorOutlineIcon sx={{ fontSize: "1rem !important", color: "#ea580c !important" }} />
-                )
-              }
-              label={reported ? "보고 완료" : "미보고"}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {/* Status Badge */}
+            {detail && (
+              <Chip
+                icon={
+                  reported ? (
+                    <CheckCircleIcon sx={{ fontSize: "1rem !important", color: "#16a34a !important" }} />
+                  ) : (
+                    <ErrorOutlineIcon sx={{ fontSize: "1rem !important", color: "#ea580c !important" }} />
+                  )
+                }
+                label={reported ? "보고 완료" : "미보고"}
+                sx={{
+                  fontWeight: 700,
+                  fontSize: "0.82rem",
+                  backgroundColor: reported ? "rgba(22, 163, 74, 0.1)" : "rgba(234, 88, 12, 0.1)",
+                  color: reported ? "#16a34a" : "#ea580c",
+                  border: reported ? "1px solid rgba(22, 163, 74, 0.25)" : "1px solid rgba(234, 88, 12, 0.25)",
+                }}
+              />
+            )}
+            <IconButton
+              onClick={onClose}
+              size="small"
               sx={{
-                fontWeight: 700,
-                fontSize: "0.82rem",
-                backgroundColor: reported ? "rgba(22, 163, 74, 0.1)" : "rgba(234, 88, 12, 0.1)",
-                color: reported ? "#16a34a" : "#ea580c",
-                border: reported ? "1px solid rgba(22, 163, 74, 0.25)" : "1px solid rgba(234, 88, 12, 0.25)",
+                color: "#94a3b8",
+                "&:hover": { color: "#334155", backgroundColor: "rgba(0, 0, 0, 0.06)" },
               }}
-            />
-          )}
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Box>
         </Box>
 
         {/* Summary Mini Bar */}
@@ -169,7 +195,7 @@ const GardenAttendanceDetailModal = ({ open, onClose, gardenName, date }) => {
         )}
       </DialogTitle>
 
-      <DialogContent dividers sx={{ py: 2.5 }}>
+      <DialogContent dividers sx={{ py: 2.5, px: { xs: 2.5, sm: 3 } }}>
         {loading ? (
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 6 }}>
             <CircularProgress sx={{ color: "#ea580c", mb: 2 }} />
@@ -346,7 +372,7 @@ const GardenAttendanceDetailModal = ({ open, onClose, gardenName, date }) => {
         )}
       </DialogContent>
 
-      <DialogActions sx={{ p: 2, pt: 1.5 }}>
+      <DialogActions sx={{ p: 2, px: { xs: 2.5, sm: 3 }, pt: 1.5 }}>
         <Button
           onClick={onClose}
           variant="contained"

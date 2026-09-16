@@ -229,7 +229,7 @@ const ResponsiveAppBar = () => {
                 disableScrollLock
                 {...bindMenu(userPopupState)}
                 classes={{ paper: 'custom-submenu-paper' }}
-                PaperProps={{ elevation: 0 }}
+                slotProps={{ paper: { elevation: 0 } }}
                 TransitionComponent={Slide}
                 TransitionProps={{ direction: "left", timeout: 350 }}
               >
