@@ -1,11 +1,12 @@
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { Await, useLoaderData, useRevalidator } from "react-router";
 import Schedule from "./Schedule";
 import AdminComponent from "../../../common/AdminComponent";
 
-import { CircularProgress, Fab, Typography } from "@mui/material";
+import { CircularProgress, Fab, Tooltip, Typography } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { refreshSchedules } from "../../../api/schedules";
+import useSnackbar from "../../../util/useSnackbar";
 
 const titleBackground = {
   backgroundImage: 'url("/img/News/Schedules/Schedules.webp")',
@@ -16,6 +17,22 @@ const titleBackground = {
 const Schedules = () => {
   const data = useLoaderData();
   const revalidator = useRevalidator();
+  const { openSnackbar } = useSnackbar();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    try {
+      await refreshSchedules();
+      revalidator.revalidate();
+      openSnackbar("success", "교회 일정을 성공적으로 새로고침했습니다.");
+    } catch {
+      openSnackbar("error", "교회 일정을 새로고침하는 중 오류가 발생했습니다.");
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   return (
     <>
@@ -76,15 +93,27 @@ const Schedules = () => {
         </div>
       </div>
       <AdminComponent>
-        <Fab
-          style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
-          onClick={async () => {
-            await refreshSchedules();
-            revalidator.revalidate();
-          }}
-        >
-          <RefreshIcon />
-        </Fab>
+        <Tooltip title="일정 새로고침">
+          <span>
+            <Fab
+              color="primary"
+              disabled={isRefreshing}
+              sx={{
+                position: "fixed",
+                right: { xs: 20, md: 32 },
+                bottom: { xs: 24, md: 36 },
+                zIndex: 1000,
+              }}
+              onClick={handleRefresh}
+            >
+              {isRefreshing ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                <RefreshIcon />
+              )}
+            </Fab>
+          </span>
+        </Tooltip>
       </AdminComponent>
     </>
   );

@@ -106,6 +106,21 @@ const theme = createTheme({
         },
       },
     },
+    MuiFab: {
+      defaultProps: {
+        color: "primary",
+      },
+      styleOverrides: {
+        root: {
+          boxShadow: "0 6px 20px rgba(255, 107, 0, 0.35)",
+          transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+          "&:hover": {
+            backgroundColor: tokens.colors.primaryHover,
+            boxShadow: "0 8px 24px rgba(255, 107, 0, 0.45)",
+          },
+        },
+      },
+    },
     MuiCard: {
       styleOverrides: {
         root: {
