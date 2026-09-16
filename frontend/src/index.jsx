@@ -4,11 +4,12 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
 
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
+import theme from "./theme";
 import ModalsProvider from "./util/ModalsProvider";
 import Modals from "./util/Modals";
 import SnackbarProvider from "./util/SnackBarProvider";
@@ -24,24 +25,6 @@ export const queryClient = new QueryClient({
       retry: 1,
       staleTime: 1 * 60 * 1000, // 1 minute
     },
-  },
-});
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      light: "#ff9240",
-      main: "#FF6B00",
-      dark: "#d95b00",
-      contrastText: "#ffffff",
-      red: "#ff0000",
-    },
-    secondary: {
-      main: "#ffffff",
-    },
-  },
-  typography: {
-    fontFamily: "NanumSquareNeoVariable",
   },
 });
 

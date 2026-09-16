@@ -74,25 +74,6 @@ const GardenAttendanceDetailModal = ({ open, onClose, gardenName, date }) => {
       onClose={onClose}
       maxWidth="sm"
       fullWidth
-      slotProps={{
-        backdrop: { className: "custom-dialog-backdrop" },
-        paper: {
-          sx: {
-            borderRadius: "24px !important",
-            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15) !important",
-            border: "1px solid rgba(0, 0, 0, 0.08) !important",
-            overflow: "hidden !important",
-          },
-        },
-      }}
-      sx={{
-        "& .MuiDialog-paper": {
-          borderRadius: "24px !important",
-          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15) !important",
-          border: "1px solid rgba(0, 0, 0, 0.08) !important",
-          overflow: "hidden !important",
-        },
-      }}
     >
       {/* Header */}
       <DialogTitle sx={{ pb: 1.5, pt: 2.5, px: { xs: 2.5, sm: 3 } }}>
@@ -204,13 +185,13 @@ const GardenAttendanceDetailModal = ({ open, onClose, gardenName, date }) => {
             </Typography>
           </Box>
         ) : error ? (
-          <Alert severity="error" sx={{ borderRadius: "12px" }}>
+          <Alert severity="error">
             {error}
           </Alert>
         ) : !reported ? (
           /* Unreported Garden View */
           <Box>
-            <Alert severity="warning" sx={{ borderRadius: "12px", mb: 2.5 }}>
+            <Alert severity="warning" sx={{ mb: 2.5 }}>
               해당 주일에는 아직 정원지기의 출석 보고가 완료되지 않았습니다.
             </Alert>
             <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#475569", mb: 1.5 }}>

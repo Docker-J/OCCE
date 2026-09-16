@@ -513,18 +513,6 @@ const MemberManagement = () => {
                 sx={{
                   mb: 3.5,
                   borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
-                  "& .MuiTab-root": {
-                    fontWeight: 700,
-                    fontSize: "1rem",
-                    py: 1.5,
-                    color: "#64748b",
-                    "&.Mui-selected": { color: "#ea580c" },
-                  },
-                  "& .MuiTabs-indicator": {
-                    backgroundColor: "#ea580c",
-                    height: 3,
-                    borderRadius: "3px 3px 0 0",
-                  },
                 }}
               >
                 <Tab
