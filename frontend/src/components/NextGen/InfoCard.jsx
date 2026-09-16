@@ -6,53 +6,16 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { v4 as uuidv4 } from "uuid";
 
 import GroupsIcon from "@mui/icons-material/Groups";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PlaceIcon from "@mui/icons-material/Place";
 import ContactSupportIcon from "@mui/icons-material/ContactSupport";
 
-import Slider from "react-slick";
-
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import "../../common/slick/slick-default-dots.css";
+import CustomCarousel from "../../common/CustomCarousel";
 import Styles from "./InfoCard.module.css";
 
 const InfoCard = ({ age, time, place, ask, imgs }) => {
-  const settings = () => {
-    const baseSettings = {
-      className: Styles["slick-slide"],
-      dots: true,
-      infinite: true,
-      lazyLoad: true,
-      speed: 300,
-      autoplay: true,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      swipe: imgs?.length > 1,
-    };
-
-    if (imgs?.length > 1) {
-      return {
-        ...baseSettings,
-        dotsClass: "slick-dots slick-default-dots",
-        customPaging: () => (
-          <span
-            style={{
-              width: "8px",
-              height: "8px",
-              borderRadius: "50%",
-              background: "#808080",
-              display: "inline-block",
-            }}
-          />
-        ),
-      };
-    }
-    return baseSettings;
-  };
 
   return (
     <Card
@@ -120,15 +83,22 @@ const InfoCard = ({ age, time, place, ask, imgs }) => {
             sx={{ width: "100%", maxWidth: { xs: "none", md: "64%" } }}
           >
             <Box sx={{ pb: "75%", position: "relative", overflow: "hidden" }}>
-              <div className={Styles.boxContent}>
-                <Slider {...settings()}>
-                  {imgs.map((img) => (
-                    <div className={Styles["img-container"]} key={uuidv4()}>
-                      <img loading="lazy" src={img.src} alt="" />
-                    </div>
-                  ))}
-                </Slider>
-              </div>
+              <CustomCarousel
+                className={Styles.boxContent}
+                fillHeight
+                showArrows={false}
+                showDots={imgs.length > 1}
+                dotColor="#808080"
+                autoPlay={imgs.length > 1}
+                autoPlayInterval={3500}
+                loop={imgs.length > 1}
+              >
+                {imgs.map((img) => (
+                  <div className={Styles["img-container"]} key={img.src}>
+                    <img loading="lazy" src={img.src} alt="" />
+                  </div>
+                ))}
+              </CustomCarousel>
             </Box>
           </Box>
         )}

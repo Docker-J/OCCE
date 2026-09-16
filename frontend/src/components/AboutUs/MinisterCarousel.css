@@ -1,14 +1,4 @@
-.slick-list {
-  height: 100%;
-}
-
 .cardContainer {
-  height: 100vh;
-  /* position: relative;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);*/
-}
-.slick-initialized {
   height: 100%;
+  cursor: pointer;
 }

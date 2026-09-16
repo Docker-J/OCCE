@@ -1,8 +1,5 @@
 import { Typography, Box, Grid, Card, CardContent, Stack, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import "../../common/slick/slick-default-dots.css";
+import CustomCarousel from "../../common/CustomCarousel";
 import { v4 as uuidv4 } from "uuid";
 
 import GroupsIcon from "@mui/icons-material/Groups";
@@ -54,30 +51,6 @@ const ministries = [
   },
 ];
 
-const sliderSettings = {
-  dots: true,
-  infinite: true,
-  lazyLoad: true,
-  speed: 500,
-  autoplay: true,
-  autoplaySpeed: 3500,
-  slidesToShow: 1, // Only 1 image provided, so show 1
-  slidesToScroll: 1,
-  dotsClass: "slick-dots slick-default-dots",
-  customPaging: () => (
-    <span
-      style={{
-        width: "10px",
-        height: "10px",
-        borderRadius: "50%",
-        background: "#bdbdbd",
-        display: "inline-block",
-        margin: "0 4px",
-      }}
-    />
-  ),
-};
-
 const YoungAdult = () => {
   return (
     <>
@@ -105,7 +78,6 @@ const YoungAdult = () => {
           .animate-fade {
             animation: slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
           }
-          .slick-default-dots li.slick-active span { background-color: #c62828 !important; }
         `}
       </style>
 
@@ -209,9 +181,15 @@ const YoungAdult = () => {
           {/* 3. Photo Gallery Carousel (1 Image) */}
           <Box className="animate-fade" sx={{ mb: 12, animationDelay: "0.2s" }}>
             <Box sx={{ maxWidth: "800px", mx: "auto" }}>
-              <Slider {...sliderSettings}>
+              <CustomCarousel
+                autoPlay={true}
+                autoPlayInterval={3500}
+                dotColor="#c62828"
+                showArrows={false}
+                loop={true}
+              >
                 {imgs.map((img) => (
-                  <Box key={uuidv4()} sx={{ position: "relative", paddingTop: "56.25%", borderRadius: "24px", overflow: "hidden", boxShadow: "0 12px 32px rgba(0,0,0,0.08)" }}>
+                  <Box key={img.src} sx={{ position: "relative", paddingTop: "56.25%", borderRadius: "24px", overflow: "hidden", boxShadow: "0 12px 32px rgba(0,0,0,0.08)" }}>
                     <img loading="lazy" src={img.src} 
                       alt="Young Adult Activity" 
                       style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.5s ease" }}
@@ -220,7 +198,7 @@ const YoungAdult = () => {
                     />
                   </Box>
                 ))}
-              </Slider>
+              </CustomCarousel>
             </Box>
           </Box>
 

@@ -1,9 +1,5 @@
 import { Typography, Box, Grid, Card, CardContent, Stack, List, ListItem, ListItemIcon, ListItemText, useMediaQuery, useTheme } from "@mui/material";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import "../../common/slick/slick-default-dots.css";
-import { v4 as uuidv4 } from "uuid";
+import CustomCarousel from "../../common/CustomCarousel";
 
 import GroupsIcon from "@mui/icons-material/Groups";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -24,41 +20,6 @@ const imgs = [
   { src: "/img/NextGen/Preschool/4.jpg" },
   { src: "/img/NextGen/Preschool/5.jpg" },
 ];
-
-const sliderSettings = {
-  dots: true,
-  infinite: true,
-  lazyLoad: true,
-  speed: 500,
-  autoplay: true,
-  autoplaySpeed: 3500,
-  slidesToShow: 2,
-  slidesToScroll: 1,
-  responsive: [
-    {
-      breakpoint: 900,
-      settings: { 
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        infinite: true,
-        dots: true
-      }
-    }
-  ],
-  dotsClass: "slick-dots slick-default-dots",
-  customPaging: () => (
-    <span
-      style={{
-        width: "10px",
-        height: "10px",
-        borderRadius: "50%",
-        background: "#bdbdbd",
-        display: "inline-block",
-        margin: "0 4px",
-      }}
-    />
-  ),
-};
 
 const Preschool = () => {
   const theme = useTheme();
@@ -90,9 +51,6 @@ const Preschool = () => {
           .animate-fade {
             animation: slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
           }
-          .slick-slide { padding: 0 12px; }
-          .slick-list { margin: 0 -12px; }
-          .slick-default-dots li.slick-active span { background-color: #558b2f !important; }
         `}
       </style>
 
@@ -187,9 +145,18 @@ const Preschool = () => {
           {/* 3. Photo Gallery Carousel */}
           <Box className="animate-fade" sx={{ mb: 12, animationDelay: "0.2s" }}>
             <Box sx={{ mx: { xs: -2, md: 0 } }}>
-              <Slider {...sliderSettings} slidesToShow={isMobile ? 1 : 2}>
+              <CustomCarousel
+                autoPlay={true}
+                autoPlayInterval={3500}
+                dotColor="#558b2f"
+                showArrows={false}
+                slideBasis={isMobile ? "100%" : "calc(50% - 12px)"}
+                slideGap="24px"
+                options={{ align: "start", containScroll: "trimSnaps" }}
+                loop={true}
+              >
                 {imgs.map((img) => (
-                  <Box key={uuidv4()} sx={{ position: "relative", paddingTop: "70%", borderRadius: "24px", overflow: "hidden", boxShadow: "0 12px 32px rgba(0,0,0,0.08)" }}>
+                  <Box key={img.src} sx={{ position: "relative", paddingTop: "70%", borderRadius: "24px", overflow: "hidden", boxShadow: "0 12px 32px rgba(0,0,0,0.08)" }}>
                     <img loading="lazy" src={img.src} 
                       alt="Preschool Activity" 
                       style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.5s ease" }}
@@ -198,7 +165,7 @@ const Preschool = () => {
                     />
                   </Box>
                 ))}
-              </Slider>
+              </CustomCarousel>
             </Box>
           </Box>
 

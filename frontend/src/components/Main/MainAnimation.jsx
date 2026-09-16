@@ -166,6 +166,8 @@ const MainAnimation = () => {
           height: "23svh",
           width: "auto",
           padding: "4svh 0",
+          display: "block",
+          margin: "0 auto",
         }}
         src="img/ONLogo.svg"
         alt="logo of ON Community Church of Edmonton"

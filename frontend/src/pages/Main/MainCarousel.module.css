@@ -1,9 +1,18 @@
-.carousel :global(.slider) {
-  height: clamp(375px, 50svh, 620px);
+.carousel,
+.carousel :global(.embla),
+.carousel :global(.embla__container),
+.carousel :global(.embla__slide),
+.carousel :global(.embla__slide > *) {
+  height: clamp(375px, 50svh, 620px) !important;
 }
 
 @media only screen and (min-width: 900px) {
-  .carousel :global(.slider) {
-    height: 58svh;
+  .carousel,
+  .carousel :global(.embla),
+  .carousel :global(.embla__container),
+  .carousel :global(.embla__slide),
+  .carousel :global(.embla__slide > *) {
+    height: 58svh !important;
   }
 }
+

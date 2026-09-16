@@ -29,9 +29,8 @@ const Main = () => {
     <>
       <CustomCarousel
         className={carouselStyles.carousel}
-        showThumbs={false}
-        showStatus={false}
         showArrows={false}
+        fillHeight
       >
         <div className="churchName">
           <MainAnimation />

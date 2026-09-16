@@ -1,11 +1,7 @@
 import { Typography, Box } from "@mui/material";
 import YoutubePlaylist from "./../../components/Online/YoutubePlaylist";
 import { useLoaderData } from "react-router";
-
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import "../../common/slick/slick-default-dots.css";
+import CustomCarousel from "../../common/CustomCarousel";
 
 const titleBackground = {
   backgroundImage: 'url("/img/Online/Sermon.webp")',
@@ -14,18 +10,6 @@ const titleBackground = {
 
 const Bible291 = () => {
   const { today, match } = useLoaderData();
-
-  const sliderSettings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    arrows: false,
-    dotsClass: "slick-dots slick-default-dots",
-    autoplay: true,
-    autoplaySpeed: 5000,
-  };
 
   return (
     <>
@@ -102,7 +86,13 @@ const Bible291 = () => {
               overflow: "hidden",
             }}
           >
-            <Slider {...sliderSettings}>
+            <CustomCarousel
+              autoPlay={true}
+              autoPlayInterval={5000}
+              showArrows={false}
+              showDots={true}
+              loop={true}
+            >
               <div>
                 <img loading="lazy" style={{
                     width: "100%",
@@ -143,7 +133,7 @@ const Bible291 = () => {
                   alt="안내 4"
                 />
               </div>
-            </Slider>
+            </CustomCarousel>
           </div>
         </div>
       </div>

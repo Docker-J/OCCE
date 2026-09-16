@@ -1,33 +1,12 @@
-import { useRef } from "react";
-import { v4 as uuidv4 } from "uuid";
-
-import "./MinisterCarousel.css";
-
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-
-import { NextArrow, PrevArrow } from "../../common/Arrows";
-
+import { useMediaQuery, useTheme } from "@mui/material";
+import CustomCarousel from "../../common/CustomCarousel";
 import { MinistersList } from "./MinistersList";
 import MinisterCard from "./MinisterCard";
+import "./MinisterCarousel.css";
 
 const MinisterCarousel = () => {
-  const sliderRef = useRef(null);
-
-  const settings = {
-    dots: true,
-    dotsClass: "slick-dots",
-    className: "center",
-    centerMode: true,
-    infinite: false,
-    centerPadding: "19.5%",
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    // speed: 500,
-    nextArrow: <NextArrow />,
-    prevArrow: <PrevArrow />,
-  };
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
     <div
@@ -36,14 +15,22 @@ const MinisterCarousel = () => {
         width: "100%",
         maxWidth: "1000px",
         margin: "auto",
+        position: "relative",
       }}
     >
-      <Slider ref={sliderRef} {...settings}>
-        {MinistersList.map((minister, index) => (
+      <CustomCarousel
+        fillHeight
+        showArrows={true}
+        showDots={true}
+        loop={false}
+        clickableSlides={true}
+        slideBasis={isMobile ? "85%" : "62%"}
+        options={{ align: "center", containScroll: false }}
+      >
+        {MinistersList.map((minister) => (
           <div
-            key={uuidv4()}
+            key={minister.title}
             className="cardContainer"
-            onClick={() => sliderRef.current.slickGoTo(index)}
           >
             <MinisterCard
               title={minister.title}
@@ -53,7 +40,7 @@ const MinisterCarousel = () => {
             />
           </div>
         ))}
-      </Slider>
+      </CustomCarousel>
     </div>
   );
 };
