@@ -72,10 +72,15 @@ const MeditationONPost = () => {
                 // ) {
                 return (
                   <img
-                    style={{ objectFit: "contain" }}
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      display: "block",
+                      objectFit: "contain",
+                    }}
                     key={index}
                     src={`https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${image}/MeditationON`}
-                    alt="test"
+                    alt={`묵상 ON ${index + 1}`}
                     loading="lazy"
                   />
                 );

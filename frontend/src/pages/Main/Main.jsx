@@ -13,11 +13,31 @@ import CustomCarousel from "../../common/CustomCarousel";
 import AdminComponent from "../../common/AdminComponent";
 import BroadcastModal from "../../components/Main/BroadcastModal";
 
-const MainImage = ({ backgroundImage }) => {
+const MainImage = ({ src, backgroundImage, alt = "OCCE Church" }) => {
+  const imgSrc =
+    src ||
+    (backgroundImage
+      ? backgroundImage.replace(/^url\(["']?|["']?\)$/g, "")
+      : "");
+
   return (
     <div className="main-image-wrapper">
-      <div className="blur-bg" style={{ backgroundImage: backgroundImage }} />
-      <div className="image-bg" style={{ backgroundImage: backgroundImage }} />
+      <div
+        className="main-ambient-glow"
+        style={{ backgroundImage: `url(${imgSrc})` }}
+      />
+      <div className="main-ambient-scrim" />
+
+      <div className="main-photo-frame">
+        <img
+          className="main-hero-image"
+          src={imgSrc}
+          alt={alt}
+          loading="lazy"
+        />
+      </div>
+
+      <div className="main-hero-overlay" />
     </div>
   );
 };

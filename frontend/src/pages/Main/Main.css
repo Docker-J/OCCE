@@ -22,12 +22,6 @@
   background-size: cover;
 }
 
-.carousel img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
 .churchName .learnMoreAbtChurch {
   position: absolute;
   bottom: 10%;
@@ -36,33 +30,85 @@
 .main-image-wrapper {
   position: relative;
   height: 100%;
-  min-height: 100%;
   width: 100%;
   flex: 1 1 100%;
   overflow: hidden;
+  background-color: #0b0f19;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.blur-bg {
+/* 1. Deep diffused ambient color glow (matches the photo's own colors seamlessly) */
+.main-ambient-glow {
   position: absolute;
-  width: 100vw;
-  left: -25px;
-  right: -25px;
-  top: -25px;
-  bottom: -25px;
-  -webkit-filter: blur(15px);
-  -moz-filter: blur(15px);
-  filter: blur(15px);
-  transform: scale(1.1);
+  inset: -30px;
   background-size: cover;
-  background-repeat: no-repeat;
   background-position: center;
+  filter: blur(50px) saturate(1.1);
+  transform: scale(1.15);
+  opacity: 0.75;
+  pointer-events: none;
 }
 
-.image-bg {
+/* 2. Soft atmospheric vignette */
+.main-ambient-scrim {
   position: absolute;
   inset: 0;
-  background-repeat: no-repeat;
-  background-color: transparent;
-  background-size: contain;
-  background-position: center;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(11, 15, 25, 0.05) 0%,
+    rgba(11, 15, 25, 0.35) 75%,
+    rgba(11, 15, 25, 0.65) 100%
+  );
+  pointer-events: none;
+}
+
+/* 3. Centered photo with ultra-wide soft feathered dissolve */
+.main-photo-frame {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.main-hero-image {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  margin: auto;
+  /* Ultra-wide smooth radial feather: 0 sharp lines, perfectly dissolved into background */
+  -webkit-mask-image: radial-gradient(
+    ellipse 85% 82% at 50% 50%,
+    black 45%,
+    rgba(0, 0, 0, 0.8) 65%,
+    rgba(0, 0, 0, 0.25) 85%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 85% 82% at 50% 50%,
+    black 45%,
+    rgba(0, 0, 0, 0.8) 65%,
+    rgba(0, 0, 0, 0.25) 85%,
+    transparent 100%
+  );
+}
+
+.main-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(11, 15, 25, 0.25) 0%,
+    transparent 20%,
+    transparent 80%,
+    rgba(11, 15, 25, 0.45) 100%
+  );
+  pointer-events: none;
+  z-index: 2;
 }

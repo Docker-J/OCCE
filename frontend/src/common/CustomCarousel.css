@@ -37,6 +37,12 @@
   height: 100%;
 }
 
+.embla-wrapper:not(.fill-height) .embla__slide > img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 .embla__dots {
   position: absolute;
   bottom: 16px;
