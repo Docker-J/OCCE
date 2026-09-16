@@ -13,14 +13,15 @@ import RequestManager from "./manager/RequestManager";
 import { ErrorBoundary } from "react-error-boundary";
 import FullScreenLoading from "./common/FullScreenLoading";
 import GlobalLoader from "./common/GlobalLoader";
+import { lazyRetry, handleChunkReload, isChunkLoadError } from "./util/lazyRetry";
 
 window.addEventListener("vite:preloadError", () => {
-  const isRefreshed = window.sessionStorage.getItem("vite-preload-error-refreshed");
-  if (!isRefreshed) {
-    window.sessionStorage.setItem("vite-preload-error-refreshed", "true");
-    window.location.reload();
-  } else {
-    window.sessionStorage.removeItem("vite-preload-error-refreshed");
+  handleChunkReload();
+});
+
+window.addEventListener("unhandledrejection", (event) => {
+  if (isChunkLoadError(event?.reason)) {
+    handleChunkReload();
   }
 });
 
@@ -106,108 +107,108 @@ const router = createBrowserRouter([
         children: [
       {
         path: "/",
-        lazy: async () => ({ Component: (await import("./pages/Main/Main")).default }),
+        lazy: lazyRetry(async () => ({ Component: (await import("./pages/Main/Main")).default })),
       },
       {
         path: "/aboutus",
-        lazy: async () => ({ Component: (await import("./pages/AboutUs/AboutUs")).default }),
+        lazy: lazyRetry(async () => ({ Component: (await import("./pages/AboutUs/AboutUs")).default })),
       },
       {
         path: "/announcements",
-        lazy: async () => {
+        lazy: lazyRetry(async () => {
           const [m, l] = await Promise.all([
             import("./pages/News/Announcements/Announcements"),
             import("./route/AnnouncementsLoader")
           ]);
           return { Component: m.default, loader: l.loader };
-        },
+        }),
       },
       {
         path: "/announcements/:announcementID",
-        lazy: async () => {
+        lazy: lazyRetry(async () => {
           const [m, l] = await Promise.all([
             import("./pages/News/Announcements/Announcement"),
             import("./route/AnnouncementLoader")
           ]);
           return { Component: m.default, loader: l.loader };
-        },
+        }),
       },
       {
         path: "/weeklyupdate/:date?",
-        lazy: async () => {
+        lazy: lazyRetry(async () => {
           const [m, l] = await Promise.all([
             import("./pages/News/WeeklyUpdate/WeeklyUpdate"),
             import("./route/WeeklyUpdateLoader")
           ]);
           return { Component: m.default, loader: l.loader };
-        },
+        }),
         shouldRevalidate: () => false,
       },
       {
         path: "/albums/:albumID",
-        lazy: async () => {
+        lazy: lazyRetry(async () => {
           const [m, l] = await Promise.all([
             import("./pages/News/Albums/Album"),
             import("./route/AlbumLoader")
           ]);
           return { Component: m.default, loader: l.loader };
-        },
+        }),
       },
       {
         path: "/columns",
-        lazy: async () => {
+        lazy: lazyRetry(async () => {
           const [m, l] = await Promise.all([
             import("./pages/News/Columns/Columns"),
             import("./route/ColumnsLoader")
           ]);
           return { Component: m.default, loader: l.loader };
-        },
+        }),
       },
       {
         path: "/columns/:columnID",
-        lazy: async () => {
+        lazy: lazyRetry(async () => {
           const [m, l] = await Promise.all([
             import("./pages/News/Columns/Column"),
             import("./route/ColumnLoader")
           ]);
           return { Component: m.default, loader: l.loader };
-        },
+        }),
       },
       {
         path: "/schedules",
-        lazy: async () => {
+        lazy: lazyRetry(async () => {
           const [m, l] = await Promise.all([
             import("./pages/News/Schedules/Schedules"),
             import("./route/SchedulesLoader")
           ]);
           return { Component: m.default, loader: l.loader };
-        },
+        }),
       },
       {
         path: "/newcomers",
-        lazy: async () => ({ Component: (await import("./pages/News/NewComers/NewComers")).default }),
+        lazy: lazyRetry(async () => ({ Component: (await import("./pages/News/NewComers/NewComers")).default })),
       },
       {
         path: "/admin/members",
-        lazy: async () => ({ Component: (await import("./pages/Admin/MemberManagement")).default }),
+        lazy: lazyRetry(async () => ({ Component: (await import("./pages/Admin/MemberManagement")).default })),
       },
       {
         path: "/community",
         children: [
           {
             path: "smallgroup",
-            lazy: async () => ({ Component: (await import("./pages/Community/SmallGroup")).default }),
+            lazy: lazyRetry(async () => ({ Component: (await import("./pages/Community/SmallGroup")).default })),
           },
           {
             path: "smallgroup/report",
-            lazy: async () => {
+            lazy: lazyRetry(async () => {
               const m = await import("./pages/Community/SmallGroupReport");
               return { Component: m.default, action: m.action };
-            },
+            }),
           },
           {
             path: "ministry",
-            lazy: async () => ({ Component: (await import("./pages/Community/Ministry")).default }),
+            lazy: lazyRetry(async () => ({ Component: (await import("./pages/Community/Ministry")).default })),
           },
         ],
       },
@@ -216,43 +217,43 @@ const router = createBrowserRouter([
         children: [
           {
             path: "sundayservice",
-            lazy: async () => ({ Component: (await import("./pages/Online/SundayService")).default }),
+            lazy: lazyRetry(async () => ({ Component: (await import("./pages/Online/SundayService")).default })),
           },
           {
             path: "sermon",
-            lazy: async () => ({ Component: (await import("./pages/Online/Sermon")).default }),
+            lazy: lazyRetry(async () => ({ Component: (await import("./pages/Online/Sermon")).default })),
           },
           {
             path: "worship",
-            lazy: async () => ({ Component: (await import("./pages/Online/Worship")).default }),
+            lazy: lazyRetry(async () => ({ Component: (await import("./pages/Online/Worship")).default })),
           },
           {
             path: "dawnQT",
-            lazy: async () => ({ Component: (await import("./pages/Online/DawnQT")).default }),
+            lazy: lazyRetry(async () => ({ Component: (await import("./pages/Online/DawnQT")).default })),
           },
           {
             path: "prayON",
-            lazy: async () => ({ Component: (await import("./pages/Online/PrayON")).default }),
+            lazy: lazyRetry(async () => ({ Component: (await import("./pages/Online/PrayON")).default })),
           },
           {
             path: "meditationON/:postID",
-            lazy: async () => {
+            lazy: lazyRetry(async () => {
               const [m, l] = await Promise.all([
                 import("./pages/Online/MeditationON/MeditationONPost"),
                 import("./route/MeditationONPostLoader")
               ]);
               return { Component: m.default, loader: l.loader };
-            },
+            }),
           },
           {
             path: "bible291",
-            lazy: async () => {
+            lazy: lazyRetry(async () => {
               const [m, l] = await Promise.all([
                 import("./pages/Online/Bible291"),
                 import("./route/Bible291Loader")
               ]);
               return { Component: m.default, loader: l.loader };
-            },
+            }),
           },
         ],
       },
@@ -261,19 +262,19 @@ const router = createBrowserRouter([
         children: [
           {
             path: "preschool",
-            lazy: async () => ({ Component: (await import("./pages/NextGen/Preschool")).default }),
+            lazy: lazyRetry(async () => ({ Component: (await import("./pages/NextGen/Preschool")).default })),
           },
           {
             path: "elementary",
-            lazy: async () => ({ Component: (await import("./pages/NextGen/Elementary")).default }),
+            lazy: lazyRetry(async () => ({ Component: (await import("./pages/NextGen/Elementary")).default })),
           },
           {
             path: "youth",
-            lazy: async () => ({ Component: (await import("./pages/NextGen/Youth/Youth")).default }),
+            lazy: lazyRetry(async () => ({ Component: (await import("./pages/NextGen/Youth/Youth")).default })),
           },
           {
             path: "youngadult",
-            lazy: async () => ({ Component: (await import("./pages/NextGen/YoungAdult")).default }),
+            lazy: lazyRetry(async () => ({ Component: (await import("./pages/NextGen/YoungAdult")).default })),
           },
         ],
       },
@@ -288,11 +289,11 @@ const router = createBrowserRouter([
       children: [
         {
           path: "/albums",
-          lazy: async () => ({ Component: (await import("./pages/News/Albums/Albums")).default }),
+          lazy: lazyRetry(async () => ({ Component: (await import("./pages/News/Albums/Albums")).default })),
         },
         {
           path: "/online/meditationON",
-          lazy: async () => ({ Component: (await import("./pages/Online/MeditationON/MeditationON")).default }),
+          lazy: lazyRetry(async () => ({ Component: (await import("./pages/Online/MeditationON/MeditationON")).default })),
         },
       ],
     },
