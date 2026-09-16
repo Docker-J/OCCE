@@ -24,10 +24,23 @@ const SnackBar = () => {
     <Snackbar
       anchorOrigin={{ vertical: "top", horizontal: "center" }}
       open={isOpen}
-      autoHideDuration={8000}
+      autoHideDuration={6000}
       onClose={onClose}
+      sx={{
+        top: { xs: "108px !important", sm: "128px !important" },
+      }}
     >
-      <Alert severity={severity} onClose={onClose} action={action}>
+      <Alert
+        severity={severity}
+        onClose={onClose}
+        action={action}
+        sx={{
+          minWidth: "280px",
+          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.12)",
+          backdropFilter: "blur(12px)",
+          alignItems: "center",
+        }}
+      >
         {message}
       </Alert>
     </Snackbar>
