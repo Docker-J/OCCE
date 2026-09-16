@@ -2,6 +2,7 @@ import { getDocClient } from "../api/dynamodb.js";
 import { PutCommand, DeleteCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { getUserVerifier } from "../middleware/auth.js";
 import sendNotification from "../api/sendNotification.js";
+import sendBroadcastSms from "../api/sendSms.js";
 
 const TABLENAME = "FCMToken";
 
@@ -117,24 +118,68 @@ export const unregisterController = async (c) => {
 export const broadcastController = async (c) => {
   try {
     const body = await c.req.json();
-    const { title, body: notificationBody, pathname, targetRole } = body;
+    const {
+      title,
+      body: notificationBody,
+      pathname,
+      targetRole = "all",
+      sendPush = true,
+      sendSms = false,
+      smsTarget = "no_push_only",
+    } = body;
 
     if (!title || !notificationBody) {
       return c.json({ error: "Title and body are required" }, 400);
     }
 
-    await sendNotification(
-      c.env,
-      title,
-      notificationBody,
-      pathname || "",
-      targetRole || "all"
-    );
+    if (!sendPush && !sendSms) {
+      return c.json(
+        { error: "At least one broadcast channel (push or sms) must be selected" },
+        400
+      );
+    }
 
-    return c.json({ success: true }, 200);
+    const tasks = [];
+    let pushPromise = null;
+    let smsPromise = null;
+
+    if (sendPush) {
+      pushPromise = sendNotification(
+        c.env,
+        title,
+        notificationBody,
+        pathname || "",
+        targetRole || "all"
+      );
+      tasks.push(pushPromise);
+    }
+
+    if (sendSms) {
+      smsPromise = sendBroadcastSms(
+        c.env,
+        title,
+        notificationBody,
+        pathname || "",
+        smsTarget || "no_push_only"
+      );
+      tasks.push(smsPromise);
+    }
+
+    await Promise.all(tasks);
+
+    const smsResult = smsPromise ? await smsPromise : null;
+
+    return c.json(
+      {
+        success: true,
+        pushSent: !!sendPush,
+        smsResult,
+      },
+      200
+    );
   } catch (err) {
     console.error("Broadcast notification error:", err);
-    return c.json({ error: "Internal Server Error" }, 500);
+    return c.json({ error: "Internal Server Error", message: err.message }, 500);
   }
 };
 

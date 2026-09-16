@@ -33,16 +33,26 @@ export const unregisterToken = async (token) => {
   }
 };
 
-export const broadcastNotification = async (title, body, pathname, targetRole = "all") => {
+export const broadcastNotification = async (
+  title,
+  body,
+  pathname,
+  targetRole = "all",
+  options = {}
+) => {
   try {
-    await axios.post("/api/notification/broadcast", {
+    const res = await axios.post("/api/notification/broadcast", {
       title,
       body,
       pathname,
       targetRole,
+      sendPush: options.sendPush !== false,
+      sendSms: !!options.sendSms,
+      smsTarget: options.smsTarget || "no_push_only",
     });
-  } catch {
-    throw new Error();
+    return res.data;
+  } catch (err) {
+    throw err;
   }
 };
 
