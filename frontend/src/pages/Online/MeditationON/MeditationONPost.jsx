@@ -63,7 +63,7 @@ const MeditationONPost = () => {
               transform: "translateX(-50%)",
             }}
           >
-            <CustomCarousel>
+            <CustomCarousel loop={false}>
               {Object.values(Images).map((image, index) => {
                 // if (
                 //   index === selectedItem ||
