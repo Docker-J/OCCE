@@ -17,7 +17,7 @@ const DepartmentCarousel = ({
       <Box
         sx={{
           mx: isSingleImage ? "auto" : { xs: -2, md: 0 },
-          maxWidth: isSingleImage ? "800px" : "100%",
+          maxWidth: isSingleImage ? "800px" : undefined,
           ...aspectRatioContainerStyle,
         }}
       >
@@ -33,7 +33,7 @@ const DepartmentCarousel = ({
               ? "100%"
               : "50%"
           }
-          slideGap="24px"
+          slideGap={isSingleImage || isMobile ? undefined : "24px"}
           options={
             isSingleImage
               ? undefined
