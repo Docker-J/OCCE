@@ -64,7 +64,7 @@ const ribbonItems = [
   {
     icon: PersonIcon,
     label: "담당",
-    value: "담당 교역자",
+    value: "이수연 전도사",
   },
 ];
 
@@ -112,17 +112,17 @@ const Elementary = () => {
           <DepartmentQuote
             quote={
               <>
-                그는 시냇가에 심은 나무가 철을 따라 열매를 맺으며 <br />
-                그 잎사귀가 마르지 아니함 같으니 그가 하는 모든 일이 다 형통하리로다
+                앞으로 달려가서 보기 위하여 돌무화과나무에 올라가니 <br />
+                이는 예수께서 그리로 지나가시게 됨이러라
               </>
             }
             subQuote={
               <>
-                That person is like a tree planted by streams of water, which yields its fruit in season <br />
-                and whose leaf does not wither—whatever they do prospers.
+                So he ran ahead and climbed a sycamore-fig tree to see him, <br />
+                since Jesus was coming that way.
               </>
             }
-            reference="- 시편 Psalm 1:3 -"
+            reference="- 누가복음 Luke 19:4 -"
             themeColor="#5d4037"
             iconColor="rgba(121, 85, 72, 0.2)"
           />
@@ -131,7 +131,7 @@ const Elementary = () => {
           <DepartmentCarousel
             images={imgs}
             dotColor="#5d4037"
-            paddingTop="70%"
+            paddingTop="65%"
             alt="Elementary Activity"
           />
 
@@ -142,16 +142,16 @@ const Elementary = () => {
                 icon={ParkIcon}
                 iconBgColor="#efebe9"
                 iconColor="#5d4037"
-                title="시냇가에 심은 나무"
+                title="나무 위의 삭개오처럼"
                 headerMb={4}
                 animationDelay="0.3s"
               >
                 <Typography variant="body1" sx={{ color: "#555", lineHeight: 1.8, wordBreak: "keep-all" }}>
                   <span style={{ fontWeight: 800, color: "#5d4037", fontSize: "1.1em" }}>온교회 유초등부</span>는 
-                  하나님의 말씀이라는 시냇가에 깊이 뿌리를 내리고, 매일 성경을 읽고 묵상하며 주님의 말씀에 순종하는 삶을 배웁니다. 
-                  <br /><br />
-                  어린 시절부터 말씀 위에 굳게 서서, 어떤 세상의 바람에도 흔들리지 않고 철을 따라 열매를 맺는 
-                  <strong>"믿음의 거목"</strong>으로 자라가도록 돕는 사역을 지향합니다.
+                  예수님을 보기 위해 나무 위에 올랐던 삭개오처럼 예수님을 찾고 구하며, 죄를 회개하고 구원받는 예수님의 사람이 되길 
+                  소원하여 지어진 이름입니다. <br /><br />
+                  예수님을 기쁘게 영접하고 구원받아, 그 말씀대로 사는 자녀와 제자 삼는 것을 목적으로 합니다.
+                  주일 예배 후속 부서활동 뿐 아니라 평소 가정 주도 신앙 교육이 가능하도록 각 가정의 신앙 교육을 지원합니다.
                 </Typography>
               </DepartmentFeatureCard>
             </Grid>
