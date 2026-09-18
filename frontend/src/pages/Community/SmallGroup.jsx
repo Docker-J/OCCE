@@ -45,24 +45,6 @@ const SmallGroup = () => {
         </div>
       </div>
 
-      {/* Animation Styles */}
-      <style>
-        {`
-          @keyframes slideUpFade {
-            from {
-              opacity: 0;
-              transform: translateY(30px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-          .animate-fade {
-            animation: slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
-          }
-        `}
-      </style>
 
       <div className="container-wrapper" style={{ backgroundColor: "#fcfbf9", paddingBottom: "80px", paddingTop: "60px" }}>
         <div className="container" style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
