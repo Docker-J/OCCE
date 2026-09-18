@@ -5,15 +5,9 @@ import { Link } from "react-router";
 import MovieIcon from "@mui/icons-material/Movie";
 import PhotoIcon from "@mui/icons-material/Photo";
 
+import { extractPlainText } from "../../../util/textUtils";
+
 const BoardTable = ({ announcements }) => {
-  function getText(html) {
-    let doc = new DOMParser().parseFromString(html, "text/html");
-    let allTextNodes = Array.from(doc.body.childNodes).filter(
-      (node) =>
-        node.nodeType === Node.TEXT_NODE || node.nodeType === Node.ELEMENT_NODE
-    );
-    return allTextNodes.map((node) => node.textContent.trim()).join(" ");
-  }
 
   return (
     <div
@@ -94,7 +88,7 @@ const BoardTable = ({ announcements }) => {
                     textOverflow: "ellipsis",
                   }}
                 >
-                  {getText(announcement.body)}
+                  {extractPlainText(announcement.body)}
                 </p>
                 {announcement.images !== null ? <PhotoIcon /> : null}
                 {announcement.video ? <MovieIcon /> : null}
