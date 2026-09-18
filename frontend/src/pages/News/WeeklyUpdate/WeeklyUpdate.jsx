@@ -1,144 +1,41 @@
-import { useState, useEffect, useCallback, lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
+import { Typography } from "@mui/material";
+import { useLoaderData } from "react-router";
+import { format } from "date-fns";
 
-import { Box, Fab, IconButton, Typography } from "@mui/material";
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import UploadIcon from "@mui/icons-material/Upload";
-import DeleteIcon from "@mui/icons-material/Delete";
-
-import { isMobile } from "react-device-detect";
-
-import ButtonDatePicker from "../../../common/ButtonDatePicker";
-import BulletinSkeleton from "../../../components/News/WeeklyUpdate/BulletinSkeleton";
+import {
+  WeeklyUpdateDateToolbar,
+  WeeklyUpdateAdminFabs,
+  BulletinSkeleton,
+  useWeeklyUpdate,
+  useBulletinDimensions,
+} from "../../../components/News/WeeklyUpdate";
+import "./WeeklyUpdate.css";
 
 const PDFReader = lazy(
   () => import("../../../components/News/WeeklyUpdate/PDFReader"),
 );
-
-import { useLoaderData, useNavigate } from "react-router";
-import AdminComponent from "../../../common/AdminComponent";
-import {
-  addDays,
-  endOfWeek,
-  format,
-  isAfter,
-  isBefore,
-  isSameDay,
-  isSunday,
-  parse,
-  startOfWeek,
-  subDays,
-} from "date-fns";
-
-import "./WeeklyUpdate.css";
-import useModals from "../../../util/useModal";
-import { deleteWeeklyUpdate, getWeeklyUpdate } from "../../../api/weeklyupdate";
-import useAuthStore from "../../../store/useAuthStore";
-import { MIN_DATE } from "../../../constants/WeeklyUpdate";
-import CustomConfirmDialog from "../../../common/CustomConfirmDialog";
 
 const titleBackground = {
   backgroundImage: 'url("/img/News/WeeklyUpdate/WeeklyUpdate.webp")',
 };
 
 const WeeklyUpdate = () => {
-  const { openModal } = useModals();
-  const navigate = useNavigate();
-  const authenticated = useAuthStore((state) => state.authenticated);
-  const authInitialized = useAuthStore((state) => state.authInitialized);
-
   const { maxDate, queryDate } = useLoaderData();
+  const {
+    selectedDate,
+    setSelectedDate,
+    bulletin,
+    loading,
+    previousSunday,
+    nextSunday,
+    canGoPrevious,
+    canGoNext,
+    deleteFile,
+    minDate,
+  } = useWeeklyUpdate(queryDate, maxDate);
 
-  const [bulletin, setBulletin] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(queryDate);
-
-  const [loading, setLoading] = useState(true);
-
-  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState(false);
-
-  // Get Bulletin from Firestore
-  const loadFile = useCallback(async () => {
-    setLoading(true);
-    setBulletin(null);
-    try {
-      const result = await getWeeklyUpdate(selectedDate);
-
-      setBulletin(result.data);
-    } catch (err) {
-      console.log(err);
-      setBulletin(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedDate]);
-
-  const deleteFile = async () => {
-    try {
-      const result = await deleteWeeklyUpdate(selectedDate);
-      const rawDate = typeof result?.data === "string" ? result.data.trim() : "";
-      if (rawDate) {
-        setSelectedDate(parse(rawDate, "yyyyMMdd", new Date()));
-      } else {
-        previousSunday();
-      }
-    } catch (err) {
-      console.error("Failed to delete weekly update:", err);
-    }
-  };
-
-  const previousSunday = () => {
-    setSelectedDate((prev) =>
-      isSunday(prev)
-        ? subDays(prev, 7)
-        : startOfWeek(prev, { weekStartsOn: 0 }),
-    );
-  };
-
-  const nextSunday = () => {
-    setSelectedDate((prev) =>
-      isSunday(prev) ? addDays(prev, 7) : endOfWeek(prev, { weekStartsOn: 1 }),
-    );
-  };
-
-  useEffect(() => {
-    if (!authInitialized) return;
-
-    loadFile();
-    navigate("/weeklyupdate/" + format(selectedDate, "yyyyMMdd"), {
-      replace: true,
-    });
-  }, [selectedDate, authenticated, authInitialized, loadFile, navigate]);
-
-  const calculateDimensions = () => {
-    if (typeof window === "undefined") {
-      return { width: null, height: null };
-    }
-    const width = isMobile
-      ? document.documentElement.clientWidth
-      : window.innerWidth;
-    const height = isMobile
-      ? document.documentElement.clientHeight
-      : window.innerHeight;
-
-    const aspectRatio = height / width;
-    const isPortrait = aspectRatio >= 16 / 10;
-
-    return {
-      width: isPortrait ? width - 30 : null,
-      height: isPortrait ? null : height,
-    };
-  };
-
-  const [documentDimension, setDocumentDimension] = useState(calculateDimensions);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setDocumentDimension(calculateDimensions());
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const documentDimension = useBulletinDimensions();
 
   return (
     <>
@@ -158,78 +55,26 @@ const WeeklyUpdate = () => {
           </Typography>
         </div>
       </div>
+
       <div className="container-wrapper" style={{ backgroundColor: "#ffffff" }}>
         <div
           className="container"
           style={{ textAlign: "center", paddingLeft: 0, paddingRight: 0 }}
         >
-          <Box
-            sx={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "rgba(255, 255, 255, 0.85)",
-              backdropFilter: "blur(12px)",
-              WebkitBackdropFilter: "blur(12px)",
-              borderRadius: "40px",
-              boxShadow:
-                "0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 10px rgba(0, 0, 0, 0.05)",
-              border: "1px solid rgba(0, 0, 0, 0.15)",
-              px: 1,
-              py: 0.5,
-              mb: 3,
-              mt: 1,
-            }}
-          >
-            <IconButton
-              id="previousBulletin"
-              onClick={previousSunday}
-              disabled={
-                isSameDay(selectedDate, MIN_DATE) ||
-                isBefore(selectedDate, MIN_DATE) ||
-                loading
-              }
-              sx={{
-                color: "#FF6B00",
-                "&:hover": { backgroundColor: "rgba(255, 107, 0, 0.1)" },
-              }}
-            >
-              <ArrowBackIosIcon sx={{ fontSize: "1.1rem", ml: 0.5 }} />
-            </IconButton>
-
-            <ButtonDatePicker
-              value={selectedDate}
-              minDate={MIN_DATE}
-              maxDate={maxDate}
-              onChange={setSelectedDate}
-              disableDate={(date) => !isSunday(date)}
-              buttonVariant="text"
-              hideIcon={true}
-              buttonSx={{ px: { xs: 1, sm: 2 } }}
-            />
-
-            <IconButton
-              id="nextBulletin"
-              onClick={nextSunday}
-              disabled={
-                isSameDay(selectedDate, maxDate) ||
-                isAfter(selectedDate, maxDate) ||
-                loading
-              }
-              sx={{
-                color: "#FF6B00",
-                "&:hover": { backgroundColor: "rgba(255, 107, 0, 0.1)" },
-              }}
-            >
-              <ArrowForwardIosIcon sx={{ fontSize: "1.1rem" }} />
-            </IconButton>
-          </Box>
+          <WeeklyUpdateDateToolbar
+            selectedDate={selectedDate}
+            onChangeDate={setSelectedDate}
+            previousSunday={previousSunday}
+            nextSunday={nextSunday}
+            canGoPrevious={canGoPrevious}
+            canGoNext={canGoNext}
+            minDate={minDate}
+            maxDate={maxDate}
+          />
 
           <Suspense
             fallback={
-              <BulletinSkeleton
-                documentDimension={documentDimension}
-              />
+              <BulletinSkeleton documentDimension={documentDimension} />
             }
           >
             <PDFReader
@@ -240,42 +85,12 @@ const WeeklyUpdate = () => {
           </Suspense>
         </div>
       </div>
-      <AdminComponent>
-        <Fab
-          id="uploadBulletinButton"
-          onClick={async () => {
-            const { default: WeeklyUpdatePostModalComponent } = await import(
-              "../../../components/News/WeeklyUpdate/WeeklyUpdatePostModal" // Use the correct path
-            );
 
-            openModal(WeeklyUpdatePostModalComponent, {
-              setParentDate: setSelectedDate,
-            });
-          }}
-        >
-          <UploadIcon />
-        </Fab>
-
-        <Fab
-          id="deleteBulletinButton"
-          sx={{
-            backgroundColor: "#d10000",
-            color: "white",
-            ":hover": { backgroundColor: "#ff0000" },
-          }}
-          onClick={() => setDeleteConfirmDialog(true)}
-        >
-          <DeleteIcon />
-        </Fab>
-
-        <CustomConfirmDialog
-          title="삭제하시겠습니까?"
-          body={`${format(selectedDate, "yyyyMMdd")} 주보가 삭제됩니다`}
-          isOpen={deleteConfirmDialog}
-          onClose={() => setDeleteConfirmDialog(false)}
-          onConfirm={deleteFile}
-        />
-      </AdminComponent>
+      <WeeklyUpdateAdminFabs
+        selectedDate={selectedDate}
+        onDateChange={setSelectedDate}
+        onDeleteConfirm={deleteFile}
+      />
     </>
   );
 };
