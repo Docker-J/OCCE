@@ -39,13 +39,7 @@ export const getAlbumsController = async (c) => {
   const command = new QueryCommand(param);
 
   const result = await docClient.send(command);
-
-  const dataArray = [];
-  result.Items.forEach((data) => {
-    dataArray.push(data);
-  });
-
-  return c.json(dataArray);
+  return c.json(result.Items || []);
 };
 
 export const getAlbumController = async (c) => {
@@ -65,7 +59,7 @@ export const getAlbumController = async (c) => {
   const result = await docClient.send(command);
 
   if (!result.Items || result.Items.length === 0) {
-    return c.body(null, 404);
+    return c.json({ error: "NotFound", message: "앨범을 찾을 수 없습니다." }, 404);
   }
 
   return c.json({ title: result.Items[0].Title, images: result.Items[0].Images });
@@ -132,7 +126,7 @@ export const deleteAlbumController = async (c) => {
   const result = await docClient.send(getAlbumCommand);
 
   if (!result.Items || result.Items.length === 0) {
-    return c.body(null, 404);
+    return c.json({ error: "NotFound", message: "앨범을 찾을 수 없습니다." }, 404);
   }
 
   const images = Object.values(result.Items[0].Images);
@@ -152,5 +146,5 @@ export const deleteAlbumController = async (c) => {
   await docClient.send(deleteAlbumCommand);
 
   await purgeCache(c.env, ["oncce.ca/api/albums"]);
-  return c.body(null, 200);
+  return c.json({ success: true, id }, 200);
 };

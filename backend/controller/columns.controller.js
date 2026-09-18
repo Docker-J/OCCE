@@ -8,21 +8,21 @@ const PAGE_SIZE = 10;
 
 
 export const getColumnsController = async (c) => {
-  const pageStr = c.req.query("page");
-  const page = pageStr ? parseInt(pageStr, 10) : null;
+  const pageParsed = parseInt(c.req.query("page") || "1", 10);
+  const page = isNaN(pageParsed) || pageParsed < 1 ? 1 : pageParsed;
   const db = c.env.DB;
 
   const countSql = `SELECT COUNT(id) AS count FROM ${TABLENAME}`;
   const dataSql = `SELECT * FROM ${TABLENAME} ORDER BY timestamp DESC LIMIT ? OFFSET ?`;
-  const offset = page ? (page - 1) * PAGE_SIZE : 0;
+  const offset = (page - 1) * PAGE_SIZE;
 
   const [countResult, dataResult] = await Promise.all([
     executeD1Query(db, countSql),
     executeD1Query(db, dataSql, [PAGE_SIZE, offset]),
   ]);
 
-  const count = countResult.result[0].results[0].count;
-  const announcements = dataResult.result[0].results || [];
+  const count = countResult.result[0]?.results?.[0]?.count ?? 0;
+  const announcements = dataResult.result[0]?.results || [];
 
   return c.json({
     count,
@@ -36,8 +36,8 @@ export const getColumnController = async (c) => {
   const sql = `SELECT id, title, body, timestamp FROM ${TABLENAME} WHERE id = ?`;
   const params = [id];
   const result = await executeD1Query(db, sql, params);
-  if (!result.result[0].results || result.result[0].results.length === 0) {
-    return c.body(null, 404);
+  if (!result.result[0]?.results || result.result[0].results.length === 0) {
+    return c.json({ error: "NotFound", message: "칼럼을 찾을 수 없습니다." }, 404);
   }
   return c.json(result.result[0].results[0]);
 };
@@ -51,7 +51,7 @@ export const postColumnController = async (c) => {
     body.title,
     body.body,
     body.images && body.images.length > 0 ? body.images : null,
-    body.date,
+    body.date || new Date().toISOString(),
   ];
 
   const result = await executeD1Query(db, sql, params);
@@ -68,12 +68,16 @@ export const editColumnController = async (c) => {
   const getParams = [id];
 
   const result = await executeD1Query(db, getSql, getParams);
-  const images = result.result[0].results[0].images
+  const images = result.result[0]?.results?.[0]?.images
     ? result.result[0].results[0].images.split(",")
     : [];
 
+  const incomingImages = Array.isArray(body.images)
+    ? body.images
+    : (typeof body.images === "string" && body.images ? body.images.split(",") : []);
+
   const missingImages = images.filter(
-    (item) => !body.images.includes(item)
+    (item) => !incomingImages.includes(item)
   );
 
   if (missingImages.length > 0) {
@@ -114,5 +118,5 @@ export const deleteColumnController = async (c) => {
   await executeD1Query(db, deleteSql, deleteParams);
 
   await purgeCache(c.env, ["oncce.ca/api/columns"]);
-  return c.body(null, 200);
+  return c.json({ success: true, id }, 200);
 };

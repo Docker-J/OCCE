@@ -1,3 +1,7 @@
-import multer from "multer";
-
-export const upload = multer({ storage: multer.memoryStorage() });
+/**
+ * @deprecated
+ * Legacy Express multer middleware.
+ * Note: Cloudflare Workers (V8 Isolate) uses native Web Standards (`c.req.formData()`)
+ * instead of Node.js stream-based multer.
+ */
+export {};

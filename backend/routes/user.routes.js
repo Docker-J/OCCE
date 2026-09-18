@@ -1,5 +1,9 @@
 import { Hono } from "hono";
 import {
+  validateJson,
+  validateQuery,
+} from "../middleware/validator.js";
+import {
   confirmSignUpController,
   refreshSignInController,
   requestConfirmController,
@@ -12,13 +16,46 @@ import {
 
 const router = new Hono();
 
+// Authentication lifecycle
 router.post("/sign-in", signInController);
 router.post("/refresh-sign-in", refreshSignInController);
-router.post("/sign-up", signUpController);
-router.post("/confirm", confirmSignUpController);
-router.get("/resend-confirm", requestConfirmController);
 router.post("/sign-out", signOutController);
-router.post("/forgot-password", forgotPasswordController);
-router.post("/confirm-forgot-password", confirmForgotPasswordController);
+
+// Registration & verification
+router.post(
+  "/sign-up",
+  validateJson(["name", "phone", "password"]),
+  signUpController
+);
+
+router.post(
+  "/confirm",
+  validateJson(["phone", "confirmCode"]),
+  confirmSignUpController
+);
+
+router.get(
+  "/resend-confirm",
+  validateQuery({
+    phone: {
+      required: true,
+      message: "Phone number query parameter is required.",
+    },
+  }),
+  requestConfirmController
+);
+
+// Password recovery
+router.post(
+  "/forgot-password",
+  validateJson(["phone"]),
+  forgotPasswordController
+);
+
+router.post(
+  "/confirm-forgot-password",
+  validateJson(["phone", "confirmCode", "password"]),
+  confirmForgotPasswordController
+);
 
 export default router;

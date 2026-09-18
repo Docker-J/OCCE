@@ -40,54 +40,103 @@ export const getLeaderVerifier = (env) => {
   return leaderVerifierInstance;
 };
 
-export const authStaff = async (c, next) => {
-  try {
-    const authHeader = c.req.header("Authorization");
-    if (!authHeader) throw new Error("No Authorization header provided");
+/**
+ * Safely extracts the Bearer token from the Authorization header.
+ *
+ * @param {import("hono").Context} c
+ * @returns {string|null}
+ */
+const extractBearerToken = (c) => {
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader) return null;
 
-    const token = authHeader.split(" ")[1];
-    const verifier = getStaffVerifier(c.env);
-    const payload = await verifier.verify(token);
-
-    c.set("user", payload);
-    await next();
-  } catch (err) {
-    console.error("Staff authentication failed:", err);
-    return c.text("Unauthorized", 401);
+  const parts = authHeader.trim().split(/\s+/);
+  if (parts.length === 2 && /^Bearer$/i.test(parts[0])) {
+    return parts[1];
   }
+  return null;
 };
 
-export const authUser = async (c, next) => {
-  try {
-    const authHeader = c.req.header("Authorization");
-    if (!authHeader) throw new Error("No Authorization header provided");
+/**
+ * Higher-order authentication middleware factory.
+ * Provides unified Bearer token extraction, role verification, and JSON error responses.
+ *
+ * @param {Object} options
+ * @param {Function} options.getVerifier - Verifier retrieval function
+ * @param {boolean} [options.optional=false] - If true, non-authenticated requests pass through with authenticated=false
+ * @param {string} [options.roleName="User"] - Role name for descriptive error reporting
+ * @returns {import("hono").MiddlewareHandler}
+ */
+export const createAuthMiddleware = ({
+  getVerifier,
+  optional = false,
+  roleName = "User",
+}) => {
+  return async (c, next) => {
+    const token = extractBearerToken(c);
 
-    const token = authHeader.split(" ")[1];
-    const verifier = getUserVerifier(c.env);
-    const payload = await verifier.verify(token);
+    if (!token) {
+      if (optional) {
+        c.set("authenticated", false);
+        return next();
+      }
+      return c.json(
+        {
+          error: "Unauthorized",
+          message: `Authorization Bearer token is required for ${roleName} access.`,
+        },
+        401
+      );
+    }
 
-    c.set("user", payload);
-    c.set("authenticated", true);
-  } catch (err) {
-    c.set("authenticated", false);
-  } finally {
-    await next();
-  }
+    try {
+      const verifier = getVerifier(c.env);
+      const payload = await verifier.verify(token);
+
+      c.set("user", payload);
+      if (optional) {
+        c.set("authenticated", true);
+      }
+      return next();
+    } catch (err) {
+      if (optional) {
+        c.set("authenticated", false);
+        return next();
+      }
+      console.error(`[Auth] ${roleName} token verification failed:`, err.message || err);
+      return c.json(
+        {
+          error: "Unauthorized",
+          message: "Invalid, expired, or insufficient permissions token.",
+        },
+        401
+      );
+    }
+  };
 };
 
-export const authLeader = async (c, next) => {
-  try {
-    const authHeader = c.req.header("Authorization");
-    if (!authHeader) throw new Error("No Authorization header provided");
+/**
+ * Requires Staff privileges (Admin / Staff group).
+ */
+export const authStaff = createAuthMiddleware({
+  getVerifier: getStaffVerifier,
+  roleName: "Staff",
+});
 
-    const token = authHeader.split(" ")[1];
-    const verifier = getLeaderVerifier(c.env);
-    const payload = await verifier.verify(token);
+/**
+ * Optional authentication for general users.
+ * Sets `c.get("authenticated") = true|false` and `c.get("user") = payload`.
+ */
+export const authUser = createAuthMiddleware({
+  getVerifier: getUserVerifier,
+  optional: true,
+  roleName: "User",
+});
 
-    c.set("user", payload);
-    await next();
-  } catch (err) {
-    console.error("Leader authentication failed:", err);
-    return c.text("Unauthorized", 401);
-  }
-};
+/**
+ * Requires Leader privileges (Staff or GardenKeeper group).
+ */
+export const authLeader = createAuthMiddleware({
+  getVerifier: getLeaderVerifier,
+  roleName: "Leader",
+});

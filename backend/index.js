@@ -1,66 +1,121 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { logger } from "hono/logger";
+import { secureHeaders } from "hono/secure-headers";
+import { HTTPException } from "hono/http-exception";
 import { DeleteItemCommand } from "@aws-sdk/client-dynamodb";
+
 import { getDocClient } from "./api/dynamodb.js";
-
-import user from "./routes/user.routes.js";
-import announcements from "./routes/announcements.routes.js";
-import column from "./routes/columns.routes.js";
-import weeklyupdate from "./routes/weeklyupdate.routes.js";
-import albums from "./routes/albums.routes.js";
-import meditationon from "./routes/meditationon.routes.js";
-import notification from "./routes/notification.routes.js";
-import schedules from "./routes/schedules.routes.js";
-import images from "./routes/images.routes.js";
-import attendance from "./routes/attendance.routes.js";
-import bible291 from "./routes/bible291.routes.js";
-import admin from "./routes/admin.routes.js";
-
+import apiRouter from "./routes/index.js";
 import { handleScheduled } from "./jobs/scheduled.js";
 import { linkPreviewMiddleware } from "./middleware/linkPreview.js";
 
 const app = new Hono();
 
-app.onError((err, c) => {
-  console.error(`[Global Error] ${c.req.method} ${c.req.url} -`, err);
-  return c.json({ error: "Internal Server Error", details: err.message }, 500);
-});
+// ==========================================
+// 1. Global Pre-Routing Middlewares
+// ==========================================
 
-app.use("*", cors());
+// HTTP Request / Response logger
+app.use("*", logger());
+
+// Security headers (X-Frame-Options, X-Content-Type-Options, etc.)
+app.use("*", secureHeaders());
+
+// CORS configuration with credentials and method control
+app.use(
+  "*",
+  cors({
+    origin: (origin) => origin || "*",
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+    exposeHeaders: ["Content-Length"],
+    maxAge: 86400,
+    credentials: true,
+  })
+);
+
+// Dynamic OpenGraph / Twitter meta-tag rewriter for bot crawlers
 app.use("*", (c, next) => linkPreviewMiddleware(c, next, app));
 
-// Mount sub-routers
-app.route("/api/user", user);
-app.route("/api/announcements", announcements);
-app.route("/api/columns", column);
-app.route("/api/weekly-update", weeklyupdate);
-app.route("/api/albums", albums);
-app.route("/api/schedules", schedules);
-app.route("/api/meditation-on", meditationon);
-app.route("/api/notification", notification);
-app.route("/api/images", images);
-app.route("/api/attendance", attendance);
-app.route("/api/bible291", bible291);
-app.route("/api/admin", admin);
+// ==========================================
+// 2. Error & Not Found Handlers
+// ==========================================
 
+// Global exception handler
+app.onError((err, c) => {
+  console.error(`[Global Error] ${c.req.method} ${c.req.url} -`, err);
+
+  // Handle Hono HTTP exceptions (e.g. 400 Bad Request, 401 Unauthorized)
+  if (err instanceof HTTPException) {
+    return c.json(
+      {
+        error: err.name || "HTTPException",
+        message: err.message,
+      },
+      err.status
+    );
+  }
+
+  // Handle unexpected internal server errors
+  return c.json(
+    {
+      error: "InternalServerError",
+      message: err.message || "An unexpected error occurred",
+    },
+    500
+  );
+});
+
+// Global 404 handler returning uniform JSON specification
+app.notFound((c) => {
+  return c.json(
+    {
+      error: "NotFound",
+      message: `Cannot ${c.req.method} ${c.req.path}`,
+    },
+    404
+  );
+});
+
+// ==========================================
+// 3. API Router Registration
+// ==========================================
+app.route("/api", apiRouter);
+
+// ==========================================
+// 4. Cloudflare Worker Life Cycle Handlers
+// ==========================================
 export default {
   /**
-   * Queue handler to process background tasks like FCM notifications.
+   * Fetch handler routing incoming HTTP traffic through Hono.
+   */
+  fetch(request, env, ctx) {
+    return app.fetch(request, env, ctx);
+  },
+
+  /**
+   * Cloudflare Queue handler to process asynchronous background tasks (e.g. FCM push notifications).
    */
   async queue(batch, env, ctx) {
-    console.log(`Processing FCM Queue batch of ${batch.messages.length} messages`);
-    
-    // With max_batch_size=1, batch.messages.length is 1.
-    // Each message contains up to 20 tokens (tokens array).
+    console.log(`[Queue] Processing FCM batch of ${batch.messages.length} message(s)`);
+
+    // Lazily instantiate DynamoDB client once per batch
+    let docClient = null;
+
     const sendPromises = batch.messages.flatMap((msg) => {
-      const { tokens, payloadTemplate, accessToken, projectId } = msg.body;
-      
+      const { tokens, payloadTemplate, accessToken, projectId } = msg.body || {};
+
+      if (!Array.isArray(tokens) || tokens.length === 0) {
+        return [];
+      }
+
       return tokens.map(async (token) => {
         const payload = {
           message: {
             token: token,
             ...payloadTemplate,
-          }
+          },
         };
 
         try {
@@ -78,26 +133,32 @@ export default {
 
           if (!res.ok) {
             const errText = await res.text();
-            console.error(`FCM send error for token ${token}:`, errText);
-            
-            if (errText.includes("UNREGISTERED") || errText.includes("NotRegistered")) {
-              console.log(`Token ${token} is unregistered. Deleting from DynamoDB...`);
-              const docClient = getDocClient(env);
+            console.error(`[FCM] Send error for token ${token}:`, errText);
+
+            // Clean up stale / unregistered tokens from DynamoDB
+            if (
+              errText.includes("UNREGISTERED") ||
+              errText.includes("NotRegistered")
+            ) {
+              console.log(`[FCM] Token ${token} is unregistered. Removing from DynamoDB...`);
+              if (!docClient) {
+                docClient = getDocClient(env);
+              }
               const deleteCmd = new DeleteItemCommand({
                 TableName: "FCMToken",
                 Key: {
-                  token: { S: token }
-                }
+                  token: { S: token },
+                },
               });
               await docClient.send(deleteCmd);
-              console.log(`Successfully deleted unregistered token: ${token}`);
+              console.log(`[FCM] Successfully deleted unregistered token: ${token}`);
             }
           } else {
-            // Must consume or cancel response body to release HTTP socket and prevent deadlock in Cloudflare Workers
+            // Cancel response body stream to release worker socket and avoid memory leaks
             await res.body?.cancel();
           }
         } catch (err) {
-          console.error(`FCM network error for token ${token}:`, err);
+          console.error(`[FCM] Network exception for token ${token}:`, err);
         }
       });
     });
@@ -106,18 +167,10 @@ export default {
   },
 
   /**
-   * Fetch handler to route HTTP requests through Hono.
-   */
-  fetch(request, env, ctx) {
-    return app.fetch(request, env, ctx);
-  },
-
-  /**
-   * Scheduled handler to perform background cron tasks
-   * delegated to backend/jobs/scheduled.js.
+   * Scheduled cron triggers delegated to backend/jobs/scheduled.js.
    */
   async scheduled(event, env, ctx) {
-    console.log(`[Wrangler Scheduled Trigger] Cron: ${event.cron}`);
+    console.log(`[Scheduled] Cron trigger: ${event.cron}`);
     ctx.waitUntil(handleScheduled(event, env, ctx));
   },
 };

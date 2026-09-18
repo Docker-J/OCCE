@@ -1,6 +1,7 @@
-import { cache } from "hono/cache";
 import { Hono } from "hono";
 import { authStaff } from "../middleware/auth.js";
+import { apiCache } from "../middleware/cache.js";
+import { validateParam } from "../middleware/validator.js";
 import {
   deleteAlbumController,
   getAlbumController,
@@ -10,9 +11,24 @@ import {
 
 const router = new Hono();
 
-router.get("/", cache({ cacheName: "occe-api", cacheControl: "public, s-maxage=604800, max-age=0" }), getAlbumsController);
-router.get("/:id", cache({ cacheName: "occe-api", cacheControl: "public, s-maxage=604800, max-age=0" }), getAlbumController);
-router.delete("/:id", authStaff, deleteAlbumController);
-router.post("/", authStaff, postAlbumController);
+// Collection routes (list & create)
+router
+  .get("/", apiCache(), getAlbumsController)
+  .post("/", authStaff, postAlbumController);
+
+// Individual album routes (read & delete)
+router
+  .get(
+    "/:id",
+    validateParam({ id: { required: true } }),
+    apiCache(),
+    getAlbumController
+  )
+  .delete(
+    "/:id",
+    authStaff,
+    validateParam({ id: { required: true } }),
+    deleteAlbumController
+  );
 
 export default router;

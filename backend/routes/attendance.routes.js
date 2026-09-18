@@ -5,7 +5,6 @@ import {
   getReportController,
   postReportController,
 } from "../controller/attendance.controller.js";
-
 import {
   getGatheringReportController,
   getGatheringHistoryController,
@@ -14,23 +13,23 @@ import {
 
 const router = new Hono();
 
-// Get gardens and members based on user role
-router.get("/gardens", authLeader, getGardensController);
+// All attendance and gathering endpoints require Leader (Staff or GardenKeeper) authentication
+router.use("*", authLeader);
 
-// Get already reported attendance for a garden on a specific date
-router.get("/report", authLeader, getReportController);
+// Garden & member roster
+router.get("/gardens", getGardensController);
 
-// Get already reported gathering report for a garden on a specific date
-router.get("/gathering-report", authLeader, getGatheringReportController);
+// Sunday service attendance report (query existing & submit new)
+router
+  .get("/report", getReportController)
+  .post("/report", postReportController);
 
-// Get gathering history dates for a garden
-router.get("/gathering-history", authLeader, getGatheringHistoryController);
+// Small group gathering report (query existing & submit new)
+router
+  .get("/gathering-report", getGatheringReportController)
+  .post("/gathering-report", postGatheringReportController);
 
-// Submit attendance report
-router.post("/report", authLeader, postReportController);
-
-// Submit garden gathering report
-router.post("/gathering-report", authLeader, postGatheringReportController);
+// Historical gathering report dates
+router.get("/gathering-history", getGatheringHistoryController);
 
 export default router;
-

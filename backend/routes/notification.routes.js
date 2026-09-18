@@ -1,5 +1,6 @@
 import { Hono } from "hono";
-import { authStaff } from "./../middleware/auth.js";
+import { authStaff } from "../middleware/auth.js";
+import { validateJson } from "../middleware/validator.js";
 import {
   registerController,
   unregisterController,
@@ -9,9 +10,27 @@ import {
 
 const router = new Hono();
 
-router.put("/register", registerController);
-router.delete("/unregister", unregisterController);
+// Device push token lifecycle
+router.put(
+  "/register",
+  validateJson(["token"]),
+  registerController
+);
+
+router.delete(
+  "/unregister",
+  validateJson(["token"]),
+  unregisterController
+);
+
 router.post("/unlink", unlinkRoleController);
-router.post("/broadcast", authStaff, broadcastController);
+
+// Staff notification broadcast
+router.post(
+  "/broadcast",
+  authStaff,
+  validateJson(["title", "body"]),
+  broadcastController
+);
 
 export default router;

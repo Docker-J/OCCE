@@ -38,13 +38,7 @@ export const getMeditationONsController = async (c) => {
   const command = new QueryCommand(scanParam);
 
   const result = await docClient.send(command);
-
-  const dataArray = [];
-  result.Items.forEach((data) => {
-    dataArray.push(data);
-  });
-
-  return c.json(dataArray);
+  return c.json(result.Items || []);
 };
 
 export const getMeditationONController = async (c) => {
@@ -67,7 +61,7 @@ export const getMeditationONController = async (c) => {
   const result = await docClient.send(command);
 
   if (!result.Items || result.Items.length === 0) {
-    return c.body(null, 404);
+    return c.json({ error: "NotFound", message: "묵상ON 게시글을 찾을 수 없습니다." }, 404);
   }
 
   return c.json(result.Items[0]);
@@ -113,7 +107,7 @@ export const postMeditationONController = async (c) => {
     console.log("MeditationON created:", response);
 
     await purgeCache(c.env, ["oncce.ca/api/meditation-on"]);
-    return c.body(null, 201);
+    return c.json({ success: true, message: "MeditationON created successfully" }, 201);
   } catch (error) {
     console.error("postMeditationONController error:", error);
     return c.json(

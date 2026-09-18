@@ -1,6 +1,10 @@
 import { Hono } from "hono";
 import { authStaff } from "../middleware/auth.js";
 import {
+  validateJson,
+  validateParam,
+} from "../middleware/validator.js";
+import {
   listUsersController,
   updateUserRoleController,
   updateUserStatusController,
@@ -13,21 +17,46 @@ import {
 
 const router = new Hono();
 
-// All admin routes require Staff authorization
+// All admin routes strictly require Staff authorization
 router.use("*", authStaff);
 
+// User membership management
 router.get("/users", listUsersController);
-router.post("/users/:username/role", updateUserRoleController);
-router.post("/users/:username/status", updateUserStatusController);
-router.delete("/users/:username", deleteUserController);
 
-// Weekly attendance summary and trends
+router.post(
+  "/users/:username/role",
+  validateParam({ username: { required: true } }),
+  validateJson(["action"]),
+  updateUserRoleController
+);
+
+router.post(
+  "/users/:username/status",
+  validateParam({ username: { required: true } }),
+  validateJson(["enabled"]),
+  updateUserStatusController
+);
+
+router.delete(
+  "/users/:username",
+  validateParam({ username: { required: true } }),
+  deleteUserController
+);
+
+// Attendance administration & analytics
 router.get("/attendance/summary", getAttendanceStatsController);
 
-// Garden specific attendance details for a given week
 router.get(
   "/attendance/gardens/:gardenName/:date",
-  getGardenAttendanceDetailController,
+  validateParam({
+    gardenName: { required: true },
+    date: {
+      required: true,
+      pattern: /^\d{4}-\d{2}-\d{2}$/,
+      message: "Date parameter must follow YYYY-MM-DD format.",
+    },
+  }),
+  getGardenAttendanceDetailController
 );
 
 export default router;

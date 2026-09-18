@@ -1,4 +1,6 @@
 export const deleteImages = async (env, images) => {
+  if (!Array.isArray(images) || images.length === 0) return;
+
   try {
     const CLOUDFLARE_ACCOUNT_ID = env.CLOUDFLARE_ACCOUNT_ID;
     const CLOUDFLARE_API_KEY = env.CLOUDFLARE_API_KEY;
@@ -66,7 +68,7 @@ export const uploadImageController = async (c) => {
   const image = formData.get("image");
 
   if (!image) {
-    return c.text("No image file provided", 400);
+    return c.json({ error: "BadRequest", message: "No image file provided" }, 400);
   }
 
   const result = await uploadImage(c.env, image);

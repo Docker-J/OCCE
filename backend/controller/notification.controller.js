@@ -57,10 +57,10 @@ export const registerController = async (c) => {
     });
 
     await docClient.send(command);
-    return c.body(null, 200);
+    return c.json({ success: true }, 200);
   } catch (err) {
     console.error("Register notification token error:", err);
-    return c.body(null, 500);
+    return c.json({ error: "RegisterTokenError", message: err.message }, 500);
   }
 };
 
@@ -68,7 +68,7 @@ export const unlinkRoleController = async (c) => {
   try {
     const body = await c.req.json();
     if (!body?.token) {
-      return c.body(null, 400);
+      return c.json({ error: "BadRequest", message: "Token is required." }, 400);
     }
     const docClient = getDocClient(c.env);
 
@@ -88,10 +88,10 @@ export const unlinkRoleController = async (c) => {
     });
 
     await docClient.send(command);
-    return c.body(null, 200);
+    return c.json({ success: true }, 200);
   } catch (err) {
     console.error("Unlink notification token role error:", err);
-    return c.body(null, 500);
+    return c.json({ error: "UnlinkRoleError", message: err.message }, 500);
   }
 };
 
@@ -108,10 +108,10 @@ export const unregisterController = async (c) => {
     });
 
     await docClient.send(command);
-    return c.body(null, 200);
+    return c.json({ success: true }, 200);
   } catch (err) {
     console.error("Unregister notification token error:", err);
-    return c.body(null, 500);
+    return c.json({ error: "UnregisterTokenError", message: err.message }, 500);
   }
 };
 

@@ -41,8 +41,11 @@ const getRememberCookieOptions = (remember = false) => {
 
 export const signInController = async (c) => {
   const authHeader = c.req.header("Authorization");
-  if (!authHeader) {
-    return c.text("Unauthorized", 401);
+  if (!authHeader || !authHeader.startsWith("Basic ")) {
+    return c.json(
+      { error: "Unauthorized", message: "Missing or invalid Basic Authorization header." },
+      401
+    );
   }
 
   let remember = false;
@@ -53,11 +56,19 @@ export const signInController = async (c) => {
     // Body might be empty, ignore
   }
 
-  const auth = new Buffer.from(authHeader.split(" ")[1], "base64")
-    .toString()
-    .split(":");
-  const phone = auth[0];
-  const password = auth[1];
+  const base64Credentials = authHeader.slice(6).trim();
+  const credentials = Buffer.from(base64Credentials, "base64").toString("utf-8");
+  const colonIndex = credentials.indexOf(":");
+
+  if (colonIndex === -1) {
+    return c.json(
+      { error: "InvalidCredentials", message: "Malformed credentials format." },
+      400
+    );
+  }
+
+  const phone = credentials.slice(0, colonIndex);
+  const password = credentials.slice(colonIndex + 1);
 
   console.log("PHONE: ", phone);
   console.log("Sign In requested");
@@ -110,8 +121,14 @@ export const signInController = async (c) => {
       remember: !!remember,
     });
   } catch (error) {
-    console.log(error);
-    return c.body(null, 403);
+    console.error("signInController error:", error);
+    return c.json(
+      {
+        error: error.name || "AuthenticationFailed",
+        message: error.message || "Sign in failed.",
+      },
+      error.$metadata?.httpStatusCode || 403
+    );
   }
 };
 
@@ -177,8 +194,14 @@ export const refreshSignInController = async (c) => {
       remember: isRemembered,
     });
   } catch (error) {
-    console.log(error);
-    return c.body(null, 403);
+    console.error("refreshSignInController error:", error);
+    return c.json(
+      {
+        error: error.name || "RefreshFailed",
+        message: error.message || "Failed to refresh authentication session.",
+      },
+      error.$metadata?.httpStatusCode || 403
+    );
   }
 };
 

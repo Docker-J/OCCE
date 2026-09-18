@@ -8,14 +8,14 @@ const PAGE_SIZE = 10;
 
 
 export const getAnnouncementsController = async (c) => {
-  const pageStr = c.req.query("page");
-  const page = pageStr ? parseInt(pageStr, 10) : null;
+  const pageParsed = parseInt(c.req.query("page") || "1", 10);
+  const page = isNaN(pageParsed) || pageParsed < 1 ? 1 : pageParsed;
   const db = c.env.DB;
 
   const countSql = `SELECT COUNT(id) AS count FROM ${TABLENAME} WHERE pin = 0 OR pin IS NULL`;
   const pinSql = `SELECT * FROM ${TABLENAME} WHERE pin = 1 ORDER BY timestamp DESC`;
   const dataSql = `SELECT * FROM ${TABLENAME} WHERE pin = 0 OR pin IS NULL ORDER BY timestamp DESC LIMIT ? OFFSET ?`;
-  const offset = page ? (page - 1) * PAGE_SIZE : 0;
+  const offset = (page - 1) * PAGE_SIZE;
 
   const [countResult, pinResult, dataResult] = await Promise.all([
     executeD1Query(db, countSql),
@@ -23,9 +23,9 @@ export const getAnnouncementsController = async (c) => {
     executeD1Query(db, dataSql, [PAGE_SIZE, offset]),
   ]);
 
-  const count = countResult.result[0].results[0].count;
-  const pinned = pinResult.result[0].results || [];
-  const data = dataResult.result[0].results || [];
+  const count = countResult.result[0]?.results?.[0]?.count ?? 0;
+  const pinned = pinResult.result[0]?.results || [];
+  const data = dataResult.result[0]?.results || [];
 
   const announcements = pinned.concat(data);
 
@@ -39,8 +39,8 @@ export const getAnnouncementController = async (c) => {
   const params = [id];
 
   const result = await executeD1Query(db, sql, params);
-  if (!result.result[0].results || result.result[0].results.length === 0) {
-    return c.body(null, 404);
+  if (!result.result[0]?.results || result.result[0].results.length === 0) {
+    return c.json({ error: "NotFound", message: "공지사항을 찾을 수 없습니다." }, 404);
   }
   return c.json(result.result[0].results[0]);
 };
@@ -55,7 +55,7 @@ export const postAnnouncementController = async (c) => {
     body.body,
     body.images && body.images.length > 0 ? body.images : null,
     new Date().toISOString(),
-    body.video,
+    body.video || null,
   ];
 
   const result = await executeD1Query(db, sql, params);
@@ -71,14 +71,17 @@ export const editAnnouncementController = async (c) => {
   const getSql = `SELECT images FROM ${TABLENAME} WHERE id = ?`;
   const getParams = [id];
 
-  // Remove try-catch for images too, let it fail fast if DB fails
   const result = await executeD1Query(db, getSql, getParams);
-  const images = result.result[0].results[0].images
+  const images = result.result[0]?.results?.[0]?.images
     ? result.result[0].results[0].images.split(",")
     : [];
 
+  const incomingImages = Array.isArray(body.images)
+    ? body.images
+    : (typeof body.images === "string" && body.images ? body.images.split(",") : []);
+
   const missingImages = images.filter(
-    (item) => !body.images.includes(item)
+    (item) => !incomingImages.includes(item)
   );
 
   if (missingImages.length > 0) {
@@ -90,7 +93,7 @@ export const editAnnouncementController = async (c) => {
     body.title,
     body.body,
     body.images && body.images.length > 0 ? body.images : null,
-    body.video,
+    body.video || null,
     id,
   ];
 
@@ -120,7 +123,7 @@ export const deleteAnnouncementController = async (c) => {
   await executeD1Query(db, deleteSql, deleteParams);
   
   await purgeCache(c.env, ["oncce.ca/api/announcements"]);
-  return c.body(null, 200);
+  return c.json({ success: true, id }, 200);
 };
 
 export const pinAnnouncementController = async (c) => {
@@ -133,5 +136,5 @@ export const pinAnnouncementController = async (c) => {
 
   await executeD1Query(db, sql, params);
   await purgeCache(c.env, ["oncce.ca/api/announcements"]);
-  return c.body(null, 201);
+  return c.json({ success: true, id, pin: body.pin }, 200);
 };

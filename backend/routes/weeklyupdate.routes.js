@@ -1,6 +1,7 @@
-import { cache } from "hono/cache";
 import { Hono } from "hono";
-import { authStaff, authUser } from "./../middleware/auth.js";
+import { authStaff, authUser } from "../middleware/auth.js";
+import { apiCache } from "../middleware/cache.js";
+import { validateParam } from "../middleware/validator.js";
 import {
   deleteWeeklyUpdateController,
   getRecentWeeklyUpdateDateController,
@@ -10,20 +11,39 @@ import {
 
 const router = new Hono();
 
-// Only cache public requests. If Authorization header exists, bypass cache completely
-const publicWeeklyUpdateCache = async (c, next) => {
-  if (c.req.header("Authorization")) {
-    return next();
-  }
-  return cache({
-    cacheName: "occe-api",
-    cacheControl: "public, s-maxage=604800, max-age=0",
-  })(c, next);
+// Date validation rule for weekly bulletin (YYYYMMDD)
+const dateParamRule = {
+  date: {
+    required: true,
+    pattern: /^\d{8}$/,
+    message: "Invalid date format. Expected YYYYMMDD.",
+  },
 };
 
-router.get("/recent-date", cache({ cacheName: "occe-api", cacheControl: "public, s-maxage=604800, max-age=0" }), getRecentWeeklyUpdateDateController);
-router.get("/:date", publicWeeklyUpdateCache, authUser, getWeeklyUpdateController);
-router.put("/:date", authStaff, uploadWeeklyUpdateController);
-router.delete("/:date", authStaff, deleteWeeklyUpdateController);
+// Recent bulletin date
+router.get("/recent-date", apiCache(), getRecentWeeklyUpdateDateController);
+
+// Date-specific bulletin routes (read, upload, delete)
+router.get(
+  "/:date",
+  validateParam(dateParamRule),
+  apiCache({ bypassOnAuth: true }),
+  authUser,
+  getWeeklyUpdateController
+);
+
+router.put(
+  "/:date",
+  authStaff,
+  validateParam(dateParamRule),
+  uploadWeeklyUpdateController
+);
+
+router.delete(
+  "/:date",
+  authStaff,
+  validateParam(dateParamRule),
+  deleteWeeklyUpdateController
+);
 
 export default router;

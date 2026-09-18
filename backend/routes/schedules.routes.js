@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { apiCache } from "../middleware/cache.js";
 import {
   getSchedulesController,
   refreshSchedulesController,
@@ -6,7 +7,8 @@ import {
 
 const router = new Hono();
 
-router.get("/", getSchedulesController);
+// Church schedules cache (1 day) & on-demand refresh
+router.get("/", apiCache({ sMaxAge: 86400 }), getSchedulesController);
 router.get("/refresh", refreshSchedulesController);
 
 export default router;
