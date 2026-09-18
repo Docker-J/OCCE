@@ -31,13 +31,13 @@ const DepartmentCarousel = ({
               ? "100%"
               : isMobile
               ? "100%"
-              : "calc(50% - 12px)"
+              : "50%"
           }
           slideGap="24px"
           options={
             isSingleImage
               ? undefined
-              : { align: "start", containScroll: "trimSnaps" }
+              : { align: "start" }
           }
           loop={true}
         >

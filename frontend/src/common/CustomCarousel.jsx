@@ -108,19 +108,22 @@ const CustomCarousel = ({
   const containerStyle = React.useMemo(() => {
     const style = {};
     if (slideGap) {
-      style.gap = slideGap;
+      style.marginLeft = `calc(-1 * ${slideGap})`;
     }
     return style;
   }, [slideGap]);
 
   const computedSlideStyle = React.useMemo(() => {
     const style = { ...slideStyle };
+    if (slideGap) {
+      style.paddingLeft = slideGap;
+    }
     if (slideBasis) {
       style.flex = `0 0 ${slideBasis}`;
       style.maxWidth = slideBasis;
     }
     return style;
-  }, [slideBasis, slideStyle]);
+  }, [slideBasis, slideGap, slideStyle]);
 
   const handleSlideClick = (index, event) => {
     if (onSlideClick) {
