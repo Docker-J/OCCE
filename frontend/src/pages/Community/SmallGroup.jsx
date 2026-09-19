@@ -49,6 +49,100 @@ const SmallGroup = () => {
       <div className="container-wrapper" style={{ backgroundColor: "#fcfbf9", paddingBottom: "80px", paddingTop: "60px" }}>
         <div className="container" style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           
+          {/* Leader Control Panel (정원지기 전용 메뉴 최상단 배치) */}
+          {isLeader && (
+            <Card 
+              className="animate-fade" 
+              sx={{ 
+                borderRadius: "24px", 
+                border: "2px solid #FF6B00", 
+                boxShadow: "0 12px 40px rgba(255, 107, 0, 0.15)",
+                backgroundColor: "#fff",
+                overflow: "visible",
+                position: "relative",
+                mt: { xs: 2, md: 1 },
+                mb: 8,
+              }}
+            >
+              <Box 
+                sx={{ 
+                  position: "absolute", 
+                  top: -20, 
+                  left: "50%", 
+                  transform: "translateX(-50%)", 
+                  backgroundColor: "#FF6B00", 
+                  color: "#fff", 
+                  px: 3, 
+                  py: 1, 
+                  borderRadius: "30px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  fontWeight: 800,
+                  boxShadow: "0 4px 12px rgba(255, 107, 0, 0.3)"
+                }}
+              >
+                <SupervisorAccountIcon /> 정원지기 전용 메뉴
+              </Box>
+              
+              <CardContent sx={{ p: { xs: 4, md: 6 }, pt: { xs: 6, md: 8 }, textAlign: "center" }}>
+                <Typography variant="body1" sx={{ color: "#666", mb: 4, fontWeight: 600 }}>
+                  정원 모임과 주일 출석 현황을 각 보고서 양식에 맞추어 제출해 주세요.
+                </Typography>
+                
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: 3,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <Button
+                    component={Link}
+                    to="/community/smallgroup/report?type=sunday"
+                    variant="contained"
+                    size="large"
+                    startIcon={<AssignmentTurnedInIcon />}
+                    sx={{
+                      backgroundColor: "#dc2626",
+                      "&:hover": { backgroundColor: "#b91c1c", transform: "translateY(-3px)", boxShadow: "0 8px 16px rgba(220, 38, 38, 0.3)" },
+                      borderRadius: "16px",
+                      px: { xs: 3, md: 5 },
+                      py: 1.8,
+                      fontWeight: 800,
+                      fontSize: "1.05em",
+                      boxShadow: "0 4px 12px 0 rgba(220, 38, 38, 0.2)",
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    주일 출석 보고하기
+                  </Button>
+                  <Button
+                    component={Link}
+                    to="/community/smallgroup/report?type=gathering"
+                    variant="contained"
+                    size="large"
+                    startIcon={<AssignmentTurnedInIcon />}
+                    sx={{
+                      backgroundColor: "#ea580c",
+                      "&:hover": { backgroundColor: "#c2410c", transform: "translateY(-3px)", boxShadow: "0 8px 16px rgba(234, 88, 12, 0.3)" },
+                      borderRadius: "16px",
+                      px: { xs: 3, md: 5 },
+                      py: 1.8,
+                      fontWeight: 800,
+                      fontSize: "1.05em",
+                      boxShadow: "0 4px 12px 0 rgba(234, 88, 12, 0.2)",
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    정원 모임 보고하기
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+          )}
+
           {/* 1. Main Pull Quote */}
           <Box className="animate-fade" sx={{ textAlign: "center", mb: 8, position: "relative" }}>
             <FormatQuoteIcon sx={{ fontSize: "4rem", color: "rgba(255, 107, 0, 0.2)", mb: -2 }} />
@@ -165,7 +259,7 @@ const SmallGroup = () => {
 
           {/* 3. Conclusion Box */}
           <Box 
-            className="animate-fade"
+            className="animate-fade" 
             sx={{ 
               backgroundColor: "#fff0e6",
               border: "1px solid rgba(255, 107, 0, 0.2)",
@@ -173,7 +267,6 @@ const SmallGroup = () => {
               p: { xs: 4, md: 6 }, 
               textAlign: "center",
               animationDelay: "0.4s",
-              mb: 8
             }}
           >
             <Typography variant="h6" sx={{ color: "#444", lineHeight: 1.8, wordBreak: "keep-all", fontWeight: 500 }}>
@@ -181,99 +274,6 @@ const SmallGroup = () => {
               말씀 안에 살아계신 하나님을 통해 <span style={{ color: "#FF6B00", fontWeight: 800 }}>태초의 에덴을 경험하는 행복한 만남과 나눔과 성장, 그리고 지상 최대 명령인 복음 전파의 자리</span>입니다.
             </Typography>
           </Box>
-
-          {/* 4. Leader Control Panel */}
-          {isLeader && (
-            <Card 
-              className="animate-fade" 
-              sx={{ 
-                borderRadius: "24px", 
-                border: "2px solid #FF6B00", 
-                boxShadow: "0 12px 40px rgba(255, 107, 0, 0.15)",
-                backgroundColor: "#fff",
-                animationDelay: "0.5s",
-                overflow: "visible",
-                position: "relative"
-              }}
-            >
-              <Box 
-                sx={{ 
-                  position: "absolute", 
-                  top: -20, 
-                  left: "50%", 
-                  transform: "translateX(-50%)", 
-                  backgroundColor: "#FF6B00", 
-                  color: "#fff", 
-                  px: 3, 
-                  py: 1, 
-                  borderRadius: "30px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  fontWeight: 800,
-                  boxShadow: "0 4px 12px rgba(255, 107, 0, 0.3)"
-                }}
-              >
-                <SupervisorAccountIcon /> 정원지기 전용 메뉴
-              </Box>
-              
-              <CardContent sx={{ p: { xs: 4, md: 6 }, pt: { xs: 6, md: 8 }, textAlign: "center" }}>
-                <Typography variant="body1" sx={{ color: "#666", mb: 4, fontWeight: 600 }}>
-                  정원 모임과 주일 출석 현황을 각 보고서 양식에 맞추어 제출해 주세요.
-                </Typography>
-                
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: 3,
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <Button
-                    component={Link}
-                    to="/community/smallgroup/report?type=sunday"
-                    variant="contained"
-                    size="large"
-                    startIcon={<AssignmentTurnedInIcon />}
-                    sx={{
-                      backgroundColor: "#dc2626",
-                      "&:hover": { backgroundColor: "#b91c1c", transform: "translateY(-3px)", boxShadow: "0 8px 16px rgba(220, 38, 38, 0.3)" },
-                      borderRadius: "16px",
-                      px: { xs: 3, md: 5 },
-                      py: 1.8,
-                      fontWeight: 800,
-                      fontSize: "1.05em",
-                      boxShadow: "0 4px 12px 0 rgba(220, 38, 38, 0.2)",
-                      transition: "all 0.3s ease",
-                    }}
-                  >
-                    주일 출석 보고하기
-                  </Button>
-                  <Button
-                    component={Link}
-                    to="/community/smallgroup/report?type=gathering"
-                    variant="contained"
-                    size="large"
-                    startIcon={<AssignmentTurnedInIcon />}
-                    sx={{
-                      backgroundColor: "#ea580c",
-                      "&:hover": { backgroundColor: "#c2410c", transform: "translateY(-3px)", boxShadow: "0 8px 16px rgba(234, 88, 12, 0.3)" },
-                      borderRadius: "16px",
-                      px: { xs: 3, md: 5 },
-                      py: 1.8,
-                      fontWeight: 800,
-                      fontSize: "1.05em",
-                      boxShadow: "0 4px 12px 0 rgba(234, 88, 12, 0.2)",
-                      transition: "all 0.3s ease",
-                    }}
-                  >
-                    정원 모임 보고하기
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          )}
 
         </div>
       </div>
