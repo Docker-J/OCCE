@@ -12,8 +12,13 @@ const ResetPasswordRequestModal = ({ isOpen, onClose }) => {
   const { openSnackbar } = useSnackbar();
   const [phone, setPhone] = useState("");
 
-  const handleRequestReset = () => {
-    forgotPassword(phone, requestSuccess, requestFail);
+  const handleRequestReset = async () => {
+    try {
+      await forgotPassword(phone);
+      requestSuccess();
+    } catch (err) {
+      requestFail(err.message);
+    }
   };
 
   const requestSuccess = () => {

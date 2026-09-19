@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const signIn = async (phone, password, remember, success, fail) => {
+export const signIn = async (phone, password, remember = false, success, fail) => {
   let isRemember = false;
   let successCb = success;
   let failCb = fail;
@@ -26,20 +26,22 @@ export const signIn = async (phone, password, remember, success, fail) => {
     );
 
     if (successCb) successCb(res.data);
+    return res.data;
   } catch (error) {
-    console.log(error);
-    if (failCb) failCb();
+    if (failCb) failCb(error);
+    throw error;
   }
 };
 
 export const refreshTokenSignIn = async (arg1, arg2, arg3) => {
   let success, fail, refreshToken;
   if (typeof arg1 === "function") {
-    // New signature: refreshTokenSignIn(success, fail)
+    // Signature: refreshTokenSignIn(success, fail, refreshToken)
     success = arg1;
     fail = arg2;
+    refreshToken = arg3;
   } else {
-    // Backward-compatible signature: refreshTokenSignIn(refreshToken, success, fail)
+    // Signature: refreshTokenSignIn(refreshToken, success, fail)
     refreshToken = arg1;
     success = arg2;
     fail = arg3;
@@ -52,37 +54,43 @@ export const refreshTokenSignIn = async (arg1, arg2, arg3) => {
     );
 
     if (success) success(res.data);
+    return res.data;
   } catch (error) {
     if (fail) fail(error);
+    throw error;
   }
 };
 
 export const signUp = async (name, phone, password, success, fail) => {
   try {
     const res = await axios.post("/api/user/sign-up", {
-      phone: phone,
-      password: password,
-      name: name,
+      phone,
+      password,
+      name,
     });
 
-    success(res.data);
+    if (success) success(res.data);
+    return res.data;
   } catch (error) {
-    console.log(error.response.data);
-    fail(error.response.data?.error);
+    const errorDetail = error.response?.data?.error || error.message;
+    if (fail) fail(errorDetail);
+    throw new Error(errorDetail);
   }
 };
 
 export const confirmSignUp = async (phone, confirmCode, success, fail) => {
   try {
     const res = await axios.post("/api/user/confirm", {
-      phone: phone,
-      confirmCode: confirmCode,
+      phone,
+      confirmCode,
     });
 
-    success();
+    if (success) success(res.data);
+    return res.data;
   } catch (error) {
-    console.log(error);
-    fail();
+    const errorDetail = error.response?.data?.error || error.message;
+    if (fail) fail(errorDetail);
+    throw new Error(errorDetail);
   }
 };
 
@@ -90,41 +98,56 @@ export const resendSignUpConfirm = async (phone, success, fail) => {
   try {
     const res = await axios.get(`/api/user/resend-confirm?phone=${phone}`);
 
-    success();
+    if (success) success(res.data);
+    return res.data;
   } catch (error) {
-    fail(error.response?.data?.error);
+    const errorDetail = error.response?.data?.error || error.message;
+    if (fail) fail(errorDetail);
+    throw new Error(errorDetail);
   }
 };
 
 export const signOut = async (success) => {
   try {
-    await axios.post("/api/user/sign-out");
-  } catch {
-  } finally {
-    success();
+    const res = await axios.post("/api/user/sign-out");
+    if (success) success(res.data);
+    return res.data;
+  } catch (error) {
+    if (success) success();
+    return null;
   }
 };
 
 export const forgotPassword = async (phone, success, fail) => {
   try {
     const res = await axios.post("/api/user/forgot-password", { phone });
-    success(res.data);
+    if (success) success(res.data);
+    return res.data;
   } catch (error) {
-    console.log(error);
-    fail(error.response?.data?.error);
+    const errorDetail = error.response?.data?.error || error.message;
+    if (fail) fail(errorDetail);
+    throw new Error(errorDetail);
   }
 };
 
-export const confirmForgotPassword = async (phone, confirmCode, password, success, fail) => {
+export const confirmForgotPassword = async (
+  phone,
+  confirmCode,
+  password,
+  success,
+  fail
+) => {
   try {
     const res = await axios.post("/api/user/confirm-forgot-password", {
       phone,
       confirmCode,
       password,
     });
-    success(res.data);
+    if (success) success(res.data);
+    return res.data;
   } catch (error) {
-    console.log(error);
-    fail(error.response?.data?.error);
+    const errorDetail = error.response?.data?.error || error.message;
+    if (fail) fail(errorDetail);
+    throw new Error(errorDetail);
   }
 };

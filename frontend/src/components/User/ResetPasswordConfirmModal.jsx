@@ -43,28 +43,22 @@ const ResetPasswordConfirmModal = ({ phone, isOpen, onClose }) => {
     return () => clearInterval(interval);
   }, [isTimerActive, seconds]);
 
-  const onResendRequest = () => {
-    forgotPassword(phone, resendSuccess, resendFail);
+  const onResendRequest = async () => {
+    try {
+      await forgotPassword(phone);
+      resendSuccess();
+    } catch {
+      resendFail();
+    }
   };
 
-  const resendSuccess = () => {
-    openSnackbar("success", "새로운 인증번호가 전송되었습니다.");
-    setSeconds(60);
-    setIsTimerActive(true);
-  };
-
-  const resendFail = () => {
-    openSnackbar("error", "인증번호 재전송에 실패했습니다.");
-  };
-
-  const handleConfirmReset = (data) => {
-    confirmForgotPassword(
-      phone,
-      confirmCode,
-      data.password,
-      confirmSuccess,
-      confirmFail,
-    );
+  const handleConfirmReset = async (data) => {
+    try {
+      await confirmForgotPassword(phone, confirmCode, data.password);
+      confirmSuccess();
+    } catch (err) {
+      confirmFail(err.message);
+    }
   };
 
   const confirmSuccess = () => {

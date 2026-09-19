@@ -55,7 +55,7 @@ const SignInModal = ({ isOpen, onClose }) => {
     openSnackbar("error", "Wrong User Credentials");
   };
 
-  const handleSignIn = (data) => {
+  const handleSignIn = async (data) => {
     // data.phoneNumber will contain the formatted string "(123) 456-7890"
     const PASSWORD_REGEX = /^(?=.*[\d])(?=.*[!@#$%^&*])[\w!@#$%^&*]/;
     const isValid =
@@ -69,19 +69,18 @@ const SignInModal = ({ isOpen, onClose }) => {
     }
 
     setIsLoading(true);
-    signIn(
-      data.phoneNumber,
-      data.password,
-      getValues("remember"),
-      (result) => {
-        setIsLoading(false);
-        signInSuccess(result);
-      },
-      () => {
-        setIsLoading(false);
-        signInFail();
-      },
-    );
+    try {
+      const result = await signIn(
+        data.phoneNumber,
+        data.password,
+        getValues("remember")
+      );
+      signInSuccess(result);
+    } catch {
+      signInFail();
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleClose = () => {

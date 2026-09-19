@@ -31,12 +31,22 @@ const SignUpConfirmModal = ({ phone, isOpen, onClose }) => {
     return () => clearInterval(interval);
   }, [isTimerActive, seconds]);
 
-  const onSubmit = () => {
-    confirmSignUp(phone, confirmCode, confirmSuccess, confirmFail);
+  const onSubmit = async () => {
+    try {
+      await confirmSignUp(phone, confirmCode);
+      confirmSuccess();
+    } catch (err) {
+      confirmFail(err.message);
+    }
   };
 
-  const onResendRequest = () => {
-    resendSignUpConfirm(phone, resendSuccess, resendFail);
+  const onResendRequest = async () => {
+    try {
+      await resendSignUpConfirm(phone);
+      resendSuccess();
+    } catch (err) {
+      resendFail(err.message);
+    }
   };
 
   const confirmSuccess = () => {
