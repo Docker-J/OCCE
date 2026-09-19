@@ -4,13 +4,22 @@ import babel from "@rolldown/plugin-babel";
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import { analyzer } from "vite-bundle-analyzer";
 
-export default defineConfig(() => {
+export default defineConfig(({ mode }) => {
+  const isProd = mode === "production";
+
   return {
     build: {
       outDir: "build",
       chunkSizeWarningLimit: 1000,
-      rollupOptions: {
+      rolldownOptions: {
         output: {
+          minify: isProd
+            ? {
+                compress: {
+                  dropConsole: true,
+                },
+              }
+            : undefined,
           manualChunks(id) {
             if (id.includes("vite/preload-helper")) {
               return "reactVendor";
