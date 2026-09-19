@@ -28,31 +28,36 @@ const UserManager = () => {
   };
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      signInfail();
-    }, 3000);
+    let cancelled = false;
 
-    const legacyToken =
-      localStorage.getItem("refreshToken") ||
-      sessionStorage.getItem("refreshToken");
+    const initAuth = async () => {
+      const timeoutId = setTimeout(() => {
+        if (!cancelled) signInfail();
+      }, 3000);
 
-    refreshTokenSignIn(
-      (result) => {
+      const legacyToken =
+        localStorage.getItem("refreshToken") ||
+        sessionStorage.getItem("refreshToken");
+
+      try {
+        const result = await refreshTokenSignIn(legacyToken);
         clearTimeout(timeoutId);
+        if (cancelled) return;
         signInSuccess(result);
-        // Clear legacy storage after successful migration to cookie
         localStorage.removeItem("refreshToken");
         sessionStorage.removeItem("refreshToken");
         localStorage.removeItem("remember");
-      },
-      () => {
+      } catch {
         clearTimeout(timeoutId);
+        if (cancelled) return;
         signInfail();
-      },
-      legacyToken
-    );
+      }
+    };
 
-    return () => clearTimeout(timeoutId);
+    initAuth();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 };
 

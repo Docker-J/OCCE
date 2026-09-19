@@ -5,8 +5,11 @@
  */
 
 import { Typography, Box } from "@mui/material";
-import axios from "axios";
 import useModals from "../../util/useModal";
+import {
+  submitAttendanceReport,
+  submitGatheringReport,
+} from "../../api/attendance";
 
 // 커스텀 훅
 import { useSmallGroupReport } from "./hooks/useSmallGroupReport";
@@ -236,17 +239,17 @@ export async function action({ request }) {
     const { reportType, payload } = await request.json();
 
     if (reportType === "gathering") {
-      const res = await axios.post("/api/attendance/gathering-report", payload);
-      return { success: true, reportType, message: res.data || "Success" };
+      const data = await submitGatheringReport(payload);
+      return { success: true, reportType, message: data || "Success" };
     } else {
-      const res = await axios.post("/api/attendance/report", payload);
-      return { success: true, reportType, message: res.data || "Success" };
+      const data = await submitAttendanceReport(payload);
+      return { success: true, reportType, message: data || "Success" };
     }
   } catch (error) {
     console.error("Action error:", error);
     return {
       success: false,
-      error: error.response?.data?.message || "보고 제출에 실패했습니다.",
+      error: error.message || "보고 제출에 실패했습니다.",
     };
   }
 }

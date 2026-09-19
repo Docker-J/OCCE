@@ -81,12 +81,14 @@ const ResponsiveAppBar = () => {
       : []),
     {
       title: "로그아웃",
-      onClick: () => {
+      onClick: async () => {
         setIsLoggingOut(true);
-        signOut(() => {
+        try {
+          await signOut();
+        } finally {
           signOutSuccess();
           setIsLoggingOut(false);
-        });
+        }
       },
     },
   ];

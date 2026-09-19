@@ -131,33 +131,31 @@ export const useSmallGroupReport = () => {
   }, [recentSundays]);
 
   // 정원 및 멤버 목록 페칭
-  const fetchData = () => {
+  const fetchData = async () => {
     if (!authenticated || !isLeader) return;
     setLoading(true);
     setError(null);
-    getGardensAndMembers(
-      (data) => {
-        setIsStaff(data.isStaff);
-        setAssignedGarden(data.assignedGarden);
-        setGardens(data.gardens || {});
+    try {
+      const data = await getGardensAndMembers();
+      setIsStaff(data.isStaff);
+      setAssignedGarden(data.assignedGarden);
+      setGardens(data.gardens || {});
 
-        const gardenNames = Object.keys(data.gardens || {});
-        if (gardenNames.length > 0) {
-          setSelectedGarden(
-            data.assignedGarden && gardenNames.includes(data.assignedGarden)
-              ? data.assignedGarden
-              : gardenNames[0]
-          );
-        } else {
-          setSelectedGarden("");
-        }
-        setLoading(false);
-      },
-      (errMsg) => {
-        setError(errMsg);
-        setLoading(false);
+      const gardenNames = Object.keys(data.gardens || {});
+      if (gardenNames.length > 0) {
+        setSelectedGarden(
+          data.assignedGarden && gardenNames.includes(data.assignedGarden)
+            ? data.assignedGarden
+            : gardenNames[0]
+        );
+      } else {
+        setSelectedGarden("");
       }
-    );
+    } catch (err) {
+      setError(err.message || "정원 목록을 가져오는데 실패했습니다.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -178,34 +176,33 @@ export const useSmallGroupReport = () => {
       defaultChecked[member] = true;
     });
 
-    let isMounted = true;
+    const controller = new AbortController();
 
-    if (reportType === "gathering") {
-      if (!gatheringDateStr) {
-        setCheckedMembers(defaultChecked);
-        setIsReported(false);
-        return;
-      }
-
+    const checkReport = async () => {
       setCheckingReport(true);
       setIsReported(false);
-      getGatheringReport(
-        gatheringDateStr,
-        selectedGarden,
-        (data) => {
-          if (!isMounted) return;
-          setCheckingReport(false);
+
+      try {
+        if (reportType === "gathering") {
+          if (!gatheringDateStr) {
+            setCheckedMembers(defaultChecked);
+            setIsReported(false);
+            setCheckingReport(false);
+            return;
+          }
+
+          const data = await getGatheringReport(gatheringDateStr, selectedGarden, {
+            signal: controller.signal,
+          });
+          if (controller.signal.aborted) return;
+
           if (data && data.reported) {
             setIsReported(true);
             const restoredChecked = {};
             const absenteesList = data.absentees || [];
 
             gardens[selectedGarden].forEach((member) => {
-              if (absenteesList.includes(member)) {
-                restoredChecked[member] = false;
-              } else {
-                restoredChecked[member] = true;
-              }
+              restoredChecked[member] = !absenteesList.includes(member);
             });
 
             setCheckedMembers(restoredChecked);
@@ -225,40 +222,26 @@ export const useSmallGroupReport = () => {
             setGatheringLocation("");
             setGatheringNotes("");
           }
-        },
-        () => {
-          if (!isMounted) return;
-          setCheckingReport(false);
-          setIsReported(false);
-          setCheckedMembers(defaultChecked);
-        }
-      );
-    } else {
-      if (!selectedDate) {
-        setCheckedMembers(defaultChecked);
-        setIsReported(false);
-        return;
-      }
+        } else {
+          if (!selectedDate) {
+            setCheckedMembers(defaultChecked);
+            setIsReported(false);
+            setCheckingReport(false);
+            return;
+          }
 
-      setCheckingReport(true);
-      setIsReported(false);
-      getAttendanceReport(
-        selectedDate,
-        selectedGarden,
-        (data) => {
-          if (!isMounted) return;
-          setCheckingReport(false);
+          const data = await getAttendanceReport(selectedDate, selectedGarden, {
+            signal: controller.signal,
+          });
+          if (controller.signal.aborted) return;
+
           if (data && data.reported) {
             setIsReported(true);
             const restoredChecked = {};
             const absenteesList = data.absentees || [];
 
             gardens[selectedGarden].forEach((member) => {
-              if (absenteesList.includes(member)) {
-                restoredChecked[member] = false;
-              } else {
-                restoredChecked[member] = true;
-              }
+              restoredChecked[member] = !absenteesList.includes(member);
             });
 
             setCheckedMembers(restoredChecked);
@@ -268,19 +251,23 @@ export const useSmallGroupReport = () => {
             setCheckedMembers(defaultChecked);
             setAbsenceReasons({});
           }
-        },
-        () => {
-          if (!isMounted) return;
-          setCheckingReport(false);
-          setIsReported(false);
-          setCheckedMembers(defaultChecked);
-          setAbsenceReasons({});
         }
-      );
-    }
+      } catch {
+        if (controller.signal.aborted) return;
+        setIsReported(false);
+        setCheckedMembers(defaultChecked);
+        setAbsenceReasons({});
+      } finally {
+        if (!controller.signal.aborted) {
+          setCheckingReport(false);
+        }
+      }
+    };
+
+    checkReport();
 
     return () => {
-      isMounted = false;
+      controller.abort();
     };
   }, [selectedGarden, selectedDate, gatheringDateStr, reportType, gardens]);
 
@@ -291,20 +278,27 @@ export const useSmallGroupReport = () => {
       return;
     }
 
-    let isMounted = true;
-    getGatheringHistory(
-      selectedGarden,
-      (data) => {
-        if (!isMounted) return;
-        setGatheringHistoryDates(data.dates || []);
-      },
-      (errMsg) => {
-        console.warn("Failed to fetch gathering history dates:", errMsg);
+    const controller = new AbortController();
+
+    const fetchHistory = async () => {
+      try {
+        const data = await getGatheringHistory(selectedGarden, {
+          signal: controller.signal,
+        });
+        if (!controller.signal.aborted) {
+          setGatheringHistoryDates(data.dates || []);
+        }
+      } catch (err) {
+        if (!controller.signal.aborted) {
+          console.warn("Failed to fetch gathering history dates:", err);
+        }
       }
-    );
+    };
+
+    fetchHistory();
 
     return () => {
-      isMounted = false;
+      controller.abort();
     };
   }, [reportType, selectedGarden]);
 
