@@ -13,6 +13,7 @@ import {
   importRosterFromDriveController,
   listGardensController,
   manageGardensController,
+  reorderGardensController,
   createGardenController,
   updateGardenController,
   deleteGardenController,
@@ -73,6 +74,7 @@ router.post("/members/import-drive", importRosterFromDriveController);
 // Master data lookups & Garden Management
 router.get("/gardens", listGardensController);
 router.get("/gardens/manage", manageGardensController);
+router.put("/gardens/reorder", validateJson(["orderedIds"]), reorderGardensController);
 router.post("/gardens", validateJson(["name"]), createGardenController);
 router.put("/gardens/:id", validateParam({ id: { required: true } }), updateGardenController);
 router.delete("/gardens/:id", validateParam({ id: { required: true } }), deleteGardenController);

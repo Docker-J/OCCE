@@ -58,12 +58,16 @@ import YardOutlinedIcon from "@mui/icons-material/YardOutlined";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import {
   getAdminGardensWithStats,
   createGarden,
   updateGarden,
   deleteGarden,
+  reorderGardens,
 } from "../../../api/admin";
 
 const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
@@ -73,6 +77,11 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+
+  // 드래그 앤 드롭 및 순서 재배치 상태
+  const [draggedGardenId, setDraggedGardenId] = useState(null);
+  const [dragOverGardenId, setDragOverGardenId] = useState(null);
+  const [isReordering, setIsReordering] = useState(false);
 
   // 편집/추가 모달 상태 (기존 상단 인라인에서 팝업 모달로 전환하여 즉각 반응 보장)
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -301,6 +310,83 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
     }
   };
 
+  // 정원 순서 드래그 앤 드롭 및 순서 재배치 적용
+  const applyReorder = async (sourceId, targetId) => {
+    const fromIndex = gardens.findIndex((g) => g.id === sourceId);
+    const toIndex = gardens.findIndex((g) => g.id === targetId);
+    if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return;
+
+    const previousGardens = [...gardens];
+    const updated = [...gardens];
+    const [moved] = updated.splice(fromIndex, 1);
+    updated.splice(toIndex, 0, moved);
+
+    // 순서 번호(orderNum) 1부터 연속 재부여
+    const reorderedWithNums = updated.map((item, idx) => ({
+      ...item,
+      orderNum: idx + 1,
+    }));
+
+    // 즉시 로컬 상태 반영 (낙관적 업데이트)
+    setGardens(reorderedWithNums);
+    setDraggedGardenId(null);
+    setDragOverGardenId(null);
+
+    try {
+      setIsReordering(true);
+      const orderedIds = reorderedWithNums.map((g) => g.id);
+      await reorderGardens(orderedIds);
+      setSuccessMessage("정원 순서가 성공적으로 저장되었습니다.");
+      onGardensUpdated?.();
+    } catch (err) {
+      console.error("Failed to reorder gardens:", err);
+      setErrorMessage(err?.response?.data?.message || "정원 순서 저장 중 오류가 발생했습니다.");
+      setGardens(previousGardens); // 실패 시 원복
+    } finally {
+      setIsReordering(false);
+    }
+  };
+
+  const handleDragStart = (e, gardenId) => {
+    if (searchTerm.trim() || isReordering) {
+      e.preventDefault();
+      return;
+    }
+    setDraggedGardenId(gardenId);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", gardenId.toString());
+  };
+
+  const handleDragOver = (e, gardenId) => {
+    e.preventDefault();
+    if (!draggedGardenId || draggedGardenId === gardenId) return;
+    e.dataTransfer.dropEffect = "move";
+    if (dragOverGardenId !== gardenId) {
+      setDragOverGardenId(gardenId);
+    }
+  };
+
+  const handleDragLeave = (e, gardenId) => {
+    if (dragOverGardenId === gardenId) {
+      setDragOverGardenId(null);
+    }
+  };
+
+  const handleDrop = async (e, targetGardenId) => {
+    e.preventDefault();
+    const sourceId = draggedGardenId;
+    setDraggedGardenId(null);
+    setDragOverGardenId(null);
+    if (!sourceId || sourceId === targetGardenId) return;
+
+    await applyReorder(sourceId, targetGardenId);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedGardenId(null);
+    setDragOverGardenId(null);
+  };
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       {/* ========================================================= */}
@@ -499,12 +585,22 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                 온교회 정원(목장) 목록 및 소속 현황
               </Typography>
               <Typography variant="caption" sx={{ color: "#64748b" }}>
-                소속 가구/교인수를 클릭하면 명단을 바로 확인할 수 있습니다.
+                소속 가구/교인수를 클릭하면 명단을 바로 확인할 수 있으며, 행을 드래그하여 순서를 바로 변경할 수 있습니다.
               </Typography>
             </Box>
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
+            {/* 순서 저장 중 인디케이터 */}
+            {isReordering && (
+              <Chip
+                size="small"
+                icon={<CircularProgress size={14} sx={{ color: "#16a34a" }} />}
+                label="순서 저장 중..."
+                sx={{ backgroundColor: "#f0fdf4", color: "#166534", fontWeight: 700 }}
+              />
+            )}
+
             {/* 검색창 */}
             <TextField
               size="small"
@@ -558,6 +654,15 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
           </Box>
         </Box>
 
+        {/* 검색 중 안내 */}
+        {searchTerm && (
+          <Box sx={{ px: 3, pt: 1.5 }}>
+            <Alert severity="info" sx={{ borderRadius: "10px", py: 0.5 }}>
+              검색 필터가 적용된 상태에서는 순서 드래그 기능이 비활성화됩니다. 검색어를 지우면 전체 목록에서 순서를 자유롭게 드래그하여 변경할 수 있습니다.
+            </Alert>
+          </Box>
+        )}
+
         {/* 피드백 메시지 */}
         {errorMessage && (
           <Box sx={{ px: 3, pt: 2 }}>
@@ -579,7 +684,14 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
           <Table size="medium">
             <TableHead>
               <TableRow sx={{ "& th": { backgroundColor: "#f8fafc", fontWeight: 700, color: "#475569", py: 1.5 } }}>
-                <TableCell align="center" width="80">순서</TableCell>
+                <TableCell align="center" width="105">
+                  <Tooltip title="행을 위아래로 드래그하여 순서를 바꿀 수 있습니다">
+                    <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.5, cursor: "help" }}>
+                      <DragIndicatorIcon sx={{ fontSize: 16, color: "#64748b" }} />
+                      <span>순서</span>
+                    </Box>
+                  </Tooltip>
+                </TableCell>
                 <TableCell width="200">정원명</TableCell>
                 <TableCell width="200">정원지기 (리더)</TableCell>
                 <TableCell align="center" width="140">소속 세대수</TableCell>
@@ -602,26 +714,101 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredGardens.map((g) => {
+                filteredGardens.map((g, index) => {
                   const isUnassigned = g.id === 1;
                   const gMembers = getGardenMembers(g);
                   const gHouseholds = getGardenHouseholds(g);
                   const hCount = g.householdCount !== undefined && g.householdCount !== null ? g.householdCount : gHouseholds.length;
                   const mCount = g.memberCount !== undefined && g.memberCount !== null ? g.memberCount : gMembers.length;
+                  const canDrag = !searchTerm.trim() && !isReordering;
+                  const isBeingDragged = draggedGardenId === g.id;
+                  const isDragOver = dragOverGardenId === g.id && draggedGardenId !== g.id;
 
                   return (
                     <TableRow
                       key={g.id}
                       hover
+                      draggable={canDrag}
+                      onDragStart={(e) => handleDragStart(e, g.id)}
+                      onDragOver={(e) => handleDragOver(e, g.id)}
+                      onDragLeave={(e) => handleDragLeave(e, g.id)}
+                      onDrop={(e) => handleDrop(e, g.id)}
+                      onDragEnd={handleDragEnd}
                       sx={{
-                        backgroundColor: !g.isActive ? "#f8fafc" : "inherit",
-                        opacity: !g.isActive ? 0.75 : 1,
-                        transition: "background-color 0.15s ease",
+                        backgroundColor: isDragOver
+                          ? "rgba(34, 197, 94, 0.08)"
+                          : isBeingDragged
+                          ? "#f1f5f9"
+                          : !g.isActive
+                          ? "#f8fafc"
+                          : "inherit",
+                        opacity: isBeingDragged ? 0.35 : !g.isActive ? 0.75 : 1,
+                        borderTop: isDragOver ? "3px solid #16a34a" : undefined,
+                        borderBottom: isDragOver ? "3px solid #16a34a" : undefined,
+                        cursor: canDrag ? "grab" : "default",
+                        "&:active": {
+                          cursor: canDrag ? "grabbing" : "default",
+                        },
+                        transition: "background-color 0.15s ease, opacity 0.15s ease",
                       }}
                     >
-                      {/* 순서 */}
-                      <TableCell align="center" sx={{ color: "#64748b", fontWeight: 700 }}>
-                        {g.orderNum ?? 0}
+                      {/* 순서 & 드래그 핸들 */}
+                      <TableCell align="center" sx={{ color: "#64748b", fontWeight: 700, py: 1, userSelect: "none" }}>
+                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0.4 }}>
+                          <Tooltip title={searchTerm ? "검색 중에는 드래그 순서 변경이 불가합니다" : "드래그하여 순서 변경 (위아래로 이동)"}>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                color: searchTerm ? "#cbd5e1" : "#94a3b8",
+                                p: 0.3,
+                                borderRadius: "4px",
+                                "&:hover": { color: searchTerm ? "#cbd5e1" : "#16a34a", backgroundColor: "rgba(22, 163, 74, 0.08)" },
+                              }}
+                            >
+                              <DragIndicatorIcon fontSize="small" />
+                            </Box>
+                          </Tooltip>
+
+                          <Typography variant="body2" sx={{ fontWeight: 800, minWidth: 20, textAlign: "center" }}>
+                            {index + 1}
+                          </Typography>
+
+                          {!searchTerm && (
+                            <Box sx={{ display: "flex", flexDirection: "column", ml: 0.2 }}>
+                              <Tooltip title="한 칸 위로">
+                                <span>
+                                  <IconButton
+                                    size="small"
+                                    disabled={index === 0 || isReordering}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      if (index > 0) applyReorder(g.id, filteredGardens[index - 1].id);
+                                    }}
+                                    sx={{ p: 0.1, width: 18, height: 14, color: "#64748b", "&:hover": { color: "#16a34a" } }}
+                                  >
+                                    <KeyboardArrowUpIcon sx={{ fontSize: 14 }} />
+                                  </IconButton>
+                                </span>
+                              </Tooltip>
+                              <Tooltip title="한 칸 아래로">
+                                <span>
+                                  <IconButton
+                                    size="small"
+                                    disabled={index === filteredGardens.length - 1 || isReordering}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      if (index < filteredGardens.length - 1) applyReorder(g.id, filteredGardens[index + 1].id);
+                                    }}
+                                    sx={{ p: 0.1, width: 18, height: 14, color: "#64748b", "&:hover": { color: "#16a34a" } }}
+                                  >
+                                    <KeyboardArrowDownIcon sx={{ fontSize: 14 }} />
+                                  </IconButton>
+                                </span>
+                              </Tooltip>
+                            </Box>
+                          )}
+                        </Box>
                       </TableCell>
 
                       {/* 정원명 */}

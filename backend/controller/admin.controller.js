@@ -1777,4 +1777,34 @@ export const deleteGardenController = async (c) => {
   }
 };
 
+/**
+ * PUT /api/admin/gardens/reorder
+ * Batch updates order_num for gardens
+ * Body: { orderedIds: [id1, id2, ...] }
+ */
+export const reorderGardensController = async (c) => {
+  try {
+    const env = c.env;
+    const body = await c.req.json();
+    const orderedIds = body.orderedIds;
+
+    if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
+      return c.json({ error: "ValidationError", message: "orderedIds 배열이 필요합니다." }, 400);
+    }
+
+    const stmt = env.DB.prepare("UPDATE gardens SET order_num = ? WHERE id = ?");
+    const statements = orderedIds.map((id, index) => stmt.bind(index + 1, Number(id)));
+    await env.DB.batch(statements);
+
+    return c.json({
+      success: true,
+      message: "정원 순서가 성공적으로 저장되었습니다.",
+      orderedIds,
+    });
+  } catch (error) {
+    console.error("reorderGardensController error:", error);
+    return c.json({ error: "ReorderGardensError", message: error.message }, 500);
+  }
+};
+
 

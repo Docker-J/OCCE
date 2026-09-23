@@ -106,6 +106,15 @@ export const deleteGarden = async (id) => {
 };
 
 /**
+ * Reorder gardens by array of garden IDs
+ * @param {number[]} orderedIds
+ */
+export const reorderGardens = async (orderedIds) => {
+  const res = await axios.put("/api/admin/gardens/reorder", { orderedIds });
+  return res.data;
+};
+
+/**
  * Fetch households list
  */
 export const getAdminHouseholds = async () => {
