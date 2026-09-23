@@ -447,9 +447,6 @@ const MemberFormModal = ({
       disableRestoreFocus
       maxWidth="md"
       fullWidth
-      sx={{
-        zIndex: (theme) => theme.zIndex.modal + 100,
-      }}
       slotProps={{
         paper: {
           component: "form",
