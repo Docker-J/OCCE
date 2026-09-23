@@ -110,8 +110,6 @@ const CourseManagementDashboard = ({ users = [] }) => {
   const [cohortForm, setCohortForm] = useState({
     termName: "",
     instructor: "",
-    startDate: "",
-    endDate: "",
     status: "IN_PROGRESS",
     notes: "",
   });
@@ -120,7 +118,6 @@ const CourseManagementDashboard = ({ users = [] }) => {
   const [selectedMembersToEnroll, setSelectedMembersToEnroll] = useState([]);
   const [enrollTargetCohortId, setEnrollTargetCohortId] = useState("");
   const [enrollStatus, setEnrollStatus] = useState("IN_PROGRESS");
-  const [enrollCompletionDate, setEnrollCompletionDate] = useState("");
 
   // Checkbox selection in Course-wide overview for batch enrollment
   const [selectedMemberIdsForBatch, setSelectedMemberIdsForBatch] = useState([]);
@@ -380,8 +377,6 @@ const CourseManagementDashboard = ({ users = [] }) => {
       setCohortForm({
         termName: cohort.termName,
         instructor: cohort.instructor || "",
-        startDate: cohort.startDate || "",
-        endDate: cohort.endDate || "",
         status: cohort.status || "IN_PROGRESS",
         notes: cohort.notes || "",
       });
@@ -389,8 +384,6 @@ const CourseManagementDashboard = ({ users = [] }) => {
       setCohortForm({
         termName: `${(cohorts.length || 0) + 1}기`,
         instructor: "",
-        startDate: new Date().toISOString().split("T")[0],
-        endDate: "",
         status: "IN_PROGRESS",
         notes: "",
       });
@@ -466,7 +459,6 @@ const CourseManagementDashboard = ({ users = [] }) => {
     }
     setEnrollTargetCohortId(selectedCohort?.id || (cohorts.length > 0 ? cohorts[0].id : ""));
     setEnrollStatus("IN_PROGRESS");
-    setEnrollCompletionDate("");
     setEnrollModalOpen(true);
   };
 
@@ -482,7 +474,7 @@ const CourseManagementDashboard = ({ users = [] }) => {
         memberIds,
         memberId: memberIds[0],
         status: enrollStatus,
-        completionDate: enrollStatus === "COMPLETED" ? enrollCompletionDate : null,
+        completionDate: enrollStatus === "COMPLETED" ? new Date().toISOString().split("T")[0] : null,
       });
       setFeedback({
         type: "success",
@@ -1661,24 +1653,6 @@ const CourseManagementDashboard = ({ users = [] }) => {
               onChange={(e) => setCohortForm({ ...cohortForm, instructor: e.target.value })}
               placeholder="예: OOO 목사"
             />
-            <TextField
-              label="개강일"
-              type="date"
-              size="small"
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-              value={cohortForm.startDate}
-              onChange={(e) => setCohortForm({ ...cohortForm, startDate: e.target.value })}
-            />
-            <TextField
-              label="종강/수료일"
-              type="date"
-              size="small"
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-              value={cohortForm.endDate}
-              onChange={(e) => setCohortForm({ ...cohortForm, endDate: e.target.value })}
-            />
             <FormControl size="small" fullWidth>
               <InputLabel>기수 운영 상태</InputLabel>
               <Select
@@ -1821,18 +1795,6 @@ const CourseManagementDashboard = ({ users = [] }) => {
                 <MenuItem value="COMPLETED">수료완료 (이미 이수 완료)</MenuItem>
               </Select>
             </FormControl>
-
-            {enrollStatus === "COMPLETED" && (
-              <TextField
-                label="수료 일자"
-                type="date"
-                size="small"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                value={enrollCompletionDate || new Date().toISOString().split("T")[0]}
-                onChange={(e) => setEnrollCompletionDate(e.target.value)}
-              />
-            )}
           </Stack>
         </DialogContent>
         <DialogActions sx={{ p: 2.5, pt: 1.5, flexShrink: 0 }}>
