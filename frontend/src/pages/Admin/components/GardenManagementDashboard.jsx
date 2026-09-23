@@ -430,6 +430,12 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
     setDraggedGardenId(gardenId);
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/plain", gardenId.toString());
+
+    // 순서칸 드래그 시 전체 행을 고스트 프리뷰 이미지로 표시
+    const rowEl = e.currentTarget.closest("tr");
+    if (rowEl && e.dataTransfer.setDragImage) {
+      e.dataTransfer.setDragImage(rowEl, 40, 20);
+    }
   };
 
   const handleDragOver = (e, gardenId) => {
@@ -802,12 +808,13 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                     <TableRow
                       key={g.id}
                       hover
-                      draggable={canDrag}
-                      onDragStart={(e) => handleDragStart(e, g.id)}
                       onDragOver={(e) => handleDragOver(e, g.id)}
                       onDragLeave={(e) => handleDragLeave(e, g.id)}
                       onDrop={(e) => handleDrop(e, g.id)}
-                      onDragEnd={handleDragEnd}
+                      onClick={() => {
+                        setViewingGarden(g);
+                        setModalSearchTerm("");
+                      }}
                       sx={{
                         backgroundColor: isDragOver
                           ? "rgba(34, 197, 94, 0.08)"
@@ -817,15 +824,31 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                         opacity: isBeingDragged ? 0.35 : 1,
                         borderTop: isDragOver ? "3px solid #16a34a" : undefined,
                         borderBottom: isDragOver ? "3px solid #16a34a" : undefined,
-                        cursor: canDrag ? "grab" : "default",
-                        "&:active": {
-                          cursor: canDrag ? "grabbing" : "default",
+                        cursor: "pointer",
+                        "&:hover": {
+                          backgroundColor: isDragOver ? "rgba(22, 163, 74, 0.08)" : "rgba(22, 163, 74, 0.04)",
                         },
                         transition: "background-color 0.15s ease, opacity 0.15s ease",
                       }}
                     >
-                      {/* 순서 & 드래그 핸들 */}
-                      <TableCell align="center" sx={{ color: "#64748b", fontWeight: 700, py: 1, userSelect: "none" }}>
+                      {/* 순서 & 드래그 핸들 (순서 칸 또는 아이콘을 잡아당겨 순서 변경) */}
+                      <TableCell
+                        align="center"
+                        draggable={canDrag}
+                        onDragStart={(e) => handleDragStart(e, g.id)}
+                        onDragEnd={handleDragEnd}
+                        onClick={(e) => e.stopPropagation()}
+                        sx={{
+                          color: "#64748b",
+                          fontWeight: 700,
+                          py: 1,
+                          userSelect: "none",
+                          cursor: canDrag ? "grab" : "default",
+                          "&:active": {
+                            cursor: canDrag ? "grabbing" : "default",
+                          },
+                        }}
+                      >
                         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0.4 }}>
                           <Tooltip title={searchTerm ? "검색 중에는 드래그 순서 변경이 불가합니다" : "드래그하여 순서 변경 (위아래로 이동)"}>
                             <Box
@@ -997,7 +1020,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                       </TableCell>
 
                       {/* 관리 버튼 */}
-                      <TableCell align="center">
+                      <TableCell align="center" onClick={(e) => e.stopPropagation()}>
                         <Box sx={{ display: "flex", justifyContent: "center", gap: 0.8 }}>
                           <Tooltip title="정원 정보 수정 (팝업)">
                             <IconButton
