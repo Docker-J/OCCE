@@ -12,7 +12,6 @@ import {
   Box,
   Chip,
   Tooltip,
-  IconButton,
   CircularProgress,
   Stack,
 } from "@mui/material";
@@ -20,8 +19,6 @@ import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import ForestIcon from "@mui/icons-material/Forest";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { formatPhoneNumber } from "../utils/memberUtils";
 
@@ -45,7 +42,6 @@ const MemberTableRow = ({
   isProcessing,
   onOpenRoleModal,
   onOpenEditModal,
-  onOpenDeleteDialog,
 }) => {
   const relLabel = RELATIONSHIP_LABELS[user.relationship] || (user.isHead ? "세대주" : "");
   const baptismMeta = BAPTISM_LABELS[user.baptismStatus] || BAPTISM_LABELS.NONE;
@@ -406,45 +402,6 @@ const MemberTableRow = ({
           </Tooltip>
         )}
       </TableCell>
-
-      {/* 8. 교적 관리 액션 (수정 / 제적) */}
-      <TableCell align="center" sx={{ py: 1.8, whiteSpace: "nowrap" }}>
-        <Stack direction="row" spacing={0.5} sx={{ justifyContent: "center" }}>
-          <Tooltip title="교인 정보 및 세대 주소 수정">
-            <IconButton
-              size="small"
-              disabled={isProcessing}
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenEditModal(user);
-              }}
-              sx={{
-                color: "#2563eb",
-                "&:hover": { backgroundColor: "rgba(37, 99, 235, 0.08)" },
-              }}
-            >
-              <EditOutlinedIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title="교적 제적 또는 계정 삭제">
-            <IconButton
-              size="small"
-              disabled={isProcessing}
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenDeleteDialog(user);
-              }}
-              sx={{
-                color: "#ef4444",
-                "&:hover": { backgroundColor: "rgba(239, 68, 68, 0.08)" },
-              }}
-            >
-              <DeleteOutlineIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </Stack>
-      </TableCell>
     </TableRow>
   );
 };
@@ -454,7 +411,6 @@ MemberTableRow.propTypes = {
   isProcessing: PropTypes.bool.isRequired,
   onOpenRoleModal: PropTypes.func.isRequired,
   onOpenEditModal: PropTypes.func.isRequired,
-  onOpenDeleteDialog: PropTypes.func.isRequired,
 };
 
 export default MemberTableRow;

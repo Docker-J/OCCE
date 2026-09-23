@@ -50,6 +50,7 @@ import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
 import ForestIcon from "@mui/icons-material/Forest";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
 import { getMemberCourses } from "../../../api/admin";
 
 const RELATIONSHIP_OPTIONS = [
@@ -90,6 +91,7 @@ const MemberFormModal = ({
   availableGardens = [],
   availableHouseholds = [],
   isSubmitting = false,
+  onOpenDeleteDialog,
 }) => {
   const isEdit = Boolean(initialData?.id);
 
@@ -1324,30 +1326,65 @@ const MemberFormModal = ({
           </Box>
         </DialogContent>
 
-        <DialogActions sx={{ px: 3, py: 2, flexShrink: 0, borderTop: "1px solid rgba(0, 0, 0, 0.08)" }}>
-          <Button onClick={onClose} disabled={isSubmitting} sx={{ borderRadius: "10px", color: "#666" }}>
-            취소
-          </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            onClick={handleSubmit}
-            disabled={isSubmitting || !formData.name?.trim()}
-            sx={{
-              borderRadius: "10px",
-              backgroundColor: isEdit ? "#ea580c" : "#2563eb",
-              px: 3,
-              fontWeight: 700,
-            }}
-          >
-            {isSubmitting ? (
-              <CircularProgress size={22} sx={{ color: "#fff" }} />
-            ) : isEdit ? (
-              "수정 완료"
-            ) : (
-              "등록하기"
-            )}
-          </Button>
+        <DialogActions
+          sx={{
+            px: 3,
+            py: 2,
+            flexShrink: 0,
+            borderTop: "1px solid rgba(0, 0, 0, 0.08)",
+            display: "flex",
+            justifyContent: isEdit && onOpenDeleteDialog ? "space-between" : "flex-end",
+            alignItems: "center",
+          }}
+        >
+          {isEdit && onOpenDeleteDialog && (
+            <Button
+              color="error"
+              variant="outlined"
+              startIcon={<DeleteOutlineIcon />}
+              onClick={() => onOpenDeleteDialog(initialData)}
+              disabled={isSubmitting}
+              sx={{
+                borderRadius: "10px",
+                fontWeight: 700,
+                fontSize: "0.85rem",
+                borderColor: "rgba(239, 68, 68, 0.4)",
+                color: "#dc2626",
+                "&:hover": {
+                  backgroundColor: "rgba(239, 68, 68, 0.08)",
+                  borderColor: "#dc2626",
+                },
+              }}
+            >
+              {initialData?.status === "REMOVED" ? "교적 영구 삭제" : "교적 제적 / 계정 삭제"}
+            </Button>
+          )}
+
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Button onClick={onClose} disabled={isSubmitting} sx={{ borderRadius: "10px", color: "#666" }}>
+              취소
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              onClick={handleSubmit}
+              disabled={isSubmitting || !formData.name?.trim()}
+              sx={{
+                borderRadius: "10px",
+                backgroundColor: isEdit ? "#ea580c" : "#2563eb",
+                px: 3,
+                fontWeight: 700,
+              }}
+            >
+              {isSubmitting ? (
+                <CircularProgress size={22} sx={{ color: "#fff" }} />
+              ) : isEdit ? (
+                "수정 완료"
+              ) : (
+                "등록하기"
+              )}
+            </Button>
+          </Box>
         </DialogActions>
       </LocalizationProvider>
     </Dialog>
@@ -1362,6 +1399,7 @@ MemberFormModal.propTypes = {
   availableGardens: PropTypes.array,
   availableHouseholds: PropTypes.array,
   isSubmitting: PropTypes.bool,
+  onOpenDeleteDialog: PropTypes.func,
 };
 
 export default MemberFormModal;

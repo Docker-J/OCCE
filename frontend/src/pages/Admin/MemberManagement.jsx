@@ -451,9 +451,6 @@ const MemberManagement = () => {
                               >
                                 알림
                               </TableCell>
-                              <TableCell align="center" sx={{ fontWeight: 700, color: "#555", py: 1.8 }}>
-                                관리
-                              </TableCell>
                             </TableRow>
                           </TableHead>
                           <TableBody>
@@ -464,7 +461,6 @@ const MemberManagement = () => {
                                 isProcessing={actionLoadingUser === user.username}
                                 onOpenRoleModal={(u) => setUserForRoleModal(u)}
                                 onOpenEditModal={(u) => handleOpenEditModal(u)}
-                                onOpenDeleteDialog={(u) => setUserToDelete(u)}
                               />
                             ))}
                           </TableBody>
@@ -527,6 +523,10 @@ const MemberManagement = () => {
         availableGardens={availableGardens}
         availableHouseholds={availableHouseholds}
         isSubmitting={submittingMember}
+        onOpenDeleteDialog={(u) => {
+          setMemberFormOpen(false);
+          setUserToDelete(u);
+        }}
       />
 
       {/* 정원지기 역할 모달 */}
