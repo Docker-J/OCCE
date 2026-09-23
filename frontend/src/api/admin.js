@@ -74,6 +74,38 @@ export const getAdminGardens = async () => {
 };
 
 /**
+ * Fetch all gardens with member/household statistics and leader info
+ */
+export const getAdminGardensWithStats = async () => {
+  const res = await axios.get("/api/admin/gardens/manage");
+  return res.data;
+};
+
+/**
+ * Create a new garden
+ */
+export const createGarden = async (gardenData) => {
+  const res = await axios.post("/api/admin/gardens", gardenData);
+  return res.data;
+};
+
+/**
+ * Update an existing garden
+ */
+export const updateGarden = async (id, gardenData) => {
+  const res = await axios.put(`/api/admin/gardens/${id}`, gardenData);
+  return res.data;
+};
+
+/**
+ * Delete a garden
+ */
+export const deleteGarden = async (id) => {
+  const res = await axios.delete(`/api/admin/gardens/${id}`);
+  return res.data;
+};
+
+/**
  * Fetch households list
  */
 export const getAdminHouseholds = async () => {

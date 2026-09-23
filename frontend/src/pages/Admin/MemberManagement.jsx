@@ -19,6 +19,7 @@ import MemberFilterToolbar from "./components/MemberFilterToolbar";
 import MemberTableRow from "./components/MemberTableRow";
 import MemberFormModal from "./components/MemberFormModal";
 import GardenRoleModal from "./components/GardenRoleModal";
+import GardenManagementModal from "./components/GardenManagementModal";
 import DeleteConfirmModal from "./components/DeleteConfirmModal";
 
 import {
@@ -49,6 +50,7 @@ import CourseManagementDashboard from "./components/CourseManagementDashboard";
 const MemberManagement = () => {
   const { openModal } = useModals();
   const [adminTab, setAdminTab] = useState(0);
+  const [gardenManagementOpen, setGardenManagementOpen] = useState(false);
 
   // 커스텀 훅에서 상태와 액션 추출
   const { state, actions } = useMemberManagement();
@@ -110,6 +112,7 @@ const MemberManagement = () => {
     handleConfirmPermanentDelete,
     handleImportFromDrive,
     setAvailableGardens,
+    refreshGardens,
   } = actions;
 
   // 수정 대상 교인의 세대 전체 구성원 목록 산출 (세대주 우선 정렬)
@@ -333,6 +336,7 @@ const MemberManagement = () => {
                     loading={loading}
                     refreshing={refreshing}
                     onOpenCreateModal={handleOpenCreateModal}
+                    onOpenGardenManagement={() => setGardenManagementOpen(true)}
                     onImportFromDrive={handleImportFromDrive}
                     importing={importing}
                   />
@@ -559,6 +563,17 @@ const MemberManagement = () => {
         onClose={() => !updatingRole && setUserForRoleModal(null)}
         onSave={handleSaveRoleAndGardens}
         onAddAvailableGarden={handleAddAvailableGarden}
+      />
+
+      {/* 정원(목장) 목록 관리 모달 */}
+      <GardenManagementModal
+        open={gardenManagementOpen}
+        onClose={() => setGardenManagementOpen(false)}
+        members={users}
+        onGardensUpdated={() => {
+          refreshGardens();
+          fetchUsers();
+        }}
       />
 
       {/* 제적 및 계정 삭제 모달 */}

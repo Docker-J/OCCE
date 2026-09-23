@@ -1597,3 +1597,183 @@ export const bulkSaveHouseholdController = async (c) => {
   }
 };
 
+/**
+ * GET /api/admin/gardens/manage
+ * Lists all gardens with assigned household & member counts and leader info
+ */
+export const manageGardensController = async (c) => {
+  try {
+    const env = c.env;
+    const { results } = await env.DB.prepare(`
+      SELECT 
+        g.id,
+        g.name,
+        g.leader_member_id as leaderMemberId,
+        cm.name as leaderName,
+        g.order_num as orderNum,
+        g.is_active as isActive,
+        (SELECT COUNT(*) FROM households h WHERE h.garden_id = g.id) as householdCount,
+        (
+          SELECT COUNT(*) 
+          FROM church_members m
+          JOIN households h ON m.household_id = h.id
+          WHERE h.garden_id = g.id AND m.status != 'REMOVED'
+        ) as memberCount
+      FROM gardens g
+      LEFT JOIN church_members cm ON g.leader_member_id = cm.id
+      ORDER BY g.order_num ASC, g.name ASC
+    `).all();
+
+    return c.json({ gardens: results || [] });
+  } catch (error) {
+    console.error("manageGardensController error:", error);
+    return c.json({ error: "ManageGardensError", message: error.message }, 500);
+  }
+};
+
+/**
+ * POST /api/admin/gardens
+ * Creates a new garden
+ */
+export const createGardenController = async (c) => {
+  try {
+    const env = c.env;
+    const body = await c.req.json();
+    const name = (body.name || "").trim();
+    const orderNum = Number.isInteger(body.orderNum) ? body.orderNum : 0;
+    const leaderMemberId = body.leaderMemberId ? Number(body.leaderMemberId) : null;
+    const isActive = body.isActive !== undefined ? (body.isActive ? 1 : 0) : 1;
+
+    if (!name) {
+      return c.json({ error: "ValidationError", message: "정원 이름을 입력해 주세요." }, 400);
+    }
+
+    const existing = await env.DB.prepare("SELECT id FROM gardens WHERE name = ?").bind(name).first();
+    if (existing) {
+      return c.json({ error: "DuplicateError", message: "이미 존재하는 정원 이름입니다." }, 409);
+    }
+
+    const res = await env.DB.prepare(`
+      INSERT INTO gardens (name, leader_member_id, order_num, is_active)
+      VALUES (?, ?, ?, ?)
+    `).bind(name, leaderMemberId, orderNum, isActive).run();
+
+    return c.json({
+      success: true,
+      message: `[${name}] 정원이 성공적으로 등록되었습니다.`,
+      garden: {
+        id: res.meta.last_row_id,
+        name,
+        leaderMemberId,
+        orderNum,
+        isActive,
+      },
+    }, 201);
+  } catch (error) {
+    console.error("createGardenController error:", error);
+    return c.json({ error: "CreateGardenError", message: error.message }, 500);
+  }
+};
+
+/**
+ * PUT /api/admin/gardens/:id
+ * Updates an existing garden
+ */
+export const updateGardenController = async (c) => {
+  try {
+    const env = c.env;
+    const id = Number(c.req.param("id"));
+    const body = await c.req.json();
+
+    if (!id) {
+      return c.json({ error: "ValidationError", message: "유효하지 않은 정원 ID입니다." }, 400);
+    }
+
+    const existing = await env.DB.prepare("SELECT * FROM gardens WHERE id = ?").bind(id).first();
+    if (!existing) {
+      return c.json({ error: "NotFound", message: "해당 정원을 찾을 수 없습니다." }, 404);
+    }
+
+    const name = body.name !== undefined ? body.name.trim() : existing.name;
+    const orderNum = body.orderNum !== undefined ? Number(body.orderNum) : existing.order_num;
+    const leaderMemberId = body.leaderMemberId !== undefined ? (body.leaderMemberId ? Number(body.leaderMemberId) : null) : existing.leader_member_id;
+    const isActive = body.isActive !== undefined ? (body.isActive ? 1 : 0) : existing.is_active;
+
+    if (!name) {
+      return c.json({ error: "ValidationError", message: "정원 이름을 입력해 주세요." }, 400);
+    }
+
+    if (name !== existing.name) {
+      const dup = await env.DB.prepare("SELECT id FROM gardens WHERE name = ? AND id != ?").bind(name, id).first();
+      if (dup) {
+        return c.json({ error: "DuplicateError", message: "이미 존재하는 다른 정원 이름입니다." }, 409);
+      }
+    }
+
+    await env.DB.prepare(`
+      UPDATE gardens SET
+        name = ?,
+        leader_member_id = ?,
+        order_num = ?,
+        is_active = ?
+      WHERE id = ?
+    `).bind(name, leaderMemberId, orderNum, isActive, id).run();
+
+    return c.json({
+      success: true,
+      message: `[${name}] 정원 정보가 성공적으로 수정되었습니다.`,
+      garden: {
+        id,
+        name,
+        leaderMemberId,
+        orderNum,
+        isActive,
+      },
+    });
+  } catch (error) {
+    console.error("updateGardenController error:", error);
+    return c.json({ error: "UpdateGardenError", message: error.message }, 500);
+  }
+};
+
+/**
+ * DELETE /api/admin/gardens/:id
+ * Deletes a garden if no households are assigned
+ */
+export const deleteGardenController = async (c) => {
+  try {
+    const env = c.env;
+    const id = Number(c.req.param("id"));
+
+    if (!id) {
+      return c.json({ error: "ValidationError", message: "유효하지 않은 정원 ID입니다." }, 400);
+    }
+
+    if (id === 1) {
+      return c.json({ error: "ProtectedGarden", message: "'미배정' 기본 정원은 삭제할 수 없습니다." }, 400);
+    }
+
+    const existing = await env.DB.prepare("SELECT * FROM gardens WHERE id = ?").bind(id).first();
+    if (!existing) {
+      return c.json({ error: "NotFound", message: "해당 정원을 찾을 수 없습니다." }, 404);
+    }
+
+    const countRes = await env.DB.prepare("SELECT COUNT(*) as count FROM households WHERE garden_id = ?").bind(id).first();
+    if (countRes && countRes.count > 0) {
+      return c.json({
+        error: "HasAssignedHouseholds",
+        message: `현재 이 정원에 소속된 세대(${countRes.count}가구)가 있어 삭제할 수 없습니다. 소속 세대를 다른 정원으로 변경하거나 '비활성'으로 전환해 주세요.`,
+        householdCount: countRes.count,
+      }, 400);
+    }
+
+    await env.DB.prepare("DELETE FROM gardens WHERE id = ?").bind(id).run();
+
+    return c.json({ success: true, message: `[${existing.name}] 정원이 성공적으로 삭제되었습니다.` });
+  } catch (error) {
+    console.error("deleteGardenController error:", error);
+    return c.json({ error: "DeleteGardenError", message: error.message }, 500);
+  }
+};
+
+

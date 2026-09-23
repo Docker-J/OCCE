@@ -109,6 +109,17 @@ export const useMemberManagement = () => {
     }
   };
 
+  const refreshGardens = async () => {
+    try {
+      const gardensData = await getAdminGardens();
+      if (gardensData?.gardens) {
+        setAvailableGardens(gardensData.gardens);
+      }
+    } catch (e) {
+      console.error("Failed to refresh gardens:", e);
+    }
+  };
+
   useEffect(() => {
     if (authInitialized && authenticated && admin) {
       fetchUsers();
@@ -521,6 +532,7 @@ export const useMemberManagement = () => {
       handleConfirmPermanentDelete,
       handleImportFromDrive,
       setAvailableGardens,
+      refreshGardens,
     },
   };
 };

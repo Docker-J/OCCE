@@ -12,6 +12,10 @@ import {
   deleteMemberController,
   importRosterFromDriveController,
   listGardensController,
+  manageGardensController,
+  createGardenController,
+  updateGardenController,
+  deleteGardenController,
   listHouseholdsController,
   bulkSaveHouseholdController,
   updateUserRoleController,
@@ -66,8 +70,12 @@ router.delete(
 );
 router.post("/members/import-drive", importRosterFromDriveController);
 
-// Master data lookups
+// Master data lookups & Garden Management
 router.get("/gardens", listGardensController);
+router.get("/gardens/manage", manageGardensController);
+router.post("/gardens", validateJson(["name"]), createGardenController);
+router.put("/gardens/:id", validateParam({ id: { required: true } }), updateGardenController);
+router.delete("/gardens/:id", validateParam({ id: { required: true } }), deleteGardenController);
 router.get("/households", listHouseholdsController);
 router.post("/households/bulk-save", bulkSaveHouseholdController);
 
