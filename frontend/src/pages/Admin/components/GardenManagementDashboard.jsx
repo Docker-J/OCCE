@@ -3,7 +3,8 @@
  * @description 온교회 정원(목장) 마스터 목록 관리 대시보드 (탭 전용 뷰)
  * - 4대 정원 요약 지표 카드 (전체 정원, 운영 중 정원, 배정 세대, 미배정 세대)
  * - 정원 목록 조회, 검색 및 필터링
- * - 신규 정원 등록 및 인라인 정보 수정 (정원명, 정원지기, 순서, 운영 상태)
+ * - 팝업 모달 기반 신규 정원 등록 및 정보 수정 (스크롤 위치 무관 즉각 반응)
+ * - 소속 세대 및 교인 명단 즉시 확인 (테이블 칩 클릭 시 전용 명단 모달 제공)
  * - '미배정' 기본 정원 보호 및 소속 가구 안전 삭제 가드
  */
 
@@ -37,6 +38,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Divider,
 } from "@mui/material";
 
 import ForestIcon from "@mui/icons-material/Forest";
@@ -55,6 +57,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import YardOutlinedIcon from "@mui/icons-material/YardOutlined";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import {
   getAdminGardensWithStats,
@@ -71,9 +74,9 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
-  // 편집/추가 폼 상태
+  // 편집/추가 모달 상태 (기존 상단 인라인에서 팝업 모달로 전환하여 즉각 반응 보장)
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingGardenId, setEditingGardenId] = useState(null);
+  const [editingGarden, setEditingGarden] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     orderNum: 0,
@@ -81,9 +84,63 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
     isActive: true,
   });
 
+  // 소속 세대 및 교인 명단 확인 모달
+  const [viewingGarden, setViewingGarden] = useState(null);
+
   // 삭제 확인 다이얼로그 대상
   const [gardenToDelete, setGardenToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
+
+  // 실시간 users 데이터 기반 정원별 교인 매핑
+  const gardenMembersMap = useMemo(() => {
+    const map = {};
+    (users || []).forEach((u) => {
+      if (u.status === "REMOVED") return;
+      const idKey = u.gardenId;
+      const nameKey = u.gardenName;
+      if (idKey) {
+        if (!map[idKey]) map[idKey] = [];
+        map[idKey].push(u);
+      }
+      if (nameKey && nameKey !== idKey) {
+        if (!map[nameKey]) map[nameKey] = [];
+        map[nameKey].push(u);
+      }
+    });
+    return map;
+  }, [users]);
+
+  // 특정 정원의 소속 교인 목록 추출
+  const getGardenMembers = (g) => {
+    if (!g) return [];
+    const byId = g.id ? gardenMembersMap[g.id] : null;
+    if (byId && byId.length > 0) return byId;
+    const byName = g.name ? gardenMembersMap[g.name] : null;
+    return byName || [];
+  };
+
+  // 특정 정원의 소속 세대 목록 추출
+  const getGardenHouseholds = (g) => {
+    const members = getGardenMembers(g);
+    const householdMap = new Map();
+    members.forEach((m) => {
+      const hId = m.householdId || `temp-${m.id}`;
+      if (!householdMap.has(hId)) {
+        householdMap.set(hId, {
+          id: hId,
+          householdName: m.householdName || `${m.name} 성도 가정`,
+          headName: m.headName || m.name,
+          address: m.address,
+          city: m.city,
+          province: m.province,
+          members: [m],
+        });
+      } else {
+        householdMap.get(hId).members.push(m);
+      }
+    });
+    return Array.from(householdMap.values());
+  };
 
   // 정원지기(리더) 후보 목록 (활동 중인 교인)
   const candidateLeaders = useMemo(() => {
@@ -117,15 +174,17 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
     fetchGardensList();
   }, []);
 
-  // 4대 통계 지표 계산
+  // 4대 통계 지표 계산 (users 실시간 데이터와 백엔드 통계 병합)
   const metrics = useMemo(() => {
     const totalGardens = gardens.length;
     const activeGardens = gardens.filter((g) => g.isActive).length;
     const unassignedGarden = gardens.find((g) => g.id === 1);
-    const unassignedHouseholds = unassignedGarden?.householdCount ?? 0;
+    const unassignedHouseholds = unassignedGarden
+      ? (unassignedGarden.householdCount ?? getGardenHouseholds(unassignedGarden).length)
+      : 0;
     const totalAssignedHouseholds = gardens
       .filter((g) => g.id !== 1)
-      .reduce((sum, g) => sum + (g.householdCount ?? 0), 0);
+      .reduce((sum, g) => sum + (g.householdCount ?? getGardenHouseholds(g).length), 0);
 
     return {
       totalGardens,
@@ -133,7 +192,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
       totalAssignedHouseholds,
       unassignedHouseholds,
     };
-  }, [gardens]);
+  }, [gardens, gardenMembersMap]);
 
   // 검색 필터링된 정원 목록
   const filteredGardens = useMemo(() => {
@@ -146,9 +205,9 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
     );
   }, [gardens, searchTerm]);
 
-  // 폼 열기 (신규 등록)
+  // 모달 열기 (신규 등록)
   const handleOpenCreateForm = () => {
-    setEditingGardenId(null);
+    setEditingGarden(null);
     setFormData({
       name: "",
       orderNum: gardens.length > 0 ? Math.max(...gardens.map((g) => g.orderNum || 0)) + 1 : 1,
@@ -160,9 +219,9 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
     setIsFormOpen(true);
   };
 
-  // 폼 열기 (기존 정원 수정)
+  // 모달 열기 (기존 정원 수정)
   const handleOpenEditForm = (garden) => {
-    setEditingGardenId(garden.id);
+    setEditingGarden(garden);
     setFormData({
       name: garden.name,
       orderNum: garden.orderNum ?? 0,
@@ -174,10 +233,10 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
     setIsFormOpen(true);
   };
 
-  // 폼 닫기
+  // 모달 닫기
   const handleCloseForm = () => {
     setIsFormOpen(false);
-    setEditingGardenId(null);
+    setEditingGarden(null);
     setErrorMessage("");
   };
 
@@ -194,8 +253,8 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
     setSuccessMessage("");
 
     try {
-      if (editingGardenId) {
-        await updateGarden(editingGardenId, {
+      if (editingGarden) {
+        await updateGarden(editingGarden.id, {
           name: formData.name.trim(),
           orderNum: Number(formData.orderNum) || 0,
           leaderMemberId: formData.leaderMemberId,
@@ -213,7 +272,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
       }
 
       setIsFormOpen(false);
-      setEditingGardenId(null);
+      setEditingGarden(null);
       await fetchGardensList();
       onGardensUpdated?.();
     } catch (err) {
@@ -440,7 +499,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                 온교회 정원(목장) 목록 및 소속 현황
               </Typography>
               <Typography variant="caption" sx={{ color: "#64748b" }}>
-                정원을 생성·수정하고, 소속 가구와 교인 현황을 관리합니다.
+                소속 가구/교인수를 클릭하면 명단을 바로 확인할 수 있습니다.
               </Typography>
             </Box>
           </Box>
@@ -485,7 +544,6 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
               variant="contained"
               startIcon={<AddIcon />}
               onClick={handleOpenCreateForm}
-              disabled={isFormOpen}
               sx={{
                 borderRadius: "10px",
                 backgroundColor: "#16a34a",
@@ -516,133 +574,16 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
           </Box>
         )}
 
-        {/* 인라인 등록/수정 폼 카드 */}
-        {isFormOpen && (
-          <Box sx={{ p: 3, backgroundColor: "#f8fafc", borderBottom: "1px solid rgba(0, 0, 0, 0.06)" }}>
-            <Paper
-              elevation={0}
-              component="form"
-              onSubmit={handleSubmitForm}
-              sx={{
-                p: 2.5,
-                borderRadius: "16px",
-                border: "1.5px solid #86efac",
-                backgroundColor: "#ffffff",
-                boxShadow: "0 6px 20px rgba(22, 163, 74, 0.08)",
-              }}
-            >
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "#15803d" }}>
-                  {editingGardenId ? `[${formData.name}] 정원 정보 수정` : "신규 정원 등록"}
-                </Typography>
-                <IconButton size="small" onClick={handleCloseForm} sx={{ color: "#94a3b8" }}>
-                  <CloseIcon fontSize="small" />
-                </IconButton>
-              </Box>
-
-              <Grid container spacing={2}>
-                {/* 정원명 */}
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <TextField
-                    fullWidth
-                    required
-                    size="small"
-                    label="정원 이름"
-                    placeholder="예: 에덴1정원, 가나안정원"
-                    value={formData.name}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                    disabled={editingGardenId === 1} // '미배정' 정원명은 불변
-                    sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
-                  />
-                </Grid>
-
-                {/* 노출 순서 */}
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <TextField
-                    fullWidth
-                    type="number"
-                    size="small"
-                    label="노출 순서 (낮을수록 앞쪽)"
-                    value={formData.orderNum}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, orderNum: Number(e.target.value) }))}
-                    sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
-                  />
-                </Grid>
-
-                {/* 정원지기(리더) 선택 */}
-                <Grid size={{ xs: 12, sm: 8 }}>
-                  <Autocomplete
-                    size="small"
-                    options={candidateLeaders}
-                    getOptionLabel={(opt) => opt.label || ""}
-                    value={candidateLeaders.find((l) => l.id === formData.leaderMemberId) || null}
-                    onChange={(e, val) => setFormData((prev) => ({ ...prev, leaderMemberId: val?.id || null }))}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="정원지기(리더) 교인 선택"
-                        placeholder="교인 성명 검색..."
-                        sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
-                      />
-                    )}
-                  />
-                </Grid>
-
-                {/* 운영 상태 (활성/비활성) */}
-                <Grid size={{ xs: 12, sm: 4 }} sx={{ display: "flex", alignItems: "center" }}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={formData.isActive}
-                        onChange={(e) => setFormData((prev) => ({ ...prev, isActive: e.target.checked }))}
-                        color="success"
-                        disabled={editingGardenId === 1} // 미배정은 항상 활성
-                      />
-                    }
-                    label={
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: formData.isActive ? "#16a34a" : "#64748b" }}>
-                        {formData.isActive ? "운영 중 (활성)" : "미운영 (비활성)"}
-                      </Typography>
-                    }
-                  />
-                </Grid>
-              </Grid>
-
-              <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, mt: 2.5 }}>
-                <Button onClick={handleCloseForm} size="small" sx={{ borderRadius: "8px", color: "#64748b" }}>
-                  취소
-                </Button>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  size="small"
-                  startIcon={<SaveIcon />}
-                  disabled={submitting}
-                  sx={{
-                    borderRadius: "8px",
-                    backgroundColor: "#16a34a",
-                    "&:hover": { backgroundColor: "#15803d" },
-                    fontWeight: 700,
-                    px: 2.5,
-                  }}
-                >
-                  {submitting ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : "저장하기"}
-                </Button>
-              </Box>
-            </Paper>
-          </Box>
-        )}
-
         {/* 정원 목록 테이블 */}
         <TableContainer sx={{ minHeight: 360 }}>
           <Table size="medium">
             <TableHead>
               <TableRow sx={{ "& th": { backgroundColor: "#f8fafc", fontWeight: 700, color: "#475569", py: 1.5 } }}>
                 <TableCell align="center" width="80">순서</TableCell>
-                <TableCell width="220">정원명</TableCell>
-                <TableCell width="220">정원지기 (리더)</TableCell>
-                <TableCell align="center" width="130">소속 세대수</TableCell>
-                <TableCell align="center" width="130">소속 교인수</TableCell>
+                <TableCell width="200">정원명</TableCell>
+                <TableCell width="200">정원지기 (리더)</TableCell>
+                <TableCell align="center" width="140">소속 세대수</TableCell>
+                <TableCell align="center" width="140">소속 교인수</TableCell>
                 <TableCell align="center" width="120">운영 상태</TableCell>
                 <TableCell align="center" width="120">관리</TableCell>
               </TableRow>
@@ -663,6 +604,11 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
               ) : (
                 filteredGardens.map((g) => {
                   const isUnassigned = g.id === 1;
+                  const gMembers = getGardenMembers(g);
+                  const gHouseholds = getGardenHouseholds(g);
+                  const hCount = g.householdCount !== undefined && g.householdCount !== null ? g.householdCount : gHouseholds.length;
+                  const mCount = g.memberCount !== undefined && g.memberCount !== null ? g.memberCount : gMembers.length;
+
                   return (
                     <TableRow
                       key={g.id}
@@ -733,39 +679,56 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                         )}
                       </TableCell>
 
-                      {/* 소속 세대수 */}
+                      {/* 소속 세대수 (클릭 시 명단 확인) */}
                       <TableCell align="center">
-                        <Chip
-                          size="small"
-                          icon={<HomeWorkOutlinedIcon style={{ fontSize: 15 }} />}
-                          label={`${g.householdCount ?? 0}가구`}
-                          variant="outlined"
-                          sx={{
-                            height: 24,
-                            fontSize: "0.78rem",
-                            borderColor: (g.householdCount ?? 0) > 0 ? "#cbd5e1" : "#e2e8f0",
-                            color: (g.householdCount ?? 0) > 0 ? "#1e293b" : "#94a3b8",
-                            fontWeight: (g.householdCount ?? 0) > 0 ? 800 : 500,
-                          }}
-                        />
+                        <Tooltip title="클릭하여 소속 세대 및 교인 명단 확인">
+                          <Chip
+                            size="small"
+                            icon={<HomeWorkOutlinedIcon style={{ fontSize: 15 }} />}
+                            label={`${hCount}가구`}
+                            onClick={() => setViewingGarden(g)}
+                            variant="outlined"
+                            sx={{
+                              cursor: "pointer",
+                              height: 26,
+                              fontSize: "0.8rem",
+                              borderColor: hCount > 0 ? "#94a3b8" : "#e2e8f0",
+                              color: hCount > 0 ? "#1e293b" : "#94a3b8",
+                              fontWeight: hCount > 0 ? 800 : 500,
+                              backgroundColor: hCount > 0 ? "#f8fafc" : "transparent",
+                              "&:hover": {
+                                backgroundColor: "#e2e8f0",
+                                borderColor: "#64748b",
+                              },
+                            }}
+                          />
+                        </Tooltip>
                       </TableCell>
 
-                      {/* 소속 교인수 */}
+                      {/* 소속 교인수 (클릭 시 명단 확인) */}
                       <TableCell align="center">
-                        <Chip
-                          size="small"
-                          icon={<PeopleAltOutlinedIcon style={{ fontSize: 15 }} />}
-                          label={`${g.memberCount ?? 0}명`}
-                          variant="outlined"
-                          sx={{
-                            height: 24,
-                            fontSize: "0.78rem",
-                            borderColor: (g.memberCount ?? 0) > 0 ? "#bbf7d0" : "#e2e8f0",
-                            backgroundColor: (g.memberCount ?? 0) > 0 ? "rgba(34, 197, 94, 0.05)" : "transparent",
-                            color: (g.memberCount ?? 0) > 0 ? "#15803d" : "#94a3b8",
-                            fontWeight: (g.memberCount ?? 0) > 0 ? 800 : 500,
-                          }}
-                        />
+                        <Tooltip title="클릭하여 소속 교인 명단 확인">
+                          <Chip
+                            size="small"
+                            icon={<PeopleAltOutlinedIcon style={{ fontSize: 15 }} />}
+                            label={`${mCount}명`}
+                            onClick={() => setViewingGarden(g)}
+                            variant="outlined"
+                            sx={{
+                              cursor: "pointer",
+                              height: 26,
+                              fontSize: "0.8rem",
+                              borderColor: mCount > 0 ? "#86efac" : "#e2e8f0",
+                              backgroundColor: mCount > 0 ? "rgba(34, 197, 94, 0.08)" : "transparent",
+                              color: mCount > 0 ? "#15803d" : "#94a3b8",
+                              fontWeight: mCount > 0 ? 800 : 500,
+                              "&:hover": {
+                                backgroundColor: "rgba(34, 197, 94, 0.18)",
+                                borderColor: "#22c55e",
+                              },
+                            }}
+                          />
+                        </Tooltip>
                       </TableCell>
 
                       {/* 운영 상태 */}
@@ -792,7 +755,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                       {/* 관리 버튼 */}
                       <TableCell align="center">
                         <Box sx={{ display: "flex", justifyContent: "center", gap: 0.8 }}>
-                          <Tooltip title="정원 정보 수정">
+                          <Tooltip title="정원 정보 수정 (팝업)">
                             <IconButton
                               size="small"
                               onClick={() => handleOpenEditForm(g)}
@@ -841,7 +804,301 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
       </Card>
 
       {/* ========================================================= */}
-      {/* 정원 삭제 확인 서브 다이얼로그                              */}
+      {/* 3. 정원 등록 및 정보 수정 모달 다이얼로그 (중앙 팝업)         */}
+      {/* ========================================================= */}
+      <Dialog
+        open={isFormOpen}
+        onClose={handleCloseForm}
+        maxWidth="sm"
+        fullWidth
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: "20px",
+              boxShadow: "0 16px 48px rgba(0, 0, 0, 0.16)",
+              p: 1,
+            },
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 800, color: "#15803d", display: "flex", alignItems: "center", gap: 1 }}>
+          <ForestIcon sx={{ color: "#16a34a" }} />
+          {editingGarden ? `[${editingGarden.name}] 정원 정보 수정` : "신규 정원 등록"}
+        </DialogTitle>
+        <DialogContent dividers sx={{ py: 2.5 }}>
+          {/* 수정 모드일 때: 소속 세대 및 교인 현황 요약 박스 */}
+          {editingGarden && (
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2,
+                mb: 2.5,
+                borderRadius: "14px",
+                backgroundColor: "#f0fdf4",
+                border: "1px solid #bbf7d0",
+              }}
+            >
+              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "#14532d", mb: 1 }}>
+                🌱 [{editingGarden.name}] 소속 현황
+              </Typography>
+              <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap", mb: 1.5 }}>
+                <Chip
+                  icon={<HomeWorkOutlinedIcon style={{ fontSize: 16 }} />}
+                  label={`소속 세대: ${editingGarden.householdCount ?? getGardenHouseholds(editingGarden).length}가구`}
+                  sx={{ backgroundColor: "#dcfce7", color: "#166534", fontWeight: 700 }}
+                />
+                <Chip
+                  icon={<PeopleAltOutlinedIcon style={{ fontSize: 16 }} />}
+                  label={`소속 교인: ${editingGarden.memberCount ?? getGardenMembers(editingGarden).length}명`}
+                  sx={{ backgroundColor: "#dcfce7", color: "#166534", fontWeight: 700 }}
+                />
+              </Box>
+
+              {getGardenMembers(editingGarden).length > 0 && (
+                <Box>
+                  <Typography variant="caption" sx={{ fontWeight: 700, color: "#475569", display: "block", mb: 0.6 }}>
+                    소속 교인 명단 ({getGardenMembers(editingGarden).length}명):
+                  </Typography>
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.6, maxHeight: 110, overflowY: "auto" }}>
+                    {getGardenMembers(editingGarden).map((m) => (
+                      <Chip
+                        key={m.id}
+                        label={`${m.name}${m.isHead ? " (세대주)" : ""}`}
+                        size="small"
+                        sx={{
+                          backgroundColor: m.isHead ? "#bbf7d0" : "#ffffff",
+                          border: "1px solid #86efac",
+                          fontSize: "0.75rem",
+                          height: 24,
+                        }}
+                      />
+                    ))}
+                  </Box>
+                </Box>
+              )}
+            </Paper>
+          )}
+
+          {/* 입력 필드들 */}
+          <Grid container spacing={2}>
+            {/* 정원명 */}
+            <Grid size={{ xs: 12, sm: 7 }}>
+              <TextField
+                fullWidth
+                required
+                size="small"
+                label="정원 이름"
+                placeholder="예: 에덴1정원, 가나안정원"
+                value={formData.name}
+                onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                disabled={editingGarden?.id === 1}
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+              />
+            </Grid>
+
+            {/* 노출 순서 */}
+            <Grid size={{ xs: 12, sm: 5 }}>
+              <TextField
+                fullWidth
+                type="number"
+                size="small"
+                label="노출 순서 (낮을수록 앞쪽)"
+                value={formData.orderNum}
+                onChange={(e) => setFormData((prev) => ({ ...prev, orderNum: Number(e.target.value) }))}
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+              />
+            </Grid>
+
+            {/* 정원지기 선택 */}
+            <Grid size={12}>
+              <Autocomplete
+                size="small"
+                options={candidateLeaders}
+                getOptionLabel={(opt) => opt.label || ""}
+                value={candidateLeaders.find((l) => l.id === formData.leaderMemberId) || null}
+                onChange={(e, val) => setFormData((prev) => ({ ...prev, leaderMemberId: val?.id || null }))}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="정원지기(리더) 교인 선택"
+                    placeholder="교인 성명 검색..."
+                    sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+                  />
+                )}
+              />
+            </Grid>
+
+            {/* 운영 상태 */}
+            <Grid size={12}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.isActive}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, isActive: e.target.checked }))}
+                    color="success"
+                    disabled={editingGarden?.id === 1}
+                  />
+                }
+                label={
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: formData.isActive ? "#16a34a" : "#64748b" }}>
+                    {formData.isActive ? "운영 중 (활성 정원)" : "미운영 (비활성 정원)"}
+                  </Typography>
+                }
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button onClick={handleCloseForm} sx={{ color: "#64748b", borderRadius: "10px" }}>
+            취소
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleSubmitForm}
+            disabled={submitting}
+            sx={{
+              borderRadius: "10px",
+              backgroundColor: "#16a34a",
+              "&:hover": { backgroundColor: "#15803d" },
+              fontWeight: 800,
+              px: 3,
+            }}
+          >
+            {submitting ? <CircularProgress size={20} sx={{ color: "#fff" }} /> : "저장하기"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* ========================================================= */}
+      {/* 4. 소속 세대 및 교인 명단 확인 전용 모달 다이얼로그             */}
+      {/* ========================================================= */}
+      <Dialog
+        open={Boolean(viewingGarden)}
+        onClose={() => setViewingGarden(null)}
+        maxWidth="sm"
+        fullWidth
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: "20px",
+              boxShadow: "0 16px 48px rgba(0, 0, 0, 0.16)",
+              p: 1,
+            },
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 800, color: "#15803d", display: "flex", alignItems: "center", gap: 1 }}>
+          <ForestIcon sx={{ color: "#16a34a" }} />
+          [{viewingGarden?.name}] 소속 세대 및 교인 현황
+        </DialogTitle>
+        <DialogContent dividers sx={{ py: 2.5 }}>
+          {viewingGarden && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+              {/* 요약 칩 */}
+              <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap" }}>
+                <Chip
+                  icon={<HomeWorkOutlinedIcon style={{ fontSize: 16 }} />}
+                  label={`총 ${viewingGarden.householdCount ?? getGardenHouseholds(viewingGarden).length}가구`}
+                  sx={{ backgroundColor: "#eff6ff", color: "#1d4ed8", fontWeight: 700 }}
+                />
+                <Chip
+                  icon={<PeopleAltOutlinedIcon style={{ fontSize: 16 }} />}
+                  label={`총 ${viewingGarden.memberCount ?? getGardenMembers(viewingGarden).length}명`}
+                  sx={{ backgroundColor: "#f0fdf4", color: "#15803d", fontWeight: 700 }}
+                />
+                {viewingGarden.leaderName && (
+                  <Chip
+                    label={`정원지기: ${viewingGarden.leaderName}`}
+                    sx={{ backgroundColor: "#fef3c7", color: "#b45309", fontWeight: 700 }}
+                  />
+                )}
+              </Box>
+
+              {/* 소속 세대 목록 */}
+              <Box>
+                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "#1e293b", mb: 1 }}>
+                  🏠 소속 세대 ({getGardenHouseholds(viewingGarden).length}가구)
+                </Typography>
+                {getGardenHouseholds(viewingGarden).length === 0 ? (
+                  <Typography variant="body2" sx={{ color: "#94a3b8" }}>
+                    소속된 세대가 없습니다.
+                  </Typography>
+                ) : (
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1, maxHeight: 180, overflowY: "auto" }}>
+                    {getGardenHouseholds(viewingGarden).map((h) => (
+                      <Paper
+                        key={h.id}
+                        elevation={0}
+                        sx={{
+                          p: 1.2,
+                          px: 1.8,
+                          borderRadius: "10px",
+                          backgroundColor: "#f8fafc",
+                          border: "1px solid #e2e8f0",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 700, color: "#1e293b" }}>
+                            {h.householdName}
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: "#64748b" }}>
+                            세대주: {h.headName} {h.address ? `· ${h.address}` : ""}
+                          </Typography>
+                        </Box>
+                        <Chip
+                          size="small"
+                          label={`${h.members.length}명`}
+                          sx={{ height: 22, fontSize: "0.72rem", backgroundColor: "#e2e8f0" }}
+                        />
+                      </Paper>
+                    ))}
+                  </Box>
+                )}
+              </Box>
+
+              <Divider />
+
+              {/* 소속 교인 명단 */}
+              <Box>
+                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "#1e293b", mb: 1 }}>
+                  👥 소속 교인 ({getGardenMembers(viewingGarden).length}명)
+                </Typography>
+                {getGardenMembers(viewingGarden).length === 0 ? (
+                  <Typography variant="body2" sx={{ color: "#94a3b8" }}>
+                    소속된 교인이 없습니다.
+                  </Typography>
+                ) : (
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.8, maxHeight: 180, overflowY: "auto" }}>
+                    {getGardenMembers(viewingGarden).map((m) => (
+                      <Chip
+                        key={m.id}
+                        label={`${m.name}${m.position ? ` (${m.position})` : ""}${m.isHead ? " · 세대주" : ""}`}
+                        sx={{
+                          backgroundColor: m.isHead ? "#dcfce7" : "#f1f5f9",
+                          color: m.isHead ? "#15803d" : "#334155",
+                          fontWeight: m.isHead ? 800 : 500,
+                          fontSize: "0.8rem",
+                        }}
+                      />
+                    ))}
+                  </Box>
+                )}
+              </Box>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button onClick={() => setViewingGarden(null)} variant="contained" sx={{ borderRadius: "10px", backgroundColor: "#16a34a" }}>
+            확인
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* ========================================================= */}
+      {/* 5. 정원 삭제 확인 서브 다이얼로그                              */}
       {/* ========================================================= */}
       <Dialog
         open={Boolean(gardenToDelete)}
@@ -854,10 +1111,10 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
           정원 삭제 확인
         </DialogTitle>
         <DialogContent>
-          {(gardenToDelete?.householdCount ?? 0) > 0 ? (
+          {(gardenToDelete?.householdCount ?? getGardenHouseholds(gardenToDelete).length) > 0 ? (
             <Box>
               <Alert severity="warning" sx={{ mb: 2, borderRadius: "10px" }}>
-                현재 <strong>[{gardenToDelete?.name}]</strong>에 소속된 세대가 <strong>{gardenToDelete?.householdCount}가구</strong>(교인 {gardenToDelete?.memberCount}명) 있습니다.
+                현재 <strong>[{gardenToDelete?.name}]</strong>에 소속된 세대가 <strong>{gardenToDelete?.householdCount ?? getGardenHouseholds(gardenToDelete).length}가구</strong>(교인 {gardenToDelete?.memberCount ?? getGardenMembers(gardenToDelete).length}명) 있습니다.
               </Alert>
               <Typography variant="body2" sx={{ color: "#475569", lineHeight: 1.6 }}>
                 안전한 교적 관리를 위해, 소속 세대가 있는 정원은 직접 삭제할 수 없습니다.
@@ -875,9 +1132,9 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
         </DialogContent>
         <DialogActions sx={{ px: 2.5, pb: 2 }}>
           <Button onClick={() => setGardenToDelete(null)} sx={{ color: "#64748b" }}>
-            {(gardenToDelete?.householdCount ?? 0) > 0 ? "확인" : "취소"}
+            {(gardenToDelete?.householdCount ?? getGardenHouseholds(gardenToDelete).length) > 0 ? "확인" : "취소"}
           </Button>
-          {(gardenToDelete?.householdCount ?? 0) === 0 && (
+          {(gardenToDelete?.householdCount ?? getGardenHouseholds(gardenToDelete).length) === 0 && (
             <Button
               variant="contained"
               color="error"

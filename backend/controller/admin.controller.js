@@ -1616,8 +1616,9 @@ export const manageGardensController = async (c) => {
         (
           SELECT COUNT(*) 
           FROM church_members m
-          JOIN households h ON m.household_id = h.id
-          WHERE h.garden_id = g.id AND m.status != 'REMOVED'
+          LEFT JOIN households h ON m.household_id = h.id
+          WHERE (m.custom_garden_id = g.id OR (m.custom_garden_id IS NULL AND (h.garden_id = g.id OR (h.garden_id IS NULL AND g.id = 1))))
+            AND m.status != 'REMOVED'
         ) as memberCount
       FROM gardens g
       LEFT JOIN church_members cm ON g.leader_member_id = cm.id
