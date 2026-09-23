@@ -524,6 +524,7 @@ const MemberManagement = () => {
                       refreshGardens();
                       fetchUsers();
                     }}
+                    onOpenEditMemberModal={(user) => handleOpenEditModal(user)}
                   />
                 </Box>
               )}

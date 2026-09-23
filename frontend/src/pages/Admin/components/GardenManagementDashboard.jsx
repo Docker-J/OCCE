@@ -88,7 +88,7 @@ const BAPTISM_LABELS = {
   NONE: { label: "미세례", bg: "#f3f4f6", color: "#94a3b8" },
 };
 
-const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
+const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMemberModal }) => {
   const [gardens, setGardens] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -1267,7 +1267,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                 [{viewingGarden?.name}] 정원 교인 명부
               </Typography>
               <Typography variant="caption" sx={{ color: "#64748b" }}>
-                소속된 가구 및 교인 명단을 세대별 명부 형태로 한눈에 조회합니다.
+                소속된 가구 및 교인 명단을 세대별 명부 형태로 조회합니다. 교인을 클릭하면 상세 정보를 수정할 수 있습니다.
               </Typography>
             </Box>
           </Box>
@@ -1382,11 +1382,20 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                       <TableRow
                         key={m.id}
                         hover
+                        onClick={() => {
+                          if (onOpenEditMemberModal) {
+                            const targetUser = (users || []).find((u) => u.id === m.id) || m;
+                            onOpenEditMemberModal(targetUser);
+                          }
+                        }}
+                        title={onOpenEditMemberModal ? "클릭하여 교인 상세 정보 수정" : undefined}
                         sx={{
+                          cursor: onOpenEditMemberModal ? "pointer" : "default",
                           backgroundColor: rowBg,
                           borderTop: isNewHousehold ? "2px solid #cbd5e1" : "1px solid #f1f5f9",
+                          transition: "background-color 0.15s ease",
                           "&:hover": {
-                            backgroundColor: m.isZebra ? "#f1f5f9" : "#f8fafc",
+                            backgroundColor: "rgba(37, 99, 235, 0.05)",
                           },
                         }}
                       >
@@ -1587,6 +1596,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
 GardenManagementDashboard.propTypes = {
   users: PropTypes.array,
   onGardensUpdated: PropTypes.func,
+  onOpenEditMemberModal: PropTypes.func,
 };
 
 export default GardenManagementDashboard;

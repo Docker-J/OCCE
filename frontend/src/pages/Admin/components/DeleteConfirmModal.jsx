@@ -91,6 +91,9 @@ const DeleteConfirmModal = ({
     <Dialog
       open={open}
       onClose={deleting ? undefined : onClose}
+      sx={{
+        zIndex: (theme) => theme.zIndex.modal + 200,
+      }}
       slotProps={{
         paper: {
           sx: { borderRadius: "16px", p: 1, maxWidth: isMultiMemberHead ? "560px" : "480px", width: "100%" },
