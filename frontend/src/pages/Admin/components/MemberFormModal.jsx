@@ -1397,7 +1397,7 @@ const MemberFormModal = ({
         </DialogTitle>
         <DialogContent dividers sx={{ py: 2.5 }}>
           <Typography variant="body2" sx={{ color: "#475569", mb: 2.5, lineHeight: 1.5 }}>
-            현재 세대에서 분리하여, <strong>[{separateTargetMember?.name}]</strong> 성도를 독립된 신규 세대주로 등록합니다. 새로운 거주지 주소와 소속 목장(정원)을 지정해 주세요.
+            현재 세대에서 분리하여, <strong>[{separateTargetMember?.name}]</strong> 성도를 독립된 신규 세대주로 등록합니다. 새로운 거주지 주소와 소속 정원을 지정해 주세요.
           </Typography>
 
           <Grid container spacing={2}>

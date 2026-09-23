@@ -1,6 +1,6 @@
 /**
  * @file GardenManagementDashboard.jsx
- * @description 온교회 정원(목장) 마스터 목록 관리 대시보드 (탭 전용 뷰)
+ * @description 온교회 정원 마스터 목록 관리 대시보드 (탭 전용 뷰)
  * - 4대 정원 요약 지표 카드 (전체 정원, 운영 중 정원, 배정 세대, 미배정 세대)
  * - 정원 목록 조회, 검색 및 필터링
  * - 팝업 모달 기반 신규 정원 등록 및 정보 수정 (스크롤 위치 무관 즉각 반응)
@@ -582,7 +582,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
             <ForestIcon sx={{ color: "#16a34a", fontSize: 26 }} />
             <Box>
               <Typography variant="h6" sx={{ fontWeight: 800, color: "#14532d" }}>
-                온교회 정원(목장) 목록 및 소속 현황
+                온교회 정원 목록 및 소속 현황
               </Typography>
               <Typography variant="caption" sx={{ color: "#64748b" }}>
                 소속 가구/교인수를 클릭하면 명단을 바로 확인할 수 있으며, 행을 드래그하여 순서를 바로 변경할 수 있습니다.

@@ -156,7 +156,7 @@ const MemberManagement = () => {
           ? "출석 통계 대시보드 - OCCE"
           : adminTab === 2
           ? "양육 및 교육과정 관리 - OCCE"
-          : "정원(목장) 관리 - OCCE"}
+          : "정원 관리 - OCCE"}
       </title>
 
       {/* 상단 타이틀 배너 */}
@@ -172,7 +172,7 @@ const MemberManagement = () => {
               ? "출석 통계 대시보드"
               : adminTab === 2
               ? "양육 및 교육과정 관리"
-              : "정원(목장) 관리"}
+              : "정원 관리"}
           </Typography>
           <Typography
             variant="h6"
@@ -189,7 +189,7 @@ const MemberManagement = () => {
               ? "구글 드라이브 주간 출석부의 실시간 출석 현황과 통계를 분석합니다."
               : adminTab === 2
               ? "교육과정 및 개설 기수별 수강생 등록과 수료 상태를 체계적으로 관리합니다."
-              : "온교회 목장(정원) 마스터 목록, 정원지기 배정 및 소속 세대·교인 현황을 체계적으로 관리합니다."}
+              : "온교회 정원 마스터 목록, 정원지기 배정 및 소속 세대·교인 현황을 체계적으로 관리합니다."}
           </Typography>
         </div>
       </div>
@@ -305,7 +305,7 @@ const MemberManagement = () => {
                   iconPosition="start"
                 />
                 <Tab
-                  label="정원(목장) 관리"
+                  label="정원 관리"
                   icon={<ForestIcon sx={{ fontSize: "1.2rem" }} />}
                   iconPosition="start"
                 />
@@ -544,7 +544,7 @@ const MemberManagement = () => {
                 </Box>
               )}
 
-              {/* Tab 3: 정원(목장) 관리 */}
+              {/* Tab 3: 정원 관리 */}
               {adminTab === 3 && (
                 <Box>
                   <GardenManagementDashboard
