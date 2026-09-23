@@ -136,7 +136,6 @@ const MemberFormModal = ({
   // 세대 독립(분가) 모달 상태
   const [separateTargetMember, setSeparateTargetMember] = useState(null);
   const [separateForm, setSeparateForm] = useState({
-    householdName: "",
     gardenId: 1,
     department: "청년부",
     address: "",
@@ -350,7 +349,6 @@ const MemberFormModal = ({
   const handleOpenSeparateDialog = (member) => {
     setSeparateTargetMember(member);
     setSeparateForm({
-      householdName: `${(member.name || "").trim()} 성도 가정`,
       gardenId: householdData.gardenId || availableGardens[0]?.id || 1,
       department:
         member.department === "유초등부" || member.department === "중고등부"
@@ -368,14 +366,10 @@ const MemberFormModal = ({
   // 세대 독립(분가) 확정 처리
   const handleConfirmSeparate = async () => {
     if (!separateTargetMember || !onSeparateMember) return;
-    if (!separateForm.householdName?.trim()) {
-      alert("새 세대명을 입력해 주세요.");
-      return;
-    }
     const memberId = separateTargetMember.id;
     const separationPayload = {
       name: separateTargetMember.name,
-      householdName: separateForm.householdName.trim(),
+      householdName: `${(separateTargetMember.name || "교인").trim()} 성도 가정`,
       gardenId: separateForm.gardenId,
       department: separateForm.department,
       address: separateForm.address,
@@ -990,7 +984,7 @@ const MemberFormModal = ({
                     </Typography>
                   </Box>
                   <Typography variant="caption" sx={{ color: "#3b82f6", display: "block", mt: 0.4, lineHeight: 1.4 }}>
-                    현재 [{householdData.householdName || "기존 가구"}]의 {currentMember.relationship === "CHILD" ? "자녀" : "세대원"}로 등록되어 있습니다.
+                    현재 세대의 {currentMember.relationship === "CHILD" ? "자녀" : "세대원"}로 등록되어 있습니다.
                     결혼 또는 청년 독립으로 새 가구를 형성하려면 분가 버튼을 누르세요.
                   </Typography>
                 </Box>
@@ -1401,20 +1395,10 @@ const MemberFormModal = ({
         </DialogTitle>
         <DialogContent dividers sx={{ py: 2.5 }}>
           <Typography variant="body2" sx={{ color: "#475569", mb: 2.5, lineHeight: 1.5 }}>
-            현재 <strong>[{householdData.householdName}]</strong>에서 분리하여, <strong>[{separateTargetMember?.name}]</strong> 성도를 세대주로 하는 신규 가구를 생성합니다.
+            현재 세대에서 분리하여, <strong>[{separateTargetMember?.name}]</strong> 성도를 독립된 신규 세대주로 등록합니다. 새로운 거주지 주소와 소속 목장(정원)을 지정해 주세요.
           </Typography>
 
           <Grid container spacing={2}>
-            <Grid size={12}>
-              <TextField
-                fullWidth
-                size="small"
-                label="새 세대명 (가구 명칭)"
-                value={separateForm.householdName}
-                onChange={(e) => setSeparateForm((prev) => ({ ...prev, householdName: e.target.value }))}
-                sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
-              />
-            </Grid>
 
             <Grid size={{ xs: 12, sm: 6 }}>
               <FormControl fullWidth size="small">
