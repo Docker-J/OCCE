@@ -36,6 +36,7 @@ import {
   completeAllCohortMembersController,
   removeCohortMemberController,
   getMemberCoursesController,
+  getCourseAllMembersController,
 } from "../controller/adminCourse.controller.js";
 
 const router = new Hono();
@@ -124,6 +125,11 @@ router.get(
   "/courses/:courseId/cohorts",
   validateParam({ courseId: { required: true } }),
   listCohortsController
+);
+router.get(
+  "/courses/:courseId/all-members",
+  validateParam({ courseId: { required: true } }),
+  getCourseAllMembersController
 );
 router.post(
   "/courses/:courseId/cohorts",

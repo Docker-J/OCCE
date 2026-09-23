@@ -163,6 +163,11 @@ export const getCourseCohorts = async (courseId) => {
   return res.data;
 };
 
+export const getCourseAllMembers = async (courseId) => {
+  const res = await axios.get(`/api/admin/courses/${courseId}/all-members`);
+  return res.data;
+};
+
 export const createCohort = async (courseId, cohortData) => {
   const res = await axios.post(`/api/admin/courses/${courseId}/cohorts`, cohortData);
   return res.data;

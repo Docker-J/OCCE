@@ -523,3 +523,78 @@ export const getMemberCoursesController = async (c) => {
     return c.json({ error: "FetchMemberCoursesError", message: error.message }, 500);
   }
 };
+
+/**
+ * GET /api/admin/courses/:courseId/all-members
+ * Fetches all active church members annotated with their completion status for this specific course.
+ * Useful for filtering: 전체 / 수료자 / 수강중 / 미수강자
+ */
+export const getCourseAllMembersController = async (c) => {
+  try {
+    const env = c.env;
+    const courseId = parseInt(c.req.param("courseId"), 10);
+    if (isNaN(courseId)) {
+      return c.json({ error: "InvalidRequest", message: "유효하지 않은 과정 ID입니다." }, 400);
+    }
+
+    const { results } = await env.DB.prepare(`
+      SELECT 
+        m.id as memberId,
+        m.name,
+        m.name_en as nameEn,
+        m.phone,
+        m.department,
+        m.position,
+        m.status as memberStatus,
+        COALESCE(cg.name, g.name, '미배정') as gardenName,
+        mc.id as enrollmentId,
+        mc.status as courseStatus,
+        mc.completion_date as completionDate,
+        mc.cohort_id as cohortId,
+        mc.term_name as termName,
+        mc.instructor
+      FROM church_members m
+      JOIN households h ON m.household_id = h.id
+      LEFT JOIN gardens g ON h.garden_id = g.id
+      LEFT JOIN gardens cg ON m.custom_garden_id = cg.id
+      LEFT JOIN (
+        SELECT 
+          mc_inner.id,
+          mc_inner.member_id,
+          mc_inner.cohort_id,
+          mc_inner.status,
+          mc_inner.completion_date,
+          ch_inner.course_id,
+          ch_inner.term_name,
+          ch_inner.instructor,
+          ROW_NUMBER() OVER (
+            PARTITION BY mc_inner.member_id 
+            ORDER BY 
+              CASE mc_inner.status 
+                WHEN 'COMPLETED' THEN 1 
+                WHEN 'IN_PROGRESS' THEN 2 
+                ELSE 3 
+              END ASC,
+              mc_inner.id DESC
+          ) as rn
+        FROM member_courses mc_inner
+        JOIN course_cohorts ch_inner ON mc_inner.cohort_id = ch_inner.id
+        WHERE ch_inner.course_id = ?
+      ) mc ON m.id = mc.member_id AND mc.rn = 1
+      WHERE m.status != 'REMOVED'
+      ORDER BY 
+        CASE 
+          WHEN mc.status = 'IN_PROGRESS' THEN 1
+          WHEN mc.status = 'COMPLETED' THEN 2
+          ELSE 3
+        END ASC,
+        m.name ASC
+    `).bind(courseId).all();
+
+    return c.json({ members: results || [] });
+  } catch (error) {
+    console.error("getCourseAllMembersController error:", error);
+    return c.json({ error: "FetchCourseAllMembersError", message: error.message }, 500);
+  }
+};
+
