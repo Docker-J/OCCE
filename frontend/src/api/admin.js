@@ -133,3 +133,78 @@ export const getAdminGardenAttendanceDetail = async (gardenName, date) => {
   );
   return res.data;
 };
+
+// ==========================================
+// 양육 및 교육과정 (Courses) & 기수 (Cohorts) APIs
+// ==========================================
+
+export const getCourses = async () => {
+  const res = await axios.get("/api/admin/courses");
+  return res.data;
+};
+
+export const createCourse = async (courseData) => {
+  const res = await axios.post("/api/admin/courses", courseData);
+  return res.data;
+};
+
+export const updateCourse = async (id, courseData) => {
+  const res = await axios.put(`/api/admin/courses/${id}`, courseData);
+  return res.data;
+};
+
+export const deleteCourse = async (id) => {
+  const res = await axios.delete(`/api/admin/courses/${id}`);
+  return res.data;
+};
+
+export const getCourseCohorts = async (courseId) => {
+  const res = await axios.get(`/api/admin/courses/${courseId}/cohorts`);
+  return res.data;
+};
+
+export const createCohort = async (courseId, cohortData) => {
+  const res = await axios.post(`/api/admin/courses/${courseId}/cohorts`, cohortData);
+  return res.data;
+};
+
+export const updateCohort = async (cohortId, cohortData) => {
+  const res = await axios.put(`/api/admin/cohorts/${cohortId}`, cohortData);
+  return res.data;
+};
+
+export const deleteCohort = async (cohortId) => {
+  const res = await axios.delete(`/api/admin/cohorts/${cohortId}`);
+  return res.data;
+};
+
+export const getCohortMembers = async (cohortId) => {
+  const res = await axios.get(`/api/admin/cohorts/${cohortId}/members`);
+  return res.data;
+};
+
+export const enrollCohortMember = async (cohortId, enrollmentData) => {
+  const res = await axios.post(`/api/admin/cohorts/${cohortId}/members`, enrollmentData);
+  return res.data;
+};
+
+export const updateEnrollmentStatus = async (cohortId, memberId, updateData) => {
+  const res = await axios.patch(`/api/admin/cohorts/${cohortId}/members/${memberId}`, updateData);
+  return res.data;
+};
+
+export const completeAllCohortMembers = async (cohortId, completionDate) => {
+  const res = await axios.post(`/api/admin/cohorts/${cohortId}/complete-all`, { completionDate });
+  return res.data;
+};
+
+export const removeCohortMember = async (cohortId, memberId) => {
+  const res = await axios.delete(`/api/admin/cohorts/${cohortId}/members/${memberId}`);
+  return res.data;
+};
+
+export const getMemberCourses = async (memberId) => {
+  const res = await axios.get(`/api/admin/members/${memberId}/courses`);
+  return res.data;
+};
+

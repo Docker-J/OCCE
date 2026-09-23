@@ -44,6 +44,10 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { format, parseISO, isValid } from "date-fns";
 import { GatheringDateButtonField } from "../../Community/GatheringPickerFields";
+import SchoolIcon from "@mui/icons-material/School";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
+import { getMemberCourses } from "../../../api/admin";
 
 const RELATIONSHIP_OPTIONS = [
   { value: "HEAD", label: "세대주 (본인)" },
@@ -118,10 +122,22 @@ const MemberFormModal = ({
     householdNotes: "",
   });
 
+  const [memberCoursesList, setMemberCoursesList] = useState([]);
+  const [loadingMemberCourses, setLoadingMemberCourses] = useState(false);
+
   useEffect(() => {
     setIsAddressManualEdit(false);
     setIsSeparateMode(false);
     if (initialData) {
+      if (initialData.id) {
+        setLoadingMemberCourses(true);
+        getMemberCourses(initialData.id)
+          .then((data) => setMemberCoursesList(data.courses || []))
+          .catch(() => setMemberCoursesList([]))
+          .finally(() => setLoadingMemberCourses(false));
+      } else {
+        setMemberCoursesList([]);
+      }
       setFormData({
         name: initialData.name || "",
         nameEn: initialData.nameEn || "",
@@ -1069,6 +1085,69 @@ const MemberFormModal = ({
                 </Grid>
               )}
             </Grid>
+
+            {/* 3. 양육 및 교육과정(코스) 이수 현황 (수정 모드 전용) */}
+            {isEdit && (
+              <Box
+                sx={{
+                  mt: 3,
+                  p: 2.2,
+                  borderRadius: "14px",
+                  backgroundColor: "#f8fafc",
+                  border: "1px solid #e2e8f0",
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
+                  <SchoolIcon sx={{ color: "#ea580c", fontSize: 20 }} />
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "#1e293b" }}>
+                    양육 및 훈련 과정 이수 현황
+                  </Typography>
+                </Box>
+
+                {loadingMemberCourses ? (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, py: 1 }}>
+                    <CircularProgress size={18} sx={{ color: "#ea580c" }} />
+                    <Typography variant="caption" sx={{ color: "#64748b" }}>
+                      이수 내역 조회 중...
+                    </Typography>
+                  </Box>
+                ) : memberCoursesList.length === 0 ? (
+                  <Typography variant="body2" sx={{ color: "#94a3b8", fontSize: "0.85rem" }}>
+                    등록된 양육 및 훈련 과정 이수 내역이 없습니다. (양육·훈련 과정 관리 탭에서 수강생으로 등록할 수 있습니다)
+                  </Typography>
+                ) : (
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                    {memberCoursesList.map((mc) => {
+                      const isCompleted = mc.status === "COMPLETED";
+                      return (
+                        <Chip
+                          key={mc.enrollmentId}
+                          size="small"
+                          icon={
+                            isCompleted ? (
+                              <CheckCircleIcon sx={{ fontSize: "14px !important" }} />
+                            ) : (
+                              <HourglassEmptyIcon sx={{ fontSize: "14px !important" }} />
+                            )
+                          }
+                          label={`${mc.courseName} ${mc.termName ? `(${mc.termName})` : ""} · ${
+                            isCompleted ? (mc.completionDate ? `수료 (${mc.completionDate})` : "수료") : "수강중"
+                          }`}
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: "0.75rem",
+                            backgroundColor: isCompleted ? "rgba(22, 163, 74, 0.1)" : "rgba(234, 88, 12, 0.1)",
+                            color: isCompleted ? "#16a34a" : "#ea580c",
+                            border: `1px solid ${isCompleted ? "rgba(22, 163, 74, 0.3)" : "rgba(234, 88, 12, 0.3)"}`,
+                            py: 0.5,
+                          }}
+                        />
+                      );
+                    })}
+                  </Box>
+                )}
+              </Box>
+            )}
           </Box>
         </DialogContent>
 

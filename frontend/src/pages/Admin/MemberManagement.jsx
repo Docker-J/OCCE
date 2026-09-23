@@ -43,6 +43,8 @@ import {
 import LoginIcon from "@mui/icons-material/Login";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import PeopleIcon from "@mui/icons-material/People";
+import SchoolIcon from "@mui/icons-material/School";
+import CourseManagementDashboard from "./components/CourseManagementDashboard";
 
 const MemberManagement = () => {
   const { openModal } = useModals();
@@ -125,7 +127,13 @@ const MemberManagement = () => {
 
   return (
     <>
-      <title>{adminTab === 0 ? "교적 및 교인 관리 - OCCE" : "출석 통계 대시보드 - OCCE"}</title>
+      <title>
+        {adminTab === 0
+          ? "교적 및 교인 관리 - OCCE"
+          : adminTab === 1
+          ? "출석 통계 대시보드 - OCCE"
+          : "양육 및 교육과정 관리 - OCCE"}
+      </title>
 
       {/* 상단 타이틀 배너 */}
       <div className="title-wrapper" style={TITLE_BG_STYLE}>
@@ -134,7 +142,11 @@ const MemberManagement = () => {
             variant="h4"
             sx={{ fontWeight: 830, letterSpacing: "0.2em", pl: "0.2em", color: "white" }}
           >
-            {adminTab === 0 ? "통합 교적 및 교인 관리" : "출석 통계 대시보드"}
+            {adminTab === 0
+              ? "통합 교적 및 교인 관리"
+              : adminTab === 1
+              ? "출석 통계 대시보드"
+              : "양육 및 교육과정 관리"}
           </Typography>
           <Typography
             variant="h6"
@@ -147,7 +159,9 @@ const MemberManagement = () => {
           >
             {adminTab === 0
               ? "온교회 세대별 교적부, 웹 가입 상태, 소속 정원 및 알림을 통합 관리합니다."
-              : "구글 드라이브 주간 출석부의 실시간 출석 현황과 통계를 분석합니다."}
+              : adminTab === 1
+              ? "구글 드라이브 주간 출석부의 실시간 출석 현황과 통계를 분석합니다."
+              : "교육과정 및 개설 기수별 수강생 등록과 수료 상태를 체계적으로 관리합니다."}
           </Typography>
         </div>
       </div>
@@ -255,6 +269,11 @@ const MemberManagement = () => {
                 <Tab
                   label="출석 통계 대시보드"
                   icon={<BarChartIcon sx={{ fontSize: "1.2rem" }} />}
+                  iconPosition="start"
+                />
+                <Tab
+                  label="양육·훈련 과정 관리"
+                  icon={<SchoolIcon sx={{ fontSize: "1.2rem" }} />}
                   iconPosition="start"
                 />
               </Tabs>
@@ -485,6 +504,13 @@ const MemberManagement = () => {
               {adminTab === 1 && (
                 <Box>
                   <AttendanceDashboard />
+                </Box>
+              )}
+
+              {/* Tab 2: 양육·훈련 과정 및 기수 관리 */}
+              {adminTab === 2 && (
+                <Box>
+                  <CourseManagementDashboard users={users} />
                 </Box>
               )}
             </>

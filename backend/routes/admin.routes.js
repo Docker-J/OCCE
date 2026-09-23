@@ -21,6 +21,22 @@ import {
   getAttendanceStatsController,
   getGardenAttendanceDetailController,
 } from "../controller/adminAttendance.controller.js";
+import {
+  listCoursesController,
+  createCourseController,
+  updateCourseController,
+  deleteCourseController,
+  listCohortsController,
+  createCohortController,
+  updateCohortController,
+  deleteCohortController,
+  listCohortMembersController,
+  enrollCohortMemberController,
+  updateEnrollmentStatusController,
+  completeAllCohortMembersController,
+  removeCohortMemberController,
+  getMemberCoursesController,
+} from "../controller/adminCourse.controller.js";
 
 const router = new Hono();
 
@@ -87,6 +103,80 @@ router.get(
     },
   }),
   getGardenAttendanceDetailController
+);
+
+// Course and Cohort Management
+router.get("/courses", listCoursesController);
+router.post("/courses", validateJson(["name"]), createCourseController);
+router.put(
+  "/courses/:id",
+  validateParam({ id: { required: true } }),
+  validateJson(["name"]),
+  updateCourseController
+);
+router.delete(
+  "/courses/:id",
+  validateParam({ id: { required: true } }),
+  deleteCourseController
+);
+
+router.get(
+  "/courses/:courseId/cohorts",
+  validateParam({ courseId: { required: true } }),
+  listCohortsController
+);
+router.post(
+  "/courses/:courseId/cohorts",
+  validateParam({ courseId: { required: true } }),
+  validateJson(["termName"]),
+  createCohortController
+);
+router.put(
+  "/cohorts/:cohortId",
+  validateParam({ cohortId: { required: true } }),
+  validateJson(["termName"]),
+  updateCohortController
+);
+router.delete(
+  "/cohorts/:cohortId",
+  validateParam({ cohortId: { required: true } }),
+  deleteCohortController
+);
+
+// Cohort Member Enrollments
+router.get(
+  "/cohorts/:cohortId/members",
+  validateParam({ cohortId: { required: true } }),
+  listCohortMembersController
+);
+router.post(
+  "/cohorts/:cohortId/members",
+  validateParam({ cohortId: { required: true } }),
+  validateJson(["memberId"]),
+  enrollCohortMemberController
+);
+router.patch(
+  "/cohorts/:cohortId/members/:memberId",
+  validateParam({ cohortId: { required: true }, memberId: { required: true } }),
+  validateJson(["status"]),
+  updateEnrollmentStatusController
+);
+router.post(
+  "/cohorts/:cohortId/complete-all",
+  validateParam({ cohortId: { required: true } }),
+  completeAllCohortMembersController
+);
+router.delete(
+  "/cohorts/:cohortId/members/:memberId",
+  validateParam({ cohortId: { required: true }, memberId: { required: true } }),
+  removeCohortMemberController
+);
+
+// Individual Member Course History
+router.get(
+  "/members/:memberId/courses",
+  validateParam({ memberId: { required: true } }),
+  getMemberCoursesController
 );
 
 export default router;

@@ -134,8 +134,9 @@ CREATE INDEX IF NOT EXISTS idx_fcm_tokens_expires ON fcm_tokens(expires_at);
 -- ====================================================================
 CREATE TABLE IF NOT EXISTS courses (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT UNIQUE NOT NULL,                      -- 과정명 (예: '새가족반', '제자훈련 1기')
-  category TEXT NULL,                             -- 분류
+  name TEXT UNIQUE NOT NULL,                      -- 과정명 (예: '새가족 성경공부', '제자훈련')
+  category TEXT NULL,                             -- 분류 (예: '새가족', '제자도', '성경연구')
+  description TEXT NULL,                          -- 과정 개요
   order_num INTEGER NOT NULL DEFAULT 0,           -- UI 노출 우선순위
   is_active BOOLEAN NOT NULL DEFAULT 1            -- 현재 운영 중 여부
 );
@@ -143,25 +144,44 @@ CREATE TABLE IF NOT EXISTS courses (
 CREATE INDEX IF NOT EXISTS idx_courses_active_order ON courses(is_active, order_num);
 
 -- ====================================================================
--- 6. 교인별 교육과정 이수 기록 테이블
+-- 6. 교육과정 기수(Cohorts) 마스터 테이블
+-- ====================================================================
+CREATE TABLE IF NOT EXISTS course_cohorts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  course_id INTEGER NOT NULL,                     -- 소속 교육과정 FK
+  term_name TEXT NOT NULL,                        -- 기수명 (예: '1기', '2기', '2024년 가을학기')
+  instructor TEXT NULL,                           -- 담당 교역자 / 인도자
+  start_date DATE NULL,                           -- 개강일
+  end_date DATE NULL,                             -- 종강/수료일
+  status TEXT NOT NULL DEFAULT 'IN_PROGRESS'      -- 기수 상태
+      CHECK (status IN ('OPEN', 'IN_PROGRESS', 'COMPLETED')),
+  notes TEXT NULL,                                -- 기수 메모
+  
+  FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+  UNIQUE(course_id, term_name)
+);
+
+CREATE INDEX IF NOT EXISTS idx_course_cohorts_course ON course_cohorts(course_id, status);
+
+-- ====================================================================
+-- 7. 교인별 교육과정 수강 및 이수 기록 테이블
 -- ====================================================================
 CREATE TABLE IF NOT EXISTS member_courses (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  member_id INTEGER NOT NULL,
-  course_id INTEGER NOT NULL,
-  status TEXT NOT NULL DEFAULT 'COMPLETED' 
+  member_id INTEGER NOT NULL,                     -- 교인 FK
+  cohort_id INTEGER NOT NULL,                     -- 기수 FK
+  status TEXT NOT NULL DEFAULT 'IN_PROGRESS' 
       CHECK (status IN ('COMPLETED', 'IN_PROGRESS')),
-  term TEXT,                                      -- 기수/학기
-  completion_date DATE,                           -- 수료 일자
-  instructor TEXT,                                -- 인도자 / 담당 교역자
-  notes TEXT,                                     -- 특이사항 메모
+  completion_date DATE NULL,                      -- 수료 일자
+  notes TEXT NULL,                                -- 특이사항 / 과제 이수 메모
   
   FOREIGN KEY (member_id) REFERENCES church_members(id) ON DELETE CASCADE,
-  FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE RESTRICT
+  FOREIGN KEY (cohort_id) REFERENCES course_cohorts(id) ON DELETE CASCADE,
+  UNIQUE(member_id, cohort_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_member_courses_member ON member_courses(member_id, status);
-CREATE INDEX IF NOT EXISTS idx_member_courses_course ON member_courses(course_id, status);
+CREATE INDEX IF NOT EXISTS idx_member_courses_cohort ON member_courses(cohort_id, status);
 
 -- ====================================================================
 -- 7. 사역자 심방 기록 테이블
