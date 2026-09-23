@@ -13,6 +13,7 @@ import {
   importRosterFromDriveController,
   listGardensController,
   listHouseholdsController,
+  bulkSaveHouseholdController,
   updateUserRoleController,
   updateUserStatusController,
   deleteUserController,
@@ -68,6 +69,7 @@ router.post("/members/import-drive", importRosterFromDriveController);
 // Master data lookups
 router.get("/gardens", listGardensController);
 router.get("/households", listHouseholdsController);
+router.post("/households/bulk-save", bulkSaveHouseholdController);
 
 // Legacy Cognito User operations
 router.post(

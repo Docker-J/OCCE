@@ -1448,3 +1448,152 @@ export const deleteUserController = async (c) => {
     );
   }
 };
+
+/**
+ * POST /api/admin/households/bulk-save
+ * Creates or updates a household along with multiple church members (batch operation)
+ */
+export const bulkSaveHouseholdController = async (c) => {
+  try {
+    const env = c.env;
+    const body = await c.req.json();
+    const { householdId, household = {}, members = [] } = body;
+
+    let targetHouseholdId = householdId;
+
+    // 1. Create or Update household
+    if (targetHouseholdId) {
+      const curH = await env.DB.prepare("SELECT * FROM households WHERE id = ?").bind(targetHouseholdId).first();
+      if (curH) {
+        await env.DB.prepare(`
+          UPDATE households SET
+            household_name = ?,
+            garden_id = ?,
+            address = ?,
+            address_detail = ?,
+            city = ?,
+            province = ?,
+            postal_code = ?,
+            notes = ?
+          WHERE id = ?
+        `).bind(
+          household.householdName !== undefined ? (household.householdName || "").trim() : curH.household_name,
+          household.gardenId !== undefined ? (household.gardenId || 1) : curH.garden_id,
+          household.address !== undefined ? (household.address || "").trim() : curH.address,
+          household.addressDetail !== undefined ? (household.addressDetail || "").trim() : curH.address_detail,
+          household.city !== undefined ? (household.city || "Edmonton").trim() : curH.city,
+          household.province !== undefined ? (household.province || "AB").trim() : curH.province,
+          formatPostalCode(household.postalCode || curH.postal_code),
+          household.householdNotes !== undefined ? (household.householdNotes || "").trim() : curH.notes,
+          targetHouseholdId,
+        ).run();
+      }
+    } else {
+      // Create new household
+      const firstHead = members.find((m) => m.isHead || m.relationship === "HEAD") || members[0];
+      const defaultName = firstHead?.name ? `${firstHead.name.trim()} 성도 가정` : "새 성도 가정";
+      const hName = (household.householdName || defaultName).trim();
+      const hRes = await env.DB.prepare(`
+        INSERT INTO households (household_name, garden_id, address, address_detail, city, province, postal_code, notes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        hName,
+        household.gardenId || 1,
+        (household.address || "").trim(),
+        (household.addressDetail || "").trim(),
+        (household.city || "Edmonton").trim(),
+        (household.province || "AB").trim(),
+        formatPostalCode(household.postalCode),
+        (household.householdNotes || "").trim(),
+      ).run();
+
+      targetHouseholdId = hRes.meta.last_row_id;
+    }
+
+    // 2. Process members
+    for (const mem of members) {
+      if (!mem.name || !mem.name.trim()) continue;
+
+      const phoneCleanVal = cleanPhone(mem.phone || "");
+      const isHeadVal = mem.isHead ? 1 : mem.relationship === "HEAD" ? 1 : 0;
+
+      if (mem.id) {
+        // Update existing member
+        await env.DB.prepare(`
+          UPDATE church_members SET
+            household_id = ?,
+            is_head = ?,
+            relationship = ?,
+            name = ?,
+            name_en = ?,
+            birth_date = ?,
+            gender = ?,
+            phone = ?,
+            phone_clean = ?,
+            baptism_status = ?,
+            position = ?,
+            department = ?,
+            custom_garden_id = ?,
+            registration_date = ?,
+            status = ?
+          WHERE id = ?
+        `).bind(
+          targetHouseholdId,
+          isHeadVal,
+          mem.relationship || "HEAD",
+          mem.name.trim(),
+          mem.nameEn ? mem.nameEn.trim() : null,
+          mem.birthDate || null,
+          mem.gender || null,
+          (mem.phone || "").trim(),
+          phoneCleanVal,
+          mem.baptismStatus || "NONE",
+          (mem.position || "성도").trim(),
+          (mem.department || "장년부").trim(),
+          mem.customGardenId || null,
+          mem.registrationDate || null,
+          mem.status === "REMOVED" ? "REMOVED" : "ACTIVE",
+          mem.id,
+        ).run();
+      } else {
+        // Insert new member
+        await env.DB.prepare(`
+          INSERT INTO church_members (
+            household_id, is_head, relationship, name, name_en, birth_date, gender,
+            phone, phone_clean, baptism_status, position, department,
+            custom_garden_id, registration_date, status, is_registered
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+        `).bind(
+          targetHouseholdId,
+          isHeadVal,
+          mem.relationship || "CHILD",
+          mem.name.trim(),
+          mem.nameEn ? mem.nameEn.trim() : null,
+          mem.birthDate || null,
+          mem.gender || null,
+          (mem.phone || "").trim(),
+          phoneCleanVal,
+          mem.baptismStatus || "NONE",
+          (mem.position || "성도").trim(),
+          (mem.department || "장년부").trim(),
+          mem.customGardenId || null,
+          mem.registrationDate || null,
+          mem.status === "REMOVED" ? "REMOVED" : "ACTIVE",
+        ).run();
+      }
+    }
+
+    return c.json({
+      success: true,
+      message: "세대 및 구성원 정보가 성공적으로 저장되었습니다.",
+      householdId: targetHouseholdId,
+    }, 200);
+  } catch (error) {
+    console.error("bulkSaveHouseholdController error:", error);
+    return c.json(
+      { error: "BulkSaveError", message: "세대 정보 일괄 저장 중 오류가 발생했습니다: " + error.message },
+      500,
+    );
+  }
+};
+

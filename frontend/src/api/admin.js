@@ -26,6 +26,14 @@ export const updateMember = async (id, memberData) => {
 };
 
 /**
+ * Bulk save household and multiple members (batch operation)
+ */
+export const bulkSaveHousehold = async (data) => {
+  const res = await axios.post("/api/admin/households/bulk-save", data);
+  return res.data;
+};
+
+/**
  * Update member status ('ACTIVE', 'INACTIVE', 'REMOVED' 제적)
  */
 export const updateMemberStatus = async (id, status, options = {}) => {

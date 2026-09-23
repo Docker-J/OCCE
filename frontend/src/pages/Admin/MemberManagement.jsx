@@ -4,7 +4,7 @@
  * 개별 컴포넌트, 커스텀 훅, 풀 CRUD 및 Google Autocomplete 지원
  */
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router";
 import useModals from "../../util/useModal";
 import AttendanceDashboard from "./AttendanceDashboard";
@@ -110,6 +110,24 @@ const MemberManagement = () => {
     handleImportFromDrive,
     setAvailableGardens,
   } = actions;
+
+  // 수정 대상 교인의 세대 전체 구성원 목록 산출 (세대주 우선 정렬)
+  const householdMembersForEdit = useMemo(() => {
+    if (!memberForEdit) return [];
+    if (!memberForEdit.householdId) return [memberForEdit];
+    const list = (users || []).filter(
+      (u) =>
+        u.householdId === memberForEdit.householdId &&
+        (u.status !== "REMOVED" || u.id === memberForEdit.id)
+    );
+    const order = { HEAD: 1, SPOUSE: 2, CHILD: 3, PARENT: 4, OTHER: 5 };
+    list.sort((a, b) => {
+      if (a.isHead) return -1;
+      if (b.isHead) return 1;
+      return (order[a.relationship] || 99) - (order[b.relationship] || 99);
+    });
+    return list.length > 0 ? list : [memberForEdit];
+  }, [memberForEdit, users]);
 
   // 로그인 모달 동적 로드
   const handleLoginClick = async () => {
@@ -520,6 +538,7 @@ const MemberManagement = () => {
         onClose={() => !submittingMember && setMemberFormOpen(false)}
         onSubmit={handleSubmitMemberForm}
         initialData={memberForEdit}
+        householdMembers={householdMembersForEdit}
         availableGardens={availableGardens}
         availableHouseholds={availableHouseholds}
         isSubmitting={submittingMember}

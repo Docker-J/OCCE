@@ -1,7 +1,10 @@
 /**
  * @file MemberFormModal.jsx
- * @description 교인 신규 등록 및 정보 수정 통합 모달
- * Google Places Autocomplete를 통한 세대 주소 자동완성 지원
+ * @description 세대(가구) 기반 다중 세대원 탭(Tab) 등록 및 수정 통합 모달
+ * - 세대 공통 정보(주소, 소속 정원, 세대명) 관리
+ * - 세대원별 탭(Tab) 전환 및 [＋ 세대원 추가] 지원
+ * - Google Places Autocomplete를 통한 세대 주소 자동완성 지원
+ * - 세대원별 인적사항, 직분, 세례, 부서 및 양육·훈련 과정 이수 현황 조회
  */
 
 import { useState, useEffect } from "react";
@@ -21,36 +24,41 @@ import {
   Select,
   MenuItem,
   FormControlLabel,
-  Checkbox,
   Radio,
   RadioGroup,
-  FormLabel,
   CircularProgress,
   Divider,
   Paper,
   Autocomplete,
   Chip,
   InputAdornment,
+  Tabs,
+  Tab,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
-import EditNoteIcon from "@mui/icons-material/EditNote";
+import FamilyRestroomIcon from "@mui/icons-material/FamilyRestroom";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
+import ForestIcon from "@mui/icons-material/Forest";
+import SchoolIcon from "@mui/icons-material/School";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
+import PersonIcon from "@mui/icons-material/Person";
+
 import AddressAutocompleteInput from "./AddressAutocompleteInput";
 import { PatternFormat } from "react-number-format";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { format, parseISO, isValid } from "date-fns";
 import { GatheringDateButtonField } from "../../Community/GatheringPickerFields";
-import SchoolIcon from "@mui/icons-material/School";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
-import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
-import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
-import ForestIcon from "@mui/icons-material/Forest";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
 import { getMemberCourses } from "../../../api/admin";
 
 const RELATIONSHIP_OPTIONS = [
@@ -83,11 +91,35 @@ const POSITION_OPTIONS = [
   "선교사",
 ];
 
+const createDefaultMember = (isFirst = false, hasSpouse = false) => {
+  const nextRel = isFirst ? "HEAD" : (!hasSpouse ? "SPOUSE" : "CHILD");
+  return {
+    id: null,
+    _tempKey: `temp_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+    name: "",
+    nameEn: "",
+    relationship: nextRel,
+    isHead: nextRel === "HEAD",
+    phone: "",
+    birthDate: "",
+    gender: nextRel === "SPOUSE" ? "F" : "M",
+    position: "성도",
+    department: nextRel === "CHILD" ? "유초등부" : "장년부",
+    baptismStatus: "NONE",
+    registrationDate: new Date().toISOString().slice(0, 10),
+    status: "ACTIVE",
+    isRegistered: false,
+    hasNotification: false,
+    deviceCount: 0,
+  };
+};
+
 const MemberFormModal = ({
   open,
   onClose,
   onSubmit,
   initialData = null,
+  householdMembers = [],
   availableGardens = [],
   availableHouseholds = [],
   isSubmitting = false,
@@ -98,24 +130,9 @@ const MemberFormModal = ({
   // Household type selection for create mode: 'new' or 'existing'
   const [householdMode, setHouseholdMode] = useState("new");
   const [isAddressManualEdit, setIsAddressManualEdit] = useState(false);
-  const [isSeparateMode, setIsSeparateMode] = useState(false);
 
-  // Form Fields State
-  const [formData, setFormData] = useState({
-    // Member fields
-    name: "",
-    nameEn: "",
-    relationship: "HEAD",
-    isHead: true,
-    phone: "",
-    birthDate: "",
-    gender: "M",
-    position: "성도",
-    department: "장년부",
-    baptismStatus: "NONE",
-    registrationDate: new Date().toISOString().slice(0, 10),
-    status: "ACTIVE",
-    // Household fields
+  // 공통 세대(가구) 정보
+  const [householdData, setHouseholdData] = useState({
     householdId: "",
     householdName: "",
     gardenId: 1,
@@ -127,37 +144,23 @@ const MemberFormModal = ({
     householdNotes: "",
   });
 
+  // 세대원 목록 상태 (각 탭에 해당)
+  const [membersList, setMembersList] = useState([]);
+  const [activeMemberIndex, setActiveMemberIndex] = useState(0);
+
+  // 현재 활성화된 세대원의 교육/과정 이수 목록
   const [memberCoursesList, setMemberCoursesList] = useState([]);
   const [loadingMemberCourses, setLoadingMemberCourses] = useState(false);
 
+  // 모달 열림 및 초기 데이터 변경 시 동기화
   useEffect(() => {
     setIsAddressManualEdit(false);
-    setIsSeparateMode(false);
-    if (initialData) {
-      if (initialData.id) {
-        setLoadingMemberCourses(true);
-        getMemberCourses(initialData.id)
-          .then((data) => setMemberCoursesList(data.courses || []))
-          .catch(() => setMemberCoursesList([]))
-          .finally(() => setLoadingMemberCourses(false));
-      } else {
-        setMemberCoursesList([]);
-      }
-      setFormData({
-        name: initialData.name || "",
-        nameEn: initialData.nameEn || "",
-        relationship: initialData.relationship || "HEAD",
-        isHead: initialData.isHead ?? (initialData.relationship === "HEAD"),
-        phone: initialData.phone || "",
-        birthDate: initialData.birthDate || "",
-        gender: initialData.gender || "M",
-        position: initialData.position || "성도",
-        department: initialData.department || "장년부",
-        baptismStatus: initialData.baptismStatus || "NONE",
-        registrationDate: initialData.registrationDate || "",
-        status: initialData.status === "REMOVED" ? "REMOVED" : "ACTIVE",
+
+    if (initialData && initialData.id) {
+      // 1. 공통 세대 정보 설정
+      setHouseholdData({
         householdId: initialData.householdId || "",
-        householdName: initialData.householdName || "",
+        householdName: initialData.householdName || `${initialData.name || "성도"} 성도 가정`,
         gardenId: initialData.gardenId || 1,
         address: initialData.address || "",
         addressDetail: initialData.addressDetail || "",
@@ -167,19 +170,40 @@ const MemberFormModal = ({
         householdNotes: initialData.householdNotes || "",
       });
       setHouseholdMode("existing");
+
+      // 2. 세대원 목록 구성 (동일 세대 전체 멤버 또는 단독 교인)
+      const sourceList = (householdMembers && householdMembers.length > 0)
+        ? householdMembers
+        : [initialData];
+
+      const mapped = sourceList.map((m, idx) => ({
+        id: m.id || null,
+        _tempKey: m.id ? `mem_${m.id}` : `temp_${idx}_${Date.now()}`,
+        name: m.name || "",
+        nameEn: m.nameEn || "",
+        relationship: m.relationship || (m.isHead ? "HEAD" : "CHILD"),
+        isHead: Boolean(m.isHead ?? (m.relationship === "HEAD")),
+        phone: m.phone || "",
+        birthDate: m.birthDate || "",
+        gender: m.gender || "M",
+        position: m.position || "성도",
+        department: m.department || "장년부",
+        baptismStatus: m.baptismStatus || "NONE",
+        registrationDate: m.registrationDate || "",
+        status: m.status === "REMOVED" ? "REMOVED" : "ACTIVE",
+        isRegistered: Boolean(m.isRegistered),
+        hasNotification: Boolean(m.hasNotification),
+        deviceCount: m.deviceCount || 0,
+      }));
+
+      setMembersList(mapped);
+
+      // 클릭했던 교인의 탭을 기본 활성화
+      const targetIdx = mapped.findIndex((m) => m.id === initialData.id);
+      setActiveMemberIndex(targetIdx >= 0 ? targetIdx : 0);
     } else {
-      setFormData({
-        name: "",
-        relationship: "HEAD",
-        isHead: true,
-        phone: "",
-        birthDate: "",
-        gender: "M",
-        position: "성도",
-        department: "장년부",
-        baptismStatus: "NONE",
-        registrationDate: new Date().toISOString().slice(0, 10),
-        status: "ACTIVE",
+      // 신규 등록 모드
+      setHouseholdData({
         householdId: "",
         householdName: "",
         gardenId: availableGardens[0]?.id || 1,
@@ -191,53 +215,68 @@ const MemberFormModal = ({
         householdNotes: "",
       });
       setHouseholdMode("new");
-    }
-  }, [initialData, open, availableGardens]);
 
-  const handleChange = (field, value) => {
-    setFormData((prev) => {
+      setMembersList([createDefaultMember(true, false)]);
+      setActiveMemberIndex(0);
+    }
+  }, [initialData, householdMembers, open, availableGardens]);
+
+  // 현재 활성화된 세대원
+  const currentMember = membersList[activeMemberIndex] || membersList[0] || {};
+
+  // 활성 세대원의 교육과정 이수 내역 로드
+  useEffect(() => {
+    if (currentMember?.id) {
+      setLoadingMemberCourses(true);
+      getMemberCourses(currentMember.id)
+        .then((data) => setMemberCoursesList(data.courses || []))
+        .catch(() => setMemberCoursesList([]))
+        .finally(() => setLoadingMemberCourses(false));
+    } else {
+      setMemberCoursesList([]);
+    }
+  }, [currentMember?.id]);
+
+  // 공통 세대 필드 변경 핸들러
+  const handleHouseholdChange = (field, value) => {
+    setHouseholdData((prev) => {
       const next = { ...prev, [field]: value };
-      // Auto-adjust isHead when relationship changes
-      if (field === "relationship") {
-        next.isHead = value === "HEAD";
-      }
-      // 청년은 정원(새벽, 나라)으로 구분하여 자동 반영
       if (field === "gardenId") {
         const foundG = availableGardens.find((g) => g.id === value || String(g.id) === String(value));
         const gName = foundG?.name || "";
         if (gName === "새벽" || gName === "나라") {
-          if (prev.department === "장년부") {
-            next.department = "청년부";
-          }
+          setMembersList((mPrev) =>
+            mPrev.map((m, idx) =>
+              idx === activeMemberIndex && m.department === "장년부" ? { ...m, department: "청년부" } : m
+            )
+          );
         }
       }
       return next;
     });
   };
 
+  // 기존 세대 선택 (신규 등록 모드에서 기존 세대 편입 시)
   const handleHouseholdSelect = (selectedId) => {
     const found = availableHouseholds.find((h) => String(h.id) === String(selectedId));
     if (found) {
-      const gName = found.gardenName || (availableGardens.find((g) => g.id === found.gardenId)?.name) || "";
-      const isYoungAdult = gName === "새벽" || gName === "나라";
-
-      setFormData((prev) => ({
-        ...prev,
+      setHouseholdData({
         householdId: found.id,
         householdName: found.householdName,
-        gardenId: found.gardenId || prev.gardenId,
-        department: isYoungAdult && prev.department === "장년부" ? "청년부" : prev.department,
+        gardenId: found.gardenId || householdData.gardenId,
         address: found.address || "",
         addressDetail: found.addressDetail || "",
         city: found.city || "Edmonton",
         province: found.province || "AB",
         postalCode: found.postalCode || "",
-      }));
+        householdNotes: found.notes || "",
+      });
     }
   };
 
+  // Google Places 주소 자동완성 선택
   const handleAddressSelect = ({ address, city, province, postalCode }) => {
-    setFormData((prev) => ({
+    setHouseholdData((prev) => ({
       ...prev,
       address: address || prev.address,
       city: city || prev.city || "Edmonton",
@@ -247,65 +286,101 @@ const MemberFormModal = ({
     setIsAddressManualEdit(false);
   };
 
-  const handleStartIndependence = () => {
-    setIsSeparateMode(true);
-    setFormData((prev) => ({
-      ...prev,
-      relationship: "HEAD",
-      isHead: true,
-      householdName: `${(prev.name || initialData?.name || "").trim()} 성도 가정`,
-      department:
-        prev.department === "유초등부" || prev.department === "중고등부"
-          ? "청년부"
-          : prev.department,
-    }));
+  // 활성 세대원 필드 변경 핸들러
+  const handleActiveMemberChange = (field, value) => {
+    setMembersList((prev) => {
+      const next = [...prev];
+      const target = { ...next[activeMemberIndex], [field]: value };
+
+      if (field === "relationship") {
+        if (value === "HEAD") {
+          target.isHead = true;
+          // 세대주는 1명만 허용: 다른 세대주의 HEAD 해제
+          for (let i = 0; i < next.length; i++) {
+            if (i !== activeMemberIndex && (next[i].isHead || next[i].relationship === "HEAD")) {
+              next[i] = { ...next[i], isHead: false, relationship: "SPOUSE" };
+            }
+          }
+        } else {
+          target.isHead = false;
+        }
+      }
+
+      next[activeMemberIndex] = target;
+      return next;
+    });
   };
 
-  const handleCancelIndependence = () => {
-    setIsSeparateMode(false);
-    if (initialData) {
-      setFormData((prev) => ({
-        ...prev,
-        relationship: initialData.relationship || "CHILD",
-        isHead: false,
-        householdId: initialData.householdId || "",
-        householdName: initialData.householdName || "",
-        gardenId: initialData.gardenId || 1,
-        address: initialData.address || "",
-        addressDetail: initialData.addressDetail || "",
-        city: initialData.city || "Edmonton",
-        province: initialData.province || "AB",
-        postalCode: initialData.postalCode || "",
-        householdNotes: initialData.householdNotes || "",
-        department: initialData.department || "장년부",
-      }));
+  // 새 세대원 탭 추가
+  const handleAddMemberTab = () => {
+    const hasSpouse = membersList.some((m) => m.relationship === "SPOUSE");
+    const newMember = createDefaultMember(false, hasSpouse);
+    setMembersList((prev) => [...prev, newMember]);
+    setActiveMemberIndex(membersList.length);
+  };
+
+  // 미저장 새 세대원 탭 삭제
+  const handleRemoveMemberTab = (indexToRemove, e) => {
+    if (e) e.stopPropagation();
+    if (membersList.length <= 1) return;
+
+    setMembersList((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+    if (activeMemberIndex >= indexToRemove && activeMemberIndex > 0) {
+      setActiveMemberIndex((prev) => prev - 1);
     }
   };
 
+  // 전체 저장 제출 핸들러
   const handleSubmit = (e) => {
     if (e) {
       if (typeof e.preventDefault === "function") e.preventDefault();
       if (typeof e.stopPropagation === "function") e.stopPropagation();
     }
-    console.log("[MemberFormModal] handleSubmit invoked, formData:", formData);
 
-    if (!formData.name || !formData.name.trim()) {
-      alert("교인 성명(한글)은 필수 입력 항목입니다.");
+    if (membersList.length === 0) return;
+
+    // 모든 세대원의 성명 필수 검증
+    const invalidIdx = membersList.findIndex((m) => !m.name || !m.name.trim());
+    if (invalidIdx >= 0) {
+      setActiveMemberIndex(invalidIdx);
+      alert(`[세대원 ${invalidIdx + 1}] 성명을 입력해 주세요.`);
       return;
     }
 
+    const firstHead = membersList.find((m) => m.isHead) || membersList[0];
+    const computedHouseholdName =
+      householdData.householdName || `${firstHead?.name?.trim() || "새 성도"} 성도 가정`;
+
     const payload = {
-      ...formData,
-      isHead: formData.relationship === "HEAD",
-      isNewHousehold: !isEdit && householdMode === "new",
-      isSeparateHousehold: Boolean(isEdit && isSeparateMode),
-      householdName:
-        (!isEdit && householdMode === "new") || isSeparateMode
-          ? `${formData.name.trim()} 성도 가정`
-          : (formData.householdName || `${formData.name.trim()} 성도 가정`),
+      isBulk: true,
+      householdId: householdData.householdId || null,
+      household: {
+        householdName: computedHouseholdName,
+        gardenId: householdData.gardenId || 1,
+        address: (householdData.address || "").trim(),
+        addressDetail: (householdData.addressDetail || "").trim(),
+        city: (householdData.city || "Edmonton").trim(),
+        province: (householdData.province || "AB").trim(),
+        postalCode: householdData.postalCode || "",
+        householdNotes: (householdData.householdNotes || "").trim(),
+      },
+      members: membersList.map((m) => ({
+        id: m.id || null,
+        name: m.name.trim(),
+        nameEn: m.nameEn ? m.nameEn.trim() : null,
+        relationship: m.relationship || (m.isHead ? "HEAD" : "CHILD"),
+        isHead: Boolean(m.isHead),
+        phone: m.phone || "",
+        birthDate: m.birthDate || null,
+        gender: m.gender || "M",
+        baptismStatus: m.baptismStatus || "NONE",
+        position: m.position || "성도",
+        department: m.department || "장년부",
+        registrationDate: m.registrationDate || null,
+        status: m.status === "REMOVED" ? "REMOVED" : "ACTIVE",
+      })),
     };
 
-    console.log("[MemberFormModal] Submitting payload:", payload);
     onSubmit(payload);
   };
 
@@ -327,490 +402,141 @@ const MemberFormModal = ({
             borderRadius: "20px",
             maxWidth: "960px",
             width: "100%",
-            maxHeight: "90vh",
+            maxHeight: "92vh",
             display: "flex",
             flexDirection: "column",
             overflow: "hidden",
           },
         },
       }}
-      PaperProps={{
-        component: "form",
-        onSubmit: handleSubmit,
-        noValidate: true,
-        autoComplete: "off",
-        sx: {
-          borderRadius: "20px",
-          maxWidth: "960px",
-          width: "100%",
-          maxHeight: "90vh",
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-        },
-      }}
     >
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <DialogTitle sx={{ pb: 1, px: 3, pt: 2.5, display: "flex", alignItems: "center", gap: 1.2, flexShrink: 0 }}>
-        {isEdit ? (
-          <EditNoteIcon sx={{ color: "#ea580c", fontSize: "1.8rem" }} />
-        ) : (
-          <PersonAddAlt1Icon sx={{ color: "#2563eb", fontSize: "1.8rem" }} />
-        )}
-        <Box>
-          <Typography variant="h6" sx={{ fontWeight: 800, color: "#111" }}>
-            {isEdit ? `${formData.name || "교인"} 교적 상세 및 정보 수정` : "새 교인 및 세대 등록"}
-          </Typography>
-          <Typography variant="caption" sx={{ color: "#666" }}>
-            {isEdit
-              ? `${formData.name || "교인"} 성도의 상세 교적 정보, 세대 주소 및 수강 이력을 확인하고 수정합니다.`
-              : "온교회 교적부에 새 성도와 세대 정보를 등록합니다."}
-          </Typography>
-        </Box>
-      </DialogTitle>
-
-      <DialogContent dividers sx={{ py: 2.5, px: 3, overflowY: "auto", flex: "1 1 auto" }}>
-        {/* 교인 상세 프로필 요약 카드 (행 클릭 시 한눈에 확인 가능한 디테일 뷰) */}
-        {isEdit && initialData && (
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2.2,
-              mb: 3,
-              borderRadius: "16px",
-              background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
-              border: "1px solid #e2e8f0",
-              display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
-              justifyContent: "space-between",
-              alignItems: { xs: "flex-start", sm: "center" },
-              gap: 1.5,
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.8 }}>
-              <Box
-                sx={{
-                  width: 46,
-                  height: 46,
-                  borderRadius: "50%",
-                  backgroundColor: initialData.status === "REMOVED" ? "#fee2e2" : "#ffedd5",
-                  color: initialData.status === "REMOVED" ? "#dc2626" : "#ea580c",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontWeight: 800,
-                  fontSize: "1.15rem",
-                  flexShrink: 0,
-                }}
-              >
-                {initialData.name ? initialData.name.charAt(0) : "교"}
-              </Box>
-              <Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, flexWrap: "wrap" }}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 800,
-                      color: initialData.status === "REMOVED" ? "#991b1b" : "#0f172a",
-                      fontSize: "1.05rem",
-                    }}
-                  >
-                    {initialData.name || "(이름 없음)"}
-                  </Typography>
-                  {initialData.nameEn && (
-                    <Typography variant="body2" sx={{ color: "#64748b", fontWeight: 500 }}>
-                      ({initialData.nameEn})
-                    </Typography>
-                  )}
-                  {initialData.status === "REMOVED" ? (
-                    <Chip
-                      size="small"
-                      label="제적"
-                      sx={{
-                        height: 22,
-                        fontSize: "0.72rem",
-                        fontWeight: 700,
-                        backgroundColor: "rgba(220, 38, 38, 0.1)",
-                        color: "#dc2626",
-                        border: "1px solid rgba(220, 38, 38, 0.3)",
-                      }}
-                    />
-                  ) : (
-                    <Chip
-                      size="small"
-                      label={
-                        initialData.isHead
-                          ? "세대주"
-                          : RELATIONSHIP_OPTIONS.find((r) => r.value === initialData.relationship)?.label || "세대원"
-                      }
-                      sx={{
-                        height: 22,
-                        fontSize: "0.72rem",
-                        fontWeight: 700,
-                        backgroundColor: initialData.isHead ? "rgba(234, 88, 12, 0.12)" : "#e2e8f0",
-                        color: initialData.isHead ? "#c2410c" : "#475569",
-                        border: initialData.isHead ? "1px solid rgba(234, 88, 12, 0.3)" : "1px solid #cbd5e1",
-                      }}
-                    />
-                  )}
-                </Box>
-                <Typography variant="caption" sx={{ color: "#64748b", display: "block", mt: 0.3 }}>
-                  {initialData.position || "성도"} · {BAPTISM_OPTIONS.find((b) => b.value === initialData.baptismStatus)?.label || "세례"} · {initialData.department || "장년부"}
-                  {initialData.registrationDate ? ` · 등록일: ${initialData.registrationDate}` : ""}
-                </Typography>
-              </Box>
-            </Box>
-
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, flexWrap: "wrap" }}>
-              {/* 소속 정원 */}
-              {(initialData.gardenName || initialData.garden) && (
-                <Chip
-                  icon={<ForestIcon sx={{ fontSize: "14px !important", color: "inherit !important" }} />}
-                  size="small"
-                  label={initialData.gardenName || initialData.garden}
-                  sx={{
-                    height: 26,
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    backgroundColor: "rgba(234, 88, 12, 0.1)",
-                    color: "#ea580c",
-                    border: "1px solid rgba(234, 88, 12, 0.25)",
-                  }}
-                />
-              )}
-
-              {/* 웹가입 여부 */}
-              {initialData.isRegistered ? (
-                <Chip
-                  size="small"
-                  label="웹가입 완료"
-                  sx={{
-                    height: 26,
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    backgroundColor: "#f0fdf4",
-                    color: "#16a34a",
-                    border: "1px solid #bbf7d0",
-                  }}
-                />
-              ) : (
-                <Chip
-                  size="small"
-                  label="웹 미가입"
-                  sx={{
-                    height: 26,
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    backgroundColor: "#f1f5f9",
-                    color: "#64748b",
-                    border: "1px solid #e2e8f0",
-                  }}
-                />
-              )}
-
-              {/* 알림 수신 여부 */}
-              {initialData.hasNotification ? (
-                <Chip
-                  icon={<NotificationsActiveIcon sx={{ fontSize: "14px !important", color: "#16a34a !important" }} />}
-                  size="small"
-                  label={`알림 수신중${initialData.deviceCount ? ` (${initialData.deviceCount}대)` : ""}`}
-                  sx={{
-                    height: 26,
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    backgroundColor: "#f0fdf4",
-                    color: "#16a34a",
-                    border: "1px solid #bbf7d0",
-                  }}
-                />
-              ) : (
-                <Chip
-                  icon={<NotificationsOffIcon sx={{ fontSize: "14px !important", color: "#94a3b8 !important" }} />}
-                  size="small"
-                  label="알림 미등록"
-                  sx={{
-                    height: 26,
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    backgroundColor: "#f1f5f9",
-                    color: "#64748b",
-                    border: "1px solid #e2e8f0",
-                  }}
-                />
-              )}
-            </Box>
-          </Paper>
-        )}
-        {/* 1. 세대(가구) 및 거주 주소 정보 섹션 */}
-        <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
-            <HomeOutlinedIcon sx={{ color: "#ea580c", fontSize: "1.3rem" }} />
-            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#222" }}>
-              1. 세대(가구) 및 거주 주소 정보
+          {isEdit ? (
+            <FamilyRestroomIcon sx={{ color: "#ea580c", fontSize: "1.8rem" }} />
+          ) : (
+            <PersonAddAlt1Icon sx={{ color: "#2563eb", fontSize: "1.8rem" }} />
+          )}
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 800, color: "#111" }}>
+              {isEdit
+                ? `${householdData.householdName || `${currentMember?.name || "교인"} 성도 가정`} 교적 및 세대원 관리`
+                : "새 세대(가구) 및 교인 등록"}
+            </Typography>
+            <Typography variant="caption" sx={{ color: "#666" }}>
+              {isEdit
+                ? `소속 세대원(${membersList.length}명)의 교적 정보와 공통 세대 주소를 확인하고 일괄 수정합니다.`
+                : "공통 세대 주소를 등록하고 탭을 추가하여 온 가족을 한 번에 등록합니다."}
             </Typography>
           </Box>
+        </DialogTitle>
 
-          {/* 자녀/세대원 수정 시: 세대 독립 (분가) 안내 배너 카드 */}
-          {isEdit && initialData && !initialData.isHead && (
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2,
-                mb: 2.5,
-                borderRadius: "14px",
-                backgroundColor: isSeparateMode ? "#f0fdf4" : "#eff6ff",
-                border: isSeparateMode ? "1.5px solid #86efac" : "1.5px solid #bfdbfe",
-                transition: "all 0.2s ease",
-              }}
-            >
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 1.5 }}>
-                <Box sx={{ flex: 1, minWidth: 260 }}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
-                    <HomeWorkOutlinedIcon sx={{ color: isSeparateMode ? "#16a34a" : "#2563eb", fontSize: "1.3rem" }} />
-                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: isSeparateMode ? "#166534" : "#1e40af" }}>
-                      {isSeparateMode ? "✓ 세대 독립(분가) 모드 설정됨" : "세대 독립 (새 가구로 분가)"}
-                    </Typography>
-                  </Box>
-                  <Typography variant="caption" sx={{ color: isSeparateMode ? "#15803d" : "#3b82f6", display: "block", mt: 0.4, lineHeight: 1.4 }}>
-                    {isSeparateMode
-                      ? `저장 시 [${formData.householdName || `${formData.name} 성도 가정`}]의 세대주로 신규 분가됩니다. 아래에서 거주 주소 및 사역 부서(청년부 등)를 설정할 수 있습니다.`
-                      : `현재 [${initialData.householdName || "기존 가구"}]의 ${initialData.relationship === "CHILD" ? "자녀" : "세대원"}로 등록되어 있습니다. 청년 독립 또는 결혼으로 분가하려면 버튼을 누르세요.`}
-                  </Typography>
-                </Box>
-
-                {isSeparateMode ? (
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={handleCancelIndependence}
-                    sx={{
-                      borderRadius: "10px",
-                      fontSize: "0.8rem",
-                      fontWeight: 700,
-                      color: "#475569",
-                      borderColor: "#cbd5e1",
-                      backgroundColor: "#fff",
-                      "&:hover": { backgroundColor: "#f8fafc", borderColor: "#94a3b8" },
-                    }}
-                  >
-                    분가 취소 (기존 세대 유지)
-                  </Button>
-                ) : (
-                  <Button
-                    size="small"
-                    variant="contained"
-                    onClick={handleStartIndependence}
-                    sx={{
-                      borderRadius: "10px",
-                      fontSize: "0.8rem",
-                      fontWeight: 700,
-                      backgroundColor: "#2563eb",
-                      "&:hover": { backgroundColor: "#1d4ed8" },
-                    }}
-                  >
-                    새 세대로 분가하기
-                  </Button>
-                )}
+        <DialogContent dividers sx={{ py: 2.5, px: 3, overflowY: "auto", flex: "1 1 auto" }}>
+          {/* ========================================================= */}
+          {/* 1. 세대(가구) 공통 및 거주 주소 정보 섹션                     */}
+          {/* ========================================================= */}
+          <Box sx={{ mb: 3 }}>
+            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1.5 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <HomeOutlinedIcon sx={{ color: "#ea580c", fontSize: "1.3rem" }} />
+                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#222" }}>
+                  1. 세대(가구) 공통 및 거주 주소 정보
+                </Typography>
               </Box>
-            </Paper>
-          )}
-
-          {!isEdit && (
-            <Box sx={{ mb: 2 }}>
-              <FormControl component="fieldset">
-                <FormLabel component="legend" sx={{ fontSize: "0.82rem", fontWeight: 600 }}>
-                  세대 배정 방식
-                </FormLabel>
-                <RadioGroup
-                  row
-                  value={householdMode}
-                  onChange={(e) => setHouseholdMode(e.target.value)}
-                >
-                  <FormControlLabel
-                    value="new"
-                    control={<Radio size="small" />}
-                    label="새로운 세대(가구) 생성"
-                  />
-                  <FormControlLabel
-                    value="existing"
-                    control={<Radio size="small" />}
-                    label="기존 등록된 세대에 추가 (가족 편입)"
-                  />
-                </RadioGroup>
-              </FormControl>
-            </Box>
-          )}
-
-          {!isEdit && householdMode === "existing" && (
-            <Box sx={{ mb: 2.5 }}>
-              <Autocomplete
-                fullWidth
+              <Chip
                 size="small"
-                options={availableHouseholds}
-                value={
-                  availableHouseholds.find((h) => String(h.id) === String(formData.householdId)) || null
-                }
-                onChange={(event, selected) => {
-                  if (selected) {
-                    handleHouseholdSelect(selected.id);
-                  } else {
-                    setFormData((prev) => ({
-                      ...prev,
-                      householdId: "",
-                      householdName: "",
-                      address: "",
-                      addressDetail: "",
-                      postalCode: "",
-                    }));
-                  }
-                }}
-                getOptionLabel={(option) => {
-                  if (typeof option === "string") return option;
-                  return option.householdName || "";
-                }}
-                filterOptions={(options, state) => {
-                  const q = state.inputValue.trim().toLowerCase();
-                  if (!q) return options;
-                  return options.filter((h) => {
-                    const nameMatch = (h.householdName || "").toLowerCase().includes(q);
-                    const addrMatch = (h.address || "").toLowerCase().includes(q);
-                    const gardenMatch = (h.gardenName || "").toLowerCase().includes(q);
-                    return nameMatch || addrMatch || gardenMatch;
-                  });
-                }}
-                isOptionEqualToValue={(option, val) => String(option.id) === String(val?.id)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="소속될 기존 세대 검색 및 선택 (이름, 주소, 정원으로 검색)"
-                    placeholder="세대명(예: 김철수 성도 가정), 주소, 또는 정원명으로 검색"
-                    slotProps={{
-                      ...params.slotProps,
-                      htmlInput: {
-                        ...params.slotProps?.htmlInput,
-                        autoComplete: "off",
-                      },
-                    }}
-                    sx={{
-                      backgroundColor: "#fff",
-                      "& .MuiOutlinedInput-root": { borderRadius: "10px" },
-                    }}
-                  />
-                )}
-                renderOption={(props, option) => {
-                  const { key, ...optionProps } = props;
-                  return (
-                    <Box
-                      key={key || option.id}
-                      component="li"
-                      {...optionProps}
-                      sx={{
-                        py: 1.2,
-                        px: 2,
-                        borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
-                        "&:last-child": { borderBottom: "none" },
-                      }}
-                    >
-                      <Box sx={{ width: "100%" }}>
-                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 0.3 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 700, color: "#111" }}>
-                            {option.householdName}
-                          </Typography>
-                          {option.gardenName && (
-                            <Chip
-                              size="small"
-                              label={option.gardenName}
-                              sx={{
-                                height: 20,
-                                fontSize: "0.72rem",
-                                backgroundColor: "#f0fdf4",
-                                color: "#166534",
-                                fontWeight: 600,
-                              }}
-                            />
-                          )}
-                        </Box>
-                        {option.address && (
-                          <Typography variant="caption" sx={{ color: "#666", display: "block" }}>
-                            📍 {option.address} {option.addressDetail || ""} {option.postalCode ? `(${option.postalCode})` : ""}
-                          </Typography>
-                        )}
-                      </Box>
-                    </Box>
-                  );
-                }}
-                slotProps={{
-                  popper: {
-                    sx: {
-                      zIndex: 1500,
-                      "& .MuiAutocomplete-paper": {
-                        borderRadius: "12px",
-                        boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
-                        border: "1px solid rgba(0,0,0,0.08)",
-                        mt: 1,
-                      },
-                      "& .MuiAutocomplete-listbox": {
-                        maxHeight: "320px",
-                        py: 0.5,
-                      },
-                    },
-                  },
+                label="모든 세대원 공통 적용"
+                sx={{
+                  backgroundColor: "rgba(234, 88, 12, 0.08)",
+                  color: "#ea580c",
+                  fontWeight: 700,
+                  fontSize: "0.72rem",
                 }}
               />
-
-              {/* 선택된 세대 미리보기 정보 카드 */}
-              {formData.householdId && (
-                <Paper
-                  elevation={0}
-                  sx={{
-                    mt: 1.5,
-                    p: 2,
-                    borderRadius: "12px",
-                    backgroundColor: "#f8fafc",
-                    border: "1px solid #e2e8f0",
-                  }}
-                >
-                  <Typography variant="caption" sx={{ color: "#2563eb", fontWeight: 700, display: "block", mb: 0.5 }}>
-                    ✓ 소속 확정 세대 정보
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 700, color: "#1e293b" }}>
-                    {formData.householdName}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "#64748b", display: "block", mt: 0.3 }}>
-                    {formData.address
-                      ? `거주 주소: ${formData.address} ${formData.addressDetail ? `${formData.addressDetail}, ` : ""}${formData.city || "Edmonton"}, ${formData.province || "AB"} ${formData.postalCode || ""}`
-                      : "등록된 주소 없음"}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "#ea580c", display: "block", mt: 0.5, fontWeight: 500 }}>
-                    ※ 해당 세대의 거주 주소 및 정원으로 자동 편입됩니다.
-                  </Typography>
-                </Paper>
-              )}
             </Box>
-          )}
 
+            {/* 신규 등록 모드: 새 세대 vs 기존 세대 편입 선택 */}
+            {!isEdit && (
+              <Box sx={{ mb: 2, p: 2, backgroundColor: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+                <FormControl component="fieldset">
+                  <RadioGroup
+                    row
+                    value={householdMode}
+                    onChange={(e) => setHouseholdMode(e.target.value)}
+                  >
+                    <FormControlLabel
+                      value="new"
+                      control={<Radio size="small" sx={{ color: "#ea580c", "&.Mui-checked": { color: "#ea580c" } }} />}
+                      label={<Typography variant="body2" sx={{ fontWeight: 600 }}>새 세대(가구) 신규 생성</Typography>}
+                    />
+                    <FormControlLabel
+                      value="existing"
+                      control={<Radio size="small" sx={{ color: "#ea580c", "&.Mui-checked": { color: "#ea580c" } }} />}
+                      label={<Typography variant="body2" sx={{ fontWeight: 600 }}>기존 세대에 세대원으로 편입</Typography>}
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </Box>
+            )}
+
+            {/* 기존 세대 편입 모드: 기존 가구 Autocomplete 검색 */}
+            {!isEdit && householdMode === "existing" && (
+              <Box sx={{ mb: 2 }}>
+                <Autocomplete
+                  options={availableHouseholds}
+                  getOptionLabel={(option) => {
+                    const addrPart = option.address ? ` - ${option.address}` : "";
+                    const gardenPart = option.gardenName ? ` [${option.gardenName}]` : "";
+                    return `${option.householdName || "무명 가구"}${gardenPart}${addrPart}`;
+                  }}
+                  onChange={(_, val) => handleHouseholdSelect(val?.id || "")}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      size="small"
+                      label="편입할 기존 세대 검색 및 선택"
+                      placeholder="세대명이나 주소로 검색..."
+                      sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+                    />
+                  )}
+                />
+              </Box>
+            )}
+
+            {/* 세대 주소 및 정원 설정 카드 */}
             {(householdMode === "new" || isEdit) && (
               <Paper
                 elevation={0}
                 sx={{
-                  p: 2.5,
+                  p: 2.2,
                   borderRadius: "14px",
                   border: "1px solid rgba(0, 0, 0, 0.08)",
                   backgroundColor: "#fafafa",
-                  width: "100%",
-                  boxSizing: "border-box",
                 }}
               >
                 <Grid container spacing={2}>
+                  {/* 세대명 */}
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      label="세대명 (가구 명칭)"
+                      placeholder="예: 홍길동 성도 가정"
+                      value={householdData.householdName}
+                      onChange={(e) => handleHouseholdChange("householdName", e.target.value)}
+                      sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px", backgroundColor: "#fff" } }}
+                    />
+                  </Grid>
+
                   {/* 소속 정원 */}
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth size="small" sx={{ backgroundColor: "#fff" }}>
                       <InputLabel id="modal-garden-label">소속 정원</InputLabel>
                       <Select
                         labelId="modal-garden-label"
-                        value={formData.gardenId}
+                        value={householdData.gardenId}
                         label="소속 정원"
-                        onChange={(e) => handleChange("gardenId", e.target.value)}
+                        onChange={(e) => handleHouseholdChange("gardenId", e.target.value)}
                         sx={{ borderRadius: "10px" }}
                       >
                         {availableGardens.map((g) => (
@@ -830,26 +556,26 @@ const MemberFormModal = ({
                     />
                   </Grid>
 
-                  {/* 자동 입력된 기본 도로명 주소 (Street Address) */}
+                  {/* 기본 도로명 주소 (Street Address) */}
                   <Grid size={12}>
                     <TextField
                       fullWidth
                       size="medium"
                       label="기본 도로명 주소 (Street Address)"
                       placeholder="상단 검색창에서 주소를 검색하여 선택하면 자동 입력됩니다"
-                      value={formData.address}
-                      onChange={(e) => handleChange("address", e.target.value)}
+                      value={householdData.address}
+                      onChange={(e) => handleHouseholdChange("address", e.target.value)}
                       slotProps={{
                         input: {
                           readOnly: !isAddressManualEdit,
                           startAdornment: (
                             <InputAdornment position="start">
-                              <LocationOnOutlinedIcon sx={{ color: formData.address ? "#16a34a" : "#94a3b8" }} />
+                              <LocationOnOutlinedIcon sx={{ color: householdData.address ? "#16a34a" : "#94a3b8" }} />
                             </InputAdornment>
                           ),
                           endAdornment: (
                             <InputAdornment position="end">
-                              {formData.address && !isAddressManualEdit ? (
+                              {householdData.address && !isAddressManualEdit ? (
                                 <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
                                   <Chip
                                     size="small"
@@ -874,36 +600,29 @@ const MemberFormModal = ({
                                   onClick={() => setIsAddressManualEdit(false)}
                                   sx={{ fontSize: "0.75rem", minWidth: "auto", px: 1, py: 0.2 }}
                                 >
-                                  잠금
+                                  완료
                                 </Button>
                               ) : null}
                             </InputAdornment>
                           ),
                         },
                       }}
-                      helperText={
-                        !formData.address
-                          ? "상단 [공인 주소 검색] 창에 주소를 검색하면 도로명, 도시, 주, 우편번호가 자동 완성됩니다."
-                          : isAddressManualEdit
-                          ? "직접 수정 모드 활성화됨 (오타에 주의하세요)."
-                          : "구글 공인 주소로 안전하게 잠겨 있습니다 (수정이 필요하면 우측 [직접 수정]을 누르세요)."
-                      }
                       sx={{
                         backgroundColor: isAddressManualEdit ? "#fff" : "#f8fafc",
-                        "& .MuiOutlinedInput-root": { borderRadius: "12px", minHeight: "50px" },
+                        "& .MuiOutlinedInput-root": { borderRadius: "12px", minHeight: "48px" },
                       }}
                     />
                   </Grid>
 
-                  {/* 상세 호수, 도시, 주(Province), 우편번호 */}
+                  {/* 동/호수 상세 주소 */}
                   <Grid size={{ xs: 12, sm: 4 }}>
                     <TextField
                       fullWidth
                       size="medium"
-                      label="상세 호수 (Unit / Suite #)"
-                      placeholder="예: Unit 302, Apt 4B"
-                      value={formData.addressDetail}
-                      onChange={(e) => handleChange("addressDetail", e.target.value)}
+                      label="동/호수/유닛 (Unit/Apt)"
+                      placeholder="예: Apt 204, Unit B"
+                      value={householdData.addressDetail}
+                      onChange={(e) => handleHouseholdChange("addressDetail", e.target.value)}
                       sx={{
                         backgroundColor: "#fff",
                         "& .MuiOutlinedInput-root": { borderRadius: "12px", minHeight: "48px" },
@@ -911,19 +630,15 @@ const MemberFormModal = ({
                     />
                   </Grid>
 
+                  {/* 도시 */}
                   <Grid size={{ xs: 12, sm: 3 }}>
                     <TextField
                       fullWidth
                       size="medium"
                       label="도시 (City)"
-                      placeholder="예: Edmonton"
-                      value={formData.city}
-                      onChange={(e) => handleChange("city", e.target.value)}
-                      slotProps={{
-                        input: {
-                          readOnly: !isAddressManualEdit,
-                        },
-                      }}
+                      value={householdData.city}
+                      onChange={(e) => handleHouseholdChange("city", e.target.value)}
+                      slotProps={{ input: { readOnly: !isAddressManualEdit } }}
                       sx={{
                         backgroundColor: isAddressManualEdit ? "#fff" : "#f8fafc",
                         "& .MuiOutlinedInput-root": { borderRadius: "12px", minHeight: "48px" },
@@ -931,19 +646,15 @@ const MemberFormModal = ({
                     />
                   </Grid>
 
+                  {/* 주 (Province) */}
                   <Grid size={{ xs: 12, sm: 2 }}>
                     <TextField
                       fullWidth
                       size="medium"
                       label="주 (Province)"
-                      placeholder="예: AB"
-                      value={formData.province}
-                      onChange={(e) => handleChange("province", e.target.value)}
-                      slotProps={{
-                        input: {
-                          readOnly: !isAddressManualEdit,
-                        },
-                      }}
+                      value={householdData.province}
+                      onChange={(e) => handleHouseholdChange("province", e.target.value)}
+                      slotProps={{ input: { readOnly: !isAddressManualEdit } }}
                       sx={{
                         backgroundColor: isAddressManualEdit ? "#fff" : "#f8fafc",
                         "& .MuiOutlinedInput-root": { borderRadius: "12px", minHeight: "48px" },
@@ -951,28 +662,16 @@ const MemberFormModal = ({
                     />
                   </Grid>
 
+                  {/* 우편번호 */}
                   <Grid size={{ xs: 12, sm: 3 }}>
                     <TextField
                       fullWidth
                       size="medium"
                       label="우편번호 (Postal Code)"
                       placeholder="예: T6W 0A1"
-                      value={formData.postalCode}
-                      onChange={(e) => {
-                        const val = e.target.value.toUpperCase();
-                        handleChange("postalCode", val);
-                      }}
-                      onBlur={(e) => {
-                        const clean = (e.target.value || "").replace(/[^A-Za-z0-9]/g, "").toUpperCase();
-                        if (clean.length === 6) {
-                          handleChange("postalCode", `${clean.slice(0, 3)} ${clean.slice(3)}`);
-                        }
-                      }}
-                      slotProps={{
-                        input: {
-                          readOnly: !isAddressManualEdit,
-                        },
-                      }}
+                      value={householdData.postalCode}
+                      onChange={(e) => handleHouseholdChange("postalCode", e.target.value.toUpperCase())}
+                      slotProps={{ input: { readOnly: !isAddressManualEdit } }}
                       sx={{
                         backgroundColor: isAddressManualEdit ? "#fff" : "#f8fafc",
                         "& .MuiOutlinedInput-root": { borderRadius: "12px", minHeight: "48px" },
@@ -984,18 +683,232 @@ const MemberFormModal = ({
             )}
           </Box>
 
-          <Divider sx={{ my: 2.5 }} />
+          <Divider sx={{ my: 3 }} />
 
-          {/* 2. 교인 개인 인적사항 섹션 */}
-          <Box sx={{ mb: 3 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
-              <BadgeOutlinedIcon sx={{ color: "#2563eb", fontSize: "1.3rem" }} />
-              <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#222" }}>
-                2. 교인 개인 인적사항
-              </Typography>
+          {/* ========================================================= */}
+          {/* 2. 세대원 구성 탭 (Tabs Bar) & 개인 인적사항 섹션             */}
+          {/* ========================================================= */}
+          <Box sx={{ mb: 2 }}>
+            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 1.5, mb: 1.5 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <BadgeOutlinedIcon sx={{ color: "#2563eb", fontSize: "1.3rem" }} />
+                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#222" }}>
+                  2. 세대원 구성 및 개인 교적 정보
+                </Typography>
+                <Chip
+                  size="small"
+                  label={`총 ${membersList.length}명`}
+                  sx={{ backgroundColor: "#eff6ff", color: "#1d4ed8", fontWeight: 700, height: 22 }}
+                />
+              </Box>
+
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<AddIcon />}
+                onClick={handleAddMemberTab}
+                sx={{
+                  borderRadius: "10px",
+                  fontWeight: 800,
+                  fontSize: "0.82rem",
+                  borderColor: "#ea580c",
+                  color: "#ea580c",
+                  backgroundColor: "rgba(234, 88, 12, 0.05)",
+                  "&:hover": { backgroundColor: "rgba(234, 88, 12, 0.12)", borderColor: "#c2410c" },
+                  px: 1.8,
+                  py: 0.6,
+                }}
+              >
+                세대원 추가
+              </Button>
             </Box>
 
+            {/* 세대원 탭 네비게이션 바 */}
+            <Box sx={{ borderBottom: "2px solid #e2e8f0", mb: 2.5 }}>
+              <Tabs
+                value={activeMemberIndex}
+                onChange={(_, val) => setActiveMemberIndex(val)}
+                variant="scrollable"
+                scrollButtons="auto"
+                sx={{
+                  "& .MuiTabs-indicator": { backgroundColor: "#ea580c", height: 3, borderRadius: "3px 3px 0 0" },
+                  "& .MuiTab-root": {
+                    minHeight: 46,
+                    fontWeight: 700,
+                    textTransform: "none",
+                    fontSize: "0.88rem",
+                    color: "#64748b",
+                    "&.Mui-selected": { color: "#ea580c", fontWeight: 800 },
+                  },
+                }}
+              >
+                {membersList.map((m, idx) => {
+                  const relLabel =
+                    m.isHead
+                      ? "세대주"
+                      : RELATIONSHIP_OPTIONS.find((r) => r.value === m.relationship)?.label || "세대원";
+
+                  return (
+                    <Tab
+                      key={m._tempKey || m.id || idx}
+                      label={
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
+                          <PersonIcon sx={{ fontSize: "1.1rem" }} />
+                          <Typography variant="body2" sx={{ fontWeight: "inherit", fontSize: "0.9rem" }}>
+                            {m.name || `세대원 ${idx + 1}`}
+                          </Typography>
+                          <Chip
+                            size="small"
+                            label={relLabel}
+                            sx={{
+                              height: 20,
+                              fontSize: "0.68rem",
+                              fontWeight: 700,
+                              backgroundColor: m.isHead ? "rgba(234, 88, 12, 0.14)" : "#f1f5f9",
+                              color: m.isHead ? "#c2410c" : "#475569",
+                              border: m.isHead ? "1px solid rgba(234, 88, 12, 0.3)" : "1px solid #e2e8f0",
+                              pointerEvents: "none",
+                            }}
+                          />
+                          {!m.id && membersList.length > 1 && (
+                            <Tooltip title="이 추가 세대원 취소">
+                              <IconButton
+                                size="small"
+                                onClick={(e) => handleRemoveMemberTab(idx, e)}
+                                sx={{
+                                  p: 0.2,
+                                  ml: 0.2,
+                                  color: "#94a3b8",
+                                  "&:hover": { color: "#ef4444", backgroundColor: "rgba(239, 68, 68, 0.1)" },
+                                }}
+                              >
+                                <CloseIcon sx={{ fontSize: 13 }} />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                        </Box>
+                      }
+                    />
+                  );
+                })}
+              </Tabs>
+            </Box>
+
+            {/* 활성 세대원 프로필 요약 카드 배너 (수정 모드 또는 기존 등록 교인인 경우) */}
+            {currentMember?.id && (
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2,
+                  mb: 2.5,
+                  borderRadius: "14px",
+                  background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
+                  border: "1px solid #e2e8f0",
+                  display: "flex",
+                  flexDirection: { xs: "column", sm: "row" },
+                  justifyContent: "space-between",
+                  alignItems: { xs: "flex-start", sm: "center" },
+                  gap: 1.5,
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                  <Box
+                    sx={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: "50%",
+                      backgroundColor: currentMember.status === "REMOVED" ? "#fee2e2" : "#ffedd5",
+                      color: currentMember.status === "REMOVED" ? "#dc2626" : "#ea580c",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: 800,
+                      fontSize: "1.1rem",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {currentMember.name ? currentMember.name.charAt(0) : "교"}
+                  </Box>
+                  <Box>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, flexWrap: "wrap" }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 800, color: "#0f172a" }}>
+                        {currentMember.name || "(이름 없음)"}
+                      </Typography>
+                      {currentMember.nameEn && (
+                        <Typography variant="body2" sx={{ color: "#64748b", fontWeight: 500 }}>
+                          ({currentMember.nameEn})
+                        </Typography>
+                      )}
+                      {currentMember.status === "REMOVED" ? (
+                        <Chip
+                          size="small"
+                          label="제적"
+                          sx={{
+                            height: 20,
+                            fontSize: "0.7rem",
+                            fontWeight: 700,
+                            backgroundColor: "rgba(220, 38, 38, 0.1)",
+                            color: "#dc2626",
+                          }}
+                        />
+                      ) : (
+                        <Chip
+                          size="small"
+                          label={currentMember.isHead ? "세대주" : (RELATIONSHIP_OPTIONS.find((r) => r.value === currentMember.relationship)?.label || "세대원")}
+                          sx={{
+                            height: 20,
+                            fontSize: "0.7rem",
+                            fontWeight: 700,
+                            backgroundColor: currentMember.isHead ? "rgba(234, 88, 12, 0.12)" : "#e2e8f0",
+                            color: currentMember.isHead ? "#c2410c" : "#475569",
+                          }}
+                        />
+                      )}
+                    </Box>
+                    <Typography variant="caption" sx={{ color: "#64748b", display: "block", mt: 0.2 }}>
+                      {currentMember.position || "성도"} · {BAPTISM_OPTIONS.find((b) => b.value === currentMember.baptismStatus)?.label || "세례"} · {currentMember.department || "장년부"}
+                      {currentMember.registrationDate ? ` · 등록일: ${currentMember.registrationDate}` : ""}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, flexWrap: "wrap" }}>
+                  {currentMember.isRegistered ? (
+                    <Chip
+                      size="small"
+                      label="웹가입 완료"
+                      sx={{ height: 24, fontSize: "0.72rem", fontWeight: 700, backgroundColor: "#f0fdf4", color: "#16a34a", border: "1px solid #bbf7d0" }}
+                    />
+                  ) : (
+                    <Chip
+                      size="small"
+                      label="웹 미가입"
+                      sx={{ height: 24, fontSize: "0.72rem", fontWeight: 600, backgroundColor: "#f1f5f9", color: "#64748b", border: "1px solid #e2e8f0" }}
+                    />
+                  )}
+
+                  {currentMember.hasNotification ? (
+                    <Chip
+                      icon={<NotificationsActiveIcon sx={{ fontSize: "13px !important", color: "#16a34a !important" }} />}
+                      size="small"
+                      label={`알림 수신중${currentMember.deviceCount ? ` (${currentMember.deviceCount}대)` : ""}`}
+                      sx={{ height: 24, fontSize: "0.72rem", fontWeight: 700, backgroundColor: "#f0fdf4", color: "#16a34a", border: "1px solid #bbf7d0" }}
+                    />
+                  ) : (
+                    <Chip
+                      icon={<NotificationsOffIcon sx={{ fontSize: "13px !important", color: "#94a3b8 !important" }} />}
+                      size="small"
+                      label="알림 미등록"
+                      sx={{ height: 24, fontSize: "0.72rem", fontWeight: 600, backgroundColor: "#f1f5f9", color: "#64748b", border: "1px solid #e2e8f0" }}
+                    />
+                  )}
+                </Box>
+              </Paper>
+            )}
+
+            {/* 선택된 세대원의 개인 인적사항 입력 폼 */}
             <Grid container spacing={2}>
+              {/* 성명 (한글) */}
               <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
@@ -1003,24 +916,26 @@ const MemberFormModal = ({
                   size="small"
                   label="성명 (한글)"
                   placeholder="예: 홍길동"
-                  value={formData.name}
-                  onChange={(e) => handleChange("name", e.target.value)}
+                  value={currentMember.name || ""}
+                  onChange={(e) => handleActiveMemberChange("name", e.target.value)}
                   sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
                 />
               </Grid>
 
+              {/* 영문 이름 */}
               <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
                   size="small"
                   label="영문 이름 (English Name)"
                   placeholder="예: Gildong Hong"
-                  value={formData.nameEn}
-                  onChange={(e) => handleChange("nameEn", e.target.value)}
+                  value={currentMember.nameEn || ""}
+                  onChange={(e) => handleActiveMemberChange("nameEn", e.target.value)}
                   sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
                 />
               </Grid>
 
+              {/* 휴대전화 번호 */}
               <Grid size={{ xs: 12, sm: 6 }}>
                 <PatternFormat
                   customInput={TextField}
@@ -1028,26 +943,27 @@ const MemberFormModal = ({
                   size="small"
                   type="tel"
                   label="휴대전화 번호"
-                  value={formData.phone}
+                  value={currentMember.phone || ""}
                   format="(###) ###-####"
                   mask="_"
                   allowEmptyFormatting={false}
                   placeholder="(780) 123-4567"
                   onValueChange={(values) => {
-                    handleChange("phone", values.value ? values.formattedValue : "");
+                    handleActiveMemberChange("phone", values.value ? values.formattedValue : "");
                   }}
                   sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
                 />
               </Grid>
 
+              {/* 세대 내 가족 관계 */}
               <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth size="small">
-                  <InputLabel id="relationship-label">세대주와의 가족 관계</InputLabel>
+                  <InputLabel id="tab-relationship-label">세대주와의 가족 관계</InputLabel>
                   <Select
-                    labelId="relationship-label"
-                    value={formData.relationship}
+                    labelId="tab-relationship-label"
+                    value={currentMember.relationship || "CHILD"}
                     label="세대주와의 가족 관계"
-                    onChange={(e) => handleChange("relationship", e.target.value)}
+                    onChange={(e) => handleActiveMemberChange("relationship", e.target.value)}
                     sx={{ borderRadius: "10px" }}
                   >
                     {RELATIONSHIP_OPTIONS.map((opt) => (
@@ -1059,16 +975,17 @@ const MemberFormModal = ({
                 </FormControl>
               </Grid>
 
+              {/* 생년월일 */}
               <Grid size={{ xs: 12, sm: 6 }}>
                 <DatePicker
                   label="생년월일"
                   value={
-                    formData.birthDate && isValid(parseISO(formData.birthDate))
-                      ? parseISO(formData.birthDate)
+                    currentMember.birthDate && isValid(parseISO(currentMember.birthDate))
+                      ? parseISO(currentMember.birthDate)
                       : null
                   }
                   onChange={(newVal) => {
-                    handleChange(
+                    handleActiveMemberChange(
                       "birthDate",
                       newVal && isValid(newVal) ? format(newVal, "yyyy-MM-dd") : ""
                     );
@@ -1085,23 +1002,12 @@ const MemberFormModal = ({
                       showDayOfWeek: false,
                       clearable: true,
                     },
-                    popper: {
-                      sx: { zIndex: 1400 },
-                    },
+                    popper: { sx: { zIndex: 1400 } },
                     layout: {
                       sx: {
                         ".MuiPickersDay-root.Mui-selected": {
                           backgroundColor: "#ea580c !important",
                           color: "#fff",
-                        },
-                        ".MuiPickersDay-root.Mui-selected:hover, .MuiPickersDay-root.Mui-selected:focus": {
-                          backgroundColor: "#c2410c !important",
-                        },
-                        ".MuiPickersDay-root.MuiPickersDay-today": {
-                          borderColor: "#ea580c !important",
-                        },
-                        ".MuiPickersCalendarHeader-label": {
-                          fontWeight: 700,
                         },
                       },
                     },
@@ -1109,14 +1015,15 @@ const MemberFormModal = ({
                 />
               </Grid>
 
+              {/* 성별 */}
               <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth size="small">
-                  <InputLabel id="gender-label">성별</InputLabel>
+                  <InputLabel id="tab-gender-label">성별</InputLabel>
                   <Select
-                    labelId="gender-label"
-                    value={formData.gender}
+                    labelId="tab-gender-label"
+                    value={currentMember.gender || "M"}
                     label="성별"
-                    onChange={(e) => handleChange("gender", e.target.value)}
+                    onChange={(e) => handleActiveMemberChange("gender", e.target.value)}
                     sx={{ borderRadius: "10px" }}
                   >
                     <MenuItem value="M">남성 (Male)</MenuItem>
@@ -1124,26 +1031,16 @@ const MemberFormModal = ({
                   </Select>
                 </FormControl>
               </Grid>
-            </Grid>
-          </Box>
 
-          <Divider sx={{ my: 2.5 }} />
-
-          {/* 3. 신앙 및 행정 정보 섹션 */}
-          <Box>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#222", mb: 1.5 }}>
-              3. 신앙 및 행정 정보
-            </Typography>
-
-            <Grid container spacing={2}>
+              {/* 직분 */}
               <Grid size={{ xs: 12, sm: 4 }}>
                 <FormControl fullWidth size="small">
-                  <InputLabel id="position-label">직분</InputLabel>
+                  <InputLabel id="tab-position-label">직분</InputLabel>
                   <Select
-                    labelId="position-label"
-                    value={formData.position}
+                    labelId="tab-position-label"
+                    value={currentMember.position || "성도"}
                     label="직분"
-                    onChange={(e) => handleChange("position", e.target.value)}
+                    onChange={(e) => handleActiveMemberChange("position", e.target.value)}
                     sx={{ borderRadius: "10px" }}
                   >
                     {POSITION_OPTIONS.map((pos) => (
@@ -1155,14 +1052,15 @@ const MemberFormModal = ({
                 </FormControl>
               </Grid>
 
+              {/* 소속 부서 */}
               <Grid size={{ xs: 12, sm: 4 }}>
                 <FormControl fullWidth size="small">
-                  <InputLabel id="department-label">소속 부서</InputLabel>
+                  <InputLabel id="tab-department-label">소속 부서</InputLabel>
                   <Select
-                    labelId="department-label"
-                    value={formData.department}
+                    labelId="tab-department-label"
+                    value={currentMember.department || "장년부"}
                     label="소속 부서"
-                    onChange={(e) => handleChange("department", e.target.value)}
+                    onChange={(e) => handleActiveMemberChange("department", e.target.value)}
                     sx={{ borderRadius: "10px" }}
                   >
                     {DEPARTMENT_OPTIONS.map((dept) => (
@@ -1174,14 +1072,15 @@ const MemberFormModal = ({
                 </FormControl>
               </Grid>
 
+              {/* 세례 신분 */}
               <Grid size={{ xs: 12, sm: 4 }}>
                 <FormControl fullWidth size="small">
-                  <InputLabel id="baptism-label">세례 신분</InputLabel>
+                  <InputLabel id="tab-baptism-label">세례 신분</InputLabel>
                   <Select
-                    labelId="baptism-label"
-                    value={formData.baptismStatus}
+                    labelId="tab-baptism-label"
+                    value={currentMember.baptismStatus || "NONE"}
                     label="세례 신분"
-                    onChange={(e) => handleChange("baptismStatus", e.target.value)}
+                    onChange={(e) => handleActiveMemberChange("baptismStatus", e.target.value)}
                     sx={{ borderRadius: "10px" }}
                   >
                     {BAPTISM_OPTIONS.map((opt) => (
@@ -1193,23 +1092,22 @@ const MemberFormModal = ({
                 </FormControl>
               </Grid>
 
+              {/* 등록일자 */}
               <Grid size={{ xs: 12, sm: 6 }}>
                 <DatePicker
                   label="교회 등록일"
                   value={
-                    formData.registrationDate && isValid(parseISO(formData.registrationDate))
-                      ? parseISO(formData.registrationDate)
+                    currentMember.registrationDate && isValid(parseISO(currentMember.registrationDate))
+                      ? parseISO(currentMember.registrationDate)
                       : null
                   }
                   onChange={(newVal) => {
-                    handleChange(
+                    handleActiveMemberChange(
                       "registrationDate",
                       newVal && isValid(newVal) ? format(newVal, "yyyy-MM-dd") : ""
                     );
                   }}
-                  slots={{
-                    field: GatheringDateButtonField,
-                  }}
+                  slots={{ field: GatheringDateButtonField }}
                   slotProps={{
                     field: {
                       label: "교회 등록일",
@@ -1218,39 +1116,21 @@ const MemberFormModal = ({
                       showDayOfWeek: false,
                       clearable: true,
                     },
-                    popper: {
-                      sx: { zIndex: 1400 },
-                    },
-                    layout: {
-                      sx: {
-                        ".MuiPickersDay-root.Mui-selected": {
-                          backgroundColor: "#ea580c !important",
-                          color: "#fff",
-                        },
-                        ".MuiPickersDay-root.Mui-selected:hover, .MuiPickersDay-root.Mui-selected:focus": {
-                          backgroundColor: "#c2410c !important",
-                        },
-                        ".MuiPickersDay-root.MuiPickersDay-today": {
-                          borderColor: "#ea580c !important",
-                        },
-                        ".MuiPickersCalendarHeader-label": {
-                          fontWeight: 700,
-                        },
-                      },
-                    },
+                    popper: { sx: { zIndex: 1400 } },
                   }}
                 />
               </Grid>
 
-              {isEdit && (
+              {/* 교적 상태 (수정 대상 교인만 노출) */}
+              {currentMember.id && (
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <FormControl fullWidth size="small">
-                    <InputLabel id="status-label">교적 상태</InputLabel>
+                    <InputLabel id="tab-status-label">교적 상태</InputLabel>
                     <Select
-                      labelId="status-label"
-                      value={formData.status === "REMOVED" ? "REMOVED" : "ACTIVE"}
+                      labelId="tab-status-label"
+                      value={currentMember.status || "ACTIVE"}
                       label="교적 상태"
-                      onChange={(e) => handleChange("status", e.target.value)}
+                      onChange={(e) => handleActiveMemberChange("status", e.target.value)}
                       sx={{ borderRadius: "10px" }}
                     >
                       <MenuItem value="ACTIVE">활동 (ACTIVE)</MenuItem>
@@ -1261,8 +1141,8 @@ const MemberFormModal = ({
               )}
             </Grid>
 
-            {/* 3. 양육 및 교육과정(코스) 이수 현황 (수정 모드 전용) */}
-            {isEdit && (
+            {/* 활성 세대원의 양육 및 교육과정 이수 현황 (기존 교인 전용) */}
+            {currentMember?.id && (
               <Box
                 sx={{
                   mt: 3,
@@ -1275,7 +1155,7 @@ const MemberFormModal = ({
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
                   <SchoolIcon sx={{ color: "#ea580c", fontSize: 20 }} />
                   <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "#1e293b" }}>
-                    양육 및 훈련 과정 이수 현황
+                    [{currentMember.name || "교인"}] 양육 및 훈련 과정 이수 현황
                   </Typography>
                 </Box>
 
@@ -1326,6 +1206,9 @@ const MemberFormModal = ({
           </Box>
         </DialogContent>
 
+        {/* ========================================================= */}
+        {/* 모달 하단 액션 바                                         */}
+        {/* ========================================================= */}
         <DialogActions
           sx={{
             px: 3,
@@ -1333,16 +1216,16 @@ const MemberFormModal = ({
             flexShrink: 0,
             borderTop: "1px solid rgba(0, 0, 0, 0.08)",
             display: "flex",
-            justifyContent: isEdit && onOpenDeleteDialog ? "space-between" : "flex-end",
+            justifyContent: currentMember?.id && onOpenDeleteDialog ? "space-between" : "flex-end",
             alignItems: "center",
           }}
         >
-          {isEdit && onOpenDeleteDialog && (
+          {currentMember?.id && onOpenDeleteDialog && (
             <Button
               color="error"
               variant="outlined"
               startIcon={<DeleteOutlineIcon />}
-              onClick={() => onOpenDeleteDialog(initialData)}
+              onClick={() => onOpenDeleteDialog(currentMember)}
               disabled={isSubmitting}
               sx={{
                 borderRadius: "10px",
@@ -1356,7 +1239,7 @@ const MemberFormModal = ({
                 },
               }}
             >
-              {initialData?.status === "REMOVED" ? "교적 영구 삭제" : "교적 제적 / 계정 삭제"}
+              {currentMember?.status === "REMOVED" ? `[${currentMember.name}] 교적 영구 삭제` : `[${currentMember.name}] 제적 / 계정 삭제`}
             </Button>
           )}
 
@@ -1368,20 +1251,22 @@ const MemberFormModal = ({
               type="submit"
               variant="contained"
               onClick={handleSubmit}
-              disabled={isSubmitting || !formData.name?.trim()}
+              disabled={isSubmitting || membersList.length === 0}
               sx={{
                 borderRadius: "10px",
                 backgroundColor: isEdit ? "#ea580c" : "#2563eb",
-                px: 3,
-                fontWeight: 700,
+                px: 3.5,
+                fontWeight: 800,
+                fontSize: "0.92rem",
+                boxShadow: isEdit ? "0 4px 14px rgba(234, 88, 12, 0.3)" : "0 4px 14px rgba(37, 99, 235, 0.3)",
               }}
             >
               {isSubmitting ? (
                 <CircularProgress size={22} sx={{ color: "#fff" }} />
               ) : isEdit ? (
-                "수정 완료"
+                `세대 전체 저장 (${membersList.length}명)`
               ) : (
-                "등록하기"
+                `세대 등록하기 (${membersList.length}명)`
               )}
             </Button>
           </Box>
@@ -1396,6 +1281,7 @@ MemberFormModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   initialData: PropTypes.object,
+  householdMembers: PropTypes.array,
   availableGardens: PropTypes.array,
   availableHouseholds: PropTypes.array,
   isSubmitting: PropTypes.bool,

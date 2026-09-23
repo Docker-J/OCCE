@@ -15,6 +15,7 @@ import {
   importRosterFromDrive,
   getAdminGardens,
   getAdminHouseholds,
+  bulkSaveHousehold,
   updateUserRole,
   deleteUser,
 } from "../../../api/admin";
@@ -318,16 +319,19 @@ export const useMemberManagement = () => {
   };
 
   // 신규 등록 및 수정 처리
-  const handleSubmitMemberForm = async (formData) => {
+  const handleSubmitMemberForm = async (payload) => {
     setSubmittingMember(true);
     try {
-      console.log("[useMemberManagement] Submitting member form:", { editId: memberForEdit?.id, formData });
-      if (memberForEdit?.id != null) {
-        await updateMember(memberForEdit.id, formData);
-        openSnackbar("success", `${formData.name}님의 정보가 성공적으로 수정되었습니다.`);
+      console.log("[useMemberManagement] Submitting member form:", { editId: memberForEdit?.id, payload });
+      if (payload.isBulk) {
+        await bulkSaveHousehold(payload);
+        openSnackbar("success", "세대 및 구성원 정보가 성공적으로 저장되었습니다.");
+      } else if (memberForEdit?.id != null) {
+        await updateMember(memberForEdit.id, payload);
+        openSnackbar("success", `${payload.name}님의 정보가 성공적으로 수정되었습니다.`);
       } else {
-        await createMember(formData);
-        openSnackbar("success", `${formData.name}님이 새 교인으로 등록되었습니다.`);
+        await createMember(payload);
+        openSnackbar("success", `${payload.name}님이 새 교인으로 등록되었습니다.`);
       }
       setMemberFormOpen(false);
       setMemberForEdit(null);
