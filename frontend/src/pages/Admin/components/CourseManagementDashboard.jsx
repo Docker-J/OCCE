@@ -331,8 +331,8 @@ const CourseManagementDashboard = ({ users = [] }) => {
   };
 
   const handleSubmitCourse = async (e) => {
-    e.preventDefault();
-    if (!courseForm.name.trim()) return;
+    if (e && e.preventDefault) e.preventDefault();
+    if (!courseForm.name.trim() || submitting) return;
     setSubmitting(true);
     try {
       if (courseModalMode === "create") {
@@ -392,8 +392,8 @@ const CourseManagementDashboard = ({ users = [] }) => {
   };
 
   const handleSubmitCohort = async (e) => {
-    e.preventDefault();
-    if (!selectedCourse?.id || !cohortForm.termName.trim()) return;
+    if (e && e.preventDefault) e.preventDefault();
+    if (!selectedCourse?.id || !cohortForm.termName.trim() || submitting) return;
     setSubmitting(true);
     try {
       if (cohortModalMode === "create") {
@@ -423,10 +423,9 @@ const CourseManagementDashboard = ({ users = [] }) => {
       return;
     }
     try {
-      await deleteCohort(cohort.id);
+      await deleteCohort(selectedCourse.id, cohort.id);
       setFeedback({ type: "success", message: `'${cohort.termName}' 기수가 삭제되었습니다.` });
       fetchCohortsList(selectedCourse.id);
-      fetchCourseAllMembersList(selectedCourse.id);
     } catch (err) {
       setFeedback({ type: "error", message: err.response?.data?.message || err.message });
     }
@@ -463,9 +462,9 @@ const CourseManagementDashboard = ({ users = [] }) => {
   };
 
   const handleEnrollMember = async (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     const targetCohortId = enrollTargetCohortId || selectedCohort?.id;
-    if (!targetCohortId || selectedMembersToEnroll.length === 0) return;
+    if (!targetCohortId || selectedMembersToEnroll.length === 0 || submitting) return;
 
     const memberIds = selectedMembersToEnroll.map((m) => m.id || m.memberId);
     setSubmitting(true);
@@ -1546,69 +1545,76 @@ const CourseManagementDashboard = ({ users = [] }) => {
         maxWidth="xs"
         fullWidth
         PaperProps={{
-          component: "form",
-          onSubmit: handleSubmitCourse,
           sx: {
             borderRadius: "16px",
             maxHeight: "90vh",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
           },
         }}
       >
-        <DialogTitle sx={{ fontWeight: 800, flexShrink: 0, px: 3, pt: 2.5, pb: 1.5 }}>
-          {courseModalMode === "create" ? "새 교육과정 개설" : "교육과정 정보 수정"}
-        </DialogTitle>
-        <DialogContent dividers sx={{ py: 2.5, px: 3, overflowY: "auto", flex: "1 1 auto" }}>
-          <Stack spacing={2.5}>
-            <TextField
-              label="과정명 (Course Name)"
-              size="small"
-              fullWidth
-              required
-              value={courseForm.name}
-              onChange={(e) => setCourseForm({ ...courseForm, name: e.target.value })}
-              placeholder="예: 새가족 성경공부, 제자훈련"
-            />
-            <FormControl size="small" fullWidth>
-              <InputLabel>분류 (Category)</InputLabel>
-              <Select
-                value={courseForm.category}
-                label="분류 (Category)"
-                onChange={(e) => setCourseForm({ ...courseForm, category: e.target.value })}
-              >
-                {CATEGORY_OPTIONS.map((opt) => (
-                  <MenuItem key={opt} value={opt}>
-                    {opt}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <TextField
-              label="과정 소개 및 안내 (선택)"
-              size="small"
-              fullWidth
-              multiline
-              rows={3}
-              value={courseForm.description}
-              onChange={(e) => setCourseForm({ ...courseForm, description: e.target.value })}
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions sx={{ p: 2.5, pt: 1.5, flexShrink: 0 }}>
-          <Button onClick={() => setCourseModalOpen(false)} disabled={submitting} sx={{ color: "#64748b" }}>
-            취소
-          </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={submitting || !courseForm.name.trim()}
-            sx={{ backgroundColor: "#FF6B00", "&:hover": { backgroundColor: "#ea580c" }, borderRadius: "8px" }}
-          >
-            {submitting ? "저장 중..." : "확인"}
-          </Button>
-        </DialogActions>
+        <form
+          onSubmit={handleSubmitCourse}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            maxHeight: "90vh",
+            overflow: "hidden",
+          }}
+        >
+          <DialogTitle sx={{ fontWeight: 800, flexShrink: 0, px: 3, pt: 2.5, pb: 1.5 }}>
+            {courseModalMode === "create" ? "새 교육과정 개설" : "교육과정 정보 수정"}
+          </DialogTitle>
+          <DialogContent dividers sx={{ py: 2.5, px: 3, overflowY: "auto", flex: "1 1 auto" }}>
+            <Stack spacing={2.5}>
+              <TextField
+                label="과정명 (Course Name)"
+                size="small"
+                fullWidth
+                required
+                value={courseForm.name}
+                onChange={(e) => setCourseForm({ ...courseForm, name: e.target.value })}
+                placeholder="예: 새가족 성경공부, 제자훈련"
+              />
+              <FormControl size="small" fullWidth>
+                <InputLabel>분류 (Category)</InputLabel>
+                <Select
+                  value={courseForm.category}
+                  label="분류 (Category)"
+                  onChange={(e) => setCourseForm({ ...courseForm, category: e.target.value })}
+                >
+                  {CATEGORY_OPTIONS.map((opt) => (
+                    <MenuItem key={opt} value={opt}>
+                      {opt}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <TextField
+                label="과정 소개 및 안내 (선택)"
+                size="small"
+                fullWidth
+                multiline
+                rows={3}
+                value={courseForm.description}
+                onChange={(e) => setCourseForm({ ...courseForm, description: e.target.value })}
+              />
+            </Stack>
+          </DialogContent>
+          <DialogActions sx={{ p: 2.5, pt: 1.5, flexShrink: 0 }}>
+            <Button onClick={() => setCourseModalOpen(false)} disabled={submitting} sx={{ color: "#64748b" }}>
+              취소
+            </Button>
+            <Button
+              type="submit"
+              onClick={handleSubmitCourse}
+              variant="contained"
+              disabled={submitting || !courseForm.name.trim()}
+              sx={{ backgroundColor: "#FF6B00", "&:hover": { backgroundColor: "#ea580c" }, borderRadius: "8px" }}
+            >
+              {submitting ? "저장 중..." : "확인"}
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
 
       {/* ================= MODAL: 기수 개설/수정 ================= */}
@@ -1618,68 +1624,75 @@ const CourseManagementDashboard = ({ users = [] }) => {
         maxWidth="xs"
         fullWidth
         PaperProps={{
-          component: "form",
-          onSubmit: handleSubmitCohort,
           sx: {
             borderRadius: "16px",
             maxHeight: "90vh",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
           },
         }}
       >
-        <DialogTitle sx={{ fontWeight: 800, flexShrink: 0, px: 3, pt: 2.5, pb: 1.5 }}>
-          {cohortModalMode === "create"
-            ? `[${selectedCourse?.name}] 새 기수 개설`
-            : "기수 정보 수정"}
-        </DialogTitle>
-        <DialogContent dividers sx={{ py: 2.5, px: 3, overflowY: "auto", flex: "1 1 auto" }}>
-          <Stack spacing={2.5}>
-            <TextField
-              label="기수명"
-              size="small"
-              fullWidth
-              required
-              value={cohortForm.termName}
-              onChange={(e) => setCohortForm({ ...cohortForm, termName: e.target.value })}
-              placeholder="예: 1기, 2기, 2024년 가을학기"
-            />
-            <TextField
-              label="담당 교역자 / 인도자"
-              size="small"
-              fullWidth
-              value={cohortForm.instructor}
-              onChange={(e) => setCohortForm({ ...cohortForm, instructor: e.target.value })}
-              placeholder="예: OOO 목사"
-            />
-            <FormControl size="small" fullWidth>
-              <InputLabel>기수 운영 상태</InputLabel>
-              <Select
-                value={cohortForm.status}
-                label="기수 운영 상태"
-                onChange={(e) => setCohortForm({ ...cohortForm, status: e.target.value })}
-              >
-                <MenuItem value="OPEN">모집중 (OPEN)</MenuItem>
-                <MenuItem value="IN_PROGRESS">진행중 (IN_PROGRESS)</MenuItem>
-                <MenuItem value="COMPLETED">종강/수료완료 (COMPLETED)</MenuItem>
-              </Select>
-            </FormControl>
-          </Stack>
-        </DialogContent>
-        <DialogActions sx={{ p: 2.5, pt: 1.5, flexShrink: 0 }}>
-          <Button onClick={() => setCohortModalOpen(false)} disabled={submitting} sx={{ color: "#64748b" }}>
-            취소
-          </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={submitting || !cohortForm.termName.trim()}
-            sx={{ backgroundColor: "#FF6B00", "&:hover": { backgroundColor: "#ea580c" }, borderRadius: "8px" }}
-          >
-            {submitting ? "저장 중..." : "확인"}
-          </Button>
-        </DialogActions>
+        <form
+          onSubmit={handleSubmitCohort}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            maxHeight: "90vh",
+            overflow: "hidden",
+          }}
+        >
+          <DialogTitle sx={{ fontWeight: 800, flexShrink: 0, px: 3, pt: 2.5, pb: 1.5 }}>
+            {cohortModalMode === "create"
+              ? `[${selectedCourse?.name}] 새 기수 개설`
+              : "기수 정보 수정"}
+          </DialogTitle>
+          <DialogContent dividers sx={{ py: 2.5, px: 3, overflowY: "auto", flex: "1 1 auto" }}>
+            <Stack spacing={2.5}>
+              <TextField
+                label="기수명"
+                size="small"
+                fullWidth
+                required
+                value={cohortForm.termName}
+                onChange={(e) => setCohortForm({ ...cohortForm, termName: e.target.value })}
+                placeholder="예: 1기, 2기, 2024년 가을학기"
+              />
+              <TextField
+                label="담당 교역자 / 인도자"
+                size="small"
+                fullWidth
+                value={cohortForm.instructor}
+                onChange={(e) => setCohortForm({ ...cohortForm, instructor: e.target.value })}
+                placeholder="예: OOO 목사"
+              />
+              <FormControl size="small" fullWidth>
+                <InputLabel>기수 운영 상태</InputLabel>
+                <Select
+                  value={cohortForm.status}
+                  label="기수 운영 상태"
+                  onChange={(e) => setCohortForm({ ...cohortForm, status: e.target.value })}
+                >
+                  <MenuItem value="OPEN">모집중 (OPEN)</MenuItem>
+                  <MenuItem value="IN_PROGRESS">진행중 (IN_PROGRESS)</MenuItem>
+                  <MenuItem value="COMPLETED">종강/수료완료 (COMPLETED)</MenuItem>
+                </Select>
+              </FormControl>
+            </Stack>
+          </DialogContent>
+          <DialogActions sx={{ p: 2.5, pt: 1.5, flexShrink: 0 }}>
+            <Button onClick={() => setCohortModalOpen(false)} disabled={submitting} sx={{ color: "#64748b" }}>
+              취소
+            </Button>
+            <Button
+              type="submit"
+              onClick={handleSubmitCohort}
+              variant="contained"
+              disabled={submitting || !cohortForm.termName.trim()}
+              sx={{ backgroundColor: "#FF6B00", "&:hover": { backgroundColor: "#ea580c" }, borderRadius: "8px" }}
+            >
+              {submitting ? "저장 중..." : "확인"}
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
 
       {/* ================= MODAL: 수강생 등록 ================= */}
@@ -1689,136 +1702,143 @@ const CourseManagementDashboard = ({ users = [] }) => {
         maxWidth="sm"
         fullWidth
         PaperProps={{
-          component: "form",
-          onSubmit: handleEnrollMember,
           sx: {
             borderRadius: "16px",
             maxHeight: "90vh",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
           },
         }}
       >
-        <DialogTitle sx={{ fontWeight: 800, flexShrink: 0, px: 3, pt: 2.5, pb: 1.5 }}>
-          {selectedCourse
-            ? `[${selectedCourse.name}] 수강생 기수 등록${
-                selectedMembersToEnroll.length > 0
-                  ? ` (${selectedMembersToEnroll.length}명 선택됨)`
-                  : ""
-              }`
-            : "수강생 기수 등록"}
-        </DialogTitle>
-        <DialogContent dividers sx={{ py: 2.5, px: 3, overflowY: "auto", flex: "1 1 auto" }}>
-          <Stack spacing={2.5}>
-            {cohorts.length === 0 ? (
-              <Alert severity="warning" sx={{ borderRadius: "8px" }}>
-                본 과정에 개설된 기수가 없습니다. 기수 관리에서 먼저 기수를 개설해주세요.
-              </Alert>
-            ) : (
-              <FormControl size="small" fullWidth required>
-                <InputLabel>등록 대상 기수</InputLabel>
+        <form
+          onSubmit={handleEnrollMember}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            maxHeight: "90vh",
+            overflow: "hidden",
+          }}
+        >
+          <DialogTitle sx={{ fontWeight: 800, flexShrink: 0, px: 3, pt: 2.5, pb: 1.5 }}>
+            {selectedCourse
+              ? `[${selectedCourse.name}] 수강생 기수 등록${
+                  selectedMembersToEnroll.length > 0
+                    ? ` (${selectedMembersToEnroll.length}명 선택됨)`
+                    : ""
+                }`
+              : "수강생 기수 등록"}
+          </DialogTitle>
+          <DialogContent dividers sx={{ py: 2.5, px: 3, overflowY: "auto", flex: "1 1 auto" }}>
+            <Stack spacing={2.5}>
+              {cohorts.length === 0 ? (
+                <Alert severity="warning" sx={{ borderRadius: "8px" }}>
+                  본 과정에 개설된 기수가 없습니다. 기수 관리에서 먼저 기수를 개설해주세요.
+                </Alert>
+              ) : (
+                <FormControl size="small" fullWidth required>
+                  <InputLabel>등록 대상 기수</InputLabel>
+                  <Select
+                    value={enrollTargetCohortId || (selectedCohort ? selectedCohort.id : cohorts[0]?.id || "")}
+                    label="등록 대상 기수"
+                    onChange={(e) => setEnrollTargetCohortId(e.target.value)}
+                  >
+                    {cohorts.map((c) => (
+                      <MenuItem key={c.id} value={c.id}>
+                        {c.termName} {c.instructor ? `(인도자: ${c.instructor})` : ""} ·{" "}
+                        {COHORT_STATUS_META[c.status]?.label || c.status}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+
+              <Box>
+                <Autocomplete
+                  multiple
+                  options={candidateMembers}
+                  getOptionLabel={(opt) =>
+                    `${opt.name} · ${opt.department || "장년부"} (${opt.gardenName || "미배정"})`
+                  }
+                  isOptionEqualToValue={(opt, val) =>
+                    String(opt.id || opt.memberId) === String(val?.id || val?.memberId)
+                  }
+                  value={selectedMembersToEnroll}
+                  onChange={(e, val) => setSelectedMembersToEnroll(val)}
+                  renderTags={(value, getTagProps) =>
+                    value.map((option, index) => {
+                      const { key, ...tagProps } = getTagProps({ index });
+                      return (
+                        <Chip
+                          key={key}
+                          size="small"
+                          label={`${option.name} (${option.gardenName || option.department || "미배정"})`}
+                          {...tagProps}
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: "0.75rem",
+                            backgroundColor: "rgba(255, 107, 0, 0.1)",
+                            color: "#ea580c",
+                          }}
+                        />
+                      );
+                    })
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="수강 대상 교인 (여러 명 다중 선택 가능)"
+                      size="small"
+                      placeholder={
+                        selectedMembersToEnroll.length === 0
+                          ? "등록할 교인 이름을 입력하여 추가하세요"
+                          : "교인을 계속 추가 검색할 수 있습니다"
+                      }
+                    />
+                  )}
+                />
+                <Box sx={{ mt: 0.8, px: 0.5 }}>
+                  <Typography variant="caption" sx={{ color: "#64748b" }}>
+                    * 본 코스를 이미 수강했거나 수강 중인 교인은 기수와 관계없이 수강 대상에서 완전히 제외됩니다.
+                  </Typography>
+                </Box>
+              </Box>
+
+              <FormControl size="small" fullWidth>
+                <InputLabel>수강 상태</InputLabel>
                 <Select
-                  value={enrollTargetCohortId || (selectedCohort ? selectedCohort.id : cohorts[0]?.id || "")}
-                  label="등록 대상 기수"
-                  onChange={(e) => setEnrollTargetCohortId(e.target.value)}
+                  value={enrollStatus}
+                  label="수강 상태"
+                  onChange={(e) => setEnrollStatus(e.target.value)}
                 >
-                  {cohorts.map((c) => (
-                    <MenuItem key={c.id} value={c.id}>
-                      {c.termName} {c.instructor ? `(인도자: ${c.instructor})` : ""} ·{" "}
-                      {COHORT_STATUS_META[c.status]?.label || c.status}
-                    </MenuItem>
-                  ))}
+                  <MenuItem value="IN_PROGRESS">수강중 (현재 훈련 진행중)</MenuItem>
+                  <MenuItem value="COMPLETED">수료완료 (이미 이수 완료)</MenuItem>
                 </Select>
               </FormControl>
-            )}
-
-            <Box>
-              <Autocomplete
-                multiple
-                options={candidateMembers}
-                getOptionLabel={(opt) =>
-                  `${opt.name} · ${opt.department || "장년부"} (${opt.gardenName || "미배정"})`
-                }
-                isOptionEqualToValue={(opt, val) =>
-                  String(opt.id || opt.memberId) === String(val?.id || val?.memberId)
-                }
-                value={selectedMembersToEnroll}
-                onChange={(e, val) => setSelectedMembersToEnroll(val)}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => {
-                    const { key, ...tagProps } = getTagProps({ index });
-                    return (
-                      <Chip
-                        key={key}
-                        size="small"
-                        label={`${option.name} (${option.gardenName || option.department || "미배정"})`}
-                        {...tagProps}
-                        sx={{
-                          fontWeight: 700,
-                          fontSize: "0.75rem",
-                          backgroundColor: "rgba(255, 107, 0, 0.1)",
-                          color: "#ea580c",
-                        }}
-                      />
-                    );
-                  })
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="수강 대상 교인 (여러 명 다중 선택 가능)"
-                    size="small"
-                    placeholder={
-                      selectedMembersToEnroll.length === 0
-                        ? "등록할 교인 이름을 입력하여 추가하세요"
-                        : "교인을 계속 추가 검색할 수 있습니다"
-                    }
-                  />
-                )}
-              />
-              <Box sx={{ mt: 0.8, px: 0.5 }}>
-                <Typography variant="caption" sx={{ color: "#64748b" }}>
-                  * 본 코스를 이미 수강했거나 수강 중인 교인은 기수와 관계없이 수강 대상에서 완전히 제외됩니다.
-                </Typography>
-              </Box>
-            </Box>
-
-            <FormControl size="small" fullWidth>
-              <InputLabel>수강 상태</InputLabel>
-              <Select
-                value={enrollStatus}
-                label="수강 상태"
-                onChange={(e) => setEnrollStatus(e.target.value)}
-              >
-                <MenuItem value="IN_PROGRESS">수강중 (현재 훈련 진행중)</MenuItem>
-                <MenuItem value="COMPLETED">수료완료 (이미 이수 완료)</MenuItem>
-              </Select>
-            </FormControl>
-          </Stack>
-        </DialogContent>
-        <DialogActions sx={{ p: 2.5, pt: 1.5, flexShrink: 0 }}>
-          <Button onClick={() => setEnrollModalOpen(false)} disabled={submitting} sx={{ color: "#64748b" }}>
-            취소
-          </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={
-              submitting ||
-              selectedMembersToEnroll.length === 0 ||
-              cohorts.length === 0 ||
-              (!enrollTargetCohortId && !selectedCohort?.id)
-            }
-            sx={{ backgroundColor: "#FF6B00", "&:hover": { backgroundColor: "#ea580c" }, borderRadius: "8px" }}
-          >
-            {submitting
-              ? "등록 중..."
-              : selectedMembersToEnroll.length > 0
-              ? `${selectedMembersToEnroll.length}명 등록하기`
-              : "등록하기"}
-          </Button>
-        </DialogActions>
+            </Stack>
+          </DialogContent>
+          <DialogActions sx={{ p: 2.5, pt: 1.5, flexShrink: 0 }}>
+            <Button onClick={() => setEnrollModalOpen(false)} disabled={submitting} sx={{ color: "#64748b" }}>
+              취소
+            </Button>
+            <Button
+              type="submit"
+              onClick={handleEnrollMember}
+              variant="contained"
+              disabled={
+                submitting ||
+                selectedMembersToEnroll.length === 0 ||
+                cohorts.length === 0 ||
+                (!enrollTargetCohortId && !selectedCohort?.id)
+              }
+              sx={{ backgroundColor: "#FF6B00", "&:hover": { backgroundColor: "#ea580c" }, borderRadius: "8px" }}
+            >
+              {submitting
+                ? "등록 중..."
+                : selectedMembersToEnroll.length > 0
+                ? `${selectedMembersToEnroll.length}명 등록하기`
+                : "등록하기"}
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
     </Box>
   );
