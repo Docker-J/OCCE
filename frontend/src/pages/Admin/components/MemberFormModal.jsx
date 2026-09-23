@@ -150,7 +150,7 @@ const MemberFormModal = ({
         department: initialData.department || "장년부",
         baptismStatus: initialData.baptismStatus || "NONE",
         registrationDate: initialData.registrationDate || "",
-        status: initialData.status || "ACTIVE",
+        status: initialData.status === "REMOVED" ? "REMOVED" : "ACTIVE",
         householdId: initialData.householdId || "",
         householdName: initialData.householdName || "",
         gardenId: initialData.gardenId || 1,
@@ -1072,13 +1072,12 @@ const MemberFormModal = ({
                     <InputLabel id="status-label">교적 상태</InputLabel>
                     <Select
                       labelId="status-label"
-                      value={formData.status}
+                      value={formData.status === "REMOVED" ? "REMOVED" : "ACTIVE"}
                       label="교적 상태"
                       onChange={(e) => handleChange("status", e.target.value)}
                       sx={{ borderRadius: "10px" }}
                     >
-                      <MenuItem value="ACTIVE">활동중 (ACTIVE)</MenuItem>
-                      <MenuItem value="INACTIVE">비활동 (INACTIVE)</MenuItem>
+                      <MenuItem value="ACTIVE">활동 (ACTIVE)</MenuItem>
                       <MenuItem value="REMOVED">제적 (REMOVED)</MenuItem>
                     </Select>
                   </FormControl>
