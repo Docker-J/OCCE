@@ -29,8 +29,6 @@ import {
   TextField,
   CircularProgress,
   Tooltip,
-  FormControlLabel,
-  Switch,
   Alert,
   Autocomplete,
   InputAdornment,
@@ -46,8 +44,6 @@ import AddIcon from "@mui/icons-material/Add";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
 import CloseIcon from "@mui/icons-material/Close";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlined";
-import BlockIcon from "@mui/icons-material/Block";
 import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import SaveIcon from "@mui/icons-material/Save";
@@ -55,7 +51,6 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
 import YardOutlinedIcon from "@mui/icons-material/YardOutlined";
-import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
@@ -186,7 +181,6 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
   // 4대 통계 지표 계산 (users 실시간 데이터와 백엔드 통계 병합)
   const metrics = useMemo(() => {
     const totalGardens = gardens.length;
-    const activeGardens = gardens.filter((g) => g.isActive).length;
     const unassignedGarden = gardens.find((g) => g.id === 1);
     const unassignedHouseholds = unassignedGarden
       ? (unassignedGarden.householdCount ?? getGardenHouseholds(unassignedGarden).length)
@@ -194,10 +188,13 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
     const totalAssignedHouseholds = gardens
       .filter((g) => g.id !== 1)
       .reduce((sum, g) => sum + (g.householdCount ?? getGardenHouseholds(g).length), 0);
+    const totalAssignedMembers = gardens
+      .filter((g) => g.id !== 1)
+      .reduce((sum, g) => sum + (g.memberCount ?? getGardenMembers(g).length), 0);
 
     return {
       totalGardens,
-      activeGardens,
+      totalAssignedMembers,
       totalAssignedHouseholds,
       unassignedHouseholds,
     };
@@ -431,7 +428,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
           </Card>
         </Grid>
 
-        {/* 운영 중 정원 */}
+        {/* 정원 배정 교인 */}
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card
             sx={{
@@ -445,10 +442,10 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
               <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <Box>
                   <Typography variant="caption" sx={{ color: "#64748b", fontWeight: 700 }}>
-                    운영 중인 정원
+                    정원 배정 교인
                   </Typography>
                   <Typography variant="h5" sx={{ fontWeight: 800, color: "#16a34a", mt: 0.3 }}>
-                    {metrics.activeGardens}개
+                    {metrics.totalAssignedMembers}명
                   </Typography>
                 </Box>
                 <Box
@@ -462,7 +459,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                     justifyContent: "center",
                   }}
                 >
-                  <TaskAltIcon sx={{ color: "#22c55e", fontSize: 24 }} />
+                  <PeopleAltOutlinedIcon sx={{ color: "#16a34a", fontSize: 24 }} />
                 </Box>
               </Box>
             </CardContent>
@@ -692,24 +689,23 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                     </Box>
                   </Tooltip>
                 </TableCell>
-                <TableCell width="200">정원명</TableCell>
-                <TableCell width="200">정원지기 (리더)</TableCell>
-                <TableCell align="center" width="140">소속 세대수</TableCell>
-                <TableCell align="center" width="140">소속 교인수</TableCell>
-                <TableCell align="center" width="120">운영 상태</TableCell>
+                <TableCell width="220">정원명</TableCell>
+                <TableCell width="220">정원지기 (리더)</TableCell>
+                <TableCell align="center" width="150">소속 세대수</TableCell>
+                <TableCell align="center" width="150">소속 교인수</TableCell>
                 <TableCell align="center" width="120">관리</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {loading && gardens.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} align="center" sx={{ py: 8 }}>
+                  <TableCell colSpan={6} align="center" sx={{ py: 8 }}>
                     <CircularProgress size={32} sx={{ color: "#16a34a" }} />
                   </TableCell>
                 </TableRow>
               ) : filteredGardens.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} align="center" sx={{ py: 8, color: "#94a3b8" }}>
+                  <TableCell colSpan={6} align="center" sx={{ py: 8, color: "#94a3b8" }}>
                     {searchTerm ? "검색 조건에 맞는 정원이 없습니다." : "등록된 정원이 없습니다."}
                   </TableCell>
                 </TableRow>
@@ -739,10 +735,8 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                           ? "rgba(34, 197, 94, 0.08)"
                           : isBeingDragged
                           ? "#f1f5f9"
-                          : !g.isActive
-                          ? "#f8fafc"
                           : "inherit",
-                        opacity: isBeingDragged ? 0.35 : !g.isActive ? 0.75 : 1,
+                        opacity: isBeingDragged ? 0.35 : 1,
                         borderTop: isDragOver ? "3px solid #16a34a" : undefined,
                         borderBottom: isDragOver ? "3px solid #16a34a" : undefined,
                         cursor: canDrag ? "grab" : "default",
@@ -916,27 +910,6 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                             }}
                           />
                         </Tooltip>
-                      </TableCell>
-
-                      {/* 운영 상태 */}
-                      <TableCell align="center">
-                        {g.isActive ? (
-                          <Chip
-                            size="small"
-                            icon={<CheckCircleOutlineIcon style={{ fontSize: 14 }} />}
-                            label="운영 중"
-                            color="success"
-                            variant="outlined"
-                            sx={{ height: 24, fontSize: "0.74rem", fontWeight: 700 }}
-                          />
-                        ) : (
-                          <Chip
-                            size="small"
-                            icon={<BlockIcon style={{ fontSize: 14 }} />}
-                            label="비활성"
-                            sx={{ height: 24, fontSize: "0.74rem", backgroundColor: "#f1f5f9", color: "#64748b" }}
-                          />
-                        )}
                       </TableCell>
 
                       {/* 관리 버튼 */}
@@ -1115,24 +1088,6 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
               />
             </Grid>
 
-            {/* 운영 상태 */}
-            <Grid size={12}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={formData.isActive}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, isActive: e.target.checked }))}
-                    color="success"
-                    disabled={editingGarden?.id === 1}
-                  />
-                }
-                label={
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: formData.isActive ? "#16a34a" : "#64748b" }}>
-                    {formData.isActive ? "운영 중 (활성 정원)" : "미운영 (비활성 정원)"}
-                  </Typography>
-                }
-              />
-            </Grid>
           </Grid>
         </DialogContent>
         <DialogActions sx={{ px: 3, py: 2 }}>
