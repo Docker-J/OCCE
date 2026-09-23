@@ -70,12 +70,6 @@ import {
 
 const CATEGORY_OPTIONS = ["새가족", "제자도", "사역훈련", "성경연구", "기도/영성", "기타"];
 
-const COHORT_STATUS_META = {
-  OPEN: { label: "모집중", color: "#0284c7", bg: "rgba(2, 132, 199, 0.1)" },
-  IN_PROGRESS: { label: "진행중", color: "#ea580c", bg: "rgba(234, 88, 12, 0.1)" },
-  COMPLETED: { label: "종강/수료", color: "#16a34a", bg: "rgba(22, 163, 74, 0.1)" },
-};
-
 const CourseManagementDashboard = ({ users = [] }) => {
   // Course state
   const [courses, setCourses] = useState([]);
@@ -821,8 +815,6 @@ const CourseManagementDashboard = ({ users = [] }) => {
                 <Stack spacing={1.2}>
                   {cohorts.map((cohort) => {
                     const isSelected = selectedCohort?.id === cohort.id;
-                    const statusMeta =
-                      COHORT_STATUS_META[cohort.status] || COHORT_STATUS_META.IN_PROGRESS;
                     return (
                       <Box
                         key={cohort.id}
@@ -849,29 +841,16 @@ const CourseManagementDashboard = ({ users = [] }) => {
                             mb: 0.8,
                           }}
                         >
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                            <Typography
-                              variant="subtitle2"
-                              sx={{
-                                fontWeight: 800,
-                                color: isSelected ? "#1d4ed8" : "#1e293b",
-                                fontSize: "0.95rem",
-                              }}
-                            >
-                              {cohort.termName}
-                            </Typography>
-                            <Chip
-                              size="small"
-                              label={statusMeta.label}
-                              sx={{
-                                height: 20,
-                                fontSize: "0.68rem",
-                                fontWeight: 700,
-                                backgroundColor: statusMeta.bg,
-                                color: statusMeta.color,
-                              }}
-                            />
-                          </Box>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              fontWeight: 800,
+                              color: isSelected ? "#1d4ed8" : "#1e293b",
+                              fontSize: "0.95rem",
+                            }}
+                          >
+                            {cohort.termName}
+                          </Typography>
 
                           <Box sx={{ display: "flex", alignItems: "center" }}>
                             <Tooltip title="기수 수정">
@@ -1664,18 +1643,6 @@ const CourseManagementDashboard = ({ users = [] }) => {
                 onChange={(e) => setCohortForm({ ...cohortForm, instructor: e.target.value })}
                 placeholder="예: OOO 목사"
               />
-              <FormControl size="small" fullWidth>
-                <InputLabel>기수 운영 상태</InputLabel>
-                <Select
-                  value={cohortForm.status}
-                  label="기수 운영 상태"
-                  onChange={(e) => setCohortForm({ ...cohortForm, status: e.target.value })}
-                >
-                  <MenuItem value="OPEN">모집중 (OPEN)</MenuItem>
-                  <MenuItem value="IN_PROGRESS">진행중 (IN_PROGRESS)</MenuItem>
-                  <MenuItem value="COMPLETED">종강/수료완료 (COMPLETED)</MenuItem>
-                </Select>
-              </FormControl>
             </Stack>
           </DialogContent>
           <DialogActions sx={{ p: 2.5, pt: 1.5, flexShrink: 0 }}>
@@ -1743,8 +1710,8 @@ const CourseManagementDashboard = ({ users = [] }) => {
                   >
                     {cohorts.map((c) => (
                       <MenuItem key={c.id} value={c.id}>
-                        {c.termName} {c.instructor ? `(인도자: ${c.instructor})` : ""} ·{" "}
-                        {COHORT_STATUS_META[c.status]?.label || c.status}
+                        {c.termName}
+                        {c.instructor ? ` (인도자: ${c.instructor})` : ""}
                       </MenuItem>
                     ))}
                   </Select>
