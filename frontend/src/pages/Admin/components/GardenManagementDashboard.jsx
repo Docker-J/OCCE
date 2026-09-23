@@ -1130,7 +1130,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
           {/* 입력 필드들 */}
           <Grid container spacing={2}>
             {/* 정원명 */}
-            <Grid size={{ xs: 12, sm: 7 }}>
+            <Grid size={12}>
               <TextField
                 fullWidth
                 required
@@ -1140,19 +1140,6 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                 value={formData.name}
                 onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
                 disabled={editingGarden?.id === 1}
-                sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
-              />
-            </Grid>
-
-            {/* 노출 순서 */}
-            <Grid size={{ xs: 12, sm: 5 }}>
-              <TextField
-                fullWidth
-                type="number"
-                size="small"
-                label="노출 순서 (낮을수록 앞쪽)"
-                value={formData.orderNum}
-                onChange={(e) => setFormData((prev) => ({ ...prev, orderNum: Number(e.target.value) }))}
                 sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
               />
             </Grid>
