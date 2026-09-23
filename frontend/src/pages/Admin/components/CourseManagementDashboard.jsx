@@ -35,7 +35,6 @@ import {
   TableCell,
   InputAdornment,
   Checkbox,
-  FormControlLabel,
 } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
@@ -129,30 +128,42 @@ const CourseManagementDashboard = ({ users = [] }) => {
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState(null); // { type: 'success' | 'error', message: '' }
 
-  // Set of member IDs who have already completed or are currently in progress in this course
+  // Set of member IDs who have already completed or are currently in progress in this course (across all cohorts)
   const enrolledOrCompletedMemberIds = useMemo(() => {
     const set = new Set();
     courseAllMembers.forEach((m) => {
-      if (m.courseStatus === "COMPLETED" || m.courseStatus === "IN_PROGRESS") {
-        set.add(m.memberId);
+      if (m.enrollmentId || m.courseStatus) {
+        set.add(String(m.memberId));
+        set.add(Number(m.memberId));
+      }
+    });
+    // Safety net: include current cohort members as well
+    cohortMembers.forEach((m) => {
+      if (m.memberId) {
+        set.add(String(m.memberId));
+        set.add(Number(m.memberId));
       }
     });
     return set;
-  }, [courseAllMembers]);
+  }, [courseAllMembers, cohortMembers]);
 
-  // Option to allow re-enrolling completed members if admin explicitly checks it
-  const [includeCompletedInCandidate, setIncludeCompletedInCandidate] = useState(false);
-
-  // Available active members for enrollment autocomplete (automatically filters out already completed/in-progress members)
+  // Available active members for enrollment autocomplete
+  // Any member who has taken/is taking ANY cohort of this course is strictly excluded
   const candidateMembers = useMemo(() => {
-    const preselectedIds = new Set(selectedMembersToEnroll.map((m) => m.id || m.memberId));
+    const preselectedIds = new Set(
+      selectedMembersToEnroll.map((m) => String(m.id || m.memberId))
+    );
     return users.filter((u) => {
       if (u.status === "REMOVED") return false;
-      if (preselectedIds.has(u.id)) return true;
-      if (!includeCompletedInCandidate && enrolledOrCompletedMemberIds.has(u.id)) return false;
+      const uidStr = String(u.id);
+      if (preselectedIds.has(uidStr)) return true;
+      // 기수가 달라도 이미 해당 코스를 수강/이수한 교인은 수강 대상에서 완전히 제외
+      if (enrolledOrCompletedMemberIds.has(uidStr) || enrolledOrCompletedMemberIds.has(Number(u.id))) {
+        return false;
+      }
       return true;
     });
-  }, [users, enrolledOrCompletedMemberIds, selectedMembersToEnroll, includeCompletedInCandidate]);
+  }, [users, enrolledOrCompletedMemberIds, selectedMembersToEnroll]);
 
   // Load courses
   const fetchCoursesList = async (autoSelectId = null) => {
@@ -430,6 +441,9 @@ const CourseManagementDashboard = ({ users = [] }) => {
 
   // ================= Enrollment Handlers =================
   const handleOpenEnrollModal = (preselected = null) => {
+    if (selectedCourse?.id) {
+      fetchCourseAllMembersList(selectedCourse.id);
+    }
     if (preselected) {
       const items = Array.isArray(preselected) ? preselected : [preselected];
       const resolved = items.map((item) => {
@@ -491,7 +505,7 @@ const CourseManagementDashboard = ({ users = [] }) => {
 
   // Eligible members for new enrollment (미수강 교인)
   const eligibleVisibleMembers = useMemo(() => {
-    return filteredCourseAllMembers.filter((m) => !m.courseStatus);
+    return filteredCourseAllMembers.filter((m) => !m.enrollmentId && !m.courseStatus);
   }, [filteredCourseAllMembers]);
 
   // Toggle single member checkbox in Course-wide overview
@@ -1395,7 +1409,7 @@ const CourseManagementDashboard = ({ users = [] }) => {
                         {filteredCourseAllMembers.map((m) => {
                           const isCompleted = m.courseStatus === "COMPLETED";
                           const isInProgress = m.courseStatus === "IN_PROGRESS";
-                          const isNotEnrolled = !m.courseStatus;
+                          const isNotEnrolled = !m.enrollmentId && !m.courseStatus;
 
                           return (
                             <TableRow
@@ -1412,7 +1426,9 @@ const CourseManagementDashboard = ({ users = [] }) => {
                                       ? "이미 본 과정을 수료한 교인입니다"
                                       : isInProgress
                                       ? "현재 본 과정을 수강 중인 교인입니다"
-                                      : "기수 배정 선택"
+                                      : isNotEnrolled
+                                      ? "기수 배정 선택"
+                                      : "이미 본 과정에 등록된 교인입니다"
                                   }
                                 >
                                   <span>
@@ -1760,12 +1776,11 @@ const CourseManagementDashboard = ({ users = [] }) => {
                 <Autocomplete
                   multiple
                   options={candidateMembers}
-                  getOptionLabel={(opt) => {
-                    const isDone = enrolledOrCompletedMemberIds.has(opt.id || opt.memberId);
-                    return `${opt.name} ${opt.nameEn ? `(${opt.nameEn})` : ""} · ${opt.department || "장년부"} (${opt.gardenName || "미배정"})${isDone ? " [기이수]" : ""}`;
-                  }}
+                  getOptionLabel={(opt) =>
+                    `${opt.name} ${opt.nameEn ? `(${opt.nameEn})` : ""} · ${opt.department || "장년부"} (${opt.gardenName || "미배정"})`
+                  }
                   isOptionEqualToValue={(opt, val) =>
-                    (opt.id || opt.memberId) === (val?.id || val?.memberId)
+                    String(opt.id || opt.memberId) === String(val?.id || val?.memberId)
                   }
                   value={selectedMembersToEnroll}
                   onChange={(e, val) => setSelectedMembersToEnroll(val)}
@@ -1801,33 +1816,10 @@ const CourseManagementDashboard = ({ users = [] }) => {
                     />
                   )}
                 />
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    mt: 0.8,
-                    px: 0.5,
-                  }}
-                >
+                <Box sx={{ mt: 0.8, px: 0.5 }}>
                   <Typography variant="caption" sx={{ color: "#64748b" }}>
-                    * 본 코스를 이미 수료했거나 수강 중인 교인은 목록에서 자동 제외됩니다.
+                    * 본 코스를 이미 수강했거나 수강 중인 교인은 기수와 관계없이 수강 대상에서 완전히 제외됩니다.
                   </Typography>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        size="small"
-                        checked={includeCompletedInCandidate}
-                        onChange={(e) => setIncludeCompletedInCandidate(e.target.checked)}
-                        sx={{ "&.Mui-checked": { color: "#FF6B00" }, p: 0.5 }}
-                      />
-                    }
-                    label={
-                      <Typography variant="caption" sx={{ color: "#64748b", fontWeight: 600 }}>
-                        기이수자 포함
-                      </Typography>
-                    }
-                  />
                 </Box>
               </Box>
 

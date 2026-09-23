@@ -367,6 +367,34 @@ export const enrollCohortMemberController = async (c) => {
       return c.json({ error: "InvalidRequest", message: "기수 ID와 최소 1명 이상의 교인 ID가 필요합니다." }, 400);
     }
 
+    // 기수가 속한 코스 ID 확인
+    const cohort = await env.DB.prepare(
+      "SELECT course_id FROM course_cohorts WHERE id = ?"
+    ).bind(cohortId).first();
+
+    if (!cohort) {
+      return c.json({ error: "NotFound", message: "기수를 찾을 수 없습니다." }, 404);
+    }
+
+    // 동일 코스의 다른 기수(또는 현재 기수)에 이미 수강/수료 이력이 있는지 검증
+    const placeholders = memberIds.map(() => "?").join(",");
+    const { results: alreadyEnrolled } = await env.DB.prepare(`
+      SELECT mc.member_id, m.name, cc.term_name
+      FROM member_courses mc
+      JOIN course_cohorts cc ON mc.cohort_id = cc.id
+      JOIN church_members m ON mc.member_id = m.id
+      WHERE cc.course_id = ?
+        AND mc.member_id IN (${placeholders})
+    `).bind(cohort.course_id, ...memberIds).all();
+
+    if (alreadyEnrolled && alreadyEnrolled.length > 0) {
+      const names = alreadyEnrolled.map((r) => `${r.name}(${r.term_name})`).join(", ");
+      return c.json({
+        error: "AlreadyEnrolledInCourse",
+        message: `이미 해당 코스를 수강/이수한 교인은 등록할 수 없습니다: ${names}`,
+      }, 400);
+    }
+
     const enrollmentStatus = status || "IN_PROGRESS";
     const compDate = enrollmentStatus === "COMPLETED" ? (completionDate || new Date().toISOString().split("T")[0]) : null;
 
@@ -566,7 +594,7 @@ export const getCourseAllMembersController = async (c) => {
         mc.term_name as termName,
         mc.instructor
       FROM church_members m
-      JOIN households h ON m.household_id = h.id
+      LEFT JOIN households h ON m.household_id = h.id
       LEFT JOIN gardens g ON h.garden_id = g.id
       LEFT JOIN gardens cg ON m.custom_garden_id = cg.id
       LEFT JOIN (
