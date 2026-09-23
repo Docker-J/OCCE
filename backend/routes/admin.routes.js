@@ -158,7 +158,6 @@ router.get(
 router.post(
   "/cohorts/:cohortId/members",
   validateParam({ cohortId: { required: true } }),
-  validateJson(["memberId"]),
   enrollCohortMemberController
 );
 router.patch(

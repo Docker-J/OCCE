@@ -466,6 +466,7 @@ const CourseManagementDashboard = ({ users = [] }) => {
     try {
       const res = await enrollCohortMember(targetCohortId, {
         memberIds,
+        memberId: memberIds[0],
         status: enrollStatus,
         completionDate: enrollStatus === "COMPLETED" ? enrollCompletionDate : null,
       });
