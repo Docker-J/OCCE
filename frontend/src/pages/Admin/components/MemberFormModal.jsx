@@ -132,6 +132,7 @@ const MemberFormModal = ({
   // Household type selection for create mode: 'new' or 'existing'
   const [householdMode, setHouseholdMode] = useState("new");
   const [isAddressManualEdit, setIsAddressManualEdit] = useState(false);
+  const [isSeparateAddressManualEdit, setIsSeparateAddressManualEdit] = useState(false);
 
   // 세대 독립(분가) 모달 상태
   const [separateTargetMember, setSeparateTargetMember] = useState(null);
@@ -348,6 +349,7 @@ const MemberFormModal = ({
   // 세대 독립(분가) 모달 열기
   const handleOpenSeparateDialog = (member) => {
     setSeparateTargetMember(member);
+    setIsSeparateAddressManualEdit(false);
     setSeparateForm({
       gardenId: householdData.gardenId || availableGardens[0]?.id || 1,
       department:
@@ -1448,35 +1450,120 @@ const MemberFormModal = ({
                     province: province || prev.province,
                     postalCode: postalCode || prev.postalCode,
                   }));
+                  setIsSeparateAddressManualEdit(false);
                 }}
                 placeholder="새 거주 주소 검색 (이사/분가한 경우)"
               />
             </Grid>
 
+            {/* 기본 도로명 주소 (Street Address) */}
             <Grid size={12}>
               <TextField
                 fullWidth
                 size="small"
-                label="기본 도로명 주소"
+                label="기본 도로명 주소 (Street Address)"
+                placeholder="상단 검색창에서 주소를 검색하여 선택하면 자동 입력됩니다"
                 value={separateForm.address}
                 onChange={(e) => setSeparateForm((prev) => ({ ...prev, address: e.target.value }))}
-                sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+                slotProps={{
+                  input: {
+                    readOnly: !isSeparateAddressManualEdit,
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <LocationOnOutlinedIcon sx={{ color: separateForm.address ? "#16a34a" : "#94a3b8", fontSize: "1.2rem" }} />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        {separateForm.address && !isSeparateAddressManualEdit ? (
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
+                            <Chip
+                              size="small"
+                              label="공인 주소"
+                              color="success"
+                              variant="outlined"
+                              sx={{ height: 22, fontSize: "0.72rem", fontWeight: 700 }}
+                            />
+                            <Button
+                              size="small"
+                              variant="text"
+                              onClick={() => setIsSeparateAddressManualEdit(true)}
+                              sx={{ fontSize: "0.75rem", minWidth: "auto", px: 1, py: 0.2 }}
+                            >
+                              직접 수정
+                            </Button>
+                          </Box>
+                        ) : isSeparateAddressManualEdit ? (
+                          <Button
+                            size="small"
+                            variant="text"
+                            onClick={() => setIsSeparateAddressManualEdit(false)}
+                            sx={{ fontSize: "0.75rem", minWidth: "auto", px: 1, py: 0.2 }}
+                          >
+                            완료
+                          </Button>
+                        ) : null}
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+                sx={{
+                  backgroundColor: isSeparateAddressManualEdit ? "#fff" : "#f8fafc",
+                  "& .MuiOutlinedInput-root": { borderRadius: "10px" },
+                }}
               />
             </Grid>
 
-            <Grid size={{ xs: 12, sm: 6 }}>
+            {/* 동/호수 상세 주소 */}
+            <Grid size={{ xs: 12, sm: 4 }}>
               <TextField
                 fullWidth
                 size="small"
-                label="상세 주소 (Unit/Apt)"
+                label="동/호수/유닛 (Unit/Apt)"
                 placeholder="예: Apt 301"
                 value={separateForm.addressDetail}
                 onChange={(e) => setSeparateForm((prev) => ({ ...prev, addressDetail: e.target.value }))}
-                sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+                sx={{
+                  backgroundColor: "#fff",
+                  "& .MuiOutlinedInput-root": { borderRadius: "10px" },
+                }}
               />
             </Grid>
 
-            <Grid size={{ xs: 12, sm: 6 }}>
+            {/* 도시 (City) */}
+            <Grid size={{ xs: 12, sm: 3 }}>
+              <TextField
+                fullWidth
+                size="small"
+                label="도시 (City)"
+                value={separateForm.city}
+                onChange={(e) => setSeparateForm((prev) => ({ ...prev, city: e.target.value }))}
+                slotProps={{ input: { readOnly: !isSeparateAddressManualEdit } }}
+                sx={{
+                  backgroundColor: isSeparateAddressManualEdit ? "#fff" : "#f8fafc",
+                  "& .MuiOutlinedInput-root": { borderRadius: "10px" },
+                }}
+              />
+            </Grid>
+
+            {/* 주 (Province) */}
+            <Grid size={{ xs: 12, sm: 2 }}>
+              <TextField
+                fullWidth
+                size="small"
+                label="주 (Province)"
+                value={separateForm.province}
+                onChange={(e) => setSeparateForm((prev) => ({ ...prev, province: e.target.value }))}
+                slotProps={{ input: { readOnly: !isSeparateAddressManualEdit } }}
+                sx={{
+                  backgroundColor: isSeparateAddressManualEdit ? "#fff" : "#f8fafc",
+                  "& .MuiOutlinedInput-root": { borderRadius: "10px" },
+                }}
+              />
+            </Grid>
+
+            {/* 우편번호 */}
+            <Grid size={{ xs: 12, sm: 3 }}>
               <TextField
                 fullWidth
                 size="small"
@@ -1484,7 +1571,11 @@ const MemberFormModal = ({
                 placeholder="예: T6W 0A1"
                 value={separateForm.postalCode}
                 onChange={(e) => setSeparateForm((prev) => ({ ...prev, postalCode: e.target.value.toUpperCase() }))}
-                sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+                slotProps={{ input: { readOnly: !isSeparateAddressManualEdit } }}
+                sx={{
+                  backgroundColor: isSeparateAddressManualEdit ? "#fff" : "#f8fafc",
+                  "& .MuiOutlinedInput-root": { borderRadius: "10px" },
+                }}
               />
             </Grid>
           </Grid>
