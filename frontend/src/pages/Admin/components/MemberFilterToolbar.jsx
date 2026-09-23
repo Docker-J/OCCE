@@ -23,7 +23,6 @@ import ClearIcon from "@mui/icons-material/Clear";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import CloudDownloadOutlinedIcon from "@mui/icons-material/CloudDownloadOutlined";
-import ForestIcon from "@mui/icons-material/Forest";
 
 const MemberFilterToolbar = ({
   searchTerm,
@@ -45,7 +44,6 @@ const MemberFilterToolbar = ({
   loading,
   refreshing,
   onOpenCreateModal,
-  onOpenGardenManagement,
   onImportFromDrive,
   importing,
 }) => (
@@ -86,28 +84,6 @@ const MemberFilterToolbar = ({
           }}
         >
           새 교인 등록
-        </Button>
-
-        <Button
-          variant="outlined"
-          startIcon={<ForestIcon sx={{ color: "#16a34a" }} />}
-          onClick={onOpenGardenManagement}
-          sx={{
-            borderRadius: "12px",
-            px: 2,
-            py: 1,
-            fontWeight: 700,
-            color: "#15803d",
-            borderColor: "#86efac",
-            backgroundColor: "rgba(22, 163, 74, 0.04)",
-            "&:hover": {
-              backgroundColor: "rgba(22, 163, 74, 0.1)",
-              borderColor: "#16a34a",
-            },
-            whiteSpace: "nowrap",
-          }}
-        >
-          정원 목록 관리
         </Button>
 
         <Tooltip title="Google Drive의 엑셀 교적부 데이터를 1회성으로 D1에 가져옵니다.">
@@ -317,7 +293,6 @@ MemberFilterToolbar.propTypes = {
   loading: PropTypes.bool.isRequired,
   refreshing: PropTypes.bool.isRequired,
   onOpenCreateModal: PropTypes.func.isRequired,
-  onOpenGardenManagement: PropTypes.func,
   onImportFromDrive: PropTypes.func.isRequired,
   importing: PropTypes.bool.isRequired,
 };

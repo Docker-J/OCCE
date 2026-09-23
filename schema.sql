@@ -24,12 +24,13 @@ CREATE TABLE IF NOT EXISTS Columns (
 CREATE TABLE IF NOT EXISTS gardens (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT UNIQUE NOT NULL,                      -- 정원명 (예: '미배정', '에덴1정원')
-  leader_member_id INTEGER NULL,                  -- 정원지기 교인 ID (church_members 참조)
-  order_num INTEGER NOT NULL DEFAULT 0,           -- UI 노출 우선순위
+  leader_member_id INTEGER NULL,                  -- 정원지기 교인 ID (church_members 참조, 해당 정원 소속 교인 중에서만 지정)
+  order_num INTEGER NOT NULL DEFAULT 0,           -- UI 노출 우선순위 (드래그 앤 드롭 및 순서 변경 지원)
   is_active BOOLEAN NOT NULL DEFAULT 1            -- 현재 운영 중 여부
 );
 
 CREATE INDEX IF NOT EXISTS idx_gardens_active_order ON gardens(is_active, order_num);
+CREATE INDEX IF NOT EXISTS idx_gardens_leader ON gardens(leader_member_id) WHERE leader_member_id IS NOT NULL;
 
 -- 기본 정원 데이터 시드 (미배정)
 INSERT OR IGNORE INTO gardens (id, name, order_num, is_active) VALUES (1, '미배정', 999, 1);
@@ -94,6 +95,12 @@ CREATE TABLE IF NOT EXISTS church_members (
 -- 세대당 활성 세대주는 1명만 존재
 CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_head_per_household 
 ON church_members(household_id) WHERE is_head = 1 AND status != 'REMOVED';
+
+-- 세대(가구) 구성원 전체 조회 인덱스 (가구별 구성원 로딩 및 제적 관리 최적화)
+CREATE INDEX IF NOT EXISTS idx_members_household_id ON church_members(household_id);
+
+-- 독립 소그룹(정원) 지정 예외 인덱스
+CREATE INDEX IF NOT EXISTS idx_members_custom_garden ON church_members(custom_garden_id) WHERE custom_garden_id IS NOT NULL;
 
 -- 회원가입 초고속 조회 복합 인덱스 (1ms 이내)
 CREATE INDEX IF NOT EXISTS idx_members_auth_lookup 
@@ -184,7 +191,7 @@ CREATE INDEX IF NOT EXISTS idx_member_courses_member ON member_courses(member_id
 CREATE INDEX IF NOT EXISTS idx_member_courses_cohort ON member_courses(cohort_id, status);
 
 -- ====================================================================
--- 7. 사역자 심방 기록 테이블
+-- 8. 사역자 심방 기록 테이블
 -- ====================================================================
 CREATE TABLE IF NOT EXISTS visitation_records (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -209,7 +216,7 @@ CREATE INDEX IF NOT EXISTS idx_visitations_timeline
 ON visitation_records(household_id, visit_date DESC);
 
 -- ====================================================================
--- 8. 소그룹 출석/모임 보고서 테이블 (Phase 3 직결용)
+-- 9. 소그룹 출석/모임 보고서 테이블 (Phase 3 직결용)
 -- ====================================================================
 CREATE TABLE IF NOT EXISTS sunday_attendance_reports (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

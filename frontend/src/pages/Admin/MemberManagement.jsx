@@ -332,7 +332,6 @@ const MemberManagement = () => {
                     loading={loading}
                     refreshing={refreshing}
                     onOpenCreateModal={handleOpenCreateModal}
-                    onOpenGardenManagement={() => setAdminTab(3)}
                     onImportFromDrive={handleImportFromDrive}
                     importing={importing}
                   />
