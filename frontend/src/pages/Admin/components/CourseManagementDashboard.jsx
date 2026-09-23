@@ -35,6 +35,7 @@ import {
   TableCell,
   InputAdornment,
   Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
@@ -128,10 +129,30 @@ const CourseManagementDashboard = ({ users = [] }) => {
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState(null); // { type: 'success' | 'error', message: '' }
 
-  // Available active members for enrollment autocomplete
+  // Set of member IDs who have already completed or are currently in progress in this course
+  const enrolledOrCompletedMemberIds = useMemo(() => {
+    const set = new Set();
+    courseAllMembers.forEach((m) => {
+      if (m.courseStatus === "COMPLETED" || m.courseStatus === "IN_PROGRESS") {
+        set.add(m.memberId);
+      }
+    });
+    return set;
+  }, [courseAllMembers]);
+
+  // Option to allow re-enrolling completed members if admin explicitly checks it
+  const [includeCompletedInCandidate, setIncludeCompletedInCandidate] = useState(false);
+
+  // Available active members for enrollment autocomplete (automatically filters out already completed/in-progress members)
   const candidateMembers = useMemo(() => {
-    return users.filter((u) => u.status !== "REMOVED");
-  }, [users]);
+    const preselectedIds = new Set(selectedMembersToEnroll.map((m) => m.id || m.memberId));
+    return users.filter((u) => {
+      if (u.status === "REMOVED") return false;
+      if (preselectedIds.has(u.id)) return true;
+      if (!includeCompletedInCandidate && enrolledOrCompletedMemberIds.has(u.id)) return false;
+      return true;
+    });
+  }, [users, enrolledOrCompletedMemberIds, selectedMembersToEnroll, includeCompletedInCandidate]);
 
   // Load courses
   const fetchCoursesList = async (autoSelectId = null) => {
@@ -467,6 +488,11 @@ const CourseManagementDashboard = ({ users = [] }) => {
     }
   };
 
+  // Eligible members for new enrollment (미수강 교인)
+  const eligibleVisibleMembers = useMemo(() => {
+    return filteredCourseAllMembers.filter((m) => !m.courseStatus);
+  }, [filteredCourseAllMembers]);
+
   // Toggle single member checkbox in Course-wide overview
   const handleToggleBatchMember = (memberId) => {
     setSelectedMemberIdsForBatch((prev) =>
@@ -474,15 +500,15 @@ const CourseManagementDashboard = ({ users = [] }) => {
     );
   };
 
-  // Toggle select all visible members in Course-wide overview
+  // Toggle select all visible eligible (미수강) members in Course-wide overview
   const handleToggleSelectAllBatch = () => {
-    const visibleIds = filteredCourseAllMembers.map((m) => m.memberId);
-    const allSelected =
-      visibleIds.length > 0 && visibleIds.every((id) => selectedMemberIdsForBatch.includes(id));
+    const eligibleIds = eligibleVisibleMembers.map((m) => m.memberId);
+    if (eligibleIds.length === 0) return;
+    const allSelected = eligibleIds.every((id) => selectedMemberIdsForBatch.includes(id));
     if (allSelected) {
-      setSelectedMemberIdsForBatch((prev) => prev.filter((id) => !visibleIds.includes(id)));
+      setSelectedMemberIdsForBatch((prev) => prev.filter((id) => !eligibleIds.includes(id)));
     } else {
-      setSelectedMemberIdsForBatch((prev) => Array.from(new Set([...prev, ...visibleIds])));
+      setSelectedMemberIdsForBatch((prev) => Array.from(new Set([...prev, ...eligibleIds])));
     }
   };
 
@@ -1318,26 +1344,37 @@ const CourseManagementDashboard = ({ users = [] }) => {
                       <TableHead>
                         <TableRow sx={{ backgroundColor: "#f8fafc" }}>
                           <TableCell padding="checkbox" sx={{ pl: 1, backgroundColor: "#f8fafc" }}>
-                            <Checkbox
-                              size="small"
-                              indeterminate={
-                                selectedMemberIdsForBatch.length > 0 &&
-                                !filteredCourseAllMembers.every((m) =>
-                                  selectedMemberIdsForBatch.includes(m.memberId)
-                                )
+                            <Tooltip
+                              title={
+                                eligibleVisibleMembers.length === 0
+                                  ? "배정 가능한 미수강 교인이 없습니다"
+                                  : "미수강 교인 전체 선택 / 해제"
                               }
-                              checked={
-                                filteredCourseAllMembers.length > 0 &&
-                                filteredCourseAllMembers.every((m) =>
-                                  selectedMemberIdsForBatch.includes(m.memberId)
-                                )
-                              }
-                              onChange={handleToggleSelectAllBatch}
-                              sx={{
-                                color: "#94a3b8",
-                                "&.Mui-checked, &.MuiCheckbox-indeterminate": { color: "#FF6B00" },
-                              }}
-                            />
+                            >
+                              <span>
+                                <Checkbox
+                                  size="small"
+                                  disabled={eligibleVisibleMembers.length === 0}
+                                  indeterminate={
+                                    selectedMemberIdsForBatch.length > 0 &&
+                                    !eligibleVisibleMembers.every((m) =>
+                                      selectedMemberIdsForBatch.includes(m.memberId)
+                                    )
+                                  }
+                                  checked={
+                                    eligibleVisibleMembers.length > 0 &&
+                                    eligibleVisibleMembers.every((m) =>
+                                      selectedMemberIdsForBatch.includes(m.memberId)
+                                    )
+                                  }
+                                  onChange={handleToggleSelectAllBatch}
+                                  sx={{
+                                    color: "#94a3b8",
+                                    "&.Mui-checked, &.MuiCheckbox-indeterminate": { color: "#FF6B00" },
+                                  }}
+                                />
+                              </span>
+                            </Tooltip>
                           </TableCell>
                           <TableCell sx={{ fontWeight: 800, color: "#475569" }}>성명 / 영문명</TableCell>
                           <TableCell sx={{ fontWeight: 800, color: "#475569" }}>소속 (부서/정원)</TableCell>
@@ -1368,15 +1405,28 @@ const CourseManagementDashboard = ({ users = [] }) => {
                               }}
                             >
                               <TableCell padding="checkbox" sx={{ pl: 1 }}>
-                                <Checkbox
-                                  size="small"
-                                  checked={selectedMemberIdsForBatch.includes(m.memberId)}
-                                  onChange={() => handleToggleBatchMember(m.memberId)}
-                                  sx={{
-                                    color: "#cbd5e1",
-                                    "&.Mui-checked": { color: "#FF6B00" },
-                                  }}
-                                />
+                                <Tooltip
+                                  title={
+                                    isCompleted
+                                      ? "이미 본 과정을 수료한 교인입니다"
+                                      : isInProgress
+                                      ? "현재 본 과정을 수강 중인 교인입니다"
+                                      : "기수 배정 선택"
+                                  }
+                                >
+                                  <span>
+                                    <Checkbox
+                                      size="small"
+                                      disabled={!isNotEnrolled}
+                                      checked={selectedMemberIdsForBatch.includes(m.memberId)}
+                                      onChange={() => handleToggleBatchMember(m.memberId)}
+                                      sx={{
+                                        color: "#cbd5e1",
+                                        "&.Mui-checked": { color: "#FF6B00" },
+                                      }}
+                                    />
+                                  </span>
+                                </Tooltip>
                               </TableCell>
                               <TableCell sx={{ py: 1.2 }}>
                                 <Typography variant="body2" sx={{ fontWeight: 800, color: "#1e293b" }}>
@@ -1705,49 +1755,80 @@ const CourseManagementDashboard = ({ users = [] }) => {
                 </FormControl>
               )}
 
-              <Autocomplete
-                multiple
-                options={candidateMembers}
-                getOptionLabel={(opt) =>
-                  `${opt.name} ${opt.nameEn ? `(${opt.nameEn})` : ""} · ${opt.department || "장년부"} (${opt.gardenName || "미배정"})`
-                }
-                isOptionEqualToValue={(opt, val) =>
-                  (opt.id || opt.memberId) === (val?.id || val?.memberId)
-                }
-                value={selectedMembersToEnroll}
-                onChange={(e, val) => setSelectedMembersToEnroll(val)}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => {
-                    const { key, ...tagProps } = getTagProps({ index });
-                    return (
-                      <Chip
-                        key={key}
+              <Box>
+                <Autocomplete
+                  multiple
+                  options={candidateMembers}
+                  getOptionLabel={(opt) => {
+                    const isDone = enrolledOrCompletedMemberIds.has(opt.id || opt.memberId);
+                    return `${opt.name} ${opt.nameEn ? `(${opt.nameEn})` : ""} · ${opt.department || "장년부"} (${opt.gardenName || "미배정"})${isDone ? " [기이수]" : ""}`;
+                  }}
+                  isOptionEqualToValue={(opt, val) =>
+                    (opt.id || opt.memberId) === (val?.id || val?.memberId)
+                  }
+                  value={selectedMembersToEnroll}
+                  onChange={(e, val) => setSelectedMembersToEnroll(val)}
+                  renderTags={(value, getTagProps) =>
+                    value.map((option, index) => {
+                      const { key, ...tagProps } = getTagProps({ index });
+                      return (
+                        <Chip
+                          key={key}
+                          size="small"
+                          label={`${option.name} (${option.gardenName || option.department || "미배정"})`}
+                          {...tagProps}
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: "0.75rem",
+                            backgroundColor: "rgba(255, 107, 0, 0.1)",
+                            color: "#ea580c",
+                          }}
+                        />
+                      );
+                    })
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="수강 대상 교인 (여러 명 다중 선택 가능)"
+                      size="small"
+                      placeholder={
+                        selectedMembersToEnroll.length === 0
+                          ? "등록할 교인 이름을 입력하여 추가하세요"
+                          : "교인을 계속 추가 검색할 수 있습니다"
+                      }
+                    />
+                  )}
+                />
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    mt: 0.8,
+                    px: 0.5,
+                  }}
+                >
+                  <Typography variant="caption" sx={{ color: "#64748b" }}>
+                    * 본 코스를 이미 수료했거나 수강 중인 교인은 목록에서 자동 제외됩니다.
+                  </Typography>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
                         size="small"
-                        label={`${option.name} (${option.gardenName || option.department || "미배정"})`}
-                        {...tagProps}
-                        sx={{
-                          fontWeight: 700,
-                          fontSize: "0.75rem",
-                          backgroundColor: "rgba(255, 107, 0, 0.1)",
-                          color: "#ea580c",
-                        }}
+                        checked={includeCompletedInCandidate}
+                        onChange={(e) => setIncludeCompletedInCandidate(e.target.checked)}
+                        sx={{ "&.Mui-checked": { color: "#FF6B00" }, p: 0.5 }}
                       />
-                    );
-                  })
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="수강 대상 교인 (여러 명 다중 선택 가능)"
-                    size="small"
-                    placeholder={
-                      selectedMembersToEnroll.length === 0
-                        ? "등록할 교인 이름을 입력하여 추가하세요"
-                        : "교인을 계속 추가 검색할 수 있습니다"
+                    }
+                    label={
+                      <Typography variant="caption" sx={{ color: "#64748b", fontWeight: 600 }}>
+                        기이수자 포함
+                      </Typography>
                     }
                   />
-                )}
-              />
+                </Box>
+              </Box>
 
               <FormControl size="small" fullWidth>
                 <InputLabel>수강 상태</InputLabel>
