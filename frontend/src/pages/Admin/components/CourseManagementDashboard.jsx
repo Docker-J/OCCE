@@ -1083,14 +1083,10 @@ const CourseManagementDashboard = ({ users = [] }) => {
                   <Table size="small">
                     <TableHead>
                       <TableRow sx={{ backgroundColor: "#f8fafc" }}>
-                        <TableCell sx={{ fontWeight: 800, color: "#475569" }}>성명 / 영문명</TableCell>
+                        <TableCell sx={{ fontWeight: 800, color: "#475569" }}>성명</TableCell>
                         <TableCell sx={{ fontWeight: 800, color: "#475569" }}>부서 / 정원</TableCell>
-                        <TableCell sx={{ fontWeight: 800, color: "#475569" }}>연락처</TableCell>
                         <TableCell align="center" sx={{ fontWeight: 800, color: "#475569" }}>
                           수강 상태
-                        </TableCell>
-                        <TableCell align="center" sx={{ fontWeight: 800, color: "#475569" }}>
-                          수료일자
                         </TableCell>
                         <TableCell align="center" sx={{ fontWeight: 800, color: "#475569" }}>
                           관리
@@ -1112,11 +1108,6 @@ const CourseManagementDashboard = ({ users = [] }) => {
                               <Typography variant="body2" sx={{ fontWeight: 800, color: "#1e293b" }}>
                                 {member.name}
                               </Typography>
-                              {member.nameEn && (
-                                <Typography variant="caption" sx={{ color: "#94a3b8" }}>
-                                  {member.nameEn}
-                                </Typography>
-                              )}
                             </TableCell>
 
                             <TableCell>
@@ -1125,12 +1116,6 @@ const CourseManagementDashboard = ({ users = [] }) => {
                               </Typography>
                               <Typography variant="caption" sx={{ color: "#94a3b8", display: "block" }}>
                                 {member.gardenName}
-                              </Typography>
-                            </TableCell>
-
-                            <TableCell>
-                              <Typography variant="caption" sx={{ color: "#475569" }}>
-                                {member.phone || "-"}
                               </Typography>
                             </TableCell>
 
@@ -1163,12 +1148,6 @@ const CourseManagementDashboard = ({ users = [] }) => {
                                   }}
                                 />
                               </Tooltip>
-                            </TableCell>
-
-                            <TableCell align="center">
-                              <Typography variant="caption" sx={{ color: isCompleted ? "#16a34a" : "#94a3b8", fontWeight: 600 }}>
-                                {member.completionDate || "-"}
-                              </Typography>
                             </TableCell>
 
                             <TableCell align="center">
@@ -1391,14 +1370,13 @@ const CourseManagementDashboard = ({ users = [] }) => {
                               </span>
                             </Tooltip>
                           </TableCell>
-                          <TableCell sx={{ fontWeight: 800, color: "#475569" }}>성명 / 영문명</TableCell>
+                          <TableCell sx={{ fontWeight: 800, color: "#475569" }}>성명</TableCell>
                           <TableCell sx={{ fontWeight: 800, color: "#475569" }}>소속 (부서/정원)</TableCell>
-                          <TableCell sx={{ fontWeight: 800, color: "#475569" }}>연락처</TableCell>
                           <TableCell align="center" sx={{ fontWeight: 800, color: "#475569" }}>
                             이수 현황
                           </TableCell>
                           <TableCell align="center" sx={{ fontWeight: 800, color: "#475569" }}>
-                            기수 / 이수 정보
+                            기수 정보
                           </TableCell>
                           <TableCell align="center" sx={{ fontWeight: 800, color: "#475569" }}>
                             관리
@@ -1449,11 +1427,6 @@ const CourseManagementDashboard = ({ users = [] }) => {
                                 <Typography variant="body2" sx={{ fontWeight: 800, color: "#1e293b" }}>
                                   {m.name}
                                 </Typography>
-                                {m.nameEn && (
-                                  <Typography variant="caption" sx={{ color: "#94a3b8" }}>
-                                    {m.nameEn}
-                                  </Typography>
-                                )}
                               </TableCell>
 
                               <TableCell>
@@ -1462,12 +1435,6 @@ const CourseManagementDashboard = ({ users = [] }) => {
                                 </Typography>
                                 <Typography variant="caption" sx={{ color: "#94a3b8", display: "block" }}>
                                   {m.gardenName}
-                                </Typography>
-                              </TableCell>
-
-                              <TableCell>
-                                <Typography variant="caption" sx={{ color: "#475569" }}>
-                                  {m.phone || "-"}
                                 </Typography>
                               </TableCell>
 
@@ -1512,17 +1479,12 @@ const CourseManagementDashboard = ({ users = [] }) => {
 
                               <TableCell align="center">
                                 {isCompleted ? (
-                                  <Box>
-                                    <Typography
-                                      variant="caption"
-                                      sx={{ fontWeight: 700, color: "#16a34a", display: "block" }}
-                                    >
-                                      {m.termName || "이수"}
-                                    </Typography>
-                                    <Typography variant="caption" sx={{ color: "#94a3b8" }}>
-                                      {m.completionDate || "날짜 미기입"}
-                                    </Typography>
-                                  </Box>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{ fontWeight: 700, color: "#16a34a" }}
+                                  >
+                                    {m.termName || "수료"}
+                                  </Typography>
                                 ) : isInProgress ? (
                                   <Box>
                                     <Typography
@@ -1802,7 +1764,7 @@ const CourseManagementDashboard = ({ users = [] }) => {
                 multiple
                 options={candidateMembers}
                 getOptionLabel={(opt) =>
-                  `${opt.name} ${opt.nameEn ? `(${opt.nameEn})` : ""} · ${opt.department || "장년부"} (${opt.gardenName || "미배정"})`
+                  `${opt.name} · ${opt.department || "장년부"} (${opt.gardenName || "미배정"})`
                 }
                 isOptionEqualToValue={(opt, val) =>
                   String(opt.id || opt.memberId) === String(val?.id || val?.memberId)
