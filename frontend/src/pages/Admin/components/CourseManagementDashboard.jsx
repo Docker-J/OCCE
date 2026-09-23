@@ -50,6 +50,11 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import SearchIcon from "@mui/icons-material/Search";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
+import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
+import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
+import FullscreenIcon from "@mui/icons-material/Fullscreen";
+import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 
 import {
   getCourses,
@@ -118,6 +123,32 @@ const CourseManagementDashboard = ({ users = [] }) => {
 
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState(null); // { type: 'success' | 'error', message: '' }
+
+  // Collapsible panels state: course (Panel 1), cohort (Panel 2), member (Panel 3)
+  const [isCourseCollapsed, setIsCourseCollapsed] = useState(false);
+  const [isCohortCollapsed, setIsCohortCollapsed] = useState(false);
+  const [isMemberCollapsed, setIsMemberCollapsed] = useState(false);
+
+  const isMaximized = isCourseCollapsed && isCohortCollapsed && !isMemberCollapsed;
+
+  const toggleMaximize = () => {
+    if (isMaximized) {
+      setIsCourseCollapsed(false);
+      setIsCohortCollapsed(false);
+    } else {
+      setIsCourseCollapsed(true);
+      setIsCohortCollapsed(true);
+      setIsMemberCollapsed(false);
+    }
+  };
+
+  const handleCollapseMember = () => {
+    setIsMemberCollapsed(true);
+    if (isCourseCollapsed && isCohortCollapsed) {
+      setIsCourseCollapsed(false);
+      setIsCohortCollapsed(false);
+    }
+  };
 
   // Set of member IDs who have already completed or are currently in progress in this course (across all cohorts)
   const enrolledOrCompletedMemberIds = useMemo(() => {
@@ -595,433 +626,890 @@ const CourseManagementDashboard = ({ users = [] }) => {
       )}
 
       {/* 상단 3계층 레이아웃: [과정 리스트] | [기수 선택 및 관리] | [수강생 명단] */}
-      <Grid container spacing={3}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          gap: 2.5,
+          width: "100%",
+          alignItems: "stretch",
+        }}
+      >
         {/* 1. 과정 (Course) 컬럼 */}
-        <Grid size={{ xs: 12, md: 3 }}>
+        {isCourseCollapsed ? (
           <Card
             sx={{
               borderRadius: "16px",
               boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
               border: "1px solid rgba(0,0,0,0.06)",
-              height: "100%",
+              minHeight: { xs: "auto", md: "520px" },
+              width: { xs: "100%", md: "52px" },
+              flexShrink: 0,
               display: "flex",
-              flexDirection: "column",
+              flexDirection: { xs: "row", md: "column" },
+              alignItems: "center",
+              justifyContent: { xs: "space-between", md: "flex-start" },
+              py: { xs: 1.2, md: 2 },
+              px: { xs: 2, md: 0 },
+              backgroundColor: "#f8fafc",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              "&:hover": {
+                backgroundColor: "#f1f5f9",
+                borderColor: "#cbd5e1",
+              },
             }}
+            onClick={() => setIsCourseCollapsed(false)}
           >
+            {/* Desktop vertical layout */}
             <Box
               sx={{
-                p: 2.2,
-                borderBottom: "1px solid rgba(0,0,0,0.06)",
-                display: "flex",
+                display: { xs: "none", md: "flex" },
+                flexDirection: "column",
                 alignItems: "center",
-                justifyContent: "space-between",
-                backgroundColor: "#fafafa",
+                gap: 1.5,
+                height: "100%",
+                width: "100%",
               }}
             >
-              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: "#1e293b" }}>
-                📖 교육·양육 과정
-              </Typography>
-              <Button
-                variant="contained"
-                size="small"
-                startIcon={<AddIcon />}
-                onClick={() => handleOpenCourseModal("create")}
-                sx={{
-                  backgroundColor: "#FF6B00",
-                  "&:hover": { backgroundColor: "#ea580c" },
-                  borderRadius: "8px",
-                  fontSize: "0.75rem",
-                  fontWeight: 700,
-                  boxShadow: "none",
-                  px: 1.5,
-                }}
-              >
-                새 과정
-              </Button>
-            </Box>
-
-            <Box sx={{ p: 1.5, flexGrow: 1, overflowY: "auto", maxHeight: "680px" }}>
-              {loadingCourses ? (
-                <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-                  <CircularProgress size={28} sx={{ color: "#FF6B00" }} />
-                </Box>
-              ) : courses.length === 0 ? (
-                <Box sx={{ textAlign: "center", py: 6, color: "#94a3b8" }}>
-                  <SchoolIcon sx={{ fontSize: 40, opacity: 0.3, mb: 1 }} />
-                  <Typography variant="body2">등록된 교육과정이 없습니다.</Typography>
-                </Box>
-              ) : (
-                <Stack spacing={1}>
-                  {courses.map((course) => {
-                    const isSelected = selectedCourse?.id === course.id;
-                    return (
-                      <Box
-                        key={course.id}
-                        onClick={() => setSelectedCourse(course)}
-                        sx={{
-                          p: 1.8,
-                          borderRadius: "12px",
-                          cursor: "pointer",
-                          backgroundColor: isSelected ? "rgba(255, 107, 0, 0.08)" : "#fff",
-                          border: isSelected ? "2px solid #FF6B00" : "1px solid #f1f5f9",
-                          transition: "all 0.15s ease",
-                          "&:hover": {
-                            backgroundColor: isSelected
-                              ? "rgba(255, 107, 0, 0.12)"
-                              : "#f8fafc",
-                          },
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "flex-start",
-                          }}
-                        >
-                          <Box sx={{ pr: 1 }}>
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, mb: 0.5 }}>
-                              <Typography
-                                variant="subtitle2"
-                                sx={{
-                                  fontWeight: 800,
-                                  color: isSelected ? "#ea580c" : "#1e293b",
-                                  fontSize: "0.92rem",
-                                }}
-                              >
-                                {course.name}
-                              </Typography>
-                              {course.category && (
-                                <Chip
-                                  size="small"
-                                  label={course.category}
-                                  sx={{
-                                    height: 18,
-                                    fontSize: "0.65rem",
-                                    fontWeight: 700,
-                                    backgroundColor: "#f1f5f9",
-                                    color: "#64748b",
-                                  }}
-                                />
-                              )}
-                            </Box>
-                            <Typography
-                              variant="caption"
-                              sx={{ color: "#64748b", display: "block" }}
-                            >
-                              개설: <strong>{course.cohortCount || 0}개 기수</strong> · 수료:{" "}
-                              <strong>{course.completedCount || 0}명</strong>
-                            </Typography>
-                          </Box>
-
-                          <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <Tooltip title="과정 수정">
-                              <IconButton
-                                size="small"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleOpenCourseModal("edit", course);
-                                }}
-                              >
-                                <EditOutlinedIcon sx={{ fontSize: 16, color: "#94a3b8" }} />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title="과정 삭제">
-                              <IconButton
-                                size="small"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteCourse(course);
-                                }}
-                              >
-                                <DeleteOutlineIcon sx={{ fontSize: 16, color: "#ef4444" }} />
-                              </IconButton>
-                            </Tooltip>
-                          </Box>
-                        </Box>
-                      </Box>
-                    );
-                  })}
-                </Stack>
-              )}
-            </Box>
-          </Card>
-        </Grid>
-
-        {/* 2. 기수 (Cohorts) 컬럼 */}
-        <Grid size={{ xs: 12, md: 3 }}>
-          <Card
-            sx={{
-              borderRadius: "16px",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-              border: "1px solid rgba(0,0,0,0.06)",
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <Box
-              sx={{
-                p: 2.2,
-                borderBottom: "1px solid rgba(0,0,0,0.06)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                backgroundColor: "#fafafa",
-              }}
-            >
-              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: "#1e293b" }}>
-                🗓️ 개설 기수 목록
-              </Typography>
-              {selectedCourse && (
-                <Button
-                  variant="outlined"
+              <Tooltip title="과정 목록 펼치기">
+                <IconButton
                   size="small"
-                  startIcon={<AddIcon />}
-                  onClick={() => handleOpenCohortModal("create")}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsCourseCollapsed(false);
+                  }}
                   sx={{
-                    borderColor: "#ea580c",
-                    color: "#ea580c",
-                    "&:hover": { borderColor: "#c2410c", backgroundColor: "rgba(234, 88, 12, 0.05)" },
-                    borderRadius: "8px",
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    px: 1.5,
+                    backgroundColor: "#fff",
+                    border: "1px solid #e2e8f0",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+                    "&:hover": { backgroundColor: "#f8fafc" },
                   }}
                 >
-                  기수 개설
-                </Button>
-              )}
-            </Box>
-
-            <Box sx={{ p: 1.5, flexGrow: 1, overflowY: "auto", maxHeight: "680px" }}>
-              {!selectedCourse ? (
-                <Box sx={{ textAlign: "center", py: 6, color: "#94a3b8" }}>
-                  <Typography variant="body2">좌측에서 과정을 선택해 주세요.</Typography>
-                </Box>
-              ) : loadingCohorts ? (
-                <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-                  <CircularProgress size={28} sx={{ color: "#ea580c" }} />
-                </Box>
-              ) : cohorts.length === 0 ? (
-                <Box sx={{ textAlign: "center", py: 6, color: "#94a3b8" }}>
-                  <Typography variant="body2">
-                    개설된 기수가 없습니다.
-                    <br />
-                    상단의 <strong>[기수 개설]</strong> 버튼을 눌러주세요.
-                  </Typography>
-                </Box>
-              ) : (
-                <Stack spacing={1.2}>
-                  {cohorts.map((cohort) => {
-                    const isSelected = selectedCohort?.id === cohort.id;
-                    return (
-                      <Box
-                        key={cohort.id}
-                        onClick={() => setSelectedCohort(cohort)}
-                        sx={{
-                          p: 1.8,
-                          borderRadius: "12px",
-                          cursor: "pointer",
-                          backgroundColor: isSelected ? "rgba(37, 99, 235, 0.06)" : "#fff",
-                          border: isSelected ? "2px solid #2563eb" : "1px solid #f1f5f9",
-                          transition: "all 0.15s ease",
-                          "&:hover": {
-                            backgroundColor: isSelected
-                              ? "rgba(37, 99, 235, 0.1)"
-                              : "#f8fafc",
-                          },
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "flex-start",
-                            mb: 0.8,
-                          }}
-                        >
-                          <Typography
-                            variant="subtitle2"
-                            sx={{
-                              fontWeight: 800,
-                              color: isSelected ? "#1d4ed8" : "#1e293b",
-                              fontSize: "0.95rem",
-                            }}
-                          >
-                            {cohort.termName}
-                          </Typography>
-
-                          <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <Tooltip title="기수 수정">
-                              <IconButton
-                                size="small"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleOpenCohortModal("edit", cohort);
-                                }}
-                              >
-                                <EditOutlinedIcon sx={{ fontSize: 16, color: "#94a3b8" }} />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title="기수 삭제">
-                              <IconButton
-                                size="small"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteCohort(cohort);
-                                }}
-                              >
-                                <DeleteOutlineIcon sx={{ fontSize: 16, color: "#ef4444" }} />
-                              </IconButton>
-                            </Tooltip>
-                          </Box>
-                        </Box>
-
-                        <Typography variant="caption" sx={{ color: "#64748b", display: "block" }}>
-                          인도자: <strong>{cohort.instructor || "미지정"}</strong>
-                        </Typography>
-                        <Typography variant="caption" sx={{ color: "#64748b", display: "block" }}>
-                          수강: <strong>{cohort.totalEnrolled || 0}명</strong> (진행중{" "}
-                          {cohort.inProgressCount || 0} · 수료 {cohort.completedCount || 0})
-                        </Typography>
-                      </Box>
-                    );
-                  })}
-                </Stack>
-              )}
-            </Box>
-          </Card>
-        </Grid>
-
-        {/* 3. 수강생 명단 및 코스 전체 현황 (Column 3) */}
-        <Grid size={{ xs: 12, md: 6 }}>
-          <Card
-            sx={{
-              borderRadius: "16px",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-              border: "1px solid rgba(0,0,0,0.06)",
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            {/* 상단 탭 / 토글 바 */}
-            <Box
-              sx={{
-                p: 2,
-                borderBottom: "1px solid rgba(0,0,0,0.06)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                backgroundColor: "#fafafa",
-                flexWrap: "wrap",
-                gap: 1.5,
-              }}
-            >
-              {/* 뷰 모드 토글: 기수별 명단 vs 코스 전체 현황 */}
+                  <KeyboardDoubleArrowRightIcon sx={{ fontSize: 16, color: "#475569" }} />
+                </IconButton>
+              </Tooltip>
               <Box
                 sx={{
                   display: "flex",
-                  p: "3px",
-                  bgcolor: "#f1f5f9",
-                  borderRadius: "10px",
-                  gap: 0.5,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexGrow: 1,
+                  writingMode: "vertical-rl",
+                  textOrientation: "mixed",
+                  transform: "rotate(180deg)",
                 }}
               >
-                <Button
-                  size="small"
-                  onClick={() => setViewMode("cohort")}
+                <Typography
                   sx={{
-                    borderRadius: "8px",
-                    px: 1.6,
-                    py: 0.5,
-                    fontSize: "0.8rem",
                     fontWeight: 800,
-                    backgroundColor: viewMode === "cohort" ? "#fff" : "transparent",
-                    color: viewMode === "cohort" ? "#1e293b" : "#64748b",
-                    boxShadow: viewMode === "cohort" ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
-                    "&:hover": { backgroundColor: viewMode === "cohort" ? "#fff" : "rgba(255,255,255,0.6)" },
+                    fontSize: "0.82rem",
+                    color: "#334155",
+                    letterSpacing: "1px",
+                    whiteSpace: "nowrap",
                   }}
                 >
-                  기수별 수강생 {selectedCohort ? `(${selectedCohort.termName})` : ""}
-                </Button>
-                <Button
-                  size="small"
-                  onClick={() => setViewMode("course_all")}
-                  sx={{
-                    borderRadius: "8px",
-                    px: 1.6,
-                    py: 0.5,
-                    fontSize: "0.8rem",
-                    fontWeight: 800,
-                    backgroundColor: viewMode === "course_all" ? "#fff" : "transparent",
-                    color: viewMode === "course_all" ? "#ea580c" : "#64748b",
-                    boxShadow: viewMode === "course_all" ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
-                    "&:hover": { backgroundColor: viewMode === "course_all" ? "#fff" : "rgba(255,255,255,0.6)" },
-                  }}
-                >
-                  코스 전체 교인 현황
-                </Button>
+                  📖 {selectedCourse ? selectedCourse.name : "교육·양육 과정"}
+                </Typography>
               </Box>
+            </Box>
 
-              {/* 기수별 뷰 액션 버튼 */}
-              {viewMode === "cohort" && selectedCohort && (
-                <Stack direction="row" spacing={1}>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    startIcon={<DoneAllIcon />}
-                    onClick={handleCompleteAll}
-                    disabled={cohortMembers.length === 0 || cohortMembers.every((m) => m.status === "COMPLETED")}
-                    sx={{
-                      borderRadius: "8px",
-                      fontSize: "0.75rem",
-                      fontWeight: 700,
-                      borderColor: "#16a34a",
-                      color: "#16a34a",
-                      "&:hover": { borderColor: "#15803d", backgroundColor: "rgba(22, 163, 74, 0.05)" },
-                    }}
-                  >
-                    전원 일괄수료
-                  </Button>
+            {/* Mobile horizontal layout */}
+            <Box
+              sx={{
+                display: { xs: "flex", md: "none" },
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <Typography variant="body2" sx={{ fontWeight: 800, color: "#334155" }}>
+                📖 {selectedCourse ? selectedCourse.name : "교육·양육 과정"} (터치하여 펼치기)
+              </Typography>
+              <KeyboardDoubleArrowDownIcon sx={{ fontSize: 18, color: "#64748b" }} />
+            </Box>
+          </Card>
+        ) : (
+          <Box
+            sx={{
+              width: {
+                xs: "100%",
+                md: isMemberCollapsed ? "auto" : isCohortCollapsed ? "340px" : "300px",
+              },
+              flex: {
+                xs: "1 1 auto",
+                md: isMemberCollapsed ? 1 : "none",
+              },
+              flexShrink: 0,
+              transition: "all 0.2s ease",
+            }}
+          >
+            <Card
+              sx={{
+                borderRadius: "16px",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+                border: "1px solid rgba(0,0,0,0.06)",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <Box
+                sx={{
+                  p: 2,
+                  borderBottom: "1px solid rgba(0,0,0,0.06)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  backgroundColor: "#fafafa",
+                }}
+              >
+                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: "#1e293b", fontSize: "0.95rem" }}>
+                  📖 교육·양육 과정
+                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
                   <Button
                     variant="contained"
                     size="small"
-                    startIcon={<GroupAddIcon />}
-                    onClick={() => handleOpenEnrollModal()}
+                    startIcon={<AddIcon />}
+                    onClick={() => handleOpenCourseModal("create")}
                     sx={{
                       backgroundColor: "#FF6B00",
                       "&:hover": { backgroundColor: "#ea580c" },
                       borderRadius: "8px",
-                      fontSize: "0.75rem",
+                      fontSize: "0.72rem",
                       fontWeight: 700,
                       boxShadow: "none",
+                      px: 1.2,
+                      py: 0.4,
                     }}
                   >
-                    수강생 추가
+                    새 과정
                   </Button>
-                </Stack>
-              )}
-
-              {/* 코스 전체 뷰 액션 */}
-              {viewMode === "course_all" && (
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <Typography variant="caption" sx={{ color: "#64748b", fontWeight: 600 }}>
-                    총 교인 {courseOverviewStats.total}명
-                  </Typography>
-                  <Tooltip title="새로고침">
+                  <Tooltip title="과정 패널 접기">
                     <IconButton
                       size="small"
-                      onClick={() => selectedCourse?.id && fetchCourseAllMembersList(selectedCourse.id)}
-                      disabled={loadingAllMembers}
+                      onClick={() => setIsCourseCollapsed(true)}
+                      sx={{
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "8px",
+                        p: 0.5,
+                        "&:hover": { backgroundColor: "#f1f5f9" },
+                      }}
                     >
-                      <RefreshIcon sx={{ fontSize: 18, color: "#64748b" }} />
+                      <KeyboardDoubleArrowLeftIcon sx={{ fontSize: 16, color: "#64748b" }} />
                     </IconButton>
                   </Tooltip>
-                </Stack>
-              )}
+                </Box>
+              </Box>
+
+              <Box sx={{ p: 1.5, flexGrow: 1, overflowY: "auto", maxHeight: "680px" }}>
+                {loadingCourses ? (
+                  <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+                    <CircularProgress size={28} sx={{ color: "#FF6B00" }} />
+                  </Box>
+                ) : courses.length === 0 ? (
+                  <Box sx={{ textAlign: "center", py: 6, color: "#94a3b8" }}>
+                    <SchoolIcon sx={{ fontSize: 40, opacity: 0.3, mb: 1 }} />
+                    <Typography variant="body2">등록된 교육과정이 없습니다.</Typography>
+                  </Box>
+                ) : (
+                  <Stack spacing={1}>
+                    {courses.map((course) => {
+                      const isSelected = selectedCourse?.id === course.id;
+                      return (
+                        <Box
+                          key={course.id}
+                          onClick={() => setSelectedCourse(course)}
+                          sx={{
+                            p: 1.8,
+                            borderRadius: "12px",
+                            cursor: "pointer",
+                            backgroundColor: isSelected ? "rgba(255, 107, 0, 0.08)" : "#fff",
+                            border: isSelected ? "2px solid #FF6B00" : "1px solid #f1f5f9",
+                            transition: "all 0.15s ease",
+                            "&:hover": {
+                              backgroundColor: isSelected
+                                ? "rgba(255, 107, 0, 0.12)"
+                                : "#f8fafc",
+                            },
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "flex-start",
+                            }}
+                          >
+                            <Box sx={{ pr: 1 }}>
+                              <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, mb: 0.5 }}>
+                                <Typography
+                                  variant="subtitle2"
+                                  sx={{
+                                    fontWeight: 800,
+                                    color: isSelected ? "#ea580c" : "#1e293b",
+                                    fontSize: "0.92rem",
+                                  }}
+                                >
+                                  {course.name}
+                                </Typography>
+                                {course.category && (
+                                  <Chip
+                                    size="small"
+                                    label={course.category}
+                                    sx={{
+                                      height: 18,
+                                      fontSize: "0.65rem",
+                                      fontWeight: 700,
+                                      backgroundColor: "#f1f5f9",
+                                      color: "#64748b",
+                                    }}
+                                  />
+                                )}
+                              </Box>
+                              <Typography
+                                variant="caption"
+                                sx={{ color: "#64748b", display: "block" }}
+                              >
+                                개설: <strong>{course.cohortCount || 0}개 기수</strong> · 수료:{" "}
+                                <strong>{course.completedCount || 0}명</strong>
+                              </Typography>
+                            </Box>
+
+                            <Box sx={{ display: "flex", alignItems: "center" }}>
+                              <Tooltip title="과정 수정">
+                                <IconButton
+                                  size="small"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOpenCourseModal("edit", course);
+                                  }}
+                                >
+                                  <EditOutlinedIcon sx={{ fontSize: 16, color: "#94a3b8" }} />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="과정 삭제">
+                                <IconButton
+                                  size="small"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteCourse(course);
+                                  }}
+                                >
+                                  <DeleteOutlineIcon sx={{ fontSize: 16, color: "#ef4444" }} />
+                                </IconButton>
+                              </Tooltip>
+                            </Box>
+                          </Box>
+                        </Box>
+                      );
+                    })}
+                  </Stack>
+                )}
+              </Box>
+            </Card>
+          </Box>
+        )}
+
+        {/* 2. 기수 (Cohorts) 컬럼 */}
+        {isCohortCollapsed ? (
+          <Card
+            sx={{
+              borderRadius: "16px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+              border: "1px solid rgba(0,0,0,0.06)",
+              minHeight: { xs: "auto", md: "520px" },
+              width: { xs: "100%", md: "52px" },
+              flexShrink: 0,
+              display: "flex",
+              flexDirection: { xs: "row", md: "column" },
+              alignItems: "center",
+              justifyContent: { xs: "space-between", md: "flex-start" },
+              py: { xs: 1.2, md: 2 },
+              px: { xs: 2, md: 0 },
+              backgroundColor: "#f8fafc",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              "&:hover": {
+                backgroundColor: "#f1f5f9",
+                borderColor: "#cbd5e1",
+              },
+            }}
+            onClick={() => setIsCohortCollapsed(false)}
+          >
+            {/* Desktop vertical layout */}
+            <Box
+              sx={{
+                display: { xs: "none", md: "flex" },
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 1.5,
+                height: "100%",
+                width: "100%",
+              }}
+            >
+              <Tooltip title="기수 목록 펼치기">
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsCohortCollapsed(false);
+                  }}
+                  sx={{
+                    backgroundColor: "#fff",
+                    border: "1px solid #e2e8f0",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+                    "&:hover": { backgroundColor: "#f8fafc" },
+                  }}
+                >
+                  <KeyboardDoubleArrowRightIcon sx={{ fontSize: 16, color: "#475569" }} />
+                </IconButton>
+              </Tooltip>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexGrow: 1,
+                  writingMode: "vertical-rl",
+                  textOrientation: "mixed",
+                  transform: "rotate(180deg)",
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontWeight: 800,
+                    fontSize: "0.82rem",
+                    color: "#334155",
+                    letterSpacing: "1px",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  🗓️ {selectedCohort ? selectedCohort.termName : "개설 기수 목록"}
+                </Typography>
+              </Box>
             </Box>
+
+            {/* Mobile horizontal layout */}
+            <Box
+              sx={{
+                display: { xs: "flex", md: "none" },
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <Typography variant="body2" sx={{ fontWeight: 800, color: "#334155" }}>
+                🗓️ {selectedCohort ? selectedCohort.termName : "개설 기수 목록"} (터치하여 펼치기)
+              </Typography>
+              <KeyboardDoubleArrowDownIcon sx={{ fontSize: 18, color: "#64748b" }} />
+            </Box>
+          </Card>
+        ) : (
+          <Box
+            sx={{
+              width: {
+                xs: "100%",
+                md: isMemberCollapsed ? "auto" : isCourseCollapsed ? "340px" : "300px",
+              },
+              flex: {
+                xs: "1 1 auto",
+                md: isMemberCollapsed ? 1 : "none",
+              },
+              flexShrink: 0,
+              transition: "all 0.2s ease",
+            }}
+          >
+            <Card
+              sx={{
+                borderRadius: "16px",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+                border: "1px solid rgba(0,0,0,0.06)",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <Box
+                sx={{
+                  p: 2,
+                  borderBottom: "1px solid rgba(0,0,0,0.06)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  backgroundColor: "#fafafa",
+                }}
+              >
+                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: "#1e293b", fontSize: "0.95rem" }}>
+                  🗓️ 개설 기수 목록
+                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
+                  {selectedCourse && (
+                    <Button
+                      variant="contained"
+                      size="small"
+                      startIcon={<AddIcon />}
+                      onClick={() => handleOpenCohortModal("create")}
+                      sx={{
+                        backgroundColor: "#FF6B00",
+                        "&:hover": { backgroundColor: "#ea580c" },
+                        borderRadius: "8px",
+                        fontSize: "0.72rem",
+                        fontWeight: 700,
+                        boxShadow: "none",
+                        px: 1.2,
+                        py: 0.4,
+                      }}
+                    >
+                      기수 개설
+                    </Button>
+                  )}
+                  <Tooltip title="기수 패널 접기">
+                    <IconButton
+                      size="small"
+                      onClick={() => setIsCohortCollapsed(true)}
+                      sx={{
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "8px",
+                        p: 0.5,
+                        "&:hover": { backgroundColor: "#f1f5f9" },
+                      }}
+                    >
+                      <KeyboardDoubleArrowLeftIcon sx={{ fontSize: 16, color: "#64748b" }} />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </Box>
+
+              <Box sx={{ p: 1.5, flexGrow: 1, overflowY: "auto", maxHeight: "680px" }}>
+                {!selectedCourse ? (
+                  <Box sx={{ textAlign: "center", py: 6, color: "#94a3b8" }}>
+                    <Typography variant="body2">좌측에서 과정을 선택해 주세요.</Typography>
+                  </Box>
+                ) : loadingCohorts ? (
+                  <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+                    <CircularProgress size={28} sx={{ color: "#ea580c" }} />
+                  </Box>
+                ) : cohorts.length === 0 ? (
+                  <Box sx={{ textAlign: "center", py: 6, color: "#94a3b8" }}>
+                    <Typography variant="body2">
+                      개설된 기수가 없습니다.
+                      <br />
+                      상단의 <strong>[기수 개설]</strong> 버튼을 눌러주세요.
+                    </Typography>
+                  </Box>
+                ) : (
+                  <Stack spacing={1.2}>
+                    {cohorts.map((cohort) => {
+                      const isSelected = selectedCohort?.id === cohort.id;
+                      return (
+                        <Box
+                          key={cohort.id}
+                          onClick={() => setSelectedCohort(cohort)}
+                          sx={{
+                            p: 1.8,
+                            borderRadius: "12px",
+                            cursor: "pointer",
+                            backgroundColor: isSelected ? "rgba(37, 99, 235, 0.06)" : "#fff",
+                            border: isSelected ? "2px solid #2563eb" : "1px solid #f1f5f9",
+                            transition: "all 0.15s ease",
+                            "&:hover": {
+                              backgroundColor: isSelected
+                                ? "rgba(37, 99, 235, 0.1)"
+                                : "#f8fafc",
+                            },
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "flex-start",
+                              mb: 0.8,
+                            }}
+                          >
+                            <Typography
+                              variant="subtitle2"
+                              sx={{
+                                fontWeight: 800,
+                                color: isSelected ? "#1d4ed8" : "#1e293b",
+                                fontSize: "0.95rem",
+                              }}
+                            >
+                              {cohort.termName}
+                            </Typography>
+
+                            <Box sx={{ display: "flex", alignItems: "center" }}>
+                              <Tooltip title="기수 수정">
+                                <IconButton
+                                  size="small"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOpenCohortModal("edit", cohort);
+                                  }}
+                                >
+                                  <EditOutlinedIcon sx={{ fontSize: 16, color: "#94a3b8" }} />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="기수 삭제">
+                                <IconButton
+                                  size="small"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteCohort(cohort);
+                                  }}
+                                >
+                                  <DeleteOutlineIcon sx={{ fontSize: 16, color: "#ef4444" }} />
+                                </IconButton>
+                              </Tooltip>
+                            </Box>
+                          </Box>
+
+                          <Typography variant="caption" sx={{ color: "#64748b", display: "block" }}>
+                            인도자: <strong>{cohort.instructor || "미지정"}</strong>
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: "#64748b", display: "block" }}>
+                            수강: <strong>{cohort.totalEnrolled || 0}명</strong> (진행중{" "}
+                            {cohort.inProgressCount || 0} · 수료 {cohort.completedCount || 0})
+                          </Typography>
+                        </Box>
+                      );
+                    })}
+                  </Stack>
+                )}
+              </Box>
+            </Card>
+          </Box>
+        )}
+
+        {/* 3. 수강생 명단 및 코스 전체 현황 (Column 3) */}
+        {isMemberCollapsed ? (
+          <Card
+            sx={{
+              borderRadius: "16px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+              border: "1px solid rgba(0,0,0,0.06)",
+              minHeight: { xs: "auto", md: "520px" },
+              width: { xs: "100%", md: "52px" },
+              flexShrink: 0,
+              display: "flex",
+              flexDirection: { xs: "row", md: "column" },
+              alignItems: "center",
+              justifyContent: { xs: "space-between", md: "flex-start" },
+              py: { xs: 1.2, md: 2 },
+              px: { xs: 2, md: 0 },
+              backgroundColor: "#f8fafc",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              "&:hover": {
+                backgroundColor: "#f1f5f9",
+                borderColor: "#cbd5e1",
+              },
+            }}
+            onClick={() => setIsMemberCollapsed(false)}
+          >
+            {/* Desktop vertical layout */}
+            <Box
+              sx={{
+                display: { xs: "none", md: "flex" },
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 1.5,
+                height: "100%",
+                width: "100%",
+              }}
+            >
+              <Tooltip title="명단 패널 펼치기">
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsMemberCollapsed(false);
+                  }}
+                  sx={{
+                    backgroundColor: "#fff",
+                    border: "1px solid #e2e8f0",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+                    "&:hover": { backgroundColor: "#f8fafc" },
+                  }}
+                >
+                  <KeyboardDoubleArrowLeftIcon sx={{ fontSize: 16, color: "#475569" }} />
+                </IconButton>
+              </Tooltip>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexGrow: 1,
+                  writingMode: "vertical-rl",
+                  textOrientation: "mixed",
+                  transform: "rotate(180deg)",
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontWeight: 800,
+                    fontSize: "0.82rem",
+                    color: "#334155",
+                    letterSpacing: "1px",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  👥 수강생 명단 및 코스전체 현황
+                </Typography>
+              </Box>
+            </Box>
+
+            {/* Mobile horizontal layout */}
+            <Box
+              sx={{
+                display: { xs: "flex", md: "none" },
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <Typography variant="body2" sx={{ fontWeight: 800, color: "#334155" }}>
+                👥 수강생 명단 및 코스전체 현황 (터치하여 펼치기)
+              </Typography>
+              <KeyboardDoubleArrowDownIcon sx={{ fontSize: 18, color: "#64748b" }} />
+            </Box>
+          </Card>
+        ) : (
+          <Box
+            sx={{
+              flex: "1 1 0",
+              minWidth: 0,
+              width: "100%",
+              transition: "all 0.2s ease",
+            }}
+          >
+            <Card
+              sx={{
+                borderRadius: "16px",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+                border: "1px solid rgba(0,0,0,0.06)",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              {/* 상단 탭 / 토글 바 */}
+              <Box
+                sx={{
+                  p: 2,
+                  borderBottom: "1px solid rgba(0,0,0,0.06)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  backgroundColor: "#fafafa",
+                  flexWrap: "wrap",
+                  gap: 1.5,
+                }}
+              >
+                {/* 뷰 모드 토글: 기수별 명단 vs 코스 전체 현황 & 좌측 패널 접힘 시 상태 칩 */}
+                <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      p: "3px",
+                      bgcolor: "#f1f5f9",
+                      borderRadius: "10px",
+                      gap: 0.5,
+                    }}
+                  >
+                    <Button
+                      size="small"
+                      onClick={() => setViewMode("cohort")}
+                      sx={{
+                        borderRadius: "8px",
+                        px: 1.6,
+                        py: 0.5,
+                        fontSize: "0.8rem",
+                        fontWeight: 800,
+                        backgroundColor: viewMode === "cohort" ? "#fff" : "transparent",
+                        color: viewMode === "cohort" ? "#1e293b" : "#64748b",
+                        boxShadow: viewMode === "cohort" ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
+                        "&:hover": { backgroundColor: viewMode === "cohort" ? "#fff" : "rgba(255,255,255,0.6)" },
+                      }}
+                    >
+                      기수별 수강생 {selectedCohort ? `(${selectedCohort.termName})` : ""}
+                    </Button>
+                    <Button
+                      size="small"
+                      onClick={() => setViewMode("course_all")}
+                      sx={{
+                        borderRadius: "8px",
+                        px: 1.6,
+                        py: 0.5,
+                        fontSize: "0.8rem",
+                        fontWeight: 800,
+                        backgroundColor: viewMode === "course_all" ? "#fff" : "transparent",
+                        color: viewMode === "course_all" ? "#ea580c" : "#64748b",
+                        boxShadow: viewMode === "course_all" ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
+                        "&:hover": { backgroundColor: viewMode === "course_all" ? "#fff" : "rgba(255,255,255,0.6)" },
+                      }}
+                    >
+                      코스 전체 교인 현황
+                    </Button>
+                  </Box>
+
+                  {/* 좌측 패널이 접혀 있을 때 현재 과정/기수 컨텍스트 뱃지 */}
+                  {(isCourseCollapsed || isCohortCollapsed) && selectedCourse && (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
+                      {isCourseCollapsed && (
+                        <Tooltip title="클릭하여 과정 패널 펼치기">
+                          <Chip
+                            size="small"
+                            label={`과정: ${selectedCourse.name}`}
+                            onClick={() => setIsCourseCollapsed(false)}
+                            onDelete={() => setIsCourseCollapsed(false)}
+                            deleteIcon={<KeyboardDoubleArrowRightIcon sx={{ fontSize: "14px !important" }} />}
+                            sx={{
+                              backgroundColor: "rgba(255, 107, 0, 0.08)",
+                              color: "#ea580c",
+                              fontWeight: 700,
+                              fontSize: "0.74rem",
+                              cursor: "pointer",
+                              "& .MuiChip-deleteIcon": { color: "#ea580c" },
+                            }}
+                          />
+                        </Tooltip>
+                      )}
+                      {isCohortCollapsed && selectedCohort && (
+                        <Tooltip title="클릭하여 기수 패널 펼치기">
+                          <Chip
+                            size="small"
+                            label={`기수: ${selectedCohort.termName}`}
+                            onClick={() => setIsCohortCollapsed(false)}
+                            onDelete={() => setIsCohortCollapsed(false)}
+                            deleteIcon={<KeyboardDoubleArrowRightIcon sx={{ fontSize: "14px !important" }} />}
+                            sx={{
+                              backgroundColor: "rgba(37, 99, 235, 0.08)",
+                              color: "#2563eb",
+                              fontWeight: 700,
+                              fontSize: "0.74rem",
+                              cursor: "pointer",
+                              "& .MuiChip-deleteIcon": { color: "#2563eb" },
+                            }}
+                          />
+                        </Tooltip>
+                      )}
+                    </Box>
+                  )}
+                </Box>
+
+                {/* 우측: 액션 버튼 + 최대화/복원 버튼 + 명단 접기 버튼 */}
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  {/* 기수별 뷰 액션 버튼 */}
+                  {viewMode === "cohort" && selectedCohort && (
+                    <Stack direction="row" spacing={1}>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<DoneAllIcon />}
+                        onClick={handleCompleteAll}
+                        disabled={cohortMembers.length === 0 || cohortMembers.every((m) => m.status === "COMPLETED")}
+                        sx={{
+                          borderRadius: "8px",
+                          fontSize: "0.75rem",
+                          fontWeight: 700,
+                          borderColor: "#16a34a",
+                          color: "#16a34a",
+                          "&:hover": { borderColor: "#15803d", backgroundColor: "rgba(22, 163, 74, 0.05)" },
+                        }}
+                      >
+                        전원 일괄수료
+                      </Button>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        startIcon={<GroupAddIcon />}
+                        onClick={() => handleOpenEnrollModal()}
+                        sx={{
+                          backgroundColor: "#FF6B00",
+                          "&:hover": { backgroundColor: "#ea580c" },
+                          borderRadius: "8px",
+                          fontSize: "0.75rem",
+                          fontWeight: 700,
+                          boxShadow: "none",
+                        }}
+                      >
+                        수강생 추가
+                      </Button>
+                    </Stack>
+                  )}
+
+                  {/* 코스 전체 뷰 액션 */}
+                  {viewMode === "course_all" && (
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <Typography variant="caption" sx={{ color: "#64748b", fontWeight: 600 }}>
+                        총 교인 {courseOverviewStats.total}명
+                      </Typography>
+                      <Tooltip title="새로고침">
+                        <IconButton
+                          size="small"
+                          onClick={() => selectedCourse?.id && fetchCourseAllMembersList(selectedCourse.id)}
+                          disabled={loadingAllMembers}
+                        >
+                          <RefreshIcon sx={{ fontSize: 18, color: "#64748b" }} />
+                        </IconButton>
+                      </Tooltip>
+                    </Stack>
+                  )}
+
+                  <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 20, my: "auto" }} />
+
+                  {/* 명단 화면 최대화 / 원래대로 버튼 */}
+                  <Tooltip title={isMaximized ? "좌측 패널 복원 (원래 크기로)" : "명단 화면 최대화 (좌측 패널 일괄 접기)"}>
+                    <Button
+                      size="small"
+                      variant={isMaximized ? "contained" : "outlined"}
+                      startIcon={isMaximized ? <FullscreenExitIcon /> : <FullscreenIcon />}
+                      onClick={toggleMaximize}
+                      sx={{
+                        borderRadius: "8px",
+                        fontSize: "0.75rem",
+                        fontWeight: 700,
+                        height: 32,
+                        px: 1.2,
+                        whiteSpace: "nowrap",
+                        ...(isMaximized
+                          ? {
+                              backgroundColor: "#1e293b",
+                              color: "#fff",
+                              "&:hover": { backgroundColor: "#0f172a" },
+                            }
+                          : {
+                              borderColor: "#cbd5e1",
+                              color: "#475569",
+                              "&:hover": { borderColor: "#94a3b8", backgroundColor: "#f8fafc" },
+                            }),
+                      }}
+                    >
+                      {isMaximized ? "원래 크기로" : "화면 최대화"}
+                    </Button>
+                  </Tooltip>
+
+                  {/* 명단 패널 접기 버튼 */}
+                  <Tooltip title="명단 패널 접기">
+                    <IconButton
+                      size="small"
+                      onClick={handleCollapseMember}
+                      sx={{
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "8px",
+                        p: 0.6,
+                        "&:hover": { backgroundColor: "#f1f5f9" },
+                      }}
+                    >
+                      <KeyboardDoubleArrowRightIcon sx={{ fontSize: 16, color: "#64748b" }} />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </Box>
 
             {/* 본문 영역 */}
             <Box sx={{ p: 2, flexGrow: 1, overflowY: "auto", maxHeight: "680px" }}>
@@ -1514,8 +2002,9 @@ const CourseManagementDashboard = ({ users = [] }) => {
               )}
             </Box>
           </Card>
-        </Grid>
-      </Grid>
+        </Box>
+        )}
+      </Box>
 
       {/* ================= MODAL: 과정 등록/수정 ================= */}
       <Dialog
