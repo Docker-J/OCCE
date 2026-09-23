@@ -6,6 +6,13 @@ import {
 } from "../middleware/validator.js";
 import {
   listUsersController,
+  createMemberController,
+  updateMemberController,
+  updateMemberStatusController,
+  deleteMemberController,
+  importRosterFromDriveController,
+  listGardensController,
+  listHouseholdsController,
   updateUserRoleController,
   updateUserStatusController,
   deleteUserController,
@@ -20,9 +27,32 @@ const router = new Hono();
 // All admin routes strictly require Staff authorization
 router.use("*", authStaff);
 
-// User membership management
+// User and Church Member management
 router.get("/users", listUsersController);
+router.post("/members", validateJson(["name"]), createMemberController);
+router.put(
+  "/members/:id",
+  validateParam({ id: { required: true } }),
+  updateMemberController
+);
+router.patch(
+  "/members/:id/status",
+  validateParam({ id: { required: true } }),
+  validateJson(["status"]),
+  updateMemberStatusController
+);
+router.delete(
+  "/members/:id",
+  validateParam({ id: { required: true } }),
+  deleteMemberController
+);
+router.post("/members/import-drive", importRosterFromDriveController);
 
+// Master data lookups
+router.get("/gardens", listGardensController);
+router.get("/households", listHouseholdsController);
+
+// Legacy Cognito User operations
 router.post(
   "/users/:username/role",
   validateParam({ username: { required: true } }),

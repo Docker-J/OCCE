@@ -35,14 +35,14 @@ const SignUpModal = ({ isOpen, onClose }) => {
   const handleSignUp = async (data) => {
     try {
       await signUp(data.name, data.phone, data.password);
-      successSignUp(data.phone);
+      successSignUp(data.phone, data.name);
     } catch (err) {
       failSignUp(err.message);
     }
   };
 
-  const successSignUp = (phoneValue) => {
-    openModal(SignUpConfirmModal, { phone: phoneValue });
+  const successSignUp = (phoneValue, nameValue) => {
+    openModal(SignUpConfirmModal, { phone: phoneValue, name: nameValue });
     handleClose();
   };
 

@@ -8,7 +8,7 @@ import VerificationInput from "react-verification-input";
 import SignUpFinishedModal from "./SignUpFinishedModal";
 import CustomModal from "../../common/CustomModal";
 
-const SignUpConfirmModal = ({ phone, isOpen, onClose }) => {
+const SignUpConfirmModal = ({ phone, name, isOpen, onClose }) => {
   const { openModal } = useModals();
   const { openSnackbar } = useSnackbar();
 
@@ -33,7 +33,7 @@ const SignUpConfirmModal = ({ phone, isOpen, onClose }) => {
 
   const onSubmit = async () => {
     try {
-      await confirmSignUp(phone, confirmCode);
+      await confirmSignUp(phone, confirmCode, name);
       confirmSuccess();
     } catch (err) {
       confirmFail(err.message);

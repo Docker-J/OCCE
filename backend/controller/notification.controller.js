@@ -1,10 +1,6 @@
-import { getDocClient } from "../api/dynamodb.js";
-import { PutCommand, DeleteCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { getUserVerifier } from "../middleware/auth.js";
 import sendNotification from "../api/sendNotification.js";
 import sendBroadcastSms from "../api/sendSms.js";
-
-const TABLENAME = "FCMToken";
 
 function getExpirationEpoch() {
   const now = new Date();
@@ -15,48 +11,46 @@ function getExpirationEpoch() {
 export const registerController = async (c) => {
   try {
     const body = await c.req.json();
-    const docClient = getDocClient(c.env);
-    let roles = [];
-    let sub = null;
+    const env = c.env;
+    let memberId = null;
+
+    if (!body?.token) {
+      return c.json({ error: "BadRequest", message: "Token is required." }, 400);
+    }
 
     // Check if an authenticated user session exists
     const authHeader = c.req.header("Authorization");
     if (authHeader && authHeader.startsWith("Bearer ")) {
       try {
         const token = authHeader.split(" ")[1];
-        const verifier = getUserVerifier(c.env);
+        const verifier = getUserVerifier(env);
         const payload = await verifier.verify(token);
 
         if (payload?.sub) {
-          sub = payload.sub;
-        }
-
-        // Only assign roles if explicitly requested for a trusted personal device (isRemembered === true)
-        if (body.isRemembered) {
-          const groups = payload["cognito:groups"] || [];
-          // Filter only valid system roles
-          roles = groups.filter((g) => ["GardenKeeper", "Staff"].includes(g));
+          const member = await env.DB.prepare(
+            "SELECT id FROM church_members WHERE cognito_sub = ? LIMIT 1"
+          ).bind(payload.sub).first();
+          if (member) {
+            memberId = member.id;
+          }
         }
       } catch (authErr) {
         console.warn("FCM register auth token verification skipped:", authErr.message);
       }
     }
 
-    const item = {
-      token: body.token,
-      roles: roles,
-      expiresAt: getExpirationEpoch(),
-    };
-    if (sub) {
-      item.sub = sub;
-    }
+    const expiresAt = getExpirationEpoch();
+    const deviceInfo = body.deviceInfo || null;
 
-    const command = new PutCommand({
-      TableName: TABLENAME,
-      Item: item,
-    });
+    await env.DB.prepare(`
+      INSERT INTO fcm_tokens (token, member_id, device_info, expires_at)
+      VALUES (?, ?, ?, ?)
+      ON CONFLICT(token) DO UPDATE SET
+        member_id = excluded.member_id,
+        device_info = excluded.device_info,
+        expires_at = excluded.expires_at
+    `).bind(body.token, memberId, deviceInfo, expiresAt).run();
 
-    await docClient.send(command);
     return c.json({ success: true }, 200);
   } catch (err) {
     console.error("Register notification token error:", err);
@@ -70,24 +64,12 @@ export const unlinkRoleController = async (c) => {
     if (!body?.token) {
       return c.json({ error: "BadRequest", message: "Token is required." }, 400);
     }
-    const docClient = getDocClient(c.env);
+    const env = c.env;
 
-    const command = new UpdateCommand({
-      TableName: TABLENAME,
-      Key: {
-        token: body.token,
-      },
-      UpdateExpression: "SET #roles = :emptyRoles REMOVE #sub",
-      ExpressionAttributeNames: {
-        "#roles": "roles",
-        "#sub": "sub",
-      },
-      ExpressionAttributeValues: {
-        ":emptyRoles": [],
-      },
-    });
+    await env.DB.prepare(
+      "UPDATE fcm_tokens SET member_id = NULL WHERE token = ?"
+    ).bind(body.token).run();
 
-    await docClient.send(command);
     return c.json({ success: true }, 200);
   } catch (err) {
     console.error("Unlink notification token role error:", err);
@@ -98,16 +80,15 @@ export const unlinkRoleController = async (c) => {
 export const unregisterController = async (c) => {
   try {
     const body = await c.req.json();
-    const docClient = getDocClient(c.env);
+    if (!body?.token) {
+      return c.json({ error: "BadRequest", message: "Token is required." }, 400);
+    }
+    const env = c.env;
 
-    const command = new DeleteCommand({
-      TableName: TABLENAME,
-      Key: {
-        token: body.token,
-      },
-    });
+    await env.DB.prepare(
+      "DELETE FROM fcm_tokens WHERE token = ?"
+    ).bind(body.token).run();
 
-    await docClient.send(command);
     return c.json({ success: true }, 200);
   } catch (err) {
     console.error("Unregister notification token error:", err);

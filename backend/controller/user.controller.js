@@ -10,8 +10,6 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import { getCognitoClient } from "../api/cognito.js";
 import { getCookie, setCookie, deleteCookie } from "hono/cookie";
-import { getDriveClient } from "../api/googleClients.js";
-import * as XLSX from "xlsx";
 
 const getRefreshTokenCookieOptions = (remember = false) => {
   const options = {
@@ -113,6 +111,57 @@ export const signInController = async (c) => {
       }
     }
 
+    // Link cognito_sub and ensure is_registered = 1 in D1
+    if (payload?.sub && phone) {
+      try {
+        const rawPhone = phone.replace(/\D/g, "");
+        const clean10 = rawPhone.length === 11 && rawPhone.startsWith("1") ? rawPhone.slice(1) : rawPhone;
+        const clean11 = "1" + clean10;
+
+        let memberName = "";
+        if (idToken) {
+          try {
+            const idPayload = JSON.parse(
+              Buffer.from(idToken.split(".")[1], "base64").toString("utf-8")
+            );
+            memberName = (idPayload.name || "").trim();
+          } catch (e) {
+            console.warn("Could not parse idToken payload for name:", e);
+          }
+        }
+
+        if (memberName) {
+          c.executionCtx?.waitUntil?.(
+            env.DB.prepare(
+              `UPDATE church_members 
+               SET is_registered = 1, cognito_sub = ? 
+               WHERE name = ? AND (phone_clean = ? OR phone_clean = ?) AND status != 'REMOVED'`
+            ).bind(payload.sub, memberName, clean10, clean11).run()
+          );
+        } else {
+          // If name claim is absent, only update if phone uniquely belongs to a single member
+          c.executionCtx?.waitUntil?.(
+            (async () => {
+              const matchedMembers = await env.DB.prepare(
+                `SELECT id FROM church_members 
+                 WHERE (phone_clean = ? OR phone_clean = ?) AND status != 'REMOVED'`
+              ).bind(clean10, clean11).all();
+
+              if (matchedMembers?.results?.length === 1) {
+                await env.DB.prepare(
+                  `UPDATE church_members 
+                   SET is_registered = 1, cognito_sub = ? 
+                   WHERE id = ?`
+                ).bind(payload.sub, matchedMembers.results[0].id).run();
+              }
+            })()
+          );
+        }
+      } catch (linkErr) {
+        console.warn("Could not link member cognito_sub in D1:", linkErr.message);
+      }
+    }
+
     return c.json({
       accessToken: accessToken,
       idToken: idToken,
@@ -205,74 +254,27 @@ export const refreshSignInController = async (c) => {
   }
 };
 
-let sheetCache = {
-  rows: null,
-  lastFetch: 0,
-};
-const CACHE_TTL = 3600 * 1000; // 1 hour
+export const verifyMemberInD1 = async (env, name, phone) => {
+  const rawDigits = (phone || "").replace(/\D/g, "");
+  const clean10 = rawDigits.length === 11 && rawDigits.startsWith("1") ? rawDigits.slice(1) : rawDigits;
+  const clean11 = "1" + clean10;
+  const trimmedName = (name || "").trim();
 
-const checkUserInSheet = async (env, name, phone) => {
-  let rows;
-  const now = Date.now();
+  if (!trimmedName || !clean10) return null;
 
-  if (sheetCache.rows && now - sheetCache.lastFetch < CACHE_TTL) {
-    rows = sheetCache.rows;
-  } else {
-    try {
-      const drive = getDriveClient(env, [
-        "https://www.googleapis.com/auth/drive.readonly",
-      ]);
-      const fileId = "1Uk154FmBfVHIcv8xU5V_CuTBte4QXn6D";
+  try {
+    const member = await env.DB.prepare(
+      `SELECT id, household_id, name, phone_clean, position, status 
+       FROM church_members 
+       WHERE name = ? AND (phone_clean = ? OR phone_clean = ?) AND status != 'REMOVED' 
+       LIMIT 1`
+    ).bind(trimmedName, clean10, clean11).first();
 
-      // 1. Download the file as a buffer (binary data)
-      const response = await drive.files.get(
-        { fileId, alt: "media" },
-        { responseType: "arraybuffer" },
-      );
-
-      // 2. Parse the buffer
-      const workbook = XLSX.read(response.data, { type: "buffer" });
-
-      // 3. Get the first sheet's data as an array of arrays
-      const firstSheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[firstSheetName];
-
-      rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-      if (rows && rows.length > 0) {
-        sheetCache.rows = rows;
-        sheetCache.lastFetch = now;
-      }
-    } catch (error) {
-      console.error("Drive/Excel API Error:", error);
-      return false;
-    }
+    return member || null;
+  } catch (err) {
+    console.error("D1 Member Verification Error:", err);
+    throw err;
   }
-
-  if (!rows || rows.length === 0) {
-    return false;
-  }
-
-  const matchFound = rows.some((row) => {
-    const rowNameRaw = row[1]; // Column B
-    const rowPhoneRaw = row[9]; // Column J
-    const statusRaw = row[3];
-
-    const rowName = rowNameRaw?.toString().trim();
-    const rowPhoneClean = rowPhoneRaw?.toString().replace(/\D/g, "");
-    const status = statusRaw?.toString().trim();
-
-    const inputName = name.trim();
-    const inputPhoneClean = phone.replace(/\D/g, "");
-
-    const isNameMatch = rowName === inputName;
-    const isPhoneMatch = rowPhoneClean === inputPhoneClean;
-    const isNotRemoved = status !== "제적";
-
-    return isNameMatch && isPhoneMatch && isNotRemoved;
-  });
-
-  return matchFound;
 };
 
 export const signUpController = async (c) => {
@@ -280,13 +282,13 @@ export const signUpController = async (c) => {
   const env = c.env;
 
   try {
-    const member = await checkUserInSheet(env, body.name, body.phone);
+    const member = await verifyMemberInD1(env, body.name, body.phone);
 
     if (!member) {
       return c.json({ error: "NonMemberException" }, 403);
     }
 
-    console.log("Member verified, proceeding to Cognito...");
+    console.log("Member verified via D1, proceeding to Cognito...");
   } catch (err) {
     console.error("Authorization check failed:", err);
     return c.json({ error: "InternalServerError" }, 500);
@@ -339,6 +341,57 @@ export const confirmSignUpController = async (c) => {
 
   try {
     const response = await cognitoClient.send(command);
+
+    // Mark member as registered in D1 upon confirmed sign up
+    if (body.phone) {
+      try {
+        const rawDigits = body.phone.replace(/\D/g, "");
+        const clean10 = rawDigits.length === 11 && rawDigits.startsWith("1") ? rawDigits.slice(1) : rawDigits;
+        const clean11 = "1" + clean10;
+        let memberName = (body.name || "").trim();
+
+        c.executionCtx?.waitUntil?.(
+          (async () => {
+            if (!memberName) {
+              try {
+                const getUserCmd = new AdminGetUserCommand({
+                  UserPoolId: env.AWS_COGNITO_USER_POOL_ID,
+                  Username: "+1" + clean10,
+                });
+                const userData = await cognitoClient.send(getUserCmd);
+                const nameAttr = userData.UserAttributes?.find((a) => a.Name === "name");
+                if (nameAttr?.Value) {
+                  memberName = nameAttr.Value.trim();
+                }
+              } catch (e) {
+                console.warn("Could not fetch user name from Cognito during confirmSignUp:", e.message);
+              }
+            }
+
+            if (memberName) {
+              await env.DB.prepare(
+                `UPDATE church_members 
+                 SET is_registered = 1 
+                 WHERE name = ? AND (phone_clean = ? OR phone_clean = ?) AND status != 'REMOVED'`
+              ).bind(memberName, clean10, clean11).run();
+            } else {
+              const matched = await env.DB.prepare(
+                `SELECT id FROM church_members 
+                 WHERE (phone_clean = ? OR phone_clean = ?) AND status != 'REMOVED'`
+              ).bind(clean10, clean11).all();
+              if (matched?.results?.length === 1) {
+                await env.DB.prepare(
+                  `UPDATE church_members SET is_registered = 1 WHERE id = ?`
+                ).bind(matched.results[0].id).run();
+              }
+            }
+          })()
+        );
+      } catch (dbErr) {
+        console.warn("Could not mark member as is_registered in D1:", dbErr.message);
+      }
+    }
+
     return c.json(response);
   } catch (error) {
     console.log(error);

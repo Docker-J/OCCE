@@ -1,42 +1,51 @@
-import { ScanCommand } from "@aws-sdk/client-dynamodb";
-import { getDocClient, resetDocClient } from "./dynamodb.js";
 import { getGoogleAuth } from "./googleAuth.js";
 
-const TABLENAME = "FCMToken";
+async function getTargetTokens(env, targetRole = "all") {
+  const nowEpoch = Math.floor(Date.now() / 1000);
 
-async function scanTokensWithRetry(env, scanParam, maxRetries = 3) {
-  let attempt = 0;
-  while (attempt < maxRetries) {
-    attempt++;
-    try {
-      const docClient = getDocClient(env);
-      const command = new ScanCommand(scanParam);
-      return await docClient.send(command);
-    } catch (err) {
-      console.warn(`⚠️ DynamoDB Scan attempt ${attempt}/${maxRetries} failed:`, err.message);
-      // Reset the cached client to discard stale socket connections
-      resetDocClient();
-      if (attempt >= maxRetries) {
-        throw err;
-      }
-      // Wait before retrying (1s, 2s, 3s...)
-      await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
+  if (!targetRole || targetRole === "all") {
+    const { results } = await env.DB.prepare(
+      "SELECT token FROM fcm_tokens WHERE expires_at > ?"
+    ).bind(nowEpoch).all();
+    return (results || []).map((r) => r.token);
+  }
+
+  const roles = Array.isArray(targetRole) ? targetRole : [targetRole];
+  const tokenSet = new Set();
+
+  for (const role of roles) {
+    if (role === "GardenKeeper") {
+      // Members who lead active gardens
+      const { results } = await env.DB.prepare(`
+        SELECT f.token 
+        FROM fcm_tokens f
+        JOIN gardens g ON f.member_id = g.leader_member_id
+        WHERE g.is_active = 1 AND f.expires_at > ?
+      `).bind(nowEpoch).all();
+      (results || []).forEach((r) => tokenSet.add(r.token));
+    } else if (role === "Staff" || role === "교역자") {
+      // Clergy members
+      const { results } = await env.DB.prepare(`
+        SELECT f.token 
+        FROM fcm_tokens f
+        JOIN church_members m ON f.member_id = m.id
+        WHERE m.position = '교역자' AND m.status = 'ACTIVE' AND f.expires_at > ?
+      `).bind(nowEpoch).all();
+      (results || []).forEach((r) => tokenSet.add(r.token));
     }
   }
+
+  return Array.from(tokenSet);
 }
 
-async function sendMessages(env, scanParam, message, accessToken, projectId) {
+async function sendMessages(env, tokens, message, accessToken, projectId) {
   try {
-    const result = await scanTokensWithRetry(env, scanParam);
-    const tokens = result.Items ? result.Items.map((item) => item.token.S) : [];
-
-    if (tokens.length <= 0) {
+    if (!tokens || tokens.length <= 0) {
+      console.log("[FCM] No active target tokens found for broadcast.");
       return;
     }
 
-    // To save Queue operations cost, we pack 20 tokens into a single queue message.
-    // A single queue message will trigger 20 fetch requests + up to 20 delete requests in the consumer, 
-    // guaranteeing we stay under the strict 50 subrequests limit.
+    // Pack 20 tokens into a single queue message to stay within subrequest limits
     const tokensPerMessage = 20;
     const messagesPerBatch = 100; // Cloudflare Queue sendBatch limit is 100
     const tokensPerBatch = tokensPerMessage * messagesPerBatch; // 2000
@@ -49,7 +58,7 @@ async function sendMessages(env, scanParam, message, accessToken, projectId) {
         const tokenGroup = chunk.slice(j, j + tokensPerMessage);
         batchMessages.push({
           body: {
-            tokens: tokenGroup, // Array of up to 20 tokens
+            tokens: tokenGroup,
             payloadTemplate: {
               data: message.data,
               android: message.android,
@@ -64,15 +73,10 @@ async function sendMessages(env, scanParam, message, accessToken, projectId) {
 
       try {
         await env.FCM_QUEUE.sendBatch(batchMessages);
-        console.log(`Queued batch of ${batchMessages.length} FCM messages.`);
+        console.log(`Queued batch of ${batchMessages.length} FCM messages (${chunk.length} tokens).`);
       } catch (err) {
         console.error("Failed to enqueue FCM messages:", err);
       }
-    }
-
-    if (typeof result.LastEvaluatedKey !== "undefined") {
-      scanParam.ExclusiveStartKey = result.LastEvaluatedKey;
-      await sendMessages(env, scanParam, message, accessToken, projectId); // Recursive call
     }
   } catch (err) {
     console.error("FCM Send Messages Error:", err);
@@ -81,29 +85,11 @@ async function sendMessages(env, scanParam, message, accessToken, projectId) {
 }
 
 const sendNotification = async (env, title, body, pathname, targetRole = "all") => {
-  const scanParam = {
-    TableName: TABLENAME,
-    ProjectionExpression: "#tkn",
-    ExpressionAttributeNames: { "#tkn": "token" },
-    Limit: 499,
-  };
+  const tokens = await getTargetTokens(env, targetRole);
 
-  if (targetRole && targetRole !== "all") {
-    scanParam.ExpressionAttributeNames["#roles"] = "roles";
-    if (Array.isArray(targetRole)) {
-      scanParam.FilterExpression = targetRole
-        .map((_, idx) => `contains(#roles, :role${idx})`)
-        .join(" OR ");
-      scanParam.ExpressionAttributeValues = {};
-      targetRole.forEach((role, idx) => {
-        scanParam.ExpressionAttributeValues[`:role${idx}`] = { S: role };
-      });
-    } else {
-      scanParam.FilterExpression = "contains(#roles, :role)";
-      scanParam.ExpressionAttributeValues = {
-        ":role": { S: targetRole },
-      };
-    }
+  if (tokens.length === 0) {
+    console.log(`[FCM] No recipients found for target role: ${JSON.stringify(targetRole)}`);
+    return;
   }
 
   const cleanPath = pathname.replace(/^\/+/, "");
@@ -112,7 +98,6 @@ const sendNotification = async (env, title, body, pathname, targetRole = "all") 
     : `https://oncce.ca/${cleanPath}`;
 
   const iconUrl = "https://oncce.ca/favicons/android-icon-192x192.png";
-  const badgeUrl = "https://oncce.ca/favicons/favicon-32x32.png";
 
   const message = {
     data: {
@@ -163,7 +148,7 @@ const sendNotification = async (env, title, body, pathname, targetRole = "all") 
   const tokenResponse = await client.getAccessToken();
   const accessToken = tokenResponse.token;
 
-  await sendMessages(env, scanParam, message, accessToken, projectId);
+  await sendMessages(env, tokens, message, accessToken, projectId);
 };
 
 export default sendNotification;

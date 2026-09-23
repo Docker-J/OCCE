@@ -1,5 +1,6 @@
-import { Box, TextField, InputAdornment, useForkRef } from "@mui/material";
+import { Box, TextField, InputAdornment, IconButton, useForkRef } from "@mui/material";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import ClearIcon from "@mui/icons-material/Clear";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { PickerDay, usePickerContext, useSplitFieldProps } from "@mui/x-date-pickers";
 import { format } from "date-fns";
@@ -52,21 +53,36 @@ export const GatheringDateButtonField = (props) => {
   const { _, forwardedProps } = useSplitFieldProps(props, "date");
   const pickerContext = usePickerContext();
   const handleRef = useForkRef(pickerContext.triggerRef, pickerContext.rootRef);
-  const { disabled } = forwardedProps;
+  const {
+    disabled,
+    label,
+    placeholder = "날짜 선택",
+    size = "medium",
+    clearable = false,
+    showDayOfWeek = true,
+    sx = {},
+  } = forwardedProps;
 
   let displayDate = "";
   if (pickerContext.value && !isNaN(new Date(pickerContext.value).getTime())) {
     const d = new Date(pickerContext.value);
-    const dayOfWeekNames = ["일", "월", "화", "수", "목", "금", "토"];
-    displayDate = `${format(d, "yyyy. MM. dd.")} (${dayOfWeekNames[d.getDay()]})`;
+    if (showDayOfWeek) {
+      const dayOfWeekNames = ["일", "월", "화", "수", "목", "금", "토"];
+      displayDate = `${format(d, "yyyy. MM. dd.")} (${dayOfWeekNames[d.getDay()]})`;
+    } else {
+      displayDate = format(d, "yyyy. MM. dd.");
+    }
   }
+
+  const effectiveLabel = label || pickerContext.label || "모임 날짜";
 
   return (
     <TextField
       fullWidth
+      size={size}
       ref={handleRef}
-      label="모임 날짜"
-      placeholder="날짜 선택"
+      label={effectiveLabel}
+      placeholder={placeholder}
       value={displayDate}
       disabled={disabled}
       onClick={() => {
@@ -90,16 +106,31 @@ export const GatheringDateButtonField = (props) => {
           readOnly: true,
           endAdornment: (
             <InputAdornment position="end">
+              {clearable && !disabled && pickerContext.value && (
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    pickerContext.clearValue();
+                  }}
+                  sx={{ p: 0.5, mr: 0.5 }}
+                  aria-label="clear date"
+                >
+                  <ClearIcon sx={{ fontSize: size === "small" ? "1rem" : "1.2rem", color: "#888" }} />
+                </IconButton>
+              )}
               <CalendarTodayIcon
                 sx={{
                   color: "#ea580c",
                   cursor: disabled ? "default" : "pointer",
+                  fontSize: size === "small" ? "1.2rem" : "1.5rem",
                 }}
               />
             </InputAdornment>
           ),
           sx: {
             cursor: disabled ? "default" : "pointer",
+            borderRadius: "10px",
             "& input": {
               cursor: disabled ? "default" : "pointer",
               fontWeight: 500,
@@ -114,6 +145,7 @@ export const GatheringDateButtonField = (props) => {
       }}
       sx={{
         "& .MuiOutlinedInput-root": {
+          borderRadius: "10px",
           cursor: disabled ? "default" : "pointer",
           backgroundColor: "#fff",
           "&:hover fieldset": {
@@ -126,6 +158,7 @@ export const GatheringDateButtonField = (props) => {
         "& .MuiInputLabel-root.Mui-focused": {
           color: "#ea580c",
         },
+        ...sx,
       }}
     />
   );

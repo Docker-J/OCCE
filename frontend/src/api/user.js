@@ -36,11 +36,12 @@ export const signUp = async (name, phone, password) => {
   }
 };
 
-export const confirmSignUp = async (phone, confirmCode) => {
+export const confirmSignUp = async (phone, confirmCode, name = "") => {
   try {
     const res = await axios.post("/api/user/confirm", {
       phone,
       confirmCode,
+      name,
     });
     return res.data;
   } catch (error) {
