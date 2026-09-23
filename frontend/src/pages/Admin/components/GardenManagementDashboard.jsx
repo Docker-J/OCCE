@@ -1355,16 +1355,16 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
               </Typography>
             </Box>
           ) : (
-            <TableContainer>
-              <Table size="small" sx={{ minWidth: 650 }}>
+            <TableContainer sx={{ overflowX: "auto" }}>
+              <Table size="small" sx={{ minWidth: 620, "& th, & td": { whiteSpace: "nowrap" } }}>
                 <TableHead>
-                  <TableRow sx={{ "& th": { backgroundColor: "#f1f5f9", fontWeight: 800, color: "#334155", py: 1.3, fontSize: "0.82rem" } }}>
-                    <TableCell sx={{ pl: 3, width: "22%" }}>성명</TableCell>
-                    <TableCell align="center" sx={{ width: "14%" }}>가족관계</TableCell>
-                    <TableCell align="center" sx={{ width: "14%" }}>직분</TableCell>
-                    <TableCell align="center" sx={{ width: "16%" }}>생년월일</TableCell>
-                    <TableCell align="center" sx={{ width: "14%" }}>세례구분</TableCell>
-                    <TableCell sx={{ pr: 3, width: "20%" }}>연락처</TableCell>
+                  <TableRow sx={{ "& th": { backgroundColor: "#f1f5f9", fontWeight: 800, color: "#334155", py: 1.3, fontSize: "0.82rem", whiteSpace: "nowrap" } }}>
+                    <TableCell sx={{ pl: 3, width: "15%" }}>성명</TableCell>
+                    <TableCell align="center" sx={{ width: "11%" }}>가족관계</TableCell>
+                    <TableCell align="center" sx={{ width: "10%" }}>직분</TableCell>
+                    <TableCell align="center" sx={{ width: "18%" }}>생년월일</TableCell>
+                    <TableCell align="center" sx={{ width: "11%" }}>세례구분</TableCell>
+                    <TableCell sx={{ pr: 3, width: "35%" }}>연락처</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -1391,9 +1391,9 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                         }}
                       >
                         {/* 교인 성명 및 리더 배지 */}
-                        <TableCell sx={{ pl: 3, py: 1.1, verticalAlign: "middle" }}>
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, flexWrap: "wrap" }}>
-                            <Typography variant="body2" sx={{ fontWeight: 800, color: "#0f172a" }}>
+                        <TableCell sx={{ pl: 3, py: 1.1, verticalAlign: "middle", whiteSpace: "nowrap" }}>
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, flexWrap: "nowrap" }}>
+                            <Typography variant="body2" sx={{ fontWeight: 800, color: "#0f172a", whiteSpace: "nowrap" }}>
                               {m.name}
                             </Typography>
                             {isLeader && (
@@ -1407,6 +1407,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                                   backgroundColor: "#fef3c7",
                                   color: "#b45309",
                                   border: "1px solid #fde68a",
+                                  whiteSpace: "nowrap",
                                 }}
                               />
                             )}
@@ -1414,7 +1415,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                         </TableCell>
 
                         {/* 가족관계 */}
-                        <TableCell align="center" sx={{ py: 1.1, verticalAlign: "middle" }}>
+                        <TableCell align="center" sx={{ py: 1.1, verticalAlign: "middle", whiteSpace: "nowrap" }}>
                           <Chip
                             size="small"
                             label={relLabel}
@@ -1425,27 +1426,30 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                               backgroundColor: relMeta.bg,
                               color: relMeta.color,
                               border: `1px solid ${relMeta.border}`,
+                              whiteSpace: "nowrap",
                             }}
                           />
                         </TableCell>
 
                         {/* 직분 */}
-                        <TableCell align="center" sx={{ py: 1.1, verticalAlign: "middle" }}>
+                        <TableCell align="center" sx={{ py: 1.1, verticalAlign: "middle", whiteSpace: "nowrap" }}>
                           <Chip
                             size="small"
                             label={m.position || "성도"}
-                            sx={{ height: 20, fontSize: "0.72rem", backgroundColor: "#f1f5f9", color: "#334155" }}
+                            sx={{ height: 20, fontSize: "0.72rem", backgroundColor: "#f1f5f9", color: "#334155", whiteSpace: "nowrap" }}
                           />
                         </TableCell>
 
                         {/* 생년월일 */}
-                        <TableCell align="center" sx={{ py: 1.1, verticalAlign: "middle" }}>
+                        <TableCell align="center" sx={{ py: 1.1, verticalAlign: "middle", whiteSpace: "nowrap" }}>
                           <Typography
                             variant="body2"
                             sx={{
                               fontSize: "0.82rem",
                               color: m.birthDate ? "#334155" : "#cbd5e1",
                               fontWeight: 500,
+                              whiteSpace: "nowrap",
+                              fontVariantNumeric: "tabular-nums",
                             }}
                           >
                             {m.birthDate ? String(m.birthDate).split("T")[0] : "-"}
@@ -1453,7 +1457,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                         </TableCell>
 
                         {/* 세례구분 */}
-                        <TableCell align="center" sx={{ py: 1.1, verticalAlign: "middle" }}>
+                        <TableCell align="center" sx={{ py: 1.1, verticalAlign: "middle", whiteSpace: "nowrap" }}>
                           {m.baptismStatus && m.baptismStatus !== "NONE" ? (
                             <Chip
                               size="small"
@@ -1463,6 +1467,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                                 fontSize: "0.68rem",
                                 backgroundColor: BAPTISM_LABELS[m.baptismStatus]?.bg || "#f8fafc",
                                 color: BAPTISM_LABELS[m.baptismStatus]?.color || "#475569",
+                                whiteSpace: "nowrap",
                               }}
                             />
                           ) : (
@@ -1473,8 +1478,19 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                         </TableCell>
 
                         {/* 연락처 */}
-                        <TableCell sx={{ pr: 3, py: 1.1, color: "#334155", fontSize: "0.82rem", fontWeight: 500, verticalAlign: "middle" }}>
-                          {m.phone ? formatPhoneNumber(m.phone) : <span style={{ color: "#cbd5e1" }}>-</span>}
+                        <TableCell sx={{ pr: 3, py: 1.1, verticalAlign: "middle", whiteSpace: "nowrap" }}>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontSize: "0.82rem",
+                              color: m.phone ? "#334155" : "#cbd5e1",
+                              fontWeight: 500,
+                              whiteSpace: "nowrap",
+                              fontVariantNumeric: "tabular-nums",
+                            }}
+                          >
+                            {m.phone ? formatPhoneNumber(m.phone) : "-"}
+                          </Typography>
                         </TableCell>
                       </TableRow>
                     );
