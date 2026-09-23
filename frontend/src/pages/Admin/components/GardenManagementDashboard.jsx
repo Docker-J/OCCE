@@ -1390,7 +1390,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                           },
                         }}
                       >
-                        {/* 교인 성명 및 리더/세대주 배지 */}
+                        {/* 교인 성명 및 리더 배지 */}
                         <TableCell sx={{ pl: 3, py: 1.1, verticalAlign: "middle" }}>
                           <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, flexWrap: "wrap" }}>
                             <Typography variant="body2" sx={{ fontWeight: 800, color: "#0f172a" }}>
@@ -1407,19 +1407,6 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                                   backgroundColor: "#fef3c7",
                                   color: "#b45309",
                                   border: "1px solid #fde68a",
-                                }}
-                              />
-                            )}
-                            {m.isHead && (
-                              <Chip
-                                size="small"
-                                label="세대주"
-                                sx={{
-                                  height: 18,
-                                  fontSize: "0.68rem",
-                                  fontWeight: 700,
-                                  backgroundColor: "#dcfce7",
-                                  color: "#15803d",
                                 }}
                               />
                             )}
