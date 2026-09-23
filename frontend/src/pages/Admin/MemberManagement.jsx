@@ -19,7 +19,7 @@ import MemberFilterToolbar from "./components/MemberFilterToolbar";
 import MemberTableRow from "./components/MemberTableRow";
 import MemberFormModal from "./components/MemberFormModal";
 import GardenRoleModal from "./components/GardenRoleModal";
-import GardenManagementModal from "./components/GardenManagementModal";
+import GardenManagementDashboard from "./components/GardenManagementDashboard";
 import DeleteConfirmModal from "./components/DeleteConfirmModal";
 
 import {
@@ -45,12 +45,12 @@ import LoginIcon from "@mui/icons-material/Login";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import PeopleIcon from "@mui/icons-material/People";
 import SchoolIcon from "@mui/icons-material/School";
+import ForestIcon from "@mui/icons-material/Forest";
 import CourseManagementDashboard from "./components/CourseManagementDashboard";
 
 const MemberManagement = () => {
   const { openModal } = useModals();
   const [adminTab, setAdminTab] = useState(0);
-  const [gardenManagementOpen, setGardenManagementOpen] = useState(false);
 
   // 커스텀 훅에서 상태와 액션 추출
   const { state, actions } = useMemberManagement();
@@ -154,7 +154,9 @@ const MemberManagement = () => {
           ? "교적 및 교인 관리 - OCCE"
           : adminTab === 1
           ? "출석 통계 대시보드 - OCCE"
-          : "양육 및 교육과정 관리 - OCCE"}
+          : adminTab === 2
+          ? "양육 및 교육과정 관리 - OCCE"
+          : "정원(목장) 관리 - OCCE"}
       </title>
 
       {/* 상단 타이틀 배너 */}
@@ -168,7 +170,9 @@ const MemberManagement = () => {
               ? "통합 교적 및 교인 관리"
               : adminTab === 1
               ? "출석 통계 대시보드"
-              : "양육 및 교육과정 관리"}
+              : adminTab === 2
+              ? "양육 및 교육과정 관리"
+              : "정원(목장) 관리"}
           </Typography>
           <Typography
             variant="h6"
@@ -183,7 +187,9 @@ const MemberManagement = () => {
               ? "온교회 세대별 교적부, 웹 가입 상태, 소속 정원 및 알림을 통합 관리합니다."
               : adminTab === 1
               ? "구글 드라이브 주간 출석부의 실시간 출석 현황과 통계를 분석합니다."
-              : "교육과정 및 개설 기수별 수강생 등록과 수료 상태를 체계적으로 관리합니다."}
+              : adminTab === 2
+              ? "교육과정 및 개설 기수별 수강생 등록과 수료 상태를 체계적으로 관리합니다."
+              : "온교회 목장(정원) 마스터 목록, 정원지기 배정 및 소속 세대·교인 현황을 체계적으로 관리합니다."}
           </Typography>
         </div>
       </div>
@@ -298,6 +304,11 @@ const MemberManagement = () => {
                   icon={<SchoolIcon sx={{ fontSize: "1.2rem" }} />}
                   iconPosition="start"
                 />
+                <Tab
+                  label="정원(목장) 관리"
+                  icon={<ForestIcon sx={{ fontSize: "1.2rem" }} />}
+                  iconPosition="start"
+                />
               </Tabs>
 
               {/* Tab 0: 통합 교적부 관리 */}
@@ -336,7 +347,7 @@ const MemberManagement = () => {
                     loading={loading}
                     refreshing={refreshing}
                     onOpenCreateModal={handleOpenCreateModal}
-                    onOpenGardenManagement={() => setGardenManagementOpen(true)}
+                    onOpenGardenManagement={() => setAdminTab(3)}
                     onImportFromDrive={handleImportFromDrive}
                     importing={importing}
                   />
@@ -532,6 +543,19 @@ const MemberManagement = () => {
                   <CourseManagementDashboard users={users} />
                 </Box>
               )}
+
+              {/* Tab 3: 정원(목장) 관리 */}
+              {adminTab === 3 && (
+                <Box>
+                  <GardenManagementDashboard
+                    users={users}
+                    onGardensUpdated={() => {
+                      refreshGardens();
+                      fetchUsers();
+                    }}
+                  />
+                </Box>
+              )}
             </>
           )}
         </div>
@@ -563,17 +587,6 @@ const MemberManagement = () => {
         onClose={() => !updatingRole && setUserForRoleModal(null)}
         onSave={handleSaveRoleAndGardens}
         onAddAvailableGarden={handleAddAvailableGarden}
-      />
-
-      {/* 정원(목장) 목록 관리 모달 */}
-      <GardenManagementModal
-        open={gardenManagementOpen}
-        onClose={() => setGardenManagementOpen(false)}
-        members={users}
-        onGardensUpdated={() => {
-          refreshGardens();
-          fetchUsers();
-        }}
       />
 
       {/* 제적 및 계정 삭제 모달 */}
