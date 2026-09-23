@@ -12,11 +12,8 @@ import {
   Box,
   Chip,
   Tooltip,
-  CircularProgress,
   Stack,
 } from "@mui/material";
-import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
-import ForestIcon from "@mui/icons-material/Forest";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
@@ -39,8 +36,6 @@ const BAPTISM_LABELS = {
 
 const MemberTableRow = ({
   user,
-  isProcessing,
-  onOpenRoleModal,
   onOpenEditModal,
 }) => {
   const relLabel = RELATIONSHIP_LABELS[user.relationship] || (user.isHead ? "세대주" : "");
@@ -295,76 +290,7 @@ const MemberTableRow = ({
         )}
       </TableCell>
 
-      {/* 6. 정원지기 역할 관리 */}
-      <TableCell align="center" sx={{ py: 1.8, whiteSpace: "nowrap" }}>
-        {isProcessing ? (
-          <CircularProgress size={22} sx={{ color: "#ea580c" }} />
-        ) : user.isStaff ? (
-          <Tooltip title="온교회 교역자 / 스태프 (모든 소그룹 및 행정 권한 포함)">
-            <Chip
-              icon={<SupervisorAccountIcon sx={{ fontSize: "1.1rem !important", color: "inherit !important" }} />}
-              label="스태프"
-              sx={{
-                fontWeight: 700,
-                fontSize: "0.82rem",
-                height: 30,
-                borderRadius: "10px",
-                backgroundColor: "rgba(37, 99, 235, 0.1)",
-                color: "#1d4ed8",
-                border: "1px solid rgba(37, 99, 235, 0.25)",
-              }}
-            />
-          </Tooltip>
-        ) : user.isGardenKeeper ? (
-          <Tooltip title="클릭하여 정원지기 및 담당 정원 수정 또는 해제">
-            <Chip
-              icon={<ForestIcon sx={{ fontSize: "1.1rem !important", color: "inherit !important" }} />}
-              label="정원지기"
-              clickable
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenRoleModal(user);
-              }}
-              sx={{
-                fontWeight: 700,
-                fontSize: "0.82rem",
-                height: 30,
-                borderRadius: "10px",
-                backgroundColor: "rgba(234, 88, 12, 0.12)",
-                color: "#ea580c",
-                border: "1px solid rgba(234, 88, 12, 0.3)",
-                cursor: "pointer",
-                "&:hover": { backgroundColor: "rgba(234, 88, 12, 0.22)" },
-              }}
-            />
-          </Tooltip>
-        ) : (
-          <Tooltip title="클릭하여 정원지기 임명 및 정원 배정">
-            <Chip
-              label="-"
-              clickable
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenRoleModal(user);
-              }}
-              sx={{
-                fontWeight: 700,
-                fontSize: "1rem",
-                height: 30,
-                width: 50,
-                borderRadius: "10px",
-                backgroundColor: "#f3f4f6",
-                color: "#9ca3af",
-                border: "1px solid rgba(0, 0, 0, 0.08)",
-                cursor: "pointer",
-                "&:hover": { backgroundColor: "#e5e7eb", color: "#333" },
-              }}
-            />
-          </Tooltip>
-        )}
-      </TableCell>
-
-      {/* 7. 알림 수신 상태 */}
+      {/* 6. 알림 수신 상태 */}
       <TableCell align="center" sx={{ py: 1.8, whiteSpace: "nowrap" }}>
         {user.hasNotification ? (
           <Tooltip title="주일 리마인더 및 교회 소식 푸시 알림 수신 가능" arrow>
@@ -408,8 +334,6 @@ const MemberTableRow = ({
 
 MemberTableRow.propTypes = {
   user: PropTypes.object.isRequired,
-  isProcessing: PropTypes.bool.isRequired,
-  onOpenRoleModal: PropTypes.func.isRequired,
   onOpenEditModal: PropTypes.func.isRequired,
 };
 

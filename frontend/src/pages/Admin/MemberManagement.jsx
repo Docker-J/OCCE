@@ -18,7 +18,6 @@ import MemberStats from "./components/MemberStats";
 import MemberFilterToolbar from "./components/MemberFilterToolbar";
 import MemberTableRow from "./components/MemberTableRow";
 import MemberFormModal from "./components/MemberFormModal";
-import GardenRoleModal from "./components/GardenRoleModal";
 import GardenManagementDashboard from "./components/GardenManagementDashboard";
 import DeleteConfirmModal from "./components/DeleteConfirmModal";
 
@@ -74,7 +73,6 @@ const MemberManagement = () => {
     sortDirection,
     availableGardens,
     availableHouseholds,
-    actionLoadingUser,
     users,
     filteredUsers,
     paginatedUsers,
@@ -82,8 +80,6 @@ const MemberManagement = () => {
     metrics,
     memberFormOpen,
     memberForEdit,
-    userForRoleModal,
-    updatingRole,
     userToDelete,
     deleting,
   } = state;
@@ -105,13 +101,10 @@ const MemberManagement = () => {
     setMemberFormOpen,
     handleSubmitMemberForm,
     handleSeparateMember,
-    setUserForRoleModal,
-    handleSaveRoleAndGardens,
     setUserToDelete,
     handleConfirmRemoveStatus,
     handleConfirmPermanentDelete,
     handleImportFromDrive,
-    setAvailableGardens,
     refreshGardens,
   } = actions;
 
@@ -137,14 +130,6 @@ const MemberManagement = () => {
   const handleLoginClick = async () => {
     const { default: SignInModal } = await import("../../components/User/SignInModal");
     openModal(SignInModal, {});
-  };
-
-  // 커스텀 정원 추가
-  const handleAddAvailableGarden = (newGarden) => {
-    setAvailableGardens((prev) => {
-      const exists = prev.some((g) => g.name === newGarden);
-      return exists ? prev : [...prev, { id: newGarden, name: newGarden }];
-    });
   };
 
   return (
@@ -472,17 +457,6 @@ const MemberManagement = () => {
                                   whiteSpace: "nowrap",
                                 }}
                               >
-                                역할
-                              </TableCell>
-                              <TableCell
-                                align="center"
-                                sx={{
-                                  fontWeight: 700,
-                                  color: "#555",
-                                  py: 1.8,
-                                  whiteSpace: "nowrap",
-                                }}
-                              >
                                 알림
                               </TableCell>
                             </TableRow>
@@ -492,8 +466,6 @@ const MemberManagement = () => {
                               <MemberTableRow
                                 key={user.id ? `member_${user.id}` : user.username}
                                 user={user}
-                                isProcessing={actionLoadingUser === user.username}
-                                onOpenRoleModal={(u) => setUserForRoleModal(u)}
                                 onOpenEditModal={(u) => handleOpenEditModal(u)}
                               />
                             ))}
@@ -578,16 +550,6 @@ const MemberManagement = () => {
         onSeparateMember={handleSeparateMember}
       />
 
-      {/* 정원지기 역할 모달 */}
-      <GardenRoleModal
-        open={Boolean(userForRoleModal)}
-        user={userForRoleModal}
-        availableGardens={availableGardens.map((g) => g.name || g)}
-        updatingRole={updatingRole}
-        onClose={() => !updatingRole && setUserForRoleModal(null)}
-        onSave={handleSaveRoleAndGardens}
-        onAddAvailableGarden={handleAddAvailableGarden}
-      />
 
       {/* 제적 및 계정 삭제 모달 */}
       <DeleteConfirmModal
