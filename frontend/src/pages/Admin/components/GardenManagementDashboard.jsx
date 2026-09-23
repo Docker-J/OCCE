@@ -55,9 +55,6 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
-import PhoneOutlinedIcon from "@mui/icons-material/PhoneOutlined";
-import FamilyRestroomOutlinedIcon from "@mui/icons-material/FamilyRestroomOutlined";
 
 import {
   getAdminGardensWithStats,
@@ -220,9 +217,8 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
       const inPhone = (m.phone || "").replace(/\D/g, "").includes(term);
       const inPos = (m.position || "").toLowerCase().includes(term);
       const inRel = (RELATIONSHIP_LABELS[m.relationship] || "").toLowerCase().includes(term);
-      const inHName = (m.householdName || "").toLowerCase().includes(term);
-      const inAddr = (m.householdAddress || "").toLowerCase().includes(term);
-      return inName || inPhone || inPos || inRel || inHName || inAddr;
+      const inBirth = (m.birthDate || "").includes(term);
+      return inName || inPhone || inPos || inRel || inBirth;
     });
   }, [viewingGarden, modalSearchTerm, gardens, users]);
 
@@ -1299,7 +1295,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
           {/* 모달 내 검색창 */}
           <TextField
             size="small"
-            placeholder="성명, 가구명, 주소, 직분, 연락처 검색..."
+            placeholder="성명, 직분, 생년월일, 가족관계, 연락처 검색..."
             value={modalSearchTerm}
             onChange={(e) => setModalSearchTerm(e.target.value)}
             sx={{
@@ -1337,15 +1333,15 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
             </Box>
           ) : (
             <TableContainer>
-              <Table size="small" sx={{ minWidth: 700 }}>
+              <Table size="small" sx={{ minWidth: 650 }}>
                 <TableHead>
                   <TableRow sx={{ "& th": { backgroundColor: "#f1f5f9", fontWeight: 800, color: "#334155", py: 1.3, fontSize: "0.82rem" } }}>
-                    <TableCell sx={{ pl: 3, width: "30%" }}>세대 (가구)</TableCell>
-                    <TableCell sx={{ width: "20%" }}>성명</TableCell>
-                    <TableCell align="center" sx={{ width: "12%" }}>가족관계</TableCell>
-                    <TableCell align="center" sx={{ width: "12%" }}>직분</TableCell>
-                    <TableCell align="center" sx={{ width: "12%" }}>세례구분</TableCell>
-                    <TableCell sx={{ pr: 3, width: "14%" }}>연락처</TableCell>
+                    <TableCell sx={{ pl: 3, width: "22%" }}>성명</TableCell>
+                    <TableCell align="center" sx={{ width: "14%" }}>가족관계</TableCell>
+                    <TableCell align="center" sx={{ width: "14%" }}>직분</TableCell>
+                    <TableCell align="center" sx={{ width: "16%" }}>생년월일</TableCell>
+                    <TableCell align="center" sx={{ width: "14%" }}>세례구분</TableCell>
+                    <TableCell sx={{ pr: 3, width: "20%" }}>연락처</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -1371,47 +1367,8 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                           },
                         }}
                       >
-                        {/* 세대 (가구) 정보 */}
-                        <TableCell sx={{ pl: 3, py: 1.1, verticalAlign: "top" }}>
-                          {m.isFirstInHousehold ? (
-                            <Box>
-                              <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
-                                <FamilyRestroomOutlinedIcon sx={{ fontSize: 16, color: "#16a34a" }} />
-                                <Typography variant="body2" sx={{ fontWeight: 800, color: "#1e293b" }}>
-                                  {m.householdName}
-                                </Typography>
-                                <Chip
-                                  size="small"
-                                  label={`${m.householdMemberCount}명`}
-                                  sx={{
-                                    height: 18,
-                                    fontSize: "0.68rem",
-                                    fontWeight: 700,
-                                    backgroundColor: "#e2e8f0",
-                                    color: "#475569",
-                                  }}
-                                />
-                              </Box>
-                              {m.householdAddress && (
-                                <Box sx={{ display: "flex", alignItems: "center", gap: 0.4, mt: 0.3 }}>
-                                  <LocationOnOutlinedIcon sx={{ fontSize: 13, color: "#94a3b8" }} />
-                                  <Typography variant="caption" sx={{ color: "#64748b", fontSize: "0.74rem" }}>
-                                    {m.householdAddress}
-                                  </Typography>
-                                </Box>
-                              )}
-                            </Box>
-                          ) : (
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, pl: 2.2 }}>
-                              <Typography variant="caption" sx={{ color: "#94a3b8", fontSize: "0.75rem" }}>
-                                ↳ {m.householdName}
-                              </Typography>
-                            </Box>
-                          )}
-                        </TableCell>
-
                         {/* 교인 성명 및 리더/세대주 배지 */}
-                        <TableCell sx={{ py: 1.1, verticalAlign: "middle" }}>
+                        <TableCell sx={{ pl: 3, py: 1.1, verticalAlign: "middle" }}>
                           <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, flexWrap: "wrap" }}>
                             <Typography variant="body2" sx={{ fontWeight: 800, color: "#0f172a" }}>
                               {m.name}
@@ -1469,6 +1426,20 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                             label={m.position || "성도"}
                             sx={{ height: 20, fontSize: "0.72rem", backgroundColor: "#f1f5f9", color: "#334155" }}
                           />
+                        </TableCell>
+
+                        {/* 생년월일 */}
+                        <TableCell align="center" sx={{ py: 1.1, verticalAlign: "middle" }}>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontSize: "0.82rem",
+                              color: m.birthDate ? "#334155" : "#cbd5e1",
+                              fontWeight: 500,
+                            }}
+                          >
+                            {m.birthDate ? String(m.birthDate).split("T")[0] : "-"}
+                          </Typography>
                         </TableCell>
 
                         {/* 세례구분 */}
