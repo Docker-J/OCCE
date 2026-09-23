@@ -34,6 +34,7 @@ import {
   TableRow,
   TableCell,
   InputAdornment,
+  Checkbox,
 } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
@@ -116,10 +117,13 @@ const CourseManagementDashboard = ({ users = [] }) => {
   });
 
   const [enrollModalOpen, setEnrollModalOpen] = useState(false);
-  const [selectedMemberToEnroll, setSelectedMemberToEnroll] = useState(null);
+  const [selectedMembersToEnroll, setSelectedMembersToEnroll] = useState([]);
   const [enrollTargetCohortId, setEnrollTargetCohortId] = useState("");
   const [enrollStatus, setEnrollStatus] = useState("IN_PROGRESS");
   const [enrollCompletionDate, setEnrollCompletionDate] = useState("");
+
+  // Checkbox selection in Course-wide overview for batch enrollment
+  const [selectedMemberIdsForBatch, setSelectedMemberIdsForBatch] = useState([]);
 
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState(null); // { type: 'success' | 'error', message: '' }
@@ -404,21 +408,26 @@ const CourseManagementDashboard = ({ users = [] }) => {
   };
 
   // ================= Enrollment Handlers =================
-  const handleOpenEnrollModal = (preselectedMember = null) => {
-    if (preselectedMember) {
-      const memberId = preselectedMember.id || preselectedMember.memberId;
-      const found = users.find((u) => u.id === memberId);
-      setSelectedMemberToEnroll(
-        found || {
-          id: memberId,
-          name: preselectedMember.name,
-          nameEn: preselectedMember.nameEn,
-          department: preselectedMember.department,
-          gardenName: preselectedMember.gardenName,
-        }
-      );
+  const handleOpenEnrollModal = (preselected = null) => {
+    if (preselected) {
+      const items = Array.isArray(preselected) ? preselected : [preselected];
+      const resolved = items.map((item) => {
+        const memberId = item.id || item.memberId;
+        const found = users.find((u) => u.id === memberId);
+        return (
+          found || {
+            id: memberId,
+            memberId: memberId,
+            name: item.name,
+            nameEn: item.nameEn,
+            department: item.department,
+            gardenName: item.gardenName,
+          }
+        );
+      });
+      setSelectedMembersToEnroll(resolved);
     } else {
-      setSelectedMemberToEnroll(null);
+      setSelectedMembersToEnroll([]);
     }
     setEnrollTargetCohortId(selectedCohort?.id || (cohorts.length > 0 ? cohorts[0].id : ""));
     setEnrollStatus("IN_PROGRESS");
@@ -429,20 +438,23 @@ const CourseManagementDashboard = ({ users = [] }) => {
   const handleEnrollMember = async (e) => {
     e.preventDefault();
     const targetCohortId = enrollTargetCohortId || selectedCohort?.id;
-    const memberId = selectedMemberToEnroll?.id || selectedMemberToEnroll?.memberId;
-    if (!targetCohortId || !memberId) return;
+    if (!targetCohortId || selectedMembersToEnroll.length === 0) return;
+
+    const memberIds = selectedMembersToEnroll.map((m) => m.id || m.memberId);
     setSubmitting(true);
     try {
-      await enrollCohortMember(targetCohortId, {
-        memberId,
+      const res = await enrollCohortMember(targetCohortId, {
+        memberIds,
         status: enrollStatus,
         completionDate: enrollStatus === "COMPLETED" ? enrollCompletionDate : null,
       });
       setFeedback({
         type: "success",
-        message: `${selectedMemberToEnroll.name} 성도님이 수강생으로 등록되었습니다.`,
+        message: res.message || `${memberIds.length}명의 수강생이 등록되었습니다.`,
       });
       setEnrollModalOpen(false);
+      setSelectedMembersToEnroll([]);
+      setSelectedMemberIdsForBatch([]);
       if (selectedCohort?.id) {
         fetchCohortMembersList(selectedCohort.id);
       }
@@ -453,6 +465,33 @@ const CourseManagementDashboard = ({ users = [] }) => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  // Toggle single member checkbox in Course-wide overview
+  const handleToggleBatchMember = (memberId) => {
+    setSelectedMemberIdsForBatch((prev) =>
+      prev.includes(memberId) ? prev.filter((id) => id !== memberId) : [...prev, memberId]
+    );
+  };
+
+  // Toggle select all visible members in Course-wide overview
+  const handleToggleSelectAllBatch = () => {
+    const visibleIds = filteredCourseAllMembers.map((m) => m.memberId);
+    const allSelected =
+      visibleIds.length > 0 && visibleIds.every((id) => selectedMemberIdsForBatch.includes(id));
+    if (allSelected) {
+      setSelectedMemberIdsForBatch((prev) => prev.filter((id) => !visibleIds.includes(id)));
+    } else {
+      setSelectedMemberIdsForBatch((prev) => Array.from(new Set([...prev, ...visibleIds])));
+    }
+  };
+
+  // Open modal with all currently checked members
+  const handleOpenBatchEnrollModal = () => {
+    const selectedMembers = courseAllMembers.filter((m) =>
+      selectedMemberIdsForBatch.includes(m.memberId)
+    );
+    handleOpenEnrollModal(selectedMembers);
   };
 
   const handleToggleMemberStatus = async (member) => {
@@ -1216,6 +1255,55 @@ const CourseManagementDashboard = ({ users = [] }) => {
                     />
                   </Box>
 
+                  {/* 다중 선택 일괄 배정 바 */}
+                  {selectedMemberIdsForBatch.length > 0 && (
+                    <Box
+                      sx={{
+                        mb: 1.5,
+                        p: 1.2,
+                        px: 2,
+                        borderRadius: "10px",
+                        backgroundColor: "rgba(255, 107, 0, 0.08)",
+                        border: "1px solid rgba(255, 107, 0, 0.25)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        flexWrap: "wrap",
+                        gap: 1,
+                      }}
+                    >
+                      <Typography variant="body2" sx={{ fontWeight: 700, color: "#ea580c" }}>
+                        선택된 교인: <strong>{selectedMemberIdsForBatch.length}명</strong>
+                      </Typography>
+                      <Stack direction="row" spacing={1}>
+                        <Button
+                          size="small"
+                          onClick={() => setSelectedMemberIdsForBatch([])}
+                          sx={{ color: "#64748b", fontSize: "0.75rem", fontWeight: 700 }}
+                        >
+                          선택 해제
+                        </Button>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          startIcon={<GroupAddIcon />}
+                          onClick={handleOpenBatchEnrollModal}
+                          disabled={cohorts.length === 0}
+                          sx={{
+                            backgroundColor: "#FF6B00",
+                            "&:hover": { backgroundColor: "#ea580c" },
+                            borderRadius: "8px",
+                            fontSize: "0.75rem",
+                            fontWeight: 700,
+                            boxShadow: "none",
+                          }}
+                        >
+                          선택한 {selectedMemberIdsForBatch.length}명 일괄 기수 배정
+                        </Button>
+                      </Stack>
+                    </Box>
+                  )}
+
                   {/* 교인 코스 현황 테이블 */}
                   {loadingAllMembers ? (
                     <Box sx={{ display: "flex", justifyContent: "center", py: 10 }}>
@@ -1229,6 +1317,28 @@ const CourseManagementDashboard = ({ users = [] }) => {
                     <Table size="small">
                       <TableHead>
                         <TableRow sx={{ backgroundColor: "#f8fafc" }}>
+                          <TableCell padding="checkbox" sx={{ pl: 1, backgroundColor: "#f8fafc" }}>
+                            <Checkbox
+                              size="small"
+                              indeterminate={
+                                selectedMemberIdsForBatch.length > 0 &&
+                                !filteredCourseAllMembers.every((m) =>
+                                  selectedMemberIdsForBatch.includes(m.memberId)
+                                )
+                              }
+                              checked={
+                                filteredCourseAllMembers.length > 0 &&
+                                filteredCourseAllMembers.every((m) =>
+                                  selectedMemberIdsForBatch.includes(m.memberId)
+                                )
+                              }
+                              onChange={handleToggleSelectAllBatch}
+                              sx={{
+                                color: "#94a3b8",
+                                "&.Mui-checked, &.MuiCheckbox-indeterminate": { color: "#FF6B00" },
+                              }}
+                            />
+                          </TableCell>
                           <TableCell sx={{ fontWeight: 800, color: "#475569" }}>성명 / 영문명</TableCell>
                           <TableCell sx={{ fontWeight: 800, color: "#475569" }}>소속 (부서/정원)</TableCell>
                           <TableCell sx={{ fontWeight: 800, color: "#475569" }}>연락처</TableCell>
@@ -1257,6 +1367,17 @@ const CourseManagementDashboard = ({ users = [] }) => {
                                 transition: "background-color 0.15s",
                               }}
                             >
+                              <TableCell padding="checkbox" sx={{ pl: 1 }}>
+                                <Checkbox
+                                  size="small"
+                                  checked={selectedMemberIdsForBatch.includes(m.memberId)}
+                                  onChange={() => handleToggleBatchMember(m.memberId)}
+                                  sx={{
+                                    color: "#cbd5e1",
+                                    "&.Mui-checked": { color: "#FF6B00" },
+                                  }}
+                                />
+                              </TableCell>
                               <TableCell sx={{ py: 1.2 }}>
                                 <Typography variant="body2" sx={{ fontWeight: 800, color: "#1e293b" }}>
                                   {m.name}
@@ -1552,7 +1673,13 @@ const CourseManagementDashboard = ({ users = [] }) => {
       >
         <form onSubmit={handleEnrollMember}>
           <DialogTitle sx={{ fontWeight: 800 }}>
-            {selectedCourse ? `[${selectedCourse.name}] 수강생 기수 등록` : "수강생 기수 등록"}
+            {selectedCourse
+              ? `[${selectedCourse.name}] 수강생 기수 등록${
+                  selectedMembersToEnroll.length > 0
+                    ? ` (${selectedMembersToEnroll.length}명 선택됨)`
+                    : ""
+                }`
+              : "수강생 기수 등록"}
           </DialogTitle>
           <DialogContent>
             <Stack spacing={2.5} sx={{ mt: 1 }}>
@@ -1579,6 +1706,7 @@ const CourseManagementDashboard = ({ users = [] }) => {
               )}
 
               <Autocomplete
+                multiple
                 options={candidateMembers}
                 getOptionLabel={(opt) =>
                   `${opt.name} ${opt.nameEn ? `(${opt.nameEn})` : ""} · ${opt.department || "장년부"} (${opt.gardenName || "미배정"})`
@@ -1586,15 +1714,37 @@ const CourseManagementDashboard = ({ users = [] }) => {
                 isOptionEqualToValue={(opt, val) =>
                   (opt.id || opt.memberId) === (val?.id || val?.memberId)
                 }
-                value={selectedMemberToEnroll}
-                onChange={(e, val) => setSelectedMemberToEnroll(val)}
+                value={selectedMembersToEnroll}
+                onChange={(e, val) => setSelectedMembersToEnroll(val)}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const { key, ...tagProps } = getTagProps({ index });
+                    return (
+                      <Chip
+                        key={key}
+                        size="small"
+                        label={`${option.name} (${option.gardenName || option.department || "미배정"})`}
+                        {...tagProps}
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: "0.75rem",
+                          backgroundColor: "rgba(255, 107, 0, 0.1)",
+                          color: "#ea580c",
+                        }}
+                      />
+                    );
+                  })
+                }
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="교인 검색 (성명 또는 영문명)"
+                    label="수강 대상 교인 (여러 명 다중 선택 가능)"
                     size="small"
-                    required
-                    placeholder="등록할 교인 이름을 입력하세요"
+                    placeholder={
+                      selectedMembersToEnroll.length === 0
+                        ? "등록할 교인 이름을 입력하여 추가하세요"
+                        : "교인을 계속 추가 검색할 수 있습니다"
+                    }
                   />
                 )}
               />
@@ -1633,13 +1783,17 @@ const CourseManagementDashboard = ({ users = [] }) => {
               variant="contained"
               disabled={
                 submitting ||
-                !selectedMemberToEnroll ||
+                selectedMembersToEnroll.length === 0 ||
                 cohorts.length === 0 ||
                 (!enrollTargetCohortId && !selectedCohort?.id)
               }
               sx={{ backgroundColor: "#FF6B00", "&:hover": { backgroundColor: "#ea580c" }, borderRadius: "8px" }}
             >
-              {submitting ? "등록 중..." : "등록하기"}
+              {submitting
+                ? "등록 중..."
+                : selectedMembersToEnroll.length > 0
+                ? `${selectedMembersToEnroll.length}명 등록하기`
+                : "등록하기"}
             </Button>
           </DialogActions>
         </form>

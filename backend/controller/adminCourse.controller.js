@@ -344,42 +344,54 @@ export const listCohortMembersController = async (c) => {
 
 /**
  * POST /api/admin/cohorts/:cohortId/members
- * Enrolls a member into a cohort
+ * Enrolls one or multiple members into a cohort
  */
 export const enrollCohortMemberController = async (c) => {
   try {
     const env = c.env;
     const cohortId = parseInt(c.req.param("cohortId"), 10);
-    const { memberId, status, completionDate, notes } = await c.req.json();
+    const body = await c.req.json();
+    const { status, completionDate, notes } = body;
 
-    if (isNaN(cohortId) || !memberId) {
-      return c.json({ error: "InvalidRequest", message: "기수 ID와 교인 ID(memberId)는 필수입니다." }, 400);
+    const rawMemberIds = Array.isArray(body.memberIds)
+      ? body.memberIds
+      : body.memberId
+      ? [body.memberId]
+      : [];
+
+    const memberIds = rawMemberIds
+      .map((id) => parseInt(id, 10))
+      .filter((id) => !isNaN(id) && id > 0);
+
+    if (isNaN(cohortId) || memberIds.length === 0) {
+      return c.json({ error: "InvalidRequest", message: "기수 ID와 최소 1명 이상의 교인 ID가 필요합니다." }, 400);
     }
 
     const enrollmentStatus = status || "IN_PROGRESS";
     const compDate = enrollmentStatus === "COMPLETED" ? (completionDate || new Date().toISOString().split("T")[0]) : null;
 
-    const res = await env.DB.prepare(`
-      INSERT INTO member_courses (member_id, cohort_id, status, completion_date, notes)
-      VALUES (?, ?, ?, ?, ?)
-    `).bind(
-      memberId,
-      cohortId,
-      enrollmentStatus,
-      compDate,
-      notes ? notes.trim() : null
-    ).run();
+    const statements = memberIds.map((mid) =>
+      env.DB.prepare(`
+        INSERT OR IGNORE INTO member_courses (member_id, cohort_id, status, completion_date, notes)
+        VALUES (?, ?, ?, ?, ?)
+      `).bind(
+        mid,
+        cohortId,
+        enrollmentStatus,
+        compDate,
+        notes ? notes.trim() : null
+      )
+    );
+
+    await env.DB.batch(statements);
 
     return c.json({
       success: true,
-      message: "수강생이 성공적으로 등록되었습니다.",
-      enrollmentId: res.meta.last_row_id,
+      message: `${memberIds.length}명의 수강생이 성공적으로 등록되었습니다.`,
+      count: memberIds.length,
     }, 201);
   } catch (error) {
     console.error("enrollCohortMemberController error:", error);
-    if (error.message?.includes("UNIQUE constraint failed: member_courses.member_id, member_courses.cohort_id")) {
-      return c.json({ error: "DuplicateEnrollment", message: "해당 교인은 이미 본 기수에 등록되어 있습니다." }, 409);
-    }
     return c.json({ error: "EnrollMemberError", message: error.message }, 500);
   }
 };
