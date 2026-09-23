@@ -102,6 +102,7 @@ const MemberManagement = () => {
     handleOpenEditModal,
     setMemberFormOpen,
     handleSubmitMemberForm,
+    handleSeparateMember,
     setUserForRoleModal,
     handleSaveRoleAndGardens,
     setUserToDelete,
@@ -546,6 +547,7 @@ const MemberManagement = () => {
           setMemberFormOpen(false);
           setUserToDelete(u);
         }}
+        onSeparateMember={handleSeparateMember}
       />
 
       {/* 정원지기 역할 모달 */}

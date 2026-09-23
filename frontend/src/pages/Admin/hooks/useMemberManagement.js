@@ -344,6 +344,26 @@ export const useMemberManagement = () => {
     }
   };
 
+  // 세대 독립(분가) 처리
+  const handleSeparateMember = async (memberId, separationData) => {
+    setSubmittingMember(true);
+    try {
+      await updateMember(memberId, {
+        isSeparateHousehold: true,
+        ...separationData,
+      });
+      openSnackbar("success", `${separationData.name || "교인"}님이 새 가구로 성공적으로 분가되었습니다.`);
+      setMemberFormOpen(false);
+      setMemberForEdit(null);
+      await fetchUsers(true);
+    } catch (error) {
+      console.error("Separation failed:", error);
+      openSnackbar("error", error?.response?.data?.message ?? "세대 분가 처리에 실패했습니다.");
+    } finally {
+      setSubmittingMember(false);
+    }
+  };
+
   // 제적(REMOVED) 처리
   const handleConfirmRemoveStatus = async (options = {}) => {
     if (!userToDelete) return;
@@ -493,6 +513,7 @@ export const useMemberManagement = () => {
       handleOpenEditModal,
       setMemberFormOpen,
       handleSubmitMemberForm,
+      handleSeparateMember,
       setUserForRoleModal,
       handleSaveRoleAndGardens,
       setUserToDelete,

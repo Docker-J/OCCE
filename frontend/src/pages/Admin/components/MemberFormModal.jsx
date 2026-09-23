@@ -40,6 +40,7 @@ import {
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import FamilyRestroomIcon from "@mui/icons-material/FamilyRestroom";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
@@ -124,12 +125,27 @@ const MemberFormModal = ({
   availableHouseholds = [],
   isSubmitting = false,
   onOpenDeleteDialog,
+  onSeparateMember,
 }) => {
   const isEdit = Boolean(initialData?.id);
 
   // Household type selection for create mode: 'new' or 'existing'
   const [householdMode, setHouseholdMode] = useState("new");
   const [isAddressManualEdit, setIsAddressManualEdit] = useState(false);
+
+  // 세대 독립(분가) 모달 상태
+  const [separateTargetMember, setSeparateTargetMember] = useState(null);
+  const [separateForm, setSeparateForm] = useState({
+    householdName: "",
+    gardenId: 1,
+    department: "청년부",
+    address: "",
+    addressDetail: "",
+    city: "Edmonton",
+    province: "AB",
+    postalCode: "",
+    notes: "",
+  });
 
   // 공통 세대(가구) 정보
   const [householdData, setHouseholdData] = useState({
@@ -328,6 +344,49 @@ const MemberFormModal = ({
     if (activeMemberIndex >= indexToRemove && activeMemberIndex > 0) {
       setActiveMemberIndex((prev) => prev - 1);
     }
+  };
+
+  // 세대 독립(분가) 모달 열기
+  const handleOpenSeparateDialog = (member) => {
+    setSeparateTargetMember(member);
+    setSeparateForm({
+      householdName: `${(member.name || "").trim()} 성도 가정`,
+      gardenId: householdData.gardenId || availableGardens[0]?.id || 1,
+      department:
+        member.department === "유초등부" || member.department === "중고등부"
+          ? "청년부"
+          : member.department || "청년부",
+      address: householdData.address || "",
+      addressDetail: "",
+      city: householdData.city || "Edmonton",
+      province: householdData.province || "AB",
+      postalCode: householdData.postalCode || "",
+      notes: "",
+    });
+  };
+
+  // 세대 독립(분가) 확정 처리
+  const handleConfirmSeparate = async () => {
+    if (!separateTargetMember || !onSeparateMember) return;
+    if (!separateForm.householdName?.trim()) {
+      alert("새 세대명을 입력해 주세요.");
+      return;
+    }
+    const memberId = separateTargetMember.id;
+    const separationPayload = {
+      name: separateTargetMember.name,
+      householdName: separateForm.householdName.trim(),
+      gardenId: separateForm.gardenId,
+      department: separateForm.department,
+      address: separateForm.address,
+      addressDetail: separateForm.addressDetail,
+      city: separateForm.city,
+      province: separateForm.province,
+      postalCode: separateForm.postalCode,
+      householdNotes: separateForm.notes,
+    };
+    setSeparateTargetMember(null);
+    await onSeparateMember(memberId, separationPayload);
   };
 
   // 전체 저장 제출 핸들러
@@ -906,6 +965,55 @@ const MemberFormModal = ({
               </Paper>
             )}
 
+            {/* 자녀/세대원 수정 시: 세대 독립 (분가) 안내 배너 카드 */}
+            {isEdit && currentMember?.id && !currentMember.isHead && (
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2,
+                  mb: 2.5,
+                  borderRadius: "14px",
+                  backgroundColor: "#eff6ff",
+                  border: "1.5px solid #bfdbfe",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: 1.5,
+                }}
+              >
+                <Box sx={{ flex: 1, minWidth: 260 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
+                    <HomeWorkOutlinedIcon sx={{ color: "#2563eb", fontSize: "1.3rem" }} />
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "#1e40af" }}>
+                      세대 독립 (새 가구로 분가)
+                    </Typography>
+                  </Box>
+                  <Typography variant="caption" sx={{ color: "#3b82f6", display: "block", mt: 0.4, lineHeight: 1.4 }}>
+                    현재 [{householdData.householdName || "기존 가구"}]의 {currentMember.relationship === "CHILD" ? "자녀" : "세대원"}로 등록되어 있습니다.
+                    결혼 또는 청년 독립으로 새 가구를 형성하려면 분가 버튼을 누르세요.
+                  </Typography>
+                </Box>
+
+                <Button
+                  size="small"
+                  variant="contained"
+                  onClick={() => handleOpenSeparateDialog(currentMember)}
+                  sx={{
+                    borderRadius: "10px",
+                    fontSize: "0.82rem",
+                    fontWeight: 800,
+                    backgroundColor: "#2563eb",
+                    "&:hover": { backgroundColor: "#1d4ed8" },
+                    px: 2,
+                    py: 0.8,
+                  }}
+                >
+                  이 세대원 분가(독립)하기
+                </Button>
+              </Paper>
+            )}
+
             {/* 선택된 세대원의 개인 인적사항 입력 폼 */}
             <Grid container spacing={2}>
               {/* 성명 (한글) */}
@@ -1272,6 +1380,149 @@ const MemberFormModal = ({
           </Box>
         </DialogActions>
       </LocalizationProvider>
+
+      {/* ========================================================= */}
+      {/* 세대 독립(분가) 전용 다이얼로그                            */}
+      {/* ========================================================= */}
+      <Dialog
+        open={Boolean(separateTargetMember)}
+        onClose={() => setSeparateTargetMember(null)}
+        maxWidth="sm"
+        fullWidth
+        slotProps={{
+          paper: {
+            sx: { borderRadius: "18px", p: 1 },
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 800, color: "#1e40af", display: "flex", alignItems: "center", gap: 1 }}>
+          <HomeWorkOutlinedIcon sx={{ color: "#2563eb", fontSize: "1.6rem" }} />
+          [{separateTargetMember?.name}] 성도 세대 독립(분가) 설정
+        </DialogTitle>
+        <DialogContent dividers sx={{ py: 2.5 }}>
+          <Typography variant="body2" sx={{ color: "#475569", mb: 2.5, lineHeight: 1.5 }}>
+            현재 <strong>[{householdData.householdName}]</strong>에서 분리하여, <strong>[{separateTargetMember?.name}]</strong> 성도를 세대주로 하는 신규 가구를 생성합니다.
+          </Typography>
+
+          <Grid container spacing={2}>
+            <Grid size={12}>
+              <TextField
+                fullWidth
+                size="small"
+                label="새 세대명 (가구 명칭)"
+                value={separateForm.householdName}
+                onChange={(e) => setSeparateForm((prev) => ({ ...prev, householdName: e.target.value }))}
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <FormControl fullWidth size="small">
+                <InputLabel id="sep-garden-label">소속 정원</InputLabel>
+                <Select
+                  labelId="sep-garden-label"
+                  value={separateForm.gardenId}
+                  label="소속 정원"
+                  onChange={(e) => setSeparateForm((prev) => ({ ...prev, gardenId: e.target.value }))}
+                  sx={{ borderRadius: "10px" }}
+                >
+                  {availableGardens.map((g) => (
+                    <MenuItem key={g.id || g.name} value={g.id || g.name}>
+                      {g.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <FormControl fullWidth size="small">
+                <InputLabel id="sep-dept-label">소속 부서</InputLabel>
+                <Select
+                  labelId="sep-dept-label"
+                  value={separateForm.department}
+                  label="소속 부서"
+                  onChange={(e) => setSeparateForm((prev) => ({ ...prev, department: e.target.value }))}
+                  sx={{ borderRadius: "10px" }}
+                >
+                  {DEPARTMENT_OPTIONS.map((d) => (
+                    <MenuItem key={d} value={d}>
+                      {d}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid size={12}>
+              <AddressAutocompleteInput
+                onAddressSelect={({ address, city, province, postalCode }) => {
+                  setSeparateForm((prev) => ({
+                    ...prev,
+                    address: address || prev.address,
+                    city: city || prev.city,
+                    province: province || prev.province,
+                    postalCode: postalCode || prev.postalCode,
+                  }));
+                }}
+                placeholder="새 거주 주소 검색 (이사/분가한 경우)"
+              />
+            </Grid>
+
+            <Grid size={12}>
+              <TextField
+                fullWidth
+                size="small"
+                label="기본 도로명 주소"
+                value={separateForm.address}
+                onChange={(e) => setSeparateForm((prev) => ({ ...prev, address: e.target.value }))}
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                fullWidth
+                size="small"
+                label="상세 주소 (Unit/Apt)"
+                placeholder="예: Apt 301"
+                value={separateForm.addressDetail}
+                onChange={(e) => setSeparateForm((prev) => ({ ...prev, addressDetail: e.target.value }))}
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                fullWidth
+                size="small"
+                label="우편번호 (Postal Code)"
+                placeholder="예: T6W 0A1"
+                value={separateForm.postalCode}
+                onChange={(e) => setSeparateForm((prev) => ({ ...prev, postalCode: e.target.value.toUpperCase() }))}
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button onClick={() => setSeparateTargetMember(null)} sx={{ color: "#64748b", borderRadius: "10px" }}>
+            취소
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleConfirmSeparate}
+            sx={{
+              borderRadius: "10px",
+              backgroundColor: "#2563eb",
+              fontWeight: 800,
+              px: 3,
+            }}
+          >
+            분가 확정하기
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   );
 };
@@ -1286,6 +1537,7 @@ MemberFormModal.propTypes = {
   availableHouseholds: PropTypes.array,
   isSubmitting: PropTypes.bool,
   onOpenDeleteDialog: PropTypes.func,
+  onSeparateMember: PropTypes.func,
 };
 
 export default MemberFormModal;
