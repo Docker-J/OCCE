@@ -36,9 +36,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Divider,
-  Tab,
-  Tabs,
 } from "@mui/material";
 
 import ForestIcon from "@mui/icons-material/Forest";
@@ -61,7 +58,6 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import PhoneOutlinedIcon from "@mui/icons-material/PhoneOutlined";
 import FamilyRestroomOutlinedIcon from "@mui/icons-material/FamilyRestroomOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 
 import {
   getAdminGardensWithStats,
@@ -120,7 +116,6 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
 
   // 소속 세대 및 교인 명단 확인 모달
   const [viewingGarden, setViewingGarden] = useState(null);
-  const [viewingTab, setViewingTab] = useState(0); // 0: 세대별 보기, 1: 전체 교인 목록
   const [modalSearchTerm, setModalSearchTerm] = useState("");
 
   // 삭제 확인 다이얼로그 대상
@@ -196,30 +191,28 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
     return households;
   };
 
-  // 모달 내 검색어로 필터링된 세대 목록
-  const modalHouseholds = useMemo(() => {
+  // 모달 내 세대별 정원 교인 명부 (가구 단위 지브라 패턴 적용 및 검색 필터링)
+  const gardenRegistryMembers = useMemo(() => {
     if (!viewingGarden) return [];
-    const list = getGardenHouseholds(viewingGarden);
-    if (!modalSearchTerm.trim()) return list;
-    const term = modalSearchTerm.trim().toLowerCase();
-    return list.filter((h) => {
-      const inHName = (h.householdName || "").toLowerCase().includes(term);
-      const inHead = (h.headName || "").toLowerCase().includes(term);
-      const inAddr = [h.address, h.addressDetail, h.city, h.postalCode].filter(Boolean).join(" ").toLowerCase().includes(term);
-      const inMembers = h.members.some(
-        (m) =>
-          (m.name || "").toLowerCase().includes(term) ||
-          (m.phone || "").replace(/\D/g, "").includes(term) ||
-          (m.position || "").toLowerCase().includes(term)
-      );
-      return inHName || inHead || inAddr || inMembers;
+    const households = getGardenHouseholds(viewingGarden);
+    const list = [];
+    households.forEach((h, hIdx) => {
+      const fullAddress = [h.address, h.addressDetail, h.city, h.province, h.postalCode].filter(Boolean).join(" ");
+      h.members.forEach((m, mIdx) => {
+        list.push({
+          ...m,
+          householdId: h.id,
+          householdName: h.householdName,
+          headName: h.headName,
+          householdAddress: fullAddress,
+          householdIndex: hIdx,
+          isZebra: hIdx % 2 === 1,
+          isFirstInHousehold: mIdx === 0,
+          householdMemberCount: h.members.length,
+        });
+      });
     });
-  }, [viewingGarden, modalSearchTerm, gardens, users]);
 
-  // 모달 내 검색어로 필터링된 전체 교인 목록
-  const modalMembers = useMemo(() => {
-    if (!viewingGarden) return [];
-    const list = getGardenMembers(viewingGarden);
     if (!modalSearchTerm.trim()) return list;
     const term = modalSearchTerm.trim().toLowerCase();
     return list.filter((m) => {
@@ -228,22 +221,25 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
       const inPos = (m.position || "").toLowerCase().includes(term);
       const inRel = (RELATIONSHIP_LABELS[m.relationship] || "").toLowerCase().includes(term);
       const inHName = (m.householdName || "").toLowerCase().includes(term);
-      return inName || inPhone || inPos || inRel || inHName;
+      const inAddr = (m.householdAddress || "").toLowerCase().includes(term);
+      return inName || inPhone || inPos || inRel || inHName || inAddr;
     });
   }, [viewingGarden, modalSearchTerm, gardens, users]);
 
-  // 정원지기(리더) 후보 목록 (활동 중인 교인)
+  // 정원지기(리더) 후보 목록 (해당 정원에 소속된 활동 교인만 선택 가능)
   const candidateLeaders = useMemo(() => {
-    return (users || [])
+    if (!editingGarden) return [];
+    const members = getGardenMembers(editingGarden);
+    return members
       .filter((m) => m.status !== "REMOVED")
       .map((m) => ({
         id: m.id,
         name: m.name,
         phone: m.phone,
         position: m.position,
-        label: `${m.name}${m.position ? ` (${m.position})` : ""} · ${m.phone || "연락처 미등록"}`,
+        label: `${m.name}${m.position ? ` (${m.position})` : ""} · ${m.phone ? formatPhoneNumber(m.phone) : "연락처 미등록"}`,
       }));
-  }, [users]);
+  }, [editingGarden, users, gardenMembersMap]);
 
   // 정원 통계 목록 불러오기
   const fetchGardensList = async () => {
@@ -946,16 +942,15 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                         )}
                       </TableCell>
 
-                      {/* 소속 세대수 (클릭 시 세대별 보기) */}
+                      {/* 소속 세대수 (클릭 시 정원 교인 명부 확인) */}
                       <TableCell align="center">
-                        <Tooltip title="클릭하여 소속 세대별 상세 현황 확인">
+                        <Tooltip title="클릭하여 정원 교인 명부 확인">
                           <Chip
                             size="small"
                             icon={<HomeWorkOutlinedIcon style={{ fontSize: 15 }} />}
                             label={`${hCount}가구`}
                             onClick={() => {
                               setViewingGarden(g);
-                              setViewingTab(0);
                               setModalSearchTerm("");
                             }}
                             variant="outlined"
@@ -976,16 +971,15 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                         </Tooltip>
                       </TableCell>
 
-                      {/* 소속 교인수 (클릭 시 교인 명단 확인) */}
+                      {/* 소속 교인수 (클릭 시 정원 교인 명부 확인) */}
                       <TableCell align="center">
-                        <Tooltip title="클릭하여 소속 전체 교인 명단 확인">
+                        <Tooltip title="클릭하여 정원 교인 명부 확인">
                           <Chip
                             size="small"
                             icon={<PeopleAltOutlinedIcon style={{ fontSize: 15 }} />}
                             label={`${mCount}명`}
                             onClick={() => {
                               setViewingGarden(g);
-                              setViewingTab(1);
                               setModalSearchTerm("");
                             }}
                             variant="outlined"
@@ -1163,23 +1157,34 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
               />
             </Grid>
 
-            {/* 정원지기 선택 */}
+            {/* 정원지기 선택 (정원 멤버 중에서만 선택 가능) */}
             <Grid size={12}>
-              <Autocomplete
-                size="small"
-                options={candidateLeaders}
-                getOptionLabel={(opt) => opt.label || ""}
-                value={candidateLeaders.find((l) => l.id === formData.leaderMemberId) || null}
-                onChange={(e, val) => setFormData((prev) => ({ ...prev, leaderMemberId: val?.id || null }))}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="정원지기(리더) 교인 선택"
-                    placeholder="교인 성명 검색..."
-                    sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
-                  />
-                )}
-              />
+              {!editingGarden ? (
+                <Alert severity="info" sx={{ borderRadius: "10px", fontSize: "0.85rem" }}>
+                  정원지기(리더)는 정원에 소속된 성도 중에서만 지정할 수 있습니다. 신규 정원 등록 후 교인 관리에서 성도를 배치한 뒤 정원지기를 지정해 주세요.
+                </Alert>
+              ) : candidateLeaders.length === 0 ? (
+                <Alert severity="warning" sx={{ borderRadius: "10px", fontSize: "0.85rem" }}>
+                  현재 정원에 소속된 성도가 없습니다. 교인 관리에서 먼저 성도를 이 정원에 배치해 주세요.
+                </Alert>
+              ) : (
+                <Autocomplete
+                  size="small"
+                  options={candidateLeaders}
+                  getOptionLabel={(opt) => opt.label || ""}
+                  value={candidateLeaders.find((l) => l.id === formData.leaderMemberId) || null}
+                  onChange={(e, val) => setFormData((prev) => ({ ...prev, leaderMemberId: val?.id || null }))}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="정원지기(리더) 선택 (소속 교인 중)"
+                      placeholder="소속 교인 성명 검색..."
+                      helperText="정원지기는 해당 정원에 소속된 교인 중에서만 선택할 수 있습니다."
+                      sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+                    />
+                  )}
+                />
+              )}
             </Grid>
 
           </Grid>
@@ -1206,12 +1211,12 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
       </Dialog>
 
       {/* ========================================================= */}
-      {/* 4. 소속 세대 및 교인 명단 확인 전용 모달 다이얼로그             */}
+      {/* 4. 정원 교인 명부 모달 다이얼로그 (세대별 지브라 패턴 적용)      */}
       {/* ========================================================= */}
       <Dialog
         open={Boolean(viewingGarden)}
         onClose={() => setViewingGarden(null)}
-        maxWidth="md"
+        maxWidth="lg"
         fullWidth
         slotProps={{
           paper: {
@@ -1240,8 +1245,8 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
             <Box
               sx={{
-                width: 36,
-                height: 36,
+                width: 38,
+                height: 38,
                 borderRadius: "10px",
                 backgroundColor: "rgba(22, 163, 74, 0.1)",
                 display: "flex",
@@ -1249,14 +1254,14 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
                 justifyContent: "center",
               }}
             >
-              <ForestIcon sx={{ color: "#16a34a", fontSize: 22 }} />
+              <ForestIcon sx={{ color: "#16a34a", fontSize: 24 }} />
             </Box>
             <Box>
               <Typography variant="h6" sx={{ fontWeight: 800, color: "#14532d", lineHeight: 1.2 }}>
-                [{viewingGarden?.name}] 소속 세대 및 교인 현황
+                [{viewingGarden?.name}] 정원 교인 명부
               </Typography>
               <Typography variant="caption" sx={{ color: "#64748b" }}>
-                소속된 가정(세대) 및 성도 상세 정보를 편리하게 조회합니다.
+                소속된 가구 및 교인 명단을 세대별 명부 형태로 한눈에 조회합니다.
               </Typography>
             </Box>
           </Box>
@@ -1265,375 +1270,253 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
           </IconButton>
         </DialogTitle>
 
-        {/* 탭 네비게이션 & 검색 필터 툴바 */}
-        <Box sx={{ px: 3, pt: 1.5, backgroundColor: "#fcfdfc", borderBottom: "1px solid #e2e8f0" }}>
+        {/* 상단 통계 요약 및 검색 필터 툴바 */}
+        <Box
+          sx={{
+            px: 3,
+            py: 1.6,
+            backgroundColor: "#fcfdfc",
+            borderBottom: "1px solid #e2e8f0",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 1.5,
+          }}
+        >
           {/* 상단 정원 현황 요약 칩 */}
-          <Box sx={{ display: "flex", gap: 1.2, flexWrap: "wrap", alignItems: "center", mb: 1.5 }}>
+          <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }}>
             <Chip
               icon={<HomeWorkOutlinedIcon style={{ fontSize: 16 }} />}
               label={`총 ${viewingGarden?.householdCount ?? getGardenHouseholds(viewingGarden).length}가구`}
-              sx={{ backgroundColor: "#eff6ff", color: "#1d4ed8", fontWeight: 700, height: 26 }}
+              sx={{ backgroundColor: "#eff6ff", color: "#1d4ed8", fontWeight: 700, height: 28 }}
             />
             <Chip
               icon={<PeopleAltOutlinedIcon style={{ fontSize: 16 }} />}
               label={`총 ${viewingGarden?.memberCount ?? getGardenMembers(viewingGarden).length}명 성도`}
-              sx={{ backgroundColor: "#f0fdf4", color: "#15803d", fontWeight: 700, height: 26 }}
+              sx={{ backgroundColor: "#f0fdf4", color: "#15803d", fontWeight: 700, height: 28 }}
             />
             {viewingGarden?.leaderName ? (
               <Chip
                 label={`정원지기: ${viewingGarden.leaderName}`}
-                sx={{ backgroundColor: "#fef3c7", color: "#b45309", fontWeight: 700, height: 26 }}
+                sx={{ backgroundColor: "#fef3c7", color: "#b45309", fontWeight: 700, height: 28 }}
               />
             ) : (
               <Chip
                 label="정원지기: 미지정"
-                sx={{ backgroundColor: "#f1f5f9", color: "#64748b", fontWeight: 600, height: 26 }}
+                sx={{ backgroundColor: "#f1f5f9", color: "#64748b", fontWeight: 600, height: 28 }}
               />
             )}
           </Box>
 
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
-            <Tabs
-              value={viewingTab}
-              onChange={(e, val) => setViewingTab(val)}
-              sx={{
-                minHeight: 42,
-                "& .MuiTab-root": {
-                  minHeight: 42,
-                  py: 1,
-                  px: 2,
-                  fontWeight: 700,
-                  fontSize: "0.9rem",
-                },
-                "& .Mui-selected": { color: "#15803d" },
-                "& .MuiTabs-indicator": { backgroundColor: "#16a34a", height: 3 },
-              }}
-            >
-              <Tab
-                icon={<FamilyRestroomOutlinedIcon sx={{ fontSize: 18 }} />}
-                iconPosition="start"
-                label={`세대별 보기 (${getGardenHouseholds(viewingGarden).length}가구)`}
-              />
-              <Tab
-                icon={<PersonOutlinedIcon sx={{ fontSize: 18 }} />}
-                iconPosition="start"
-                label={`전체 교인 목록 (${getGardenMembers(viewingGarden).length}명)`}
-              />
-            </Tabs>
-
-            {/* 모달 내 검색창 */}
-            <TextField
-              size="small"
-              placeholder={viewingTab === 0 ? "가구명, 세대주, 주소, 세대원..." : "성명, 직분, 가족관계, 연락처..."}
-              value={modalSearchTerm}
-              onChange={(e) => setModalSearchTerm(e.target.value)}
-              sx={{
-                width: { xs: "100%", sm: 260 },
-                backgroundColor: "#fff",
-                mb: 1,
-                "& .MuiOutlinedInput-root": { borderRadius: "10px" },
-              }}
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon sx={{ color: "#94a3b8", fontSize: "1rem" }} />
-                    </InputAdornment>
-                  ),
-                  endAdornment: modalSearchTerm ? (
-                    <InputAdornment position="end">
-                      <IconButton size="small" onClick={() => setModalSearchTerm("")}>
-                        <ClearIcon fontSize="small" />
-                      </IconButton>
-                    </InputAdornment>
-                  ) : null,
-                },
-              }}
-            />
-          </Box>
+          {/* 모달 내 검색창 */}
+          <TextField
+            size="small"
+            placeholder="성명, 가구명, 주소, 직분, 연락처 검색..."
+            value={modalSearchTerm}
+            onChange={(e) => setModalSearchTerm(e.target.value)}
+            sx={{
+              width: { xs: "100%", sm: 280 },
+              backgroundColor: "#fff",
+              "& .MuiOutlinedInput-root": { borderRadius: "10px" },
+            }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: "#94a3b8", fontSize: "1rem" }} />
+                  </InputAdornment>
+                ),
+                endAdornment: modalSearchTerm ? (
+                  <InputAdornment position="end">
+                    <IconButton size="small" onClick={() => setModalSearchTerm("")}>
+                      <ClearIcon fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                ) : null,
+              },
+            }}
+          />
         </Box>
 
-        {/* 다이얼로그 본문 */}
-        <DialogContent sx={{ p: 3, backgroundColor: "#f8fafc", maxHeight: "60vh", minHeight: 320, overflowY: "auto" }}>
-          {viewingTab === 0 ? (
-            /* 1) 세대별 보기 */
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              {modalHouseholds.length === 0 ? (
-                <Box sx={{ py: 6, textAlign: "center", color: "#94a3b8" }}>
-                  <Typography variant="body2">
-                    {modalSearchTerm ? "검색 조건에 맞는 세대가 없습니다." : "소속된 세대가 없습니다."}
-                  </Typography>
-                </Box>
-              ) : (
-                modalHouseholds.map((h) => (
-                  <Paper
-                    key={h.id}
-                    elevation={0}
-                    sx={{
-                      p: 2.2,
-                      borderRadius: "14px",
-                      backgroundColor: "#ffffff",
-                      border: "1px solid #e2e8f0",
-                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.03)",
-                      transition: "all 0.2s ease",
-                      "&:hover": {
-                        borderColor: "#86efac",
-                        boxShadow: "0 4px 16px rgba(22, 163, 74, 0.08)",
-                      },
-                    }}
-                  >
-                    {/* 가구 헤더: 가구명, 세대주, 주소, 인원수 */}
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 1, mb: 1.5 }}>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Box
-                          sx={{
-                            width: 36,
-                            height: 36,
-                            borderRadius: "10px",
-                            backgroundColor: "#f0fdf4",
-                            color: "#16a34a",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <FamilyRestroomOutlinedIcon sx={{ fontSize: 20 }} />
-                        </Box>
-                        <Box>
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
-                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: "#1e293b", lineHeight: 1.2 }}>
-                              {h.householdName}
-                            </Typography>
-                            <Chip
-                              size="small"
-                              label={`세대주: ${h.headName}`}
-                              sx={{
-                                height: 20,
-                                fontSize: "0.72rem",
-                                fontWeight: 700,
-                                backgroundColor: "#dcfce7",
-                                color: "#15803d",
-                              }}
-                            />
-                          </Box>
-                          {/* 주소 */}
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.3 }}>
-                            <LocationOnOutlinedIcon sx={{ fontSize: 14, color: "#94a3b8" }} />
-                            <Typography variant="caption" sx={{ color: "#64748b" }}>
-                              {[h.address, h.addressDetail, h.city, h.province, h.postalCode].filter(Boolean).join(", ") || "주소 미등록"}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </Box>
-
-                      <Chip
-                        size="small"
-                        icon={<PeopleAltOutlinedIcon style={{ fontSize: 14 }} />}
-                        label={`${h.members.length}명 가족`}
-                        sx={{
-                          height: 24,
-                          fontSize: "0.75rem",
-                          fontWeight: 700,
-                          backgroundColor: "#eff6ff",
-                          color: "#1d4ed8",
-                        }}
-                      />
-                    </Box>
-
-                    <Divider sx={{ my: 1.2, borderColor: "#f1f5f9" }} />
-
-                    {/* 소속 세대원 상세 그리드/리스트 */}
-                    <Box sx={{ display: "flex", flexDirection: "column", gap: 0.8 }}>
-                      {h.members.map((m) => {
-                        const relKey = m.relationship || (m.isHead ? "HEAD" : "OTHER");
-                        const relMeta = RELATIONSHIP_COLORS[relKey] || RELATIONSHIP_COLORS.OTHER;
-                        const relLabel = RELATIONSHIP_LABELS[relKey] || (m.isHead ? "세대주" : "세대원");
-
-                        return (
-                          <Box
-                            key={m.id}
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              p: 1,
-                              px: 1.5,
-                              borderRadius: "8px",
-                              backgroundColor: "#f8fafc",
-                              "&:hover": { backgroundColor: "#f1f5f9" },
-                              flexWrap: "wrap",
-                              gap: 1,
-                            }}
-                          >
-                            {/* 성명 & 관계 & 직분 */}
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                              <Typography variant="body2" sx={{ fontWeight: 800, color: "#1e293b" }}>
-                                {m.name}
-                              </Typography>
-                              <Chip
-                                size="small"
-                                label={relLabel}
-                                sx={{
-                                  height: 20,
-                                  fontSize: "0.7rem",
-                                  fontWeight: 700,
-                                  backgroundColor: relMeta.bg,
-                                  color: relMeta.color,
-                                  border: `1px solid ${relMeta.border}`,
-                                }}
-                              />
-                              {m.position && (
-                                <Chip
-                                  size="small"
-                                  label={m.position}
-                                  sx={{ height: 20, fontSize: "0.7rem", backgroundColor: "#e2e8f0", color: "#334155" }}
-                                />
-                              )}
-                              {m.baptismStatus && m.baptismStatus !== "NONE" && (
-                                <Chip
-                                  size="small"
-                                  label={BAPTISM_LABELS[m.baptismStatus]?.label || m.baptismStatus}
-                                  sx={{
-                                    height: 20,
-                                    fontSize: "0.68rem",
-                                    backgroundColor: BAPTISM_LABELS[m.baptismStatus]?.bg || "#f1f5f9",
-                                    color: BAPTISM_LABELS[m.baptismStatus]?.color || "#475569",
-                                  }}
-                                />
-                              )}
-                            </Box>
-
-                            {/* 연락처 & 부서 */}
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                              {m.department && (
-                                <Typography variant="caption" sx={{ color: "#64748b", fontWeight: 600 }}>
-                                  {m.department}
-                                </Typography>
-                              )}
-                              {m.phone ? (
-                                <Box sx={{ display: "flex", alignItems: "center", gap: 0.4 }}>
-                                  <PhoneOutlinedIcon sx={{ fontSize: 13, color: "#94a3b8" }} />
-                                  <Typography variant="caption" sx={{ color: "#475569", fontWeight: 600 }}>
-                                    {formatPhoneNumber(m.phone)}
-                                  </Typography>
-                                </Box>
-                              ) : (
-                                <Typography variant="caption" sx={{ color: "#cbd5e1" }}>
-                                  연락처 없음
-                                </Typography>
-                              )}
-                            </Box>
-                          </Box>
-                        );
-                      })}
-                    </Box>
-                  </Paper>
-                ))
-              )}
+        {/* 다이얼로그 본문: 교인 명부 (세대별 지브라 패턴 적용) */}
+        <DialogContent sx={{ p: 0, backgroundColor: "#ffffff", maxHeight: "65vh", minHeight: 320, overflowY: "auto" }}>
+          {gardenRegistryMembers.length === 0 ? (
+            <Box sx={{ py: 8, textAlign: "center", color: "#94a3b8" }}>
+              <PeopleAltOutlinedIcon sx={{ fontSize: 44, color: "#cbd5e1", mb: 1 }} />
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                {modalSearchTerm ? "검색 조건에 일치하는 교인이 없습니다." : "정원에 소속된 교인이 없습니다."}
+              </Typography>
             </Box>
           ) : (
-            /* 2) 전체 교인 목록 (테이블 뷰) */
-            <Box>
-              {modalMembers.length === 0 ? (
-                <Box sx={{ py: 6, textAlign: "center", color: "#94a3b8" }}>
-                  <Typography variant="body2">
-                    {modalSearchTerm ? "검색 조건에 맞는 교인이 없습니다." : "소속된 교인이 없습니다."}
-                  </Typography>
-                </Box>
-              ) : (
-                <TableContainer component={Paper} elevation={0} sx={{ border: "1px solid #e2e8f0", borderRadius: "12px", overflow: "hidden" }}>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow sx={{ "& th": { backgroundColor: "#f8fafc", fontWeight: 700, color: "#475569", py: 1.2 } }}>
-                        <TableCell>성명</TableCell>
-                        <TableCell align="center">가족관계</TableCell>
-                        <TableCell align="center">직분</TableCell>
-                        <TableCell>소속 세대 (가정)</TableCell>
-                        <TableCell align="center">세례</TableCell>
-                        <TableCell>연락처</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {modalMembers.map((m) => {
-                        const relKey = m.relationship || (m.isHead ? "HEAD" : "OTHER");
-                        const relMeta = RELATIONSHIP_COLORS[relKey] || RELATIONSHIP_COLORS.OTHER;
-                        const relLabel = RELATIONSHIP_LABELS[relKey] || (m.isHead ? "세대주" : "-");
+            <TableContainer>
+              <Table size="small" sx={{ minWidth: 700 }}>
+                <TableHead>
+                  <TableRow sx={{ "& th": { backgroundColor: "#f1f5f9", fontWeight: 800, color: "#334155", py: 1.3, fontSize: "0.82rem" } }}>
+                    <TableCell sx={{ pl: 3, width: "30%" }}>세대 (가구)</TableCell>
+                    <TableCell sx={{ width: "20%" }}>성명</TableCell>
+                    <TableCell align="center" sx={{ width: "12%" }}>가족관계</TableCell>
+                    <TableCell align="center" sx={{ width: "12%" }}>직분</TableCell>
+                    <TableCell align="center" sx={{ width: "12%" }}>세례구분</TableCell>
+                    <TableCell sx={{ pr: 3, width: "14%" }}>연락처</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {gardenRegistryMembers.map((m, index) => {
+                    const relKey = m.relationship || (m.isHead ? "HEAD" : "OTHER");
+                    const relMeta = RELATIONSHIP_COLORS[relKey] || RELATIONSHIP_COLORS.OTHER;
+                    const relLabel = RELATIONSHIP_LABELS[relKey] || (m.isHead ? "세대주" : "-");
+                    const isLeader = viewingGarden?.leaderMemberId === m.id || viewingGarden?.leaderName === m.name;
 
-                        return (
-                          <TableRow key={m.id} hover>
-                            <TableCell sx={{ fontWeight: 800, color: "#1e293b", py: 1.2 }}>
+                    // 세대별 지브라 패턴 배경색 (가구 단위로 흰색/연회색 교차)
+                    const rowBg = m.isZebra ? "#f8fafc" : "#ffffff";
+                    const isNewHousehold = m.isFirstInHousehold && index > 0;
+
+                    return (
+                      <TableRow
+                        key={m.id}
+                        hover
+                        sx={{
+                          backgroundColor: rowBg,
+                          borderTop: isNewHousehold ? "2px solid #cbd5e1" : "1px solid #f1f5f9",
+                          "&:hover": {
+                            backgroundColor: m.isZebra ? "#f1f5f9" : "#f8fafc",
+                          },
+                        }}
+                      >
+                        {/* 세대 (가구) 정보 */}
+                        <TableCell sx={{ pl: 3, py: 1.1, verticalAlign: "top" }}>
+                          {m.isFirstInHousehold ? (
+                            <Box>
                               <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
-                                <span>{m.name}</span>
-                                {m.isHead && (
-                                  <Chip
-                                    size="small"
-                                    label="세대주"
-                                    sx={{
-                                      height: 18,
-                                      fontSize: "0.68rem",
-                                      backgroundColor: "#dcfce7",
-                                      color: "#15803d",
-                                      fontWeight: 700,
-                                    }}
-                                  />
-                                )}
-                              </Box>
-                            </TableCell>
-                            <TableCell align="center">
-                              <Chip
-                                size="small"
-                                label={relLabel}
-                                sx={{
-                                  height: 20,
-                                  fontSize: "0.7rem",
-                                  fontWeight: 600,
-                                  backgroundColor: relMeta.bg,
-                                  color: relMeta.color,
-                                  border: `1px solid ${relMeta.border}`,
-                                }}
-                              />
-                            </TableCell>
-                            <TableCell align="center">
-                              <Chip
-                                size="small"
-                                label={m.position || "성도"}
-                                sx={{ height: 20, fontSize: "0.72rem", backgroundColor: "#f1f5f9", color: "#334155" }}
-                              />
-                            </TableCell>
-                            <TableCell sx={{ color: "#475569", fontSize: "0.84rem" }}>
-                              {m.householdName || `${m.headName || m.name} 성도 가정`}
-                            </TableCell>
-                            <TableCell align="center">
-                              {m.baptismStatus && m.baptismStatus !== "NONE" ? (
+                                <FamilyRestroomOutlinedIcon sx={{ fontSize: 16, color: "#16a34a" }} />
+                                <Typography variant="body2" sx={{ fontWeight: 800, color: "#1e293b" }}>
+                                  {m.householdName}
+                                </Typography>
                                 <Chip
                                   size="small"
-                                  label={BAPTISM_LABELS[m.baptismStatus]?.label || m.baptismStatus}
+                                  label={`${m.householdMemberCount}명`}
                                   sx={{
                                     height: 18,
                                     fontSize: "0.68rem",
-                                    backgroundColor: BAPTISM_LABELS[m.baptismStatus]?.bg || "#f8fafc",
-                                    color: BAPTISM_LABELS[m.baptismStatus]?.color || "#475569",
+                                    fontWeight: 700,
+                                    backgroundColor: "#e2e8f0",
+                                    color: "#475569",
                                   }}
                                 />
-                              ) : (
-                                <Typography variant="caption" sx={{ color: "#cbd5e1" }}>
-                                  -
-                                </Typography>
+                              </Box>
+                              {m.householdAddress && (
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 0.4, mt: 0.3 }}>
+                                  <LocationOnOutlinedIcon sx={{ fontSize: 13, color: "#94a3b8" }} />
+                                  <Typography variant="caption" sx={{ color: "#64748b", fontSize: "0.74rem" }}>
+                                    {m.householdAddress}
+                                  </Typography>
+                                </Box>
                               )}
-                            </TableCell>
-                            <TableCell sx={{ color: "#334155", fontSize: "0.82rem", fontWeight: 500 }}>
-                              {formatPhoneNumber(m.phone)}
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              )}
-            </Box>
+                            </Box>
+                          ) : (
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, pl: 2.2 }}>
+                              <Typography variant="caption" sx={{ color: "#94a3b8", fontSize: "0.75rem" }}>
+                                ↳ {m.householdName}
+                              </Typography>
+                            </Box>
+                          )}
+                        </TableCell>
+
+                        {/* 교인 성명 및 리더/세대주 배지 */}
+                        <TableCell sx={{ py: 1.1, verticalAlign: "middle" }}>
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, flexWrap: "wrap" }}>
+                            <Typography variant="body2" sx={{ fontWeight: 800, color: "#0f172a" }}>
+                              {m.name}
+                            </Typography>
+                            {isLeader && (
+                              <Chip
+                                size="small"
+                                label="정원지기"
+                                sx={{
+                                  height: 20,
+                                  fontSize: "0.68rem",
+                                  fontWeight: 800,
+                                  backgroundColor: "#fef3c7",
+                                  color: "#b45309",
+                                  border: "1px solid #fde68a",
+                                }}
+                              />
+                            )}
+                            {m.isHead && (
+                              <Chip
+                                size="small"
+                                label="세대주"
+                                sx={{
+                                  height: 18,
+                                  fontSize: "0.68rem",
+                                  fontWeight: 700,
+                                  backgroundColor: "#dcfce7",
+                                  color: "#15803d",
+                                }}
+                              />
+                            )}
+                          </Box>
+                        </TableCell>
+
+                        {/* 가족관계 */}
+                        <TableCell align="center" sx={{ py: 1.1, verticalAlign: "middle" }}>
+                          <Chip
+                            size="small"
+                            label={relLabel}
+                            sx={{
+                              height: 20,
+                              fontSize: "0.7rem",
+                              fontWeight: 700,
+                              backgroundColor: relMeta.bg,
+                              color: relMeta.color,
+                              border: `1px solid ${relMeta.border}`,
+                            }}
+                          />
+                        </TableCell>
+
+                        {/* 직분 */}
+                        <TableCell align="center" sx={{ py: 1.1, verticalAlign: "middle" }}>
+                          <Chip
+                            size="small"
+                            label={m.position || "성도"}
+                            sx={{ height: 20, fontSize: "0.72rem", backgroundColor: "#f1f5f9", color: "#334155" }}
+                          />
+                        </TableCell>
+
+                        {/* 세례구분 */}
+                        <TableCell align="center" sx={{ py: 1.1, verticalAlign: "middle" }}>
+                          {m.baptismStatus && m.baptismStatus !== "NONE" ? (
+                            <Chip
+                              size="small"
+                              label={BAPTISM_LABELS[m.baptismStatus]?.label || m.baptismStatus}
+                              sx={{
+                                height: 18,
+                                fontSize: "0.68rem",
+                                backgroundColor: BAPTISM_LABELS[m.baptismStatus]?.bg || "#f8fafc",
+                                color: BAPTISM_LABELS[m.baptismStatus]?.color || "#475569",
+                              }}
+                            />
+                          ) : (
+                            <Typography variant="caption" sx={{ color: "#cbd5e1" }}>
+                              -
+                            </Typography>
+                          )}
+                        </TableCell>
+
+                        {/* 연락처 */}
+                        <TableCell sx={{ pr: 3, py: 1.1, color: "#334155", fontSize: "0.82rem", fontWeight: 500, verticalAlign: "middle" }}>
+                          {m.phone ? formatPhoneNumber(m.phone) : <span style={{ color: "#cbd5e1" }}>-</span>}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
           )}
         </DialogContent>
+
         <DialogActions sx={{ px: 3, py: 1.8, backgroundColor: "#fcfdfc", borderTop: "1px solid #f1f5f9", justifyContent: "space-between" }}>
           <Button
             size="small"
@@ -1647,7 +1530,17 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated }) => {
           >
             정원 정보 수정하기
           </Button>
-          <Button onClick={() => setViewingGarden(null)} variant="contained" sx={{ borderRadius: "10px", backgroundColor: "#16a34a", px: 2.5 }}>
+          <Button
+            onClick={() => setViewingGarden(null)}
+            variant="contained"
+            sx={{
+              borderRadius: "10px",
+              backgroundColor: "#16a34a",
+              "&:hover": { backgroundColor: "#15803d" },
+              fontWeight: 700,
+              px: 3,
+            }}
+          >
             닫기
           </Button>
         </DialogActions>
