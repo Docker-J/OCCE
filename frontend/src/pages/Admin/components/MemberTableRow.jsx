@@ -59,7 +59,9 @@ const MemberTableRow = ({
   return (
     <TableRow
       hover
+      onClick={() => onOpenEditModal(user)}
       sx={{
+        cursor: "pointer",
         "&:last-child td, &:last-child th": { borderBottom: 0 },
         transition: "all 0.15s ease",
         backgroundColor: isRemoved
@@ -323,7 +325,10 @@ const MemberTableRow = ({
               icon={<ForestIcon sx={{ fontSize: "1.1rem !important", color: "inherit !important" }} />}
               label="정원지기"
               clickable
-              onClick={() => onOpenRoleModal(user)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenRoleModal(user);
+              }}
               sx={{
                 fontWeight: 700,
                 fontSize: "0.82rem",
@@ -342,7 +347,10 @@ const MemberTableRow = ({
             <Chip
               label="-"
               clickable
-              onClick={() => onOpenRoleModal(user)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenRoleModal(user);
+              }}
               sx={{
                 fontWeight: 700,
                 fontSize: "1rem",
@@ -406,7 +414,10 @@ const MemberTableRow = ({
             <IconButton
               size="small"
               disabled={isProcessing}
-              onClick={() => onOpenEditModal(user)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenEditModal(user);
+              }}
               sx={{
                 color: "#2563eb",
                 "&:hover": { backgroundColor: "rgba(37, 99, 235, 0.08)" },
@@ -420,7 +431,10 @@ const MemberTableRow = ({
             <IconButton
               size="small"
               disabled={isProcessing}
-              onClick={() => onOpenDeleteDialog(user)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenDeleteDialog(user);
+              }}
               sx={{
                 color: "#ef4444",
                 "&:hover": { backgroundColor: "rgba(239, 68, 68, 0.08)" },

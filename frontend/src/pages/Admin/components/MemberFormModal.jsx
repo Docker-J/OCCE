@@ -47,6 +47,9 @@ import { GatheringDateButtonField } from "../../Community/GatheringPickerFields"
 import SchoolIcon from "@mui/icons-material/School";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
+import ForestIcon from "@mui/icons-material/Forest";
 import { getMemberCourses } from "../../../api/admin";
 
 const RELATIONSHIP_OPTIONS = [
@@ -354,17 +357,188 @@ const MemberFormModal = ({
         )}
         <Box>
           <Typography variant="h6" sx={{ fontWeight: 800, color: "#111" }}>
-            {isEdit ? "교인 정보 및 세대 주소 수정" : "새 교인 및 세대 등록"}
+            {isEdit ? `${formData.name || "교인"} 교적 상세 및 정보 수정` : "새 교인 및 세대 등록"}
           </Typography>
           <Typography variant="caption" sx={{ color: "#666" }}>
             {isEdit
-              ? `${formData.name || "교인"}님의 인적사항 및 세대 주소를 수정합니다.`
+              ? `${formData.name || "교인"} 성도의 상세 교적 정보, 세대 주소 및 수강 이력을 확인하고 수정합니다.`
               : "온교회 교적부에 새 성도와 세대 정보를 등록합니다."}
           </Typography>
         </Box>
       </DialogTitle>
 
       <DialogContent dividers sx={{ py: 2.5, px: 3, overflowY: "auto", flex: "1 1 auto" }}>
+        {/* 교인 상세 프로필 요약 카드 (행 클릭 시 한눈에 확인 가능한 디테일 뷰) */}
+        {isEdit && initialData && (
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2.2,
+              mb: 3,
+              borderRadius: "16px",
+              background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
+              border: "1px solid #e2e8f0",
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              justifyContent: "space-between",
+              alignItems: { xs: "flex-start", sm: "center" },
+              gap: 1.5,
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.8 }}>
+              <Box
+                sx={{
+                  width: 46,
+                  height: 46,
+                  borderRadius: "50%",
+                  backgroundColor: initialData.status === "REMOVED" ? "#fee2e2" : "#ffedd5",
+                  color: initialData.status === "REMOVED" ? "#dc2626" : "#ea580c",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: 800,
+                  fontSize: "1.15rem",
+                  flexShrink: 0,
+                }}
+              >
+                {initialData.name ? initialData.name.charAt(0) : "교"}
+              </Box>
+              <Box>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, flexWrap: "wrap" }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: 800,
+                      color: initialData.status === "REMOVED" ? "#991b1b" : "#0f172a",
+                      fontSize: "1.05rem",
+                    }}
+                  >
+                    {initialData.name || "(이름 없음)"}
+                  </Typography>
+                  {initialData.nameEn && (
+                    <Typography variant="body2" sx={{ color: "#64748b", fontWeight: 500 }}>
+                      ({initialData.nameEn})
+                    </Typography>
+                  )}
+                  {initialData.status === "REMOVED" ? (
+                    <Chip
+                      size="small"
+                      label="제적"
+                      sx={{
+                        height: 22,
+                        fontSize: "0.72rem",
+                        fontWeight: 700,
+                        backgroundColor: "rgba(220, 38, 38, 0.1)",
+                        color: "#dc2626",
+                        border: "1px solid rgba(220, 38, 38, 0.3)",
+                      }}
+                    />
+                  ) : (
+                    <Chip
+                      size="small"
+                      label={
+                        initialData.isHead
+                          ? "세대주"
+                          : RELATIONSHIP_OPTIONS.find((r) => r.value === initialData.relationship)?.label || "세대원"
+                      }
+                      sx={{
+                        height: 22,
+                        fontSize: "0.72rem",
+                        fontWeight: 700,
+                        backgroundColor: initialData.isHead ? "rgba(234, 88, 12, 0.12)" : "#e2e8f0",
+                        color: initialData.isHead ? "#c2410c" : "#475569",
+                        border: initialData.isHead ? "1px solid rgba(234, 88, 12, 0.3)" : "1px solid #cbd5e1",
+                      }}
+                    />
+                  )}
+                </Box>
+                <Typography variant="caption" sx={{ color: "#64748b", display: "block", mt: 0.3 }}>
+                  {initialData.position || "성도"} · {BAPTISM_OPTIONS.find((b) => b.value === initialData.baptismStatus)?.label || "세례"} · {initialData.department || "장년부"}
+                  {initialData.registrationDate ? ` · 등록일: ${initialData.registrationDate}` : ""}
+                </Typography>
+              </Box>
+            </Box>
+
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, flexWrap: "wrap" }}>
+              {/* 소속 정원 */}
+              {(initialData.gardenName || initialData.garden) && (
+                <Chip
+                  icon={<ForestIcon sx={{ fontSize: "14px !important", color: "inherit !important" }} />}
+                  size="small"
+                  label={initialData.gardenName || initialData.garden}
+                  sx={{
+                    height: 26,
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
+                    backgroundColor: "rgba(234, 88, 12, 0.1)",
+                    color: "#ea580c",
+                    border: "1px solid rgba(234, 88, 12, 0.25)",
+                  }}
+                />
+              )}
+
+              {/* 웹가입 여부 */}
+              {initialData.isRegistered ? (
+                <Chip
+                  size="small"
+                  label="웹가입 완료"
+                  sx={{
+                    height: 26,
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
+                    backgroundColor: "#f0fdf4",
+                    color: "#16a34a",
+                    border: "1px solid #bbf7d0",
+                  }}
+                />
+              ) : (
+                <Chip
+                  size="small"
+                  label="웹 미가입"
+                  sx={{
+                    height: 26,
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                    backgroundColor: "#f1f5f9",
+                    color: "#64748b",
+                    border: "1px solid #e2e8f0",
+                  }}
+                />
+              )}
+
+              {/* 알림 수신 여부 */}
+              {initialData.hasNotification ? (
+                <Chip
+                  icon={<NotificationsActiveIcon sx={{ fontSize: "14px !important", color: "#16a34a !important" }} />}
+                  size="small"
+                  label={`알림 수신중${initialData.deviceCount ? ` (${initialData.deviceCount}대)` : ""}`}
+                  sx={{
+                    height: 26,
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
+                    backgroundColor: "#f0fdf4",
+                    color: "#16a34a",
+                    border: "1px solid #bbf7d0",
+                  }}
+                />
+              ) : (
+                <Chip
+                  icon={<NotificationsOffIcon sx={{ fontSize: "14px !important", color: "#94a3b8 !important" }} />}
+                  size="small"
+                  label="알림 미등록"
+                  sx={{
+                    height: 26,
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                    backgroundColor: "#f1f5f9",
+                    color: "#64748b",
+                    border: "1px solid #e2e8f0",
+                  }}
+                />
+              )}
+            </Box>
+          </Paper>
+        )}
         {/* 1. 세대(가구) 및 거주 주소 정보 섹션 */}
         <Box sx={{ mb: 3 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>

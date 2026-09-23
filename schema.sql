@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS church_members (
   registration_date DATE NULL,                    -- 실제 교회 등록 일자
   
   -- 온교회 단일 상태 머신 (제적 시 REMOVED)
-  status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE', 'REMOVED')),
+  status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'REMOVED')),
   
   -- 웹 계정 매핑
   is_registered BOOLEAN NOT NULL DEFAULT 0,
