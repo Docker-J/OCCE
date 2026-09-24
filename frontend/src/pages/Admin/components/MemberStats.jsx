@@ -21,7 +21,7 @@ const MemberStats = ({ metrics }) => {
       title: "등록 교인",
       value: `${metrics.total}명`,
       subValue: `${metrics.householdCount}세대`,
-      subText: `총 ${metrics.householdCount}가구 · 교역자 ${metrics.clergyCount || 0}명${metrics.removedCount ? ` (제적 ${metrics.removedCount}명 제외)` : ""}`,
+      subText: `총 ${metrics.householdCount}가구 · 교역자 ${metrics.clergyCount || 0}명`,
       icon: <PeopleAltOutlinedIcon fontSize="medium" />,
       bg: "rgba(234, 88, 12, 0.1)",
       color: "#111",
