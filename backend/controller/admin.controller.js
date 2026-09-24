@@ -1306,6 +1306,10 @@ export const listHouseholdsController = async (c) => {
         h.postal_code as postalCode
       FROM households h
       LEFT JOIN gardens g ON h.garden_id = g.id
+      WHERE EXISTS (
+        SELECT 1 FROM church_members m 
+        WHERE m.household_id = h.id AND m.status != 'REMOVED'
+      )
       ORDER BY headName ASC, h.id ASC
     `).all();
 
@@ -1676,7 +1680,13 @@ export const manageGardensController = async (c) => {
         cm.name as leaderName,
         g.order_num as orderNum,
         g.is_active as isActive,
-        (SELECT COUNT(*) FROM households h WHERE h.garden_id = g.id) as householdCount,
+        (
+          SELECT COUNT(DISTINCT h.id) 
+          FROM households h 
+          JOIN church_members m ON m.household_id = h.id 
+          WHERE (h.garden_id = g.id OR (h.garden_id IS NULL AND g.id = 1))
+            AND m.status != 'REMOVED'
+        ) as householdCount,
         (
           SELECT COUNT(*) 
           FROM church_members m
