@@ -30,6 +30,7 @@ import {
 import {
   listCoursesController,
   createCourseController,
+  reorderCoursesController,
   updateCourseController,
   deleteCourseController,
   listCohortsController,
@@ -121,6 +122,11 @@ router.get(
 // Course and Cohort Management
 router.get("/courses", listCoursesController);
 router.post("/courses", validateJson(["name"]), createCourseController);
+router.put(
+  "/courses/reorder",
+  validateJson(["orderedIds"]),
+  reorderCoursesController
+);
 router.put(
   "/courses/:id",
   validateParam({ id: { required: true } }),

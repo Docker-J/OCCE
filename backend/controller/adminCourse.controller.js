@@ -49,6 +49,12 @@ export const createCourseController = async (c) => {
     }
 
     const trimmedName = name.trim();
+    let orderNumVal = typeof orderNum === "number" ? orderNum : null;
+    if (orderNumVal === null) {
+      const maxOrder = await env.DB.prepare("SELECT MAX(order_num) as maxOrder FROM courses").first();
+      orderNumVal = (maxOrder?.maxOrder || 0) + 1;
+    }
+
     const res = await env.DB.prepare(`
       INSERT INTO courses (name, category, description, order_num, is_active)
       VALUES (?, ?, ?, ?, 1)
@@ -56,7 +62,7 @@ export const createCourseController = async (c) => {
       trimmedName,
       category ? category.trim() : null,
       description ? description.trim() : null,
-      typeof orderNum === "number" ? orderNum : 0
+      orderNumVal
     ).run();
 
     return c.json({
@@ -141,6 +147,36 @@ export const deleteCourseController = async (c) => {
   } catch (error) {
     console.error("deleteCourseController error:", error);
     return c.json({ error: "DeleteCourseError", message: error.message }, 500);
+  }
+};
+
+/**
+ * PUT /api/admin/courses/reorder
+ * Batch updates order_num for courses
+ * Body: { orderedIds: [id1, id2, ...] }
+ */
+export const reorderCoursesController = async (c) => {
+  try {
+    const env = c.env;
+    const body = await c.req.json();
+    const orderedIds = body.orderedIds;
+
+    if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
+      return c.json({ error: "ValidationError", message: "orderedIds 배열이 필요합니다." }, 400);
+    }
+
+    const stmt = env.DB.prepare("UPDATE courses SET order_num = ? WHERE id = ?");
+    const statements = orderedIds.map((id, index) => stmt.bind(index + 1, Number(id)));
+    await env.DB.batch(statements);
+
+    return c.json({
+      success: true,
+      message: "교육과정 순서가 성공적으로 저장되었습니다.",
+      orderedIds,
+    });
+  } catch (error) {
+    console.error("reorderCoursesController error:", error);
+    return c.json({ error: "ReorderCoursesError", message: error.message }, 500);
   }
 };
 

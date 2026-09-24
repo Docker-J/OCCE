@@ -207,6 +207,11 @@ export const deleteCourse = async (id) => {
   return res.data;
 };
 
+export const reorderCourses = async (orderedIds) => {
+  const res = await axios.put("/api/admin/courses/reorder", { orderedIds });
+  return res.data;
+};
+
 export const getCourseCohorts = async (courseId) => {
   const res = await axios.get(`/api/admin/courses/${courseId}/cohorts`);
   return res.data;

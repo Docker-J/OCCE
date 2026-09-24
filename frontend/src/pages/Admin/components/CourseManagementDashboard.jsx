@@ -55,12 +55,16 @@ import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArro
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import {
   getCourses,
   createCourse,
   updateCourse,
   deleteCourse,
+  reorderCourses,
   getCourseCohorts,
   getCourseAllMembers,
   createCohort,
@@ -80,6 +84,9 @@ const CourseManagementDashboard = ({ users = [] }) => {
   const [courses, setCourses] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [loadingCourses, setLoadingCourses] = useState(false);
+  const [draggedCourseId, setDraggedCourseId] = useState(null);
+  const [dragOverCourseId, setDragOverCourseId] = useState(null);
+  const [isReordering, setIsReordering] = useState(false);
 
   // Cohort state
   const [cohorts, setCohorts] = useState([]);
@@ -207,6 +214,99 @@ const CourseManagementDashboard = ({ users = [] }) => {
     } finally {
       setLoadingCourses(false);
     }
+  };
+
+  // 과정 순서 드래그 앤 드롭 및 순서 재배치 적용
+  const applyReorderCourses = async (sourceId, targetId) => {
+    const fromIndex = courses.findIndex((c) => c.id === sourceId);
+    const toIndex = courses.findIndex((c) => c.id === targetId);
+    if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return;
+
+    const previousCourses = [...courses];
+    const updated = [...courses];
+    const [moved] = updated.splice(fromIndex, 1);
+    updated.splice(toIndex, 0, moved);
+
+    // 순서 번호(orderNum) 1부터 연속 재부여
+    const reorderedWithNums = updated.map((item, idx) => ({
+      ...item,
+      orderNum: idx + 1,
+    }));
+
+    // 즉시 로컬 상태 반영 (낙관적 업데이트)
+    setCourses(reorderedWithNums);
+    setDraggedCourseId(null);
+    setDragOverCourseId(null);
+
+    try {
+      setIsReordering(true);
+      const orderedIds = reorderedWithNums.map((c) => c.id);
+      await reorderCourses(orderedIds);
+      setFeedback({ type: "success", message: "교육과정 순서가 성공적으로 저장되었습니다." });
+    } catch (err) {
+      console.error("Failed to reorder courses:", err);
+      setFeedback({
+        type: "error",
+        message: err?.response?.data?.message || "과정 순서 저장 중 오류가 발생했습니다.",
+      });
+      setCourses(previousCourses); // 실패 시 원복
+    } finally {
+      setIsReordering(false);
+    }
+  };
+
+  const handleDragStart = (e, courseId) => {
+    if (isReordering) {
+      e.preventDefault();
+      return;
+    }
+    setDraggedCourseId(courseId);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", courseId.toString());
+
+    const cardEl = e.currentTarget.closest(".course-card-item");
+    if (cardEl && e.dataTransfer.setDragImage) {
+      e.dataTransfer.setDragImage(cardEl, 40, 20);
+    }
+  };
+
+  const handleDragOver = (e, courseId) => {
+    e.preventDefault();
+    if (!draggedCourseId || draggedCourseId === courseId) return;
+    e.dataTransfer.dropEffect = "move";
+    if (dragOverCourseId !== courseId) {
+      setDragOverCourseId(courseId);
+    }
+  };
+
+  const handleDragLeave = (e, courseId) => {
+    if (dragOverCourseId === courseId) {
+      setDragOverCourseId(null);
+    }
+  };
+
+  const handleDrop = async (e, targetCourseId) => {
+    e.preventDefault();
+    const sourceId = draggedCourseId;
+    setDraggedCourseId(null);
+    setDragOverCourseId(null);
+    if (!sourceId || sourceId === targetCourseId) return;
+
+    await applyReorderCourses(sourceId, targetCourseId);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedCourseId(null);
+    setDragOverCourseId(null);
+  };
+
+  const handleMoveCourse = async (e, courseId, direction) => {
+    e.stopPropagation();
+    const idx = courses.findIndex((c) => c.id === courseId);
+    if (idx === -1) return;
+    const targetIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= courses.length) return;
+    await applyReorderCourses(courseId, courses[targetIdx].id);
   };
 
   // Load cohorts for selected course
@@ -815,22 +915,33 @@ const CourseManagementDashboard = ({ users = [] }) => {
                   </Box>
                 ) : (
                   <Stack spacing={1}>
-                    {courses.map((course) => {
+                    {courses.map((course, index) => {
                       const isSelected = selectedCourse?.id === course.id;
+                      const isDragging = draggedCourseId === course.id;
+                      const isDragOver = dragOverCourseId === course.id;
                       return (
                         <Box
                           key={course.id}
+                          className="course-card-item"
                           onClick={() => setSelectedCourse(course)}
+                          onDragOver={(e) => handleDragOver(e, course.id)}
+                          onDragLeave={(e) => handleDragLeave(e, course.id)}
+                          onDrop={(e) => handleDrop(e, course.id)}
                           sx={{
-                            p: 1.8,
+                            p: 1.5,
                             borderRadius: "12px",
                             cursor: "pointer",
                             backgroundColor: isSelected ? "rgba(255, 107, 0, 0.08)" : "#fff",
                             border: isSelected ? "2px solid #FF6B00" : "1px solid #f1f5f9",
-                            transition: "all 0.15s ease",
+                            borderTop: isDragOver ? "3px solid #FF6B00" : undefined,
+                            borderBottom: isDragOver ? "3px solid #FF6B00" : undefined,
+                            opacity: isDragging ? 0.35 : 1,
+                            transition: "background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease",
                             "&:hover": {
                               backgroundColor: isSelected
                                 ? "rgba(255, 107, 0, 0.12)"
+                                : isDragOver
+                                ? "rgba(255, 107, 0, 0.08)"
                                 : "#f8fafc",
                             },
                           }}
@@ -842,42 +953,119 @@ const CourseManagementDashboard = ({ users = [] }) => {
                               alignItems: "flex-start",
                             }}
                           >
-                            <Box sx={{ pr: 1 }}>
-                              <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, mb: 0.5 }}>
-                                <Typography
-                                  variant="subtitle2"
-                                  sx={{
-                                    fontWeight: 800,
-                                    color: isSelected ? "#ea580c" : "#1e293b",
-                                    fontSize: "0.92rem",
-                                  }}
-                                >
-                                  {course.name}
-                                </Typography>
-                                {course.category && (
-                                  <Chip
-                                    size="small"
-                                    label={course.category}
-                                    sx={{
-                                      height: 18,
-                                      fontSize: "0.65rem",
-                                      fontWeight: 700,
-                                      backgroundColor: "#f1f5f9",
-                                      color: "#64748b",
-                                    }}
-                                  />
-                                )}
-                              </Box>
-                              <Typography
-                                variant="caption"
-                                sx={{ color: "#64748b", display: "block" }}
+                            <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1, pr: 1, flex: 1, minWidth: 0 }}>
+                              {/* 드래그 핸들 및 순서 번호 */}
+                              <Box
+                                draggable
+                                onDragStart={(e) => handleDragStart(e, course.id)}
+                                onDragEnd={handleDragEnd}
+                                onClick={(e) => e.stopPropagation()}
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "center",
+                                  cursor: isReordering ? "default" : "grab",
+                                  "&:active": { cursor: isReordering ? "default" : "grabbing" },
+                                  userSelect: "none",
+                                  pt: 0.2,
+                                  flexShrink: 0,
+                                }}
                               >
-                                개설: <strong>{course.cohortCount || 0}개 기수</strong> · 수료:{" "}
-                                <strong>{course.completedCount || 0}명</strong>
-                              </Typography>
+                                <Tooltip title="드래그하여 순서 변경 (위아래로 이동)">
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      color: "#94a3b8",
+                                      p: 0.2,
+                                      borderRadius: "4px",
+                                      "&:hover": { color: "#ea580c", backgroundColor: "rgba(234, 88, 12, 0.08)" },
+                                    }}
+                                  >
+                                    <DragIndicatorIcon sx={{ fontSize: 18 }} />
+                                  </Box>
+                                </Tooltip>
+                                <Typography variant="caption" sx={{ fontSize: "0.7rem", fontWeight: 800, color: "#64748b" }}>
+                                  {index + 1}
+                                </Typography>
+                              </Box>
+
+                              {/* 과정 정보 */}
+                              <Box sx={{ flex: 1, minWidth: 0 }}>
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, mb: 0.5, flexWrap: "wrap" }}>
+                                  <Typography
+                                    variant="subtitle2"
+                                    sx={{
+                                      fontWeight: 800,
+                                      color: isSelected ? "#ea580c" : "#1e293b",
+                                      fontSize: "0.92rem",
+                                    }}
+                                  >
+                                    {course.name}
+                                  </Typography>
+                                  {course.category && (
+                                    <Chip
+                                      size="small"
+                                      label={course.category}
+                                      sx={{
+                                        height: 18,
+                                        fontSize: "0.65rem",
+                                        fontWeight: 700,
+                                        backgroundColor: "#f1f5f9",
+                                        color: "#64748b",
+                                      }}
+                                    />
+                                  )}
+                                </Box>
+                                <Typography
+                                  variant="caption"
+                                  sx={{ color: "#64748b", display: "block" }}
+                                >
+                                  개설: <strong>{course.cohortCount || 0}개 기수</strong> · 수료:{" "}
+                                  <strong>{course.completedCount || 0}명</strong>
+                                </Typography>
+                              </Box>
                             </Box>
 
-                            <Box sx={{ display: "flex", alignItems: "center" }}>
+                            {/* 우측 액션: 한 칸 위/아래 이동 및 수정/삭제 */}
+                            <Box sx={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
+                              <Box sx={{ display: "flex", flexDirection: "column", mr: 0.3 }}>
+                                <Tooltip title="한 칸 위로">
+                                  <span>
+                                    <IconButton
+                                      size="small"
+                                      disabled={index === 0 || isReordering}
+                                      onClick={(e) => handleMoveCourse(e, course.id, "up")}
+                                      sx={{
+                                        p: 0.2,
+                                        color: "#94a3b8",
+                                        "&:hover": { color: "#ea580c" },
+                                        "&.Mui-disabled": { opacity: 0.25 },
+                                      }}
+                                    >
+                                      <KeyboardArrowUpIcon sx={{ fontSize: 15 }} />
+                                    </IconButton>
+                                  </span>
+                                </Tooltip>
+                                <Tooltip title="한 칸 아래로">
+                                  <span>
+                                    <IconButton
+                                      size="small"
+                                      disabled={index === courses.length - 1 || isReordering}
+                                      onClick={(e) => handleMoveCourse(e, course.id, "down")}
+                                      sx={{
+                                        p: 0.2,
+                                        color: "#94a3b8",
+                                        "&:hover": { color: "#ea580c" },
+                                        "&.Mui-disabled": { opacity: 0.25 },
+                                      }}
+                                    >
+                                      <KeyboardArrowDownIcon sx={{ fontSize: 15 }} />
+                                    </IconButton>
+                                  </span>
+                                </Tooltip>
+                              </Box>
+
                               <Tooltip title="과정 수정">
                                 <IconButton
                                   size="small"
