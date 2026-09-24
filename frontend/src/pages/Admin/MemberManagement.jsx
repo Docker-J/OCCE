@@ -114,7 +114,7 @@ const MemberManagement = () => {
     if (!memberForEdit.householdId) return [memberForEdit];
     const list = (users || []).filter(
       (u) =>
-        u.householdId === memberForEdit.householdId &&
+        String(u.householdId) === String(memberForEdit.householdId) &&
         (u.status !== "REMOVED" || u.id === memberForEdit.id)
     );
     const order = { HEAD: 1, SPOUSE: 2, CHILD: 3, PARENT: 4, OTHER: 5 };
@@ -125,6 +125,29 @@ const MemberManagement = () => {
     });
     return list.length > 0 ? list : [memberForEdit];
   }, [memberForEdit, users]);
+
+  // DeleteConfirmModal에 전달할 대상 교인 정보 보강 및 동일 세대 잔여 가족 목록 산출
+  const effectiveUserToDelete = useMemo(() => {
+    if (!userToDelete) return null;
+    const matched = (users || []).find((u) => String(u.id) === String(userToDelete.id));
+    return {
+      ...(matched || {}),
+      ...userToDelete,
+      householdId: userToDelete.householdId || matched?.householdId || null,
+      householdName: userToDelete.householdName || matched?.householdName || "",
+      isHead: userToDelete.isHead ?? matched?.isHead ?? false,
+    };
+  }, [userToDelete, users]);
+
+  const familyMembersToDelete = useMemo(() => {
+    if (!effectiveUserToDelete?.householdId) return [];
+    return (users || []).filter(
+      (u) =>
+        String(u.householdId) === String(effectiveUserToDelete.householdId) &&
+        String(u.id) !== String(effectiveUserToDelete.id) &&
+        u.status !== "REMOVED"
+    );
+  }, [effectiveUserToDelete, users]);
 
   // 로그인 모달 동적 로드
   const handleLoginClick = async () => {
@@ -554,17 +577,8 @@ const MemberManagement = () => {
       {/* 제적 및 계정 삭제 모달 */}
       <DeleteConfirmModal
         open={Boolean(userToDelete)}
-        user={userToDelete}
-        familyMembers={
-          userToDelete?.householdId
-            ? (users || []).filter(
-                (u) =>
-                  u.householdId === userToDelete.householdId &&
-                  u.id !== userToDelete.id &&
-                  u.status !== "REMOVED"
-              )
-            : []
-        }
+        user={effectiveUserToDelete}
+        familyMembers={familyMembersToDelete}
         deleting={deleting}
         onClose={() => !deleting && setUserToDelete(null)}
         onConfirmRemoveStatus={handleConfirmRemoveStatus}

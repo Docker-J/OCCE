@@ -199,6 +199,8 @@ const MemberFormModal = ({
         nameEn: m.nameEn || "",
         relationship: m.relationship || (m.isHead ? "HEAD" : "CHILD"),
         isHead: Boolean(m.isHead ?? (m.relationship === "HEAD")),
+        householdId: m.householdId || initialData?.householdId || "",
+        householdName: m.householdName || initialData?.householdName || "",
         phone: m.phone || "",
         birthDate: m.birthDate || "",
         gender: m.gender || "M",
@@ -1329,7 +1331,13 @@ const MemberFormModal = ({
               color="error"
               variant="outlined"
               startIcon={<DeleteOutlineIcon />}
-              onClick={() => onOpenDeleteDialog(currentMember)}
+              onClick={() =>
+                onOpenDeleteDialog({
+                  ...currentMember,
+                  householdId: currentMember.householdId || householdData.householdId,
+                  householdName: currentMember.householdName || householdData.householdName,
+                })
+              }
               disabled={isSubmitting}
               sx={{
                 borderRadius: "10px",

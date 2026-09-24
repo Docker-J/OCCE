@@ -54,28 +54,29 @@ const DeleteConfirmModal = ({
   onConfirmRemoveStatus,
   onConfirmPermanentDelete,
 }) => {
-  const isMultiMemberHead = Boolean(user?.isHead && familyMembers.length > 0);
+  const hasFamily = familyMembers.length > 0;
+  const isMultiMemberHead = Boolean(user?.isHead && hasFamily);
 
-  // 'transfer': 세대주 승계 후 본인만 제적, 'cascade': 세대 전체 함께 제적
+  // 'transfer': 세대주 승계 후 본인만 제적, 'single': 일반 가구원 단독 제적, 'cascade': 세대 전체 함께 제적
   const [headActionChoice, setHeadActionChoice] = useState("transfer");
   const [successorId, setSuccessorId] = useState("");
 
   useEffect(() => {
-    if (familyMembers.length > 0) {
+    if (hasFamily) {
       setSuccessorId(familyMembers[0].id);
-      setHeadActionChoice("transfer");
+      setHeadActionChoice(user?.isHead ? "transfer" : "single");
+    } else {
+      setHeadActionChoice("single");
     }
-  }, [user, familyMembers]);
+  }, [user, familyMembers, hasFamily]);
 
   const handleRemove = () => {
-    if (isMultiMemberHead) {
-      if (headActionChoice === "cascade") {
-        onConfirmRemoveStatus({ cascadeHousehold: true });
-      } else {
-        onConfirmRemoveStatus({ cascadeHousehold: false, successorMemberId: successorId });
-      }
+    if (hasFamily && headActionChoice === "cascade") {
+      onConfirmRemoveStatus({ cascadeHousehold: true });
+    } else if (isMultiMemberHead && headActionChoice === "transfer") {
+      onConfirmRemoveStatus({ cascadeHousehold: false, successorMemberId: successorId });
     } else {
-      onConfirmRemoveStatus({});
+      onConfirmRemoveStatus({ cascadeHousehold: false });
     }
   };
 
@@ -93,7 +94,7 @@ const DeleteConfirmModal = ({
       onClose={deleting ? undefined : onClose}
       slotProps={{
         paper: {
-          sx: { borderRadius: "16px", p: 1, maxWidth: isMultiMemberHead ? "560px" : "480px", width: "100%" },
+          sx: { borderRadius: "16px", p: 1, maxWidth: hasFamily ? "560px" : "480px", width: "100%" },
         },
       }}
     >
@@ -107,8 +108,8 @@ const DeleteConfirmModal = ({
           {user?.householdName ? ` · ${user.householdName}` : ""}
         </DialogContentText>
 
-        {/* 다인 가구 세대주일 경우: 세대주 승계 vs 세대 전체 제적 선택 */}
-        {isMultiMemberHead && (
+        {/* 다인 가구일 경우: 세대 처리 옵션 선택 (세대주인 경우 승계 vs 세대 전체 제적 / 가구원인 경우 본인만 제적 vs 세대 전체 제적) */}
+        {hasFamily && (
           <Box
             sx={{
               p: 2.5,
@@ -119,14 +120,19 @@ const DeleteConfirmModal = ({
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-              <SupervisorAccountIcon sx={{ color: "#ca8a04", fontSize: "1.3rem" }} />
+              {isMultiMemberHead ? (
+                <SupervisorAccountIcon sx={{ color: "#ca8a04", fontSize: "1.3rem" }} />
+              ) : (
+                <GroupRemoveIcon sx={{ color: "#ca8a04", fontSize: "1.3rem" }} />
+              )}
               <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "#854d0e" }}>
-                세대주 제적 시 가구 처리 옵션 선택
+                {isMultiMemberHead ? "세대주 제적 시 가구 처리 옵션 선택" : "가구원 제적 시 세대 처리 옵션 선택"}
               </Typography>
             </Box>
             <Typography variant="body2" sx={{ color: "#713f12", mb: 2, fontSize: "0.83rem", lineHeight: 1.5 }}>
-              현재 세대에 남아있는 가족 <strong>{familyMembers.length}명</strong>이 있습니다.
-              세대 전체를 함께 제적할지, 다른 가족에게 세대주를 승계시킬지 선택해 주세요.
+              {isMultiMemberHead
+                ? `현재 세대에 남아있는 가족 ${familyMembers.length}명이 있습니다. 세대 전체를 함께 제적할지, 다른 가족에게 세대주를 승계시킬지 선택해 주세요.`
+                : `현재 세대에 함께 등록된 가족 ${familyMembers.length}명이 있습니다. 해당 교인만 제적할지, 세대 전체를 함께 제적할지 선택해 주세요.`}
             </Typography>
 
             <FormControl component="fieldset" fullWidth>
@@ -134,56 +140,84 @@ const DeleteConfirmModal = ({
                 value={headActionChoice}
                 onChange={(e) => setHeadActionChoice(e.target.value)}
               >
-                {/* 옵션 1: 세대주 승계 */}
-                <Box
-                  sx={{
-                    p: 1.5,
-                    mb: 1.5,
-                    borderRadius: "10px",
-                    backgroundColor: headActionChoice === "transfer" ? "#ffffff" : "transparent",
-                    border: headActionChoice === "transfer" ? "1.5px solid #eab308" : "1px solid #fef08a",
-                    transition: "all 0.15s ease",
-                  }}
-                >
-                  <FormControlLabel
-                    value="transfer"
-                    control={<Radio size="small" sx={{ color: "#ca8a04", "&.Mui-checked": { color: "#ca8a04" } }} />}
-                    label={
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 700, color: "#1e293b" }}>
-                          남은 가족에게 세대주 승계 (권장)
-                        </Typography>
-                        <Typography variant="caption" sx={{ color: "#64748b" }}>
-                          현재 세대주만 제적 처리되며, 지정한 가족이 새 세대주가 됩니다.
-                        </Typography>
+                {/* 옵션 1: 세대주일 때는 세대주 승계, 일반 가구원일 때는 본인만 제적 */}
+                {isMultiMemberHead ? (
+                  <Box
+                    sx={{
+                      p: 1.5,
+                      mb: 1.5,
+                      borderRadius: "10px",
+                      backgroundColor: headActionChoice === "transfer" ? "#ffffff" : "transparent",
+                      border: headActionChoice === "transfer" ? "1.5px solid #eab308" : "1px solid #fef08a",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    <FormControlLabel
+                      value="transfer"
+                      control={<Radio size="small" sx={{ color: "#ca8a04", "&.Mui-checked": { color: "#ca8a04" } }} />}
+                      label={
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 700, color: "#1e293b" }}>
+                            남은 가족에게 세대주 승계 (권장)
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: "#64748b" }}>
+                            현재 세대주만 제적 처리되며, 지정한 가족이 새 세대주가 됩니다.
+                          </Typography>
+                        </Box>
+                      }
+                    />
+
+                    {headActionChoice === "transfer" && (
+                      <Box sx={{ mt: 1.5, pl: 3.8 }}>
+                        <FormControl fullWidth size="small">
+                          <InputLabel id="successor-select-label">새 세대주 선택</InputLabel>
+                          <Select
+                            labelId="successor-select-label"
+                            value={successorId}
+                            label="새 세대주 선택"
+                            onChange={(e) => setSuccessorId(e.target.value)}
+                            sx={{ backgroundColor: "#f8fafc", borderRadius: "8px" }}
+                          >
+                            {familyMembers.map((m) => (
+                              <MenuItem key={m.id} value={m.id}>
+                                <strong>{m.name}</strong> ({getRelationshipLabel(m.relationship)})
+                                {m.phone ? ` - ${formatPhoneNumber(m.phone)}` : ""}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
                       </Box>
-                    }
-                  />
+                    )}
+                  </Box>
+                ) : (
+                  <Box
+                    sx={{
+                      p: 1.5,
+                      mb: 1.5,
+                      borderRadius: "10px",
+                      backgroundColor: headActionChoice === "single" ? "#ffffff" : "transparent",
+                      border: headActionChoice === "single" ? "1.5px solid #eab308" : "1px solid #fef08a",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    <FormControlLabel
+                      value="single"
+                      control={<Radio size="small" sx={{ color: "#ca8a04", "&.Mui-checked": { color: "#ca8a04" } }} />}
+                      label={
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 700, color: "#1e293b" }}>
+                            해당 교인만 제적 (권장)
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: "#64748b" }}>
+                            세대 및 다른 가족 구성원은 유지되며, 현재 교인만 제적 처리됩니다.
+                          </Typography>
+                        </Box>
+                      }
+                    />
+                  </Box>
+                )}
 
-                  {headActionChoice === "transfer" && (
-                    <Box sx={{ mt: 1.5, pl: 3.8 }}>
-                      <FormControl fullWidth size="small">
-                        <InputLabel id="successor-select-label">새 세대주 선택</InputLabel>
-                        <Select
-                          labelId="successor-select-label"
-                          value={successorId}
-                          label="새 세대주 선택"
-                          onChange={(e) => setSuccessorId(e.target.value)}
-                          sx={{ backgroundColor: "#f8fafc", borderRadius: "8px" }}
-                        >
-                          {familyMembers.map((m) => (
-                            <MenuItem key={m.id} value={m.id}>
-                              <strong>{m.name}</strong> ({getRelationshipLabel(m.relationship)})
-                              {m.phone ? ` - ${formatPhoneNumber(m.phone)}` : ""}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Box>
-                  )}
-                </Box>
-
-                {/* 옵션 2: 세대 전체 함께 제적 */}
+                {/* 옵션 2: 세대 전체 함께 제적 (세대주/가구원 공통) */}
                 <Box
                   sx={{
                     p: 1.5,
@@ -269,7 +303,7 @@ const DeleteConfirmModal = ({
               fontWeight: 700,
             }}
           >
-            {isMultiMemberHead && headActionChoice === "cascade"
+            {hasFamily && headActionChoice === "cascade"
               ? "세대 전체 제적"
               : isMultiMemberHead
               ? "세대주 승계 및 제적"
