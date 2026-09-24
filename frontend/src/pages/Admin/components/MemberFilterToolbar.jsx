@@ -176,7 +176,7 @@ const MemberFilterToolbar = ({
           <MenuItem value="young_adult">청년부만</MenuItem>
           <MenuItem value="youth">중고등부만</MenuItem>
           <MenuItem value="elementary">유초등부만</MenuItem>
-          <MenuItem value="kindergarten">유치부만</MenuItem>
+          <MenuItem value="kindergarten">유아유치부만</MenuItem>
         </Select>
       </FormControl>
 

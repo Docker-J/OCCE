@@ -984,10 +984,10 @@ export const importRosterFromDriveController = async (c) => {
       const birthDateVal = parseExcelDate(rawBirth);
       const genderVal = parseGender(rawGender);
 
-      // 1) 5번째 열(교회학교)을 통한 교회학교 부서 판별 (유치부, 유초등부, 중고등부)
+      // 1) 5번째 열(교회학교)을 통한 교회학교 부서 판별 (유아유치부, 유초등부, 중고등부)
       let departmentVal = "장년부";
-      if (rawChurchSchool.includes("유치")) {
-        departmentVal = "유치부";
+      if (rawChurchSchool.includes("유치") || rawChurchSchool.includes("유아")) {
+        departmentVal = "유아유치부";
       } else if (
         rawChurchSchool.includes("유초등") ||
         rawChurchSchool.includes("초등") ||
@@ -1110,7 +1110,7 @@ export const importRosterFromDriveController = async (c) => {
         String(rawStatusGarden).includes("청년") ||
         rawPosition.includes("청년");
 
-      // 교회학교(유치부/유초등부/중고등부)가 아닌 경우, 정원이 새벽/나라면 청년부, 그 외는 장년부
+      // 교회학교(유아유치부/유초등부/중고등부)가 아닌 경우, 정원이 새벽/나라면 청년부, 그 외는 장년부
       if (departmentVal === "장년부" && isYoungAdult) {
         departmentVal = "청년부";
       }

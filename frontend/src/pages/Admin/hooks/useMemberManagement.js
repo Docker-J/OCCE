@@ -204,7 +204,7 @@ export const useMemberManagement = () => {
       if (roleFilter === "young_adult" && u.department !== "청년부") return false;
       if (roleFilter === "youth" && u.department !== "중고등부") return false;
       if (roleFilter === "elementary" && u.department !== "유초등부") return false;
-      if (roleFilter === "kindergarten" && u.department !== "유치부") return false;
+      if (roleFilter === "kindergarten" && u.department !== "유아유치부" && u.department !== "유치부") return false;
 
       // 5. 정원 필터
       if (gardenFilter !== "all") {

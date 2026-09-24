@@ -82,7 +82,7 @@ const DEPARTMENT_OPTIONS = [
   "청년부",
   "중고등부",
   "유초등부",
-  "유치부",
+  "유아유치부",
 ];
 
 const POSITION_OPTIONS = [
@@ -205,7 +205,7 @@ const MemberFormModal = ({
         birthDate: m.birthDate || "",
         gender: m.gender || "M",
         position: m.position || "성도",
-        department: m.department || "장년부",
+        department: m.department === "유치부" ? "유아유치부" : (m.department || "장년부"),
         baptismStatus: m.baptismStatus || "NONE",
         registrationDate: m.registrationDate || "",
         status: m.status === "REMOVED" ? "REMOVED" : "ACTIVE",
