@@ -70,5 +70,44 @@
       "enabled": true,
       "previews_enabled": false
     }
-  ]
+  ],
+  "env": {
+    "dev": {
+      "name": "oncce-dev",
+      "workers_dev": true,
+      "routes": [],
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "occe-dev-db",
+          "database_id": "dbebb972-d10d-4adb-869f-374fa0faa13f"
+        }
+      ],
+      "r2_buckets": [
+        {
+          "binding": "weeklyupdate",
+          "bucket_name": "weeklyupdate",
+          "remote": true
+        }
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "weeklyupdate_kv",
+          "id": "33508149bdd44b2daf3bb45498e5b240",
+          "remote": true
+        }
+      ],
+      "triggers": {
+        "crons": []
+      },
+      "queues": {
+        "producers": [
+          {
+            "binding": "FCM_QUEUE",
+            "queue": "fcm-notification-queue"
+          }
+        ]
+      }
+    }
+  }
 }

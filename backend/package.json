@@ -20,6 +20,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "prefetch": "node scripts/prefetch.js",
-    "deploy": "npx wrangler deploy -c ../wrangler.json && node scripts/prefetch.js"
+    "deploy": "npx wrangler deploy -c ../wrangler.json && node scripts/prefetch.js",
+    "deploy:dev": "npx wrangler deploy --env dev -c ../wrangler.json"
   }
 }
