@@ -1417,8 +1417,8 @@ const MemberFormModal = ({
                               <HourglassEmptyIcon sx={{ fontSize: "14px !important" }} />
                             )
                           }
-                          label={`${mc.courseName} ${mc.termName ? `(${mc.termName})` : ""} · ${
-                            isCompleted ? (mc.completionDate ? `수료 (${mc.completionDate})` : "수료") : "수강중"
+                          label={`${mc.courseName}${mc.termName ? ` (${mc.termName})` : ""} · ${
+                            isCompleted ? "수료" : "수강중"
                           }`}
                           sx={{
                             fontWeight: 700,
