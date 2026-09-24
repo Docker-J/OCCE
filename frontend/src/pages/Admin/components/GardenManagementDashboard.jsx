@@ -8,7 +8,7 @@
  * - '미배정' 기본 정원 보호 및 소속 가구 안전 삭제 가드
  */
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import PropTypes from "prop-types";
 import {
   Box,
@@ -169,55 +169,76 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
     return map;
   }, [users]);
 
-  // 특정 정원의 소속 교인 목록 추출
-  const getGardenMembers = (g) => {
-    if (!g) return [];
-    const byId = g.id ? gardenMembersMap[g.id] : null;
-    if (byId && byId.length > 0) return byId;
-    const byName = g.name ? gardenMembersMap[g.name] : null;
-    return byName || [];
-  };
+  // 특정 정원의 소속 교인 목록 추출 (O(1) 캐시 조회)
+  const getGardenMembers = useCallback(
+    (g) => {
+      if (!g) return [];
+      const byId = g.id ? gardenMembersMap[g.id] : null;
+      if (byId && byId.length > 0) return byId;
+      const byName = g.name ? gardenMembersMap[g.name] : null;
+      return byName || [];
+    },
+    [gardenMembersMap]
+  );
 
-  // 특정 정원의 소속 세대 목록 추출 (가구별 세대원 그룹핑 및 관계순 정렬)
-  const getGardenHouseholds = (g) => {
-    const members = getGardenMembers(g);
-    const householdMap = new Map();
-    members.forEach((m) => {
-      const hId = m.householdId || `temp-${m.id}`;
-      if (!householdMap.has(hId)) {
-        householdMap.set(hId, {
-          id: hId,
-          householdName: m.householdName || `${m.headName || m.name} 성도 가정`,
-          headName: m.headName || (m.isHead ? m.name : "미지정"),
-          address: m.address,
-          addressDetail: m.addressDetail,
-          city: m.city,
-          province: m.province,
-          postalCode: m.postalCode,
-          members: [m],
-        });
-      } else {
-        const item = householdMap.get(hId);
-        if (m.isHead) {
-          item.headName = m.name;
+  // 실시간 users 데이터 기반 정원별 세대 목록 매핑 (useMemo로 사전 그룹핑 및 정렬 1회 캐싱)
+  const gardenHouseholdsMap = useMemo(() => {
+    const map = {};
+    const relOrder = { HEAD: 0, SPOUSE: 1, CHILD: 2, PARENT: 3, OTHER: 4 };
+
+    Object.entries(gardenMembersMap).forEach(([key, members]) => {
+      const householdMap = new Map();
+      members.forEach((m) => {
+        const hId = m.householdId || `temp-${m.id}`;
+        if (!householdMap.has(hId)) {
+          householdMap.set(hId, {
+            id: hId,
+            householdName: m.householdName || `${m.headName || m.name} 성도 가정`,
+            headName: m.headName || (m.isHead ? m.name : "미지정"),
+            address: m.address,
+            addressDetail: m.addressDetail,
+            city: m.city,
+            province: m.province,
+            postalCode: m.postalCode,
+            members: [m],
+          });
+        } else {
+          const item = householdMap.get(hId);
+          if (m.isHead) {
+            item.headName = m.name;
+          }
+          item.members.push(m);
         }
-        item.members.push(m);
-      }
+      });
+
+      const households = Array.from(householdMap.values());
+      households.forEach((h) => {
+        h.members.sort((a, b) => {
+          if (a.isHead && !b.isHead) return -1;
+          if (!a.isHead && b.isHead) return 1;
+          const aOrder = relOrder[a.relationship] ?? 5;
+          const bOrder = relOrder[b.relationship] ?? 5;
+          return aOrder - bOrder;
+        });
+      });
+
+      map[key] = households;
     });
 
-    const households = Array.from(householdMap.values());
-    households.forEach((h) => {
-      h.members.sort((a, b) => {
-        if (a.isHead && !b.isHead) return -1;
-        if (!a.isHead && b.isHead) return 1;
-        const relOrder = { HEAD: 0, SPOUSE: 1, CHILD: 2, PARENT: 3, OTHER: 4 };
-        const aOrder = relOrder[a.relationship] ?? 5;
-        const bOrder = relOrder[b.relationship] ?? 5;
-        return aOrder - bOrder;
-      });
-    });
-    return households;
-  };
+    return map;
+  }, [gardenMembersMap]);
+
+  // 특정 정원의 소속 세대 목록 추출 (O(1) 캐시 조회)
+  const getGardenHouseholds = useCallback(
+    (g) => {
+      if (!g) return [];
+      const byId = g.id ? gardenHouseholdsMap[g.id] : null;
+      if (byId && byId.length > 0) return byId;
+      const byName = g.name ? gardenHouseholdsMap[g.name] : null;
+      return byName || [];
+    },
+    [gardenHouseholdsMap]
+  );
 
   // 모달 내 세대별 정원 교인 명부 (가구 단위 지브라 패턴 적용, 검색 필터링 및 생년월일/성명 정렬 지원)
   const gardenRegistryMembers = useMemo(() => {
@@ -412,7 +433,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
       totalAssignedHouseholds,
       unassignedHouseholds,
     };
-  }, [gardens, gardenMembersMap]);
+  }, [gardens, gardenMembersMap, gardenHouseholdsMap]);
 
   // 검색 필터링된 정원 목록
   const filteredGardens = useMemo(() => {
