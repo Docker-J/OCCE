@@ -467,11 +467,13 @@ export const createMemberController = async (c) => {
       return c.json({ error: "ValidationError", message: "교인 성명은 필수 항목입니다." }, 400);
     }
 
+    const phoneCleanVal = cleanPhone(phone);
     let targetHouseholdId = householdId;
+    let newMemberId;
 
     if (isNewHousehold || !targetHouseholdId) {
       const hName = householdName ? householdName.trim() : null;
-      const hRes = await env.DB.prepare(`
+      const hStmt = env.DB.prepare(`
         INSERT INTO households (household_name, garden_id, address, address_detail, city, province, postal_code, notes)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
@@ -483,39 +485,61 @@ export const createMemberController = async (c) => {
         (province || "AB").trim(),
         formatPostalCode(postalCode),
         (householdNotes || "").trim(),
+      );
+
+      const mStmt = env.DB.prepare(`
+        INSERT INTO church_members (
+          household_id, is_head, relationship, name, name_en, birth_date, gender,
+          phone, phone_clean, baptism_status, position, department,
+          custom_garden_id, registration_date, status, is_registered
+        ) VALUES (last_insert_rowid(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+      `).bind(
+        isHead ? 1 : 0,
+        relationship,
+        name.trim(),
+        nameEn ? nameEn.trim() : null,
+        birthDate || null,
+        gender || null,
+        (phone || "").trim(),
+        phoneCleanVal,
+        baptismStatus || "NONE",
+        (position || "성도").trim(),
+        (department || "장년부").trim(),
+        customGardenId || null,
+        registrationDate || null,
+        status || "ACTIVE",
+      );
+
+      const results = await env.DB.batch([hStmt, mStmt]);
+      targetHouseholdId = results[0].meta.last_row_id;
+      newMemberId = results[1].meta.last_row_id;
+    } else {
+      const memberRes = await env.DB.prepare(`
+        INSERT INTO church_members (
+          household_id, is_head, relationship, name, name_en, birth_date, gender,
+          phone, phone_clean, baptism_status, position, department,
+          custom_garden_id, registration_date, status, is_registered
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+      `).bind(
+        targetHouseholdId,
+        isHead ? 1 : 0,
+        relationship,
+        name.trim(),
+        nameEn ? nameEn.trim() : null,
+        birthDate || null,
+        gender || null,
+        (phone || "").trim(),
+        phoneCleanVal,
+        baptismStatus || "NONE",
+        (position || "성도").trim(),
+        (department || "장년부").trim(),
+        customGardenId || null,
+        registrationDate || null,
+        status || "ACTIVE",
       ).run();
 
-      targetHouseholdId = hRes.meta.last_row_id;
+      newMemberId = memberRes.meta.last_row_id;
     }
-
-    const phoneCleanVal = cleanPhone(phone);
-
-    // Insert church member
-    const memberRes = await env.DB.prepare(`
-      INSERT INTO church_members (
-        household_id, is_head, relationship, name, name_en, birth_date, gender,
-        phone, phone_clean, baptism_status, position, department,
-        custom_garden_id, registration_date, status, is_registered
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
-    `).bind(
-      targetHouseholdId,
-      isHead ? 1 : 0,
-      relationship,
-      name.trim(),
-      nameEn ? nameEn.trim() : null,
-      birthDate || null,
-      gender || null,
-      (phone || "").trim(),
-      phoneCleanVal,
-      baptismStatus || "NONE",
-      (position || "성도").trim(),
-      (department || "장년부").trim(),
-      customGardenId || null,
-      registrationDate || null,
-      status || "ACTIVE",
-    ).run();
-
-    const newMemberId = memberRes.meta.last_row_id;
 
     return c.json({
       success: true,
@@ -597,41 +621,48 @@ export const updateMemberController = async (c) => {
       }
 
       const oldHouseholdId = currentMember.household_id;
+      const batchStmts = [];
 
       // 1. 기존 세대의 세대주였던 경우 새 세대주 지정 또는 승격
       if (currentMember.is_head && oldHouseholdId) {
         if (successorMemberId) {
-          await env.DB.prepare(
-            "UPDATE church_members SET is_head = 1, relationship = 'HEAD' WHERE id = ? AND household_id = ?"
-          ).bind(successorMemberId, oldHouseholdId).run();
+          batchStmts.push(
+            env.DB.prepare(
+              "UPDATE church_members SET is_head = 1, relationship = 'HEAD' WHERE id = ? AND household_id = ?"
+            ).bind(successorMemberId, oldHouseholdId)
+          );
         } else {
           const nextHead = await env.DB.prepare(
             "SELECT id FROM church_members WHERE household_id = ? AND id != ? AND status != 'REMOVED' ORDER BY id ASC LIMIT 1"
           ).bind(oldHouseholdId, memberId).first();
           if (nextHead) {
-            await env.DB.prepare(
-              "UPDATE church_members SET is_head = 1, relationship = 'HEAD' WHERE id = ?"
-            ).bind(nextHead.id).run();
+            batchStmts.push(
+              env.DB.prepare(
+                "UPDATE church_members SET is_head = 1, relationship = 'HEAD' WHERE id = ?"
+              ).bind(nextHead.id)
+            );
           }
         }
       }
 
       // 2. 대상 세대로 편입 (is_head = 0, relationship = relationship || 'SPOUSE')
       const targetRel = relationship || "SPOUSE";
-      await env.DB.prepare(
-        "UPDATE church_members SET household_id = ?, is_head = 0, relationship = ? WHERE id = ?"
-      ).bind(destHouseholdId, targetRel, memberId).run();
+      batchStmts.push(
+        env.DB.prepare(
+          "UPDATE church_members SET household_id = ?, is_head = 0, relationship = ? WHERE id = ?"
+        ).bind(destHouseholdId, targetRel, memberId)
+      );
 
-      // 3. 기존 세대에 남은 구성원(제적 제외) 확인하여 없으면 빈 세대(orphan household) 자동 정리
+      // 3. 기존 세대에 남은 구성원(제적 제외) 없으면 빈 세대(orphan household) 자동 정리
       if (oldHouseholdId && String(oldHouseholdId) !== String(destHouseholdId)) {
-        const remaining = await env.DB.prepare(
-          "SELECT COUNT(*) as count FROM church_members WHERE household_id = ? AND status != 'REMOVED'"
-        ).bind(oldHouseholdId).first();
-
-        if (remaining && remaining.count === 0) {
-          await env.DB.prepare("DELETE FROM households WHERE id = ?").bind(oldHouseholdId).run();
-        }
+        batchStmts.push(
+          env.DB.prepare(
+            "DELETE FROM households WHERE id = ? AND NOT EXISTS (SELECT 1 FROM church_members WHERE household_id = ? AND id != ? AND status != 'REMOVED')"
+          ).bind(oldHouseholdId, oldHouseholdId, memberId)
+        );
       }
+
+      await env.DB.batch(batchStmts);
 
       return c.json({
         success: true,
@@ -643,7 +674,8 @@ export const updateMemberController = async (c) => {
     if (isSeparateHousehold) {
       const oldHouseholdId = currentMember.household_id;
       const newHName = householdName ? householdName.trim() : null;
-      const newHRes = await env.DB.prepare(`
+
+      const hStmt = env.DB.prepare(`
         INSERT INTO households (household_name, garden_id, address, address_detail, city, province, postal_code, notes)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
@@ -655,61 +687,124 @@ export const updateMemberController = async (c) => {
         (province || "AB").trim(),
         formatPostalCode(postalCode),
         (householdNotes || "").trim(),
-      ).run();
+      );
 
-      targetHouseholdId = newHRes.meta.last_row_id;
-      targetIsHead = 1;
-      targetRelationship = "HEAD";
+      const mStmt = env.DB.prepare(`
+        UPDATE church_members SET
+          household_id = last_insert_rowid(),
+          is_head = 1,
+          relationship = 'HEAD',
+          name = ?,
+          name_en = ?,
+          birth_date = ?,
+          gender = ?,
+          phone = ?,
+          phone_clean = ?,
+          baptism_status = ?,
+          position = ?,
+          department = ?,
+          custom_garden_id = ?,
+          registration_date = ?,
+          status = ?
+        WHERE id = ?
+      `).bind(
+        name !== undefined ? name.trim() : currentMember.name,
+        nameEn !== undefined ? (nameEn ? nameEn.trim() : null) : currentMember.name_en,
+        birthDate !== undefined ? (birthDate || null) : currentMember.birth_date,
+        gender !== undefined ? (gender || null) : currentMember.gender,
+        phone !== undefined ? (phone || "").trim() : currentMember.phone,
+        phoneCleanVal,
+        baptismStatus || currentMember.baptism_status,
+        position !== undefined ? position.trim() : currentMember.position,
+        department !== undefined ? department.trim() : currentMember.department,
+        customGardenId !== undefined ? (customGardenId || null) : currentMember.custom_garden_id,
+        registrationDate !== undefined ? (registrationDate || null) : currentMember.registration_date,
+        status || currentMember.status,
+        memberId,
+      );
 
-      // 기존 세대에 남은 구성원(제적 제외) 확인하여 없으면 빈 세대 정리
-      if (oldHouseholdId && String(oldHouseholdId) !== String(targetHouseholdId)) {
-        const remaining = await env.DB.prepare(
-          "SELECT COUNT(*) as count FROM church_members WHERE household_id = ? AND status != 'REMOVED'"
-        ).bind(oldHouseholdId).first();
+      const batchStmts = [hStmt, mStmt];
 
-        if (remaining && remaining.count === 0) {
-          await env.DB.prepare("DELETE FROM households WHERE id = ?").bind(oldHouseholdId).run();
+      // 이전 세대주였던 경우 이전 세대에 새 세대주 승격 처리
+      if (currentMember.is_head && oldHouseholdId) {
+        if (successorMemberId) {
+          batchStmts.push(
+            env.DB.prepare(
+              "UPDATE church_members SET is_head = 1, relationship = 'HEAD' WHERE id = ? AND household_id = ?"
+            ).bind(successorMemberId, oldHouseholdId)
+          );
+        } else {
+          const nextHead = await env.DB.prepare(
+            "SELECT id FROM church_members WHERE household_id = ? AND id != ? AND status != 'REMOVED' ORDER BY id ASC LIMIT 1"
+          ).bind(oldHouseholdId, memberId).first();
+          if (nextHead) {
+            batchStmts.push(
+              env.DB.prepare(
+                "UPDATE church_members SET is_head = 1, relationship = 'HEAD' WHERE id = ?"
+              ).bind(nextHead.id)
+            );
+          }
         }
       }
+
+      // 이전 세대에 남은 구성원(제적 제외) 없으면 빈 세대 자동 정리
+      if (oldHouseholdId) {
+        batchStmts.push(
+          env.DB.prepare(
+            "DELETE FROM households WHERE id = ? AND NOT EXISTS (SELECT 1 FROM church_members WHERE household_id = ? AND id != ? AND status != 'REMOVED')"
+          ).bind(oldHouseholdId, oldHouseholdId, memberId)
+        );
+      }
+
+      await env.DB.batch(batchStmts);
+
+      return c.json({
+        success: true,
+        message: "성공적으로 세대 분가 처리가 완료되었습니다.",
+      });
     }
 
+    const batchStmts = [];
+
     // 1. Update member fields
-    await env.DB.prepare(`
-      UPDATE church_members SET
-        household_id = ?,
-        is_head = ?,
-        relationship = ?,
-        name = ?,
-        name_en = ?,
-        birth_date = ?,
-        gender = ?,
-        phone = ?,
-        phone_clean = ?,
-        baptism_status = ?,
-        position = ?,
-        department = ?,
-        custom_garden_id = ?,
-        registration_date = ?,
-        status = ?
-      WHERE id = ?
-    `).bind(
-      targetHouseholdId,
-      targetIsHead,
-      targetRelationship,
-      name !== undefined ? name.trim() : currentMember.name,
-      nameEn !== undefined ? (nameEn ? nameEn.trim() : null) : currentMember.name_en,
-      birthDate !== undefined ? (birthDate || null) : currentMember.birth_date,
-      gender !== undefined ? (gender || null) : currentMember.gender,
-      phone !== undefined ? (phone || "").trim() : currentMember.phone,
-      phoneCleanVal,
-      baptismStatus || currentMember.baptism_status,
-      position !== undefined ? position.trim() : currentMember.position,
-      department !== undefined ? department.trim() : currentMember.department,
-      customGardenId !== undefined ? (customGardenId || null) : currentMember.custom_garden_id,
-      registrationDate !== undefined ? (registrationDate || null) : currentMember.registration_date,
-      status || currentMember.status,
-      memberId,
-    ).run();
+    batchStmts.push(
+      env.DB.prepare(`
+        UPDATE church_members SET
+          household_id = ?,
+          is_head = ?,
+          relationship = ?,
+          name = ?,
+          name_en = ?,
+          birth_date = ?,
+          gender = ?,
+          phone = ?,
+          phone_clean = ?,
+          baptism_status = ?,
+          position = ?,
+          department = ?,
+          custom_garden_id = ?,
+          registration_date = ?,
+          status = ?
+        WHERE id = ?
+      `).bind(
+        targetHouseholdId,
+        targetIsHead,
+        targetRelationship,
+        name !== undefined ? name.trim() : currentMember.name,
+        nameEn !== undefined ? (nameEn ? nameEn.trim() : null) : currentMember.name_en,
+        birthDate !== undefined ? (birthDate || null) : currentMember.birth_date,
+        gender !== undefined ? (gender || null) : currentMember.gender,
+        phone !== undefined ? (phone || "").trim() : currentMember.phone,
+        phoneCleanVal,
+        baptismStatus || currentMember.baptism_status,
+        position !== undefined ? position.trim() : currentMember.position,
+        department !== undefined ? department.trim() : currentMember.department,
+        customGardenId !== undefined ? (customGardenId || null) : currentMember.custom_garden_id,
+        registrationDate !== undefined ? (registrationDate || null) : currentMember.registration_date,
+        status || currentMember.status,
+        memberId,
+      )
+    );
 
     // 2. If household info was passed, update household
     if (
@@ -727,30 +822,34 @@ export const updateMemberController = async (c) => {
       ).bind(targetHouseholdId).first();
 
       if (curH) {
-        await env.DB.prepare(`
-          UPDATE households SET
-            household_name = ?,
-            garden_id = ?,
-            address = ?,
-            address_detail = ?,
-            city = ?,
-            province = ?,
-            postal_code = ?,
-            notes = ?
-          WHERE id = ?
-        `).bind(
-          householdName !== undefined ? householdName.trim() : curH.household_name,
-          gardenId !== undefined ? (gardenId || 1) : curH.garden_id,
-          address !== undefined ? (address || "").trim() : curH.address,
-          addressDetail !== undefined ? (addressDetail || "").trim() : curH.address_detail,
-          city !== undefined ? (city || "Edmonton").trim() : (curH.city || "Edmonton"),
-          province !== undefined ? (province || "AB").trim() : (curH.province || "AB"),
-          postalCode !== undefined ? formatPostalCode(postalCode) : curH.postal_code,
-          householdNotes !== undefined ? (householdNotes || "").trim() : curH.notes,
-          targetHouseholdId,
-        ).run();
+        batchStmts.push(
+          env.DB.prepare(`
+            UPDATE households SET
+              household_name = ?,
+              garden_id = ?,
+              address = ?,
+              address_detail = ?,
+              city = ?,
+              province = ?,
+              postal_code = ?,
+              notes = ?
+            WHERE id = ?
+          `).bind(
+            householdName !== undefined ? (householdName ? householdName.trim() : null) : curH.household_name,
+            gardenId !== undefined ? (gardenId || 1) : curH.garden_id,
+            address !== undefined ? (address || "").trim() : curH.address,
+            addressDetail !== undefined ? (addressDetail || "").trim() : curH.address_detail,
+            city !== undefined ? (city || "Edmonton").trim() : (curH.city || "Edmonton"),
+            province !== undefined ? (province || "AB").trim() : (curH.province || "AB"),
+            postalCode !== undefined ? formatPostalCode(postalCode) : curH.postal_code,
+            householdNotes !== undefined ? (householdNotes || "").trim() : curH.notes,
+            targetHouseholdId,
+          )
+        );
       }
     }
+
+    await env.DB.batch(batchStmts);
 
     return c.json({ success: true, message: "교인 정보가 성공적으로 수정되었습니다." });
   } catch (error) {
@@ -798,15 +897,16 @@ export const updateMemberStatusController = async (c) => {
 
     // 2. 세대주 승계 후 현재 교인 제적
     if (status === "REMOVED" && successorMemberId && currentMember.household_id) {
-      // 새 세대주 승격
-      await env.DB.prepare(
-        "UPDATE church_members SET is_head = 1, relationship = 'HEAD' WHERE id = ? AND household_id = ?"
-      ).bind(successorMemberId, currentMember.household_id).run();
-
-      // 기존 세대주 제적 및 is_head 해제
-      await env.DB.prepare(
-        "UPDATE church_members SET status = 'REMOVED', is_head = 0 WHERE id = ?"
-      ).bind(memberId).run();
+      await env.DB.batch([
+        // 새 세대주 승격
+        env.DB.prepare(
+          "UPDATE church_members SET is_head = 1, relationship = 'HEAD' WHERE id = ? AND household_id = ?"
+        ).bind(successorMemberId, currentMember.household_id),
+        // 기존 세대주 제적 및 is_head 해제
+        env.DB.prepare(
+          "UPDATE church_members SET status = 'REMOVED', is_head = 0 WHERE id = ?"
+        ).bind(memberId),
+      ]);
 
       return c.json({
         success: true,
@@ -863,24 +963,32 @@ export const deleteMemberController = async (c) => {
 
     const householdId = member.household_id;
 
+    const batchStmts = [];
+
     // 만약 세대주 삭제 시 승계 대상자가 지정되었다면 새 세대주로 승격
     if (successorMemberId && householdId) {
-      await env.DB.prepare(
-        "UPDATE church_members SET is_head = 1, relationship = 'HEAD' WHERE id = ? AND household_id = ?"
-      ).bind(successorMemberId, householdId).run();
+      batchStmts.push(
+        env.DB.prepare(
+          "UPDATE church_members SET is_head = 1, relationship = 'HEAD' WHERE id = ? AND household_id = ?"
+        ).bind(successorMemberId, householdId)
+      );
     }
 
     // Delete member (cascades to fcm_tokens)
-    await env.DB.prepare("DELETE FROM church_members WHERE id = ?").bind(memberId).run();
+    batchStmts.push(
+      env.DB.prepare("DELETE FROM church_members WHERE id = ?").bind(memberId)
+    );
 
-    // Check if household has any remaining members
-    const remaining = await env.DB.prepare(
-      "SELECT COUNT(*) as count FROM church_members WHERE household_id = ?"
-    ).bind(householdId).first();
-
-    if (remaining && remaining.count === 0) {
-      await env.DB.prepare("DELETE FROM households WHERE id = ?").bind(householdId).run();
+    // If household has no more remaining members, delete household
+    if (householdId) {
+      batchStmts.push(
+        env.DB.prepare(
+          "DELETE FROM households WHERE id = ? AND NOT EXISTS (SELECT 1 FROM church_members WHERE household_id = ? AND id != ?)"
+        ).bind(householdId, householdId, memberId)
+      );
     }
+
+    await env.DB.batch(batchStmts);
 
     return c.json({ success: true, message: "교인이 성공적으로 삭제되었습니다." });
   } catch (error) {
@@ -1548,52 +1656,56 @@ export const bulkSaveHouseholdController = async (c) => {
     const { householdId, household = {}, members = [] } = body;
 
     let targetHouseholdId = householdId;
+    const batchStmts = [];
+    const isNew = !targetHouseholdId;
 
     // 1. Create or Update household
     if (targetHouseholdId) {
       const curH = await env.DB.prepare("SELECT * FROM households WHERE id = ?").bind(targetHouseholdId).first();
       if (curH) {
-        await env.DB.prepare(`
-          UPDATE households SET
-            household_name = ?,
-            garden_id = ?,
-            address = ?,
-            address_detail = ?,
-            city = ?,
-            province = ?,
-            postal_code = ?,
-            notes = ?
-          WHERE id = ?
-        `).bind(
-          household.householdName !== undefined ? (household.householdName ? household.householdName.trim() : null) : curH.household_name,
-          household.gardenId !== undefined ? (household.gardenId || 1) : curH.garden_id,
-          household.address !== undefined ? (household.address || "").trim() : curH.address,
-          household.addressDetail !== undefined ? (household.addressDetail || "").trim() : curH.address_detail,
-          household.city !== undefined ? (household.city || "Edmonton").trim() : curH.city,
-          household.province !== undefined ? (household.province || "AB").trim() : curH.province,
-          formatPostalCode(household.postalCode || curH.postal_code),
-          household.householdNotes !== undefined ? (household.householdNotes || "").trim() : curH.notes,
-          targetHouseholdId,
-        ).run();
+        batchStmts.push(
+          env.DB.prepare(`
+            UPDATE households SET
+              household_name = ?,
+              garden_id = ?,
+              address = ?,
+              address_detail = ?,
+              city = ?,
+              province = ?,
+              postal_code = ?,
+              notes = ?
+            WHERE id = ?
+          `).bind(
+            household.householdName !== undefined ? (household.householdName ? household.householdName.trim() : null) : curH.household_name,
+            household.gardenId !== undefined ? (household.gardenId || 1) : curH.garden_id,
+            household.address !== undefined ? (household.address || "").trim() : curH.address,
+            household.addressDetail !== undefined ? (household.addressDetail || "").trim() : curH.address_detail,
+            household.city !== undefined ? (household.city || "Edmonton").trim() : curH.city,
+            household.province !== undefined ? (household.province || "AB").trim() : curH.province,
+            formatPostalCode(household.postalCode || curH.postal_code),
+            household.householdNotes !== undefined ? (household.householdNotes || "").trim() : curH.notes,
+            targetHouseholdId,
+          )
+        );
       }
     } else {
       // Create new household
       const hName = household.householdName ? household.householdName.trim() : null;
-      const hRes = await env.DB.prepare(`
-        INSERT INTO households (household_name, garden_id, address, address_detail, city, province, postal_code, notes)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `).bind(
-        hName,
-        household.gardenId || 1,
-        (household.address || "").trim(),
-        (household.addressDetail || "").trim(),
-        (household.city || "Edmonton").trim(),
-        (household.province || "AB").trim(),
-        formatPostalCode(household.postalCode),
-        (household.householdNotes || "").trim(),
-      ).run();
-
-      targetHouseholdId = hRes.meta.last_row_id;
+      batchStmts.push(
+        env.DB.prepare(`
+          INSERT INTO households (household_name, garden_id, address, address_detail, city, province, postal_code, notes)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).bind(
+          hName,
+          household.gardenId || 1,
+          (household.address || "").trim(),
+          (household.addressDetail || "").trim(),
+          (household.city || "Edmonton").trim(),
+          (household.province || "AB").trim(),
+          formatPostalCode(household.postalCode),
+          (household.householdNotes || "").trim(),
+        )
+      );
     }
 
     // 2. Process members
@@ -1605,74 +1717,86 @@ export const bulkSaveHouseholdController = async (c) => {
 
       if (mem.id) {
         // Update existing member
-        await env.DB.prepare(`
-          UPDATE church_members SET
-            household_id = ?,
-            is_head = ?,
-            relationship = ?,
-            name = ?,
-            name_en = ?,
-            birth_date = ?,
-            gender = ?,
-            phone = ?,
-            phone_clean = ?,
-            baptism_status = ?,
-            position = ?,
-            department = ?,
-            custom_garden_id = ?,
-            registration_date = ?,
-            status = ?
-          WHERE id = ?
-        `).bind(
-          targetHouseholdId,
-          isHeadVal,
-          mem.relationship || "HEAD",
-          mem.name.trim(),
-          mem.nameEn ? mem.nameEn.trim() : null,
-          mem.birthDate || null,
-          mem.gender || null,
-          (mem.phone || "").trim(),
-          phoneCleanVal,
-          mem.baptismStatus || "NONE",
-          (mem.position || "성도").trim(),
-          (mem.department || "장년부").trim(),
-          mem.customGardenId || null,
-          mem.registrationDate || null,
-          mem.status === "REMOVED" ? "REMOVED" : "ACTIVE",
-          mem.id,
-        ).run();
+        batchStmts.push(
+          env.DB.prepare(`
+            UPDATE church_members SET
+              household_id = ${isNew ? "last_insert_rowid()" : "?"},
+              is_head = ?,
+              relationship = ?,
+              name = ?,
+              name_en = ?,
+              birth_date = ?,
+              gender = ?,
+              phone = ?,
+              phone_clean = ?,
+              baptism_status = ?,
+              position = ?,
+              department = ?,
+              custom_garden_id = ?,
+              registration_date = ?,
+              status = ?
+            WHERE id = ?
+          `).bind(
+            ...(isNew ? [] : [targetHouseholdId]),
+            isHeadVal,
+            mem.relationship || "HEAD",
+            mem.name.trim(),
+            mem.nameEn ? mem.nameEn.trim() : null,
+            mem.birthDate || null,
+            mem.gender || null,
+            (mem.phone || "").trim(),
+            phoneCleanVal,
+            mem.baptismStatus || "NONE",
+            (mem.position || "성도").trim(),
+            (mem.department || "장년부").trim(),
+            mem.customGardenId || null,
+            mem.registrationDate || null,
+            mem.status === "REMOVED" ? "REMOVED" : "ACTIVE",
+            mem.id,
+          )
+        );
       } else {
         // Insert new member
-        await env.DB.prepare(`
-          INSERT INTO church_members (
-            household_id, is_head, relationship, name, name_en, birth_date, gender,
-            phone, phone_clean, baptism_status, position, department,
-            custom_garden_id, registration_date, status, is_registered
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
-        `).bind(
-          targetHouseholdId,
-          isHeadVal,
-          mem.relationship || "CHILD",
-          mem.name.trim(),
-          mem.nameEn ? mem.nameEn.trim() : null,
-          mem.birthDate || null,
-          mem.gender || null,
-          (mem.phone || "").trim(),
-          phoneCleanVal,
-          mem.baptismStatus || "NONE",
-          (mem.position || "성도").trim(),
-          (mem.department || "장년부").trim(),
-          mem.customGardenId || null,
-          mem.registrationDate || null,
-          mem.status === "REMOVED" ? "REMOVED" : "ACTIVE",
-        ).run();
+        batchStmts.push(
+          env.DB.prepare(`
+            INSERT INTO church_members (
+              household_id, is_head, relationship, name, name_en, birth_date, gender,
+              phone, phone_clean, baptism_status, position, department,
+              custom_garden_id, registration_date, status, is_registered
+            ) VALUES (${isNew ? "last_insert_rowid()" : "?"}, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+          `).bind(
+            ...(isNew ? [] : [targetHouseholdId]),
+            isHeadVal,
+            mem.relationship || "CHILD",
+            mem.name.trim(),
+            mem.nameEn ? mem.nameEn.trim() : null,
+            mem.birthDate || null,
+            mem.gender || null,
+            (mem.phone || "").trim(),
+            phoneCleanVal,
+            mem.baptismStatus || "NONE",
+            (mem.position || "성도").trim(),
+            (mem.department || "장년부").trim(),
+            mem.customGardenId || null,
+            mem.registrationDate || null,
+            mem.status === "REMOVED" ? "REMOVED" : "ACTIVE",
+          )
+        );
+      }
+    }
+
+    let finalHouseholdId = targetHouseholdId;
+    if (batchStmts.length > 0) {
+      const results = await env.DB.batch(batchStmts);
+      if (isNew && results.length > 0) {
+        finalHouseholdId = results[0].meta.last_row_id;
       }
     }
 
     return c.json({
       success: true,
       message: "세대 및 구성원 정보가 성공적으로 저장되었습니다.",
-      householdId: targetHouseholdId,
+      householdId: finalHouseholdId,
     }, 200);
   } catch (error) {
     console.error("bulkSaveHouseholdController error:", error);
