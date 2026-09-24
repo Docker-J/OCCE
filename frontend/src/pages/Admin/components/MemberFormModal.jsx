@@ -7,7 +7,7 @@
  * - 세대원별 인적사항, 직분, 세례, 부서 및 양육·훈련 과정 이수 현황 조회
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 import {
   Dialog,
@@ -53,6 +53,8 @@ import SchoolIcon from "@mui/icons-material/School";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import PersonIcon from "@mui/icons-material/Person";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
 
 import AddressAutocompleteInput from "./AddressAutocompleteInput";
 import { PatternFormat } from "react-number-format";
@@ -65,6 +67,13 @@ import { getMemberCourses } from "../../../api/admin";
 const RELATIONSHIP_OPTIONS = [
   { value: "HEAD", label: "세대주 (본인)" },
   { value: "SPOUSE", label: "배우자" },
+  { value: "CHILD", label: "자녀" },
+  { value: "PARENT", label: "부모" },
+  { value: "OTHER", label: "기타 (동거인/친족)" },
+];
+
+const TRANSFER_RELATIONSHIP_OPTIONS = [
+  { value: "SPOUSE", label: "배우자 (결혼)" },
   { value: "CHILD", label: "자녀" },
   { value: "PARENT", label: "부모" },
   { value: "OTHER", label: "기타 (동거인/친족)" },
@@ -126,6 +135,8 @@ const MemberFormModal = ({
   isSubmitting = false,
   onOpenDeleteDialog,
   onSeparateMember,
+  onTransferMember,
+  allUsers = [],
 }) => {
   const isEdit = Boolean(initialData?.id);
 
@@ -145,6 +156,21 @@ const MemberFormModal = ({
     province: "AB",
     postalCode: "",
     notes: "",
+  });
+
+  // 세대 편입(Direction A: 활성 교인을 타 세대로 편입) 모달 상태
+  const [transferTargetMember, setTransferTargetMember] = useState(null);
+  const [transferForm, setTransferForm] = useState({
+    destHouseholdId: "",
+    relationship: "SPOUSE",
+    successorMemberId: "",
+  });
+
+  // 기존 등록 교인 현재 세대로 편입(Direction B) 모달 상태
+  const [isIncorporateOpen, setIsIncorporateOpen] = useState(false);
+  const [incorporateForm, setIncorporateForm] = useState({
+    memberId: "",
+    relationship: "SPOUSE",
   });
 
   // 공통 세대(가구) 정보
@@ -385,6 +411,71 @@ const MemberFormModal = ({
     };
     setSeparateTargetMember(null);
     await onSeparateMember(memberId, separationPayload);
+  };
+
+  // 편입 가능한 대상 세대 목록 (현재 세대 제외)
+  const candidateHouseholds = useMemo(() => {
+    if (!availableHouseholds) return [];
+    const currentHId = String(householdData.householdId || initialData?.householdId || "");
+    return availableHouseholds.filter((h) => String(h.id) !== currentHId);
+  }, [availableHouseholds, householdData.householdId, initialData?.householdId]);
+
+  // 편입 가능한 기존 등록 교인 목록 (현재 세대 구성원 제외, 탈퇴/제적 제외)
+  const candidateMembers = useMemo(() => {
+    if (!allUsers) return [];
+    const currentHId = String(householdData.householdId || initialData?.householdId || "");
+    return allUsers.filter(
+      (u) => u.id && String(u.householdId) !== currentHId && u.status !== "REMOVED"
+    );
+  }, [allUsers, householdData.householdId, initialData?.householdId]);
+
+  // 세대 편입(Direction A: 다른 세대로 편입) 모달 열기
+  const handleOpenTransferDialog = (member) => {
+    const remainingOthers = membersList.filter((m) => m.id && m.id !== member.id);
+    setTransferTargetMember(member);
+    setTransferForm({
+      destHouseholdId: "",
+      relationship: "SPOUSE",
+      successorMemberId: remainingOthers.length > 0 ? (remainingOthers[0].id || "") : "",
+    });
+  };
+
+  // 세대 편입(Direction A) 확정 처리
+  const handleConfirmTransfer = async () => {
+    if (!transferTargetMember || !onTransferMember || !transferForm.destHouseholdId) return;
+    const memberId = transferTargetMember.id;
+    const payload = {
+      name: transferTargetMember.name,
+      transferTargetHouseholdId: transferForm.destHouseholdId,
+      relationship: transferForm.relationship,
+      successorMemberId: transferTargetMember.isHead ? transferForm.successorMemberId : undefined,
+    };
+    setTransferTargetMember(null);
+    await onTransferMember(memberId, payload);
+  };
+
+  // 기존 교인 세대 편입(Direction B: 현재 세대로 교인 불러와 편입) 모달 열기
+  const handleOpenIncorporateDialog = () => {
+    setIsIncorporateOpen(true);
+    setIncorporateForm({
+      memberId: "",
+      relationship: "SPOUSE",
+    });
+  };
+
+  // 기존 교인 세대 편입(Direction B) 확정 처리
+  const handleConfirmIncorporate = async () => {
+    if (!incorporateForm.memberId || !onTransferMember) return;
+    const currentHId = householdData.householdId || initialData?.householdId;
+    if (!currentHId) return;
+    const selectedUser = allUsers.find((u) => String(u.id) === String(incorporateForm.memberId));
+    const payload = {
+      name: selectedUser?.name || "교인",
+      transferTargetHouseholdId: currentHId,
+      relationship: incorporateForm.relationship,
+    };
+    setIsIncorporateOpen(false);
+    await onTransferMember(incorporateForm.memberId, payload);
   };
 
   // 전체 저장 제출 핸들러
@@ -747,25 +838,49 @@ const MemberFormModal = ({
                 />
               </Box>
 
-              <Button
-                size="small"
-                variant="outlined"
-                startIcon={<AddIcon />}
-                onClick={handleAddMemberTab}
-                sx={{
-                  borderRadius: "10px",
-                  fontWeight: 800,
-                  fontSize: "0.82rem",
-                  borderColor: "#ea580c",
-                  color: "#ea580c",
-                  backgroundColor: "rgba(234, 88, 12, 0.05)",
-                  "&:hover": { backgroundColor: "rgba(234, 88, 12, 0.12)", borderColor: "#c2410c" },
-                  px: 1.8,
-                  py: 0.6,
-                }}
-              >
-                세대원 추가
-              </Button>
+              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                {isEdit && (householdData.householdId || initialData?.householdId) && (
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    startIcon={<GroupAddIcon />}
+                    onClick={handleOpenIncorporateDialog}
+                    sx={{
+                      borderRadius: "10px",
+                      fontWeight: 800,
+                      fontSize: "0.82rem",
+                      borderColor: "#2563eb",
+                      color: "#2563eb",
+                      backgroundColor: "rgba(37, 99, 235, 0.05)",
+                      "&:hover": { backgroundColor: "rgba(37, 99, 235, 0.12)", borderColor: "#1d4ed8" },
+                      px: 1.8,
+                      py: 0.6,
+                    }}
+                  >
+                    기존 교인 세대 편입
+                  </Button>
+                )}
+
+                <Button
+                  size="small"
+                  variant="outlined"
+                  startIcon={<AddIcon />}
+                  onClick={handleAddMemberTab}
+                  sx={{
+                    borderRadius: "10px",
+                    fontWeight: 800,
+                    fontSize: "0.82rem",
+                    borderColor: "#ea580c",
+                    color: "#ea580c",
+                    backgroundColor: "rgba(234, 88, 12, 0.05)",
+                    "&:hover": { backgroundColor: "rgba(234, 88, 12, 0.12)", borderColor: "#c2410c" },
+                    px: 1.8,
+                    py: 0.6,
+                  }}
+                >
+                  세대원 추가
+                </Button>
+              </Box>
             </Box>
 
             {/* 세대원 탭 네비게이션 바 */}
@@ -951,8 +1066,8 @@ const MemberFormModal = ({
               </Paper>
             )}
 
-            {/* 자녀/세대원 수정 시: 세대 독립 (분가) 안내 배너 카드 */}
-            {isEdit && currentMember?.id && !currentMember.isHead && (
+            {/* 세대 편입 및 독립(분가) 가구 변동 관리 배너 카드 */}
+            {isEdit && currentMember?.id && (
               <Paper
                 elevation={0}
                 sx={{
@@ -972,31 +1087,54 @@ const MemberFormModal = ({
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
                     <HomeWorkOutlinedIcon sx={{ color: "#2563eb", fontSize: "1.3rem" }} />
                     <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "#1e40af" }}>
-                      세대 독립 (새 가구로 분가)
+                      가구 변동 관리 (세대 편입 및 분가)
                     </Typography>
                   </Box>
                   <Typography variant="caption" sx={{ color: "#3b82f6", display: "block", mt: 0.4, lineHeight: 1.4 }}>
-                    현재 세대의 {currentMember.relationship === "CHILD" ? "자녀" : "세대원"}로 등록되어 있습니다.
-                    결혼 또는 청년 독립으로 새 가구를 형성하려면 분가 버튼을 누르세요.
+                    청년 결혼/합가 등으로 다른 세대에 편입하거나, 자녀가 독립하여 새 가구를 형성할 수 있습니다.
                   </Typography>
                 </Box>
 
-                <Button
-                  size="small"
-                  variant="contained"
-                  onClick={() => handleOpenSeparateDialog(currentMember)}
-                  sx={{
-                    borderRadius: "10px",
-                    fontSize: "0.82rem",
-                    fontWeight: 800,
-                    backgroundColor: "#2563eb",
-                    "&:hover": { backgroundColor: "#1d4ed8" },
-                    px: 2,
-                    py: 0.8,
-                  }}
-                >
-                  이 세대원 분가(독립)하기
-                </Button>
+                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    startIcon={<SwapHorizIcon />}
+                    onClick={() => handleOpenTransferDialog(currentMember)}
+                    sx={{
+                      borderRadius: "10px",
+                      fontSize: "0.82rem",
+                      fontWeight: 800,
+                      backgroundColor: "#2563eb",
+                      "&:hover": { backgroundColor: "#1d4ed8" },
+                      px: 1.8,
+                      py: 0.8,
+                    }}
+                  >
+                    다른 세대로 편입 (결혼/합가)
+                  </Button>
+
+                  {(!currentMember.isHead || membersList.length > 1) && (
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => handleOpenSeparateDialog(currentMember)}
+                      sx={{
+                        borderRadius: "10px",
+                        fontSize: "0.82rem",
+                        fontWeight: 800,
+                        borderColor: "#2563eb",
+                        color: "#2563eb",
+                        backgroundColor: "#fff",
+                        "&:hover": { backgroundColor: "#f8fafc", borderColor: "#1d4ed8" },
+                        px: 1.8,
+                        py: 0.8,
+                      }}
+                    >
+                      새 가구로 분가(독립)
+                    </Button>
+                  )}
+                </Box>
               </Paper>
             )}
 
@@ -1594,6 +1732,260 @@ const MemberFormModal = ({
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* ========================================================= */}
+      {/* 세대 편입(Direction A: 다른 세대로 편입) 다이얼로그          */}
+      {/* ========================================================= */}
+      <Dialog
+        open={Boolean(transferTargetMember)}
+        onClose={() => setTransferTargetMember(null)}
+        maxWidth="sm"
+        fullWidth
+        slotProps={{
+          paper: {
+            sx: { borderRadius: "18px", p: 1 },
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 800, color: "#1e40af", display: "flex", alignItems: "center", gap: 1 }}>
+          <SwapHorizIcon sx={{ color: "#2563eb", fontSize: "1.6rem" }} />
+          [{transferTargetMember?.name}] 성도 다른 세대로 편입 (결혼/합가)
+        </DialogTitle>
+        <DialogContent dividers sx={{ py: 2.5 }}>
+          <Box sx={{ mb: 2.5, p: 2, backgroundColor: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+            <Typography variant="body2" sx={{ color: "#334155", fontWeight: 600 }}>
+              대상 교인: <span style={{ color: "#2563eb", fontWeight: 800 }}>{transferTargetMember?.name}</span>
+              {transferTargetMember?.department ? ` (${transferTargetMember.department})` : ""}
+            </Typography>
+            <Typography variant="caption" sx={{ color: "#64748b", display: "block", mt: 0.5, lineHeight: 1.4 }}>
+              결혼이나 합가 등으로 교인을 다른 가구로 이동시킵니다. 이동 후 대상 세대의 구성원으로 등록되며 대상 세대의 주소와 정원을 공유합니다.
+            </Typography>
+          </Box>
+
+          <Grid container spacing={2.5}>
+            {/* 편입할 대상 세대 선택 */}
+            <Grid size={{ xs: 12 }}>
+              <Autocomplete
+                options={candidateHouseholds}
+                getOptionLabel={(option) => {
+                  const headPart = option.headName ? `${option.headName} 세대` : "";
+                  const addrPart = option.address ? ` - ${[option.addressDetail, option.address].filter(Boolean).join(", ")}` : "";
+                  const gardenPart = option.gardenName ? ` [${option.gardenName}]` : "";
+                  return `${headPart || option.address || "세대"}${gardenPart}${addrPart}`;
+                }}
+                onChange={(_, val) => {
+                  setTransferForm((prev) => ({
+                    ...prev,
+                    destHouseholdId: val?.id || "",
+                  }));
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    required
+                    size="small"
+                    label="편입할 대상 세대 검색 및 선택"
+                    placeholder="세대주 성명 또는 주소로 검색..."
+                    helperText="교인이 합류할 기존 가구를 선택하세요."
+                    sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+                  />
+                )}
+              />
+            </Grid>
+
+            {/* 새 세대에서의 관계 */}
+            <Grid size={{ xs: 12 }}>
+              <FormControl fullWidth size="small">
+                <InputLabel id="transfer-rel-label">새 가구에서의 관계</InputLabel>
+                <Select
+                  labelId="transfer-rel-label"
+                  value={transferForm.relationship}
+                  label="새 가구에서의 관계"
+                  onChange={(e) => setTransferForm((prev) => ({ ...prev, relationship: e.target.value }))}
+                  sx={{ borderRadius: "10px" }}
+                >
+                  {TRANSFER_RELATIONSHIP_OPTIONS.map((opt) => (
+                    <MenuItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            {/* 세대주일 경우: 세대주 승계 후속자 지정 또는 1인 세대 안내 */}
+            {transferTargetMember?.isHead && (
+              <Grid size={{ xs: 12 }}>
+                {membersList.filter((m) => m.id && m.id !== transferTargetMember.id).length > 0 ? (
+                  <Box sx={{ p: 2, backgroundColor: "#fffbeb", borderRadius: "10px", border: "1px solid #fde68a" }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#b45309", mb: 0.5 }}>
+                      세대주 승계 안내
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "#78350f", mb: 1.5, fontSize: "0.82rem" }}>
+                      현재 교인은 기존 세대의 세대주입니다. 기존 세대에 남는 구성원 중 새로운 세대주를 지정해 주세요.
+                    </Typography>
+                    <FormControl fullWidth size="small">
+                      <InputLabel id="successor-select-label">새 세대주 선택</InputLabel>
+                      <Select
+                        labelId="successor-select-label"
+                        value={transferForm.successorMemberId}
+                        label="새 세대주 선택"
+                        onChange={(e) => setTransferForm((prev) => ({ ...prev, successorMemberId: e.target.value }))}
+                        sx={{ backgroundColor: "#fff", borderRadius: "8px" }}
+                      >
+                        {membersList
+                          .filter((m) => m.id && m.id !== transferTargetMember.id)
+                          .map((m) => (
+                            <MenuItem key={m.id} value={m.id}>
+                              {m.name} ({RELATIONSHIP_OPTIONS.find((r) => r.value === m.relationship)?.label || "세대원"})
+                            </MenuItem>
+                          ))}
+                      </Select>
+                    </FormControl>
+                  </Box>
+                ) : (
+                  <Box sx={{ p: 2, backgroundColor: "#f0fdf4", borderRadius: "10px", border: "1px solid #bbf7d0" }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#166534", mb: 0.5 }}>
+                      1인 단독 세대 안내
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "#15803d", fontSize: "0.82rem" }}>
+                      현재 교인은 1인 단독 가구의 세대주입니다. 다른 세대로 편입 완료 시 기존 빈 가구는 자동으로 삭제 정리됩니다.
+                    </Typography>
+                  </Box>
+                )}
+              </Grid>
+            )}
+          </Grid>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button onClick={() => setTransferTargetMember(null)} sx={{ color: "#64748b", borderRadius: "10px" }}>
+            취소
+          </Button>
+          <Button
+            variant="contained"
+            disabled={!transferForm.destHouseholdId}
+            onClick={handleConfirmTransfer}
+            sx={{
+              borderRadius: "10px",
+              backgroundColor: "#2563eb",
+              fontWeight: 800,
+              px: 3,
+            }}
+          >
+            편입 확정하기
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* ========================================================= */}
+      {/* 기존 교인 세대 편입(Direction B: 현재 세대로 교인 합류) 다이얼로그 */}
+      {/* ========================================================= */}
+      <Dialog
+        open={isIncorporateOpen}
+        onClose={() => setIsIncorporateOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        slotProps={{
+          paper: {
+            sx: { borderRadius: "18px", p: 1 },
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 800, color: "#1e40af", display: "flex", alignItems: "center", gap: 1 }}>
+          <GroupAddIcon sx={{ color: "#2563eb", fontSize: "1.6rem" }} />
+          기존 등록 교인 세대 편입
+        </DialogTitle>
+        <DialogContent dividers sx={{ py: 2.5 }}>
+          <Box sx={{ mb: 2.5, p: 2, backgroundColor: "#eff6ff", borderRadius: "12px", border: "1px solid #bfdbfe" }}>
+            <Typography variant="body2" sx={{ color: "#1e40af", fontWeight: 700 }}>
+              현재 대상 세대: {householdData.address ? [householdData.addressDetail, householdData.address].filter(Boolean).join(", ") : "가구"}
+              {membersList.find((m) => m.isHead) ? ` (${membersList.find((m) => m.isHead)?.name} 세대)` : ""}
+            </Typography>
+            <Typography variant="caption" sx={{ color: "#3b82f6", display: "block", mt: 0.5, lineHeight: 1.4 }}>
+              결혼 또는 합가로 교적에 이미 등록되어 있는 교인을 이 세대로 불러와 합칩니다.
+            </Typography>
+          </Box>
+
+          <Grid container spacing={2.5}>
+            {/* 편입할 교인 검색 및 선택 */}
+            <Grid size={{ xs: 12 }}>
+              <Autocomplete
+                options={candidateMembers}
+                getOptionLabel={(option) => {
+                  const dept = option.department || "부서미정";
+                  const pos = option.position || "성도";
+                  const phoneStr = option.phone ? ` · ${option.phone}` : "";
+                  const currentHead = option.headName ? ` (현재: ${option.headName} 세대)` : "";
+                  return `${option.name} [${dept} / ${pos}${phoneStr}]${currentHead}`;
+                }}
+                onChange={(_, val) => {
+                  setIncorporateForm((prev) => ({
+                    ...prev,
+                    memberId: val?.id || "",
+                  }));
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    required
+                    size="small"
+                    label="편입할 교인 검색 및 선택"
+                    placeholder="성명, 부서, 연락처 등으로 검색..."
+                    helperText="이 세대로 합류할 등록 교인을 선택하세요."
+                    sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+                  />
+                )}
+              />
+            </Grid>
+
+            {/* 현재 세대에서의 관계 */}
+            <Grid size={{ xs: 12 }}>
+              <FormControl fullWidth size="small">
+                <InputLabel id="incorp-rel-label">이 가구에서의 관계</InputLabel>
+                <Select
+                  labelId="incorp-rel-label"
+                  value={incorporateForm.relationship}
+                  label="이 가구에서의 관계"
+                  onChange={(e) => setIncorporateForm((prev) => ({ ...prev, relationship: e.target.value }))}
+                  sx={{ borderRadius: "10px" }}
+                >
+                  {TRANSFER_RELATIONSHIP_OPTIONS.map((opt) => (
+                    <MenuItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid size={{ xs: 12 }}>
+              <Box sx={{ p: 2, backgroundColor: "#f8fafc", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+                <Typography variant="caption" sx={{ color: "#64748b", display: "block", lineHeight: 1.5 }}>
+                  💡 편입된 교인은 현재 세대의 주소와 소속 정원을 함께 사용하게 되며, 기존에 1인 단독 가구였던 경우 이전 빈 가구는 자동으로 삭제 정리됩니다.
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button onClick={() => setIsIncorporateOpen(false)} sx={{ color: "#64748b", borderRadius: "10px" }}>
+            취소
+          </Button>
+          <Button
+            variant="contained"
+            disabled={!incorporateForm.memberId}
+            onClick={handleConfirmIncorporate}
+            sx={{
+              borderRadius: "10px",
+              backgroundColor: "#2563eb",
+              fontWeight: 800,
+              px: 3,
+            }}
+          >
+            이 세대로 편입하기
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   );
 };
@@ -1609,6 +2001,8 @@ MemberFormModal.propTypes = {
   isSubmitting: PropTypes.bool,
   onOpenDeleteDialog: PropTypes.func,
   onSeparateMember: PropTypes.func,
+  onTransferMember: PropTypes.func,
+  allUsers: PropTypes.array,
 };
 
 export default MemberFormModal;

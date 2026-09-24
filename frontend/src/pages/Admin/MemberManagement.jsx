@@ -101,6 +101,7 @@ const MemberManagement = () => {
     setMemberFormOpen,
     handleSubmitMemberForm,
     handleSeparateMember,
+    handleTransferMember,
     setUserToDelete,
     handleConfirmRemoveStatus,
     handleConfirmPermanentDelete,
@@ -571,6 +572,8 @@ const MemberManagement = () => {
           setUserToDelete(u);
         }}
         onSeparateMember={handleSeparateMember}
+        onTransferMember={handleTransferMember}
+        allUsers={users}
       />
 
 

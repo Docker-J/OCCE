@@ -560,8 +560,11 @@ export const updateMemberController = async (c) => {
       customGardenId,
       registrationDate,
       status,
-      // Household updates & separation
+      // Household updates & separation / transfer
       isSeparateHousehold,
+      isTransferHousehold,
+      targetHouseholdId: transferTargetHouseholdId,
+      successorMemberId,
       householdId,
       householdName,
       gardenId,
@@ -586,8 +589,59 @@ export const updateMemberController = async (c) => {
     let targetIsHead = isHead !== undefined ? (isHead ? 1 : 0) : currentMember.is_head;
     let targetRelationship = relationship || currentMember.relationship;
 
+    // 세대 편입(합가/결혼 등으로 기존 세대로 이동) 처리
+    if (isTransferHousehold) {
+      const destHouseholdId = transferTargetHouseholdId || householdId;
+      if (!destHouseholdId) {
+        return c.json({ error: "ValidationError", message: "편입할 대상 세대를 지정해야 합니다." }, 400);
+      }
+
+      const oldHouseholdId = currentMember.household_id;
+
+      // 1. 기존 세대의 세대주였던 경우 새 세대주 지정 또는 승격
+      if (currentMember.is_head && oldHouseholdId) {
+        if (successorMemberId) {
+          await env.DB.prepare(
+            "UPDATE church_members SET is_head = 1, relationship = 'HEAD' WHERE id = ? AND household_id = ?"
+          ).bind(successorMemberId, oldHouseholdId).run();
+        } else {
+          const nextHead = await env.DB.prepare(
+            "SELECT id FROM church_members WHERE household_id = ? AND id != ? AND status != 'REMOVED' ORDER BY id ASC LIMIT 1"
+          ).bind(oldHouseholdId, memberId).first();
+          if (nextHead) {
+            await env.DB.prepare(
+              "UPDATE church_members SET is_head = 1, relationship = 'HEAD' WHERE id = ?"
+            ).bind(nextHead.id).run();
+          }
+        }
+      }
+
+      // 2. 대상 세대로 편입 (is_head = 0, relationship = relationship || 'SPOUSE')
+      const targetRel = relationship || "SPOUSE";
+      await env.DB.prepare(
+        "UPDATE church_members SET household_id = ?, is_head = 0, relationship = ? WHERE id = ?"
+      ).bind(destHouseholdId, targetRel, memberId).run();
+
+      // 3. 기존 세대에 남은 구성원(제적 제외) 확인하여 없으면 빈 세대(orphan household) 자동 정리
+      if (oldHouseholdId && String(oldHouseholdId) !== String(destHouseholdId)) {
+        const remaining = await env.DB.prepare(
+          "SELECT COUNT(*) as count FROM church_members WHERE household_id = ? AND status != 'REMOVED'"
+        ).bind(oldHouseholdId).first();
+
+        if (remaining && remaining.count === 0) {
+          await env.DB.prepare("DELETE FROM households WHERE id = ?").bind(oldHouseholdId).run();
+        }
+      }
+
+      return c.json({
+        success: true,
+        message: "성공적으로 세대 편입 처리가 완료되었습니다.",
+      });
+    }
+
     // 세대 독립(분가) 처리: 신규 세대 생성 후 해당 세대의 세대주(HEAD)로 설정
     if (isSeparateHousehold) {
+      const oldHouseholdId = currentMember.household_id;
       const newHName = householdName ? householdName.trim() : null;
       const newHRes = await env.DB.prepare(`
         INSERT INTO households (household_name, garden_id, address, address_detail, city, province, postal_code, notes)
@@ -606,6 +660,17 @@ export const updateMemberController = async (c) => {
       targetHouseholdId = newHRes.meta.last_row_id;
       targetIsHead = 1;
       targetRelationship = "HEAD";
+
+      // 기존 세대에 남은 구성원(제적 제외) 확인하여 없으면 빈 세대 정리
+      if (oldHouseholdId && String(oldHouseholdId) !== String(targetHouseholdId)) {
+        const remaining = await env.DB.prepare(
+          "SELECT COUNT(*) as count FROM church_members WHERE household_id = ? AND status != 'REMOVED'"
+        ).bind(oldHouseholdId).first();
+
+        if (remaining && remaining.count === 0) {
+          await env.DB.prepare("DELETE FROM households WHERE id = ?").bind(oldHouseholdId).run();
+        }
+      }
     }
 
     // 1. Update member fields
@@ -1231,6 +1296,7 @@ export const listHouseholdsController = async (c) => {
       SELECT 
         h.id, 
         h.household_name as householdName, 
+        (SELECT name FROM church_members WHERE household_id = h.id AND is_head = 1 AND status != 'REMOVED' LIMIT 1) as headName,
         h.garden_id as gardenId, 
         g.name as gardenName,
         h.address, 
@@ -1240,7 +1306,7 @@ export const listHouseholdsController = async (c) => {
         h.postal_code as postalCode
       FROM households h
       LEFT JOIN gardens g ON h.garden_id = g.id
-      ORDER BY h.household_name ASC
+      ORDER BY headName ASC, h.id ASC
     `).all();
 
     return c.json({ households: results || [] });

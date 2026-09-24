@@ -375,6 +375,26 @@ export const useMemberManagement = () => {
     }
   };
 
+  // 세대 편입(결혼/합가) 처리
+  const handleTransferMember = async (memberId, transferData) => {
+    setSubmittingMember(true);
+    try {
+      await updateMember(memberId, {
+        isTransferHousehold: true,
+        ...transferData,
+      });
+      openSnackbar("success", `${transferData.name || "교인"}님이 세대로 성공적으로 편입되었습니다.`);
+      setMemberFormOpen(false);
+      setMemberForEdit(null);
+      await fetchUsers(true);
+    } catch (error) {
+      console.error("Transfer failed:", error);
+      openSnackbar("error", error?.response?.data?.message ?? "세대 편입 처리에 실패했습니다.");
+    } finally {
+      setSubmittingMember(false);
+    }
+  };
+
   // 제적(REMOVED) 처리
   const handleConfirmRemoveStatus = async (options = {}) => {
     if (!userToDelete) return;
@@ -525,6 +545,7 @@ export const useMemberManagement = () => {
       setMemberFormOpen,
       handleSubmitMemberForm,
       handleSeparateMember,
+      handleTransferMember,
       setUserForRoleModal,
       handleSaveRoleAndGardens,
       setUserToDelete,
