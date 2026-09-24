@@ -23,14 +23,19 @@ CREATE TABLE IF NOT EXISTS Columns (
 -- ====================================================================
 CREATE TABLE IF NOT EXISTS gardens (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT UNIQUE NOT NULL,                      -- 정원명 (예: '미배정', '에덴1정원')
-  leader_member_id INTEGER NULL,                  -- 정원지기 교인 ID (church_members 참조, 해당 정원 소속 교인 중에서만 지정)
+  name TEXT UNIQUE NOT NULL,                      -- 정원명 (예: '미배정', '나라', '에덴')
+  category TEXT NOT NULL DEFAULT 'ADULT',         -- 정원 구분 ('ADULT': 장년 정원, 'YOUNG_ADULT': 청년 정원)
+  leader_member_id INTEGER NULL,                  -- 정원지기 교인 ID (church_members 참조. 장년: 해당 정원 소속, 청년: 청년부 전체 대상)
+  sub_leader_member_id INTEGER NULL,              -- 부정원지기 교인 ID (church_members 참조. 청년 정원 전용)
   order_num INTEGER NOT NULL DEFAULT 0,           -- UI 노출 우선순위 (드래그 앤 드롭 및 순서 변경 지원)
-  is_active BOOLEAN NOT NULL DEFAULT 1            -- 현재 운영 중 여부
+  is_active BOOLEAN NOT NULL DEFAULT 1,           -- 현재 운영 중 여부
+  FOREIGN KEY (leader_member_id) REFERENCES church_members(id),
+  FOREIGN KEY (sub_leader_member_id) REFERENCES church_members(id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_gardens_active_order ON gardens(is_active, order_num);
 CREATE INDEX IF NOT EXISTS idx_gardens_leader ON gardens(leader_member_id) WHERE leader_member_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_gardens_sub_leader ON gardens(sub_leader_member_id) WHERE sub_leader_member_id IS NOT NULL;
 
 -- 기본 정원 데이터 시드 (미배정)
 INSERT OR IGNORE INTO gardens (id, name, order_num, is_active) VALUES (1, '미배정', 999, 1);

@@ -1272,7 +1272,14 @@ export const listGardensController = async (c) => {
   try {
     const env = c.env;
     const { results } = await env.DB.prepare(`
-      SELECT id, name, leader_member_id as leaderMemberId, order_num as orderNum, is_active as isActive
+      SELECT 
+        id, 
+        name, 
+        category,
+        leader_member_id as leaderMemberId, 
+        sub_leader_member_id as subLeaderMemberId, 
+        order_num as orderNum, 
+        is_active as isActive
       FROM gardens
       WHERE is_active = 1
       ORDER BY order_num ASC, name ASC
@@ -1676,8 +1683,11 @@ export const manageGardensController = async (c) => {
       SELECT 
         g.id,
         g.name,
+        g.category,
         g.leader_member_id as leaderMemberId,
         cm.name as leaderName,
+        g.sub_leader_member_id as subLeaderMemberId,
+        sub_cm.name as subLeaderName,
         g.order_num as orderNum,
         g.is_active as isActive,
         (
@@ -1696,6 +1706,7 @@ export const manageGardensController = async (c) => {
         ) as memberCount
       FROM gardens g
       LEFT JOIN church_members cm ON g.leader_member_id = cm.id
+      LEFT JOIN church_members sub_cm ON g.sub_leader_member_id = sub_cm.id
       ORDER BY g.order_num ASC, g.name ASC
     `).all();
 
@@ -1715,8 +1726,10 @@ export const createGardenController = async (c) => {
     const env = c.env;
     const body = await c.req.json();
     const name = (body.name || "").trim();
+    const category = body.category === "YOUNG_ADULT" ? "YOUNG_ADULT" : "ADULT";
     const orderNum = Number.isInteger(body.orderNum) ? body.orderNum : 0;
     const leaderMemberId = body.leaderMemberId ? Number(body.leaderMemberId) : null;
+    const subLeaderMemberId = category === "YOUNG_ADULT" && body.subLeaderMemberId ? Number(body.subLeaderMemberId) : null;
     const isActive = body.isActive !== undefined ? (body.isActive ? 1 : 0) : 1;
 
     if (!name) {
@@ -1729,9 +1742,9 @@ export const createGardenController = async (c) => {
     }
 
     const res = await env.DB.prepare(`
-      INSERT INTO gardens (name, leader_member_id, order_num, is_active)
-      VALUES (?, ?, ?, ?)
-    `).bind(name, leaderMemberId, orderNum, isActive).run();
+      INSERT INTO gardens (name, category, leader_member_id, sub_leader_member_id, order_num, is_active)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).bind(name, category, leaderMemberId, subLeaderMemberId, orderNum, isActive).run();
 
     return c.json({
       success: true,
@@ -1739,7 +1752,9 @@ export const createGardenController = async (c) => {
       garden: {
         id: res.meta.last_row_id,
         name,
+        category,
         leaderMemberId,
+        subLeaderMemberId,
         orderNum,
         isActive,
       },
@@ -1770,8 +1785,19 @@ export const updateGardenController = async (c) => {
     }
 
     const name = body.name !== undefined ? body.name.trim() : existing.name;
+    const category = body.category !== undefined 
+      ? (body.category === "YOUNG_ADULT" ? "YOUNG_ADULT" : "ADULT") 
+      : (existing.category || "ADULT");
     const orderNum = body.orderNum !== undefined ? Number(body.orderNum) : existing.order_num;
-    const leaderMemberId = body.leaderMemberId !== undefined ? (body.leaderMemberId ? Number(body.leaderMemberId) : null) : existing.leader_member_id;
+    const leaderMemberId = body.leaderMemberId !== undefined 
+      ? (body.leaderMemberId ? Number(body.leaderMemberId) : null) 
+      : existing.leader_member_id;
+    // 장년 정원은 부정원지기 옵션 X (null 강제)
+    const subLeaderMemberId = category === "YOUNG_ADULT" 
+      ? (body.subLeaderMemberId !== undefined 
+          ? (body.subLeaderMemberId ? Number(body.subLeaderMemberId) : null) 
+          : existing.sub_leader_member_id) 
+      : null;
     const isActive = body.isActive !== undefined ? (body.isActive ? 1 : 0) : existing.is_active;
 
     if (!name) {
@@ -1788,11 +1814,13 @@ export const updateGardenController = async (c) => {
     await env.DB.prepare(`
       UPDATE gardens SET
         name = ?,
+        category = ?,
         leader_member_id = ?,
+        sub_leader_member_id = ?,
         order_num = ?,
         is_active = ?
       WHERE id = ?
-    `).bind(name, leaderMemberId, orderNum, isActive, id).run();
+    `).bind(name, category, leaderMemberId, subLeaderMemberId, orderNum, isActive, id).run();
 
     return c.json({
       success: true,
@@ -1800,7 +1828,9 @@ export const updateGardenController = async (c) => {
       garden: {
         id,
         name,
+        category,
         leaderMemberId,
+        subLeaderMemberId,
         orderNum,
         isActive,
       },
