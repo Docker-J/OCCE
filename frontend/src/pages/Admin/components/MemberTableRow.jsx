@@ -28,25 +28,47 @@ const RELATIONSHIP_LABELS = {
 };
 
 const BAPTISM_LABELS = {
-  BAPTIZED: { label: "세례", bg: "rgba(37, 99, 235, 0.08)", color: "#1d4ed8", border: "rgba(37, 99, 235, 0.2)" },
-  INFANT: { label: "유아세례", bg: "rgba(13, 148, 136, 0.08)", color: "#0f766e", border: "rgba(13, 148, 136, 0.2)" },
-  CONFIRMATION: { label: "입교", bg: "rgba(124, 58, 237, 0.08)", color: "#6d28d9", border: "rgba(124, 58, 237, 0.2)" },
+  BAPTIZED: {
+    label: "세례",
+    bg: "rgba(37, 99, 235, 0.08)",
+    color: "#1d4ed8",
+    border: "rgba(37, 99, 235, 0.2)",
+  },
+  INFANT: {
+    label: "유아세례",
+    bg: "rgba(13, 148, 136, 0.08)",
+    color: "#0f766e",
+    border: "rgba(13, 148, 136, 0.2)",
+  },
+  CONFIRMATION: {
+    label: "입교",
+    bg: "rgba(124, 58, 237, 0.08)",
+    color: "#6d28d9",
+    border: "rgba(124, 58, 237, 0.2)",
+  },
   NONE: { label: "미세례", bg: "#f3f4f6", color: "#6b7280", border: "#e5e7eb" },
 };
 
-const MemberTableRow = ({
-  user,
-  onOpenEditModal,
-}) => {
-  const relLabel = RELATIONSHIP_LABELS[user.relationship] || (user.isHead ? "세대주" : "");
+const MemberTableRow = ({ user, onOpenEditModal }) => {
+  const relLabel =
+    RELATIONSHIP_LABELS[user.relationship] || (user.isHead ? "세대주" : "");
   const baptismMeta = BAPTISM_LABELS[user.baptismStatus] || BAPTISM_LABELS.NONE;
   const isRemoved = user.status === "REMOVED";
 
-  const cityProvince = [user.city || "Edmonton", user.province || "AB"].filter(Boolean).join(", ");
-  const fullAddress = [user.addressDetail, user.address, cityProvince, user.postalCode]
+  const cityProvince = [user.city || "Edmonton", user.province || "AB"]
     .filter(Boolean)
     .join(", ");
-  const displayAddress = [user.addressDetail, user.address].filter(Boolean).join(", ") || "주소 등록됨";
+  const fullAddress = [
+    user.addressDetail,
+    user.address,
+    cityProvince,
+    user.postalCode,
+  ]
+    .filter(Boolean)
+    .join(", ");
+  const displayAddress =
+    [user.addressDetail, user.address].filter(Boolean).join(", ") ||
+    "주소 등록됨";
 
   return (
     <TableRow
@@ -61,7 +83,9 @@ const MemberTableRow = ({
           : user.isAlternateHousehold
           ? "#f1f5f9"
           : "#ffffff",
-        borderTop: user.isFirstInHousehold ? "2px solid #cbd5e1" : "1px dashed #e2e8f0",
+        borderTop: user.isFirstInHousehold
+          ? "2px solid #cbd5e1"
+          : "1px dashed #e2e8f0",
         "&:hover": {
           backgroundColor: isRemoved
             ? "rgba(239, 68, 68, 0.07) !important"
@@ -79,8 +103,19 @@ const MemberTableRow = ({
           transition: "all 0.15s ease",
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, flexWrap: "wrap" }}>
-          <Tooltip title={user.nameEn ? `영문명: ${user.nameEn}` : ""} disableHoverListener={!user.nameEn} arrow>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 0.8,
+            flexWrap: "wrap",
+          }}
+        >
+          <Tooltip
+            title={user.nameEn ? `영문명: ${user.nameEn}` : ""}
+            disableHoverListener={!user.nameEn}
+            arrow
+          >
             <Typography
               variant="body1"
               sx={{
@@ -93,20 +128,6 @@ const MemberTableRow = ({
               {user.name || "(이름 없음)"}
             </Typography>
           </Tooltip>
-
-          {user.birthDate && (
-            <Typography
-              component="span"
-              sx={{
-                fontSize: "0.82rem",
-                color: isRemoved ? "#991b1b" : "#64748b",
-                fontWeight: 500,
-                whiteSpace: "nowrap",
-              }}
-            >
-              ({String(user.birthDate).split("T")[0]})
-            </Typography>
-          )}
 
           {isRemoved ? (
             <Chip
@@ -167,10 +188,25 @@ const MemberTableRow = ({
 
         {/* 세대 주소 보조 정보 (세대 대표 행에만 깔끔하게 주소 칩 노출) */}
         {user.isFirstInHousehold && fullAddress && (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, mt: 0.3, flexWrap: "wrap" }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 0.8,
+              mt: 0.3,
+              flexWrap: "wrap",
+            }}
+          >
             <Tooltip title={`세대 주소: ${fullAddress}`} arrow>
               <Chip
-                icon={<HomeOutlinedIcon sx={{ fontSize: "0.9rem !important", color: "#666 !important" }} />}
+                icon={
+                  <HomeOutlinedIcon
+                    sx={{
+                      fontSize: "0.9rem !important",
+                      color: "#666 !important",
+                    }}
+                  />
+                }
                 label={displayAddress}
                 size="small"
                 sx={{
@@ -180,7 +216,10 @@ const MemberTableRow = ({
                   color: "#555",
                   backgroundColor: "#f9fafb",
                   border: "1px solid #e5e7eb",
-                  "& .MuiChip-label": { overflow: "hidden", textOverflow: "ellipsis" },
+                  "& .MuiChip-label": {
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  },
                 }}
               />
             </Tooltip>
@@ -188,10 +227,27 @@ const MemberTableRow = ({
         )}
       </TableCell>
 
-      {/* 2. 직분 및 세례 신분 */}
+      {/* 2. 생년월일 */}
       <TableCell align="center" sx={{ py: 1.8, whiteSpace: "nowrap" }}>
-        <Stack direction="row" spacing={0.8} sx={{ justifyContent: "center", alignItems: "center" }}>
+        <Typography
+          variant="body2"
+          sx={{
+            color: isRemoved ? "#991b1b" : user.birthDate ? "#334155" : "#94a3b8",
+            fontWeight: 500,
+            fontSize: "0.85rem",
+          }}
+        >
+          {user.birthDate ? String(user.birthDate).split("T")[0] : "-"}
+        </Typography>
+      </TableCell>
 
+      {/* 3. 직분 및 세례 신분 */}
+      <TableCell align="center" sx={{ py: 1.8, whiteSpace: "nowrap" }}>
+        <Stack
+          direction="row"
+          spacing={0.8}
+          sx={{ justifyContent: "center", alignItems: "center" }}
+        >
           {user.position === "교역자" ? (
             <Tooltip title="온교회 교역자">
               <Chip
@@ -208,7 +264,10 @@ const MemberTableRow = ({
               />
             </Tooltip>
           ) : (
-            <Typography variant="body2" sx={{ color: "#444", fontWeight: 600, fontSize: "0.85rem" }}>
+            <Typography
+              variant="body2"
+              sx={{ color: "#444", fontWeight: 600, fontSize: "0.85rem" }}
+            >
               {user.position || "성도"}
             </Typography>
           )}
@@ -231,7 +290,9 @@ const MemberTableRow = ({
       </TableCell>
 
       {/* 3. 연락처 */}
-      <TableCell sx={{ py: 1.8, color: "#333", fontWeight: 500, whiteSpace: "nowrap" }}>
+      <TableCell
+        sx={{ py: 1.8, color: "#333", fontWeight: 500, whiteSpace: "nowrap" }}
+      >
         <Typography
           component="span"
           sx={{
@@ -274,7 +335,7 @@ const MemberTableRow = ({
           <Tooltip title="온교회 웹사이트 계정 생성 및 본인확인 완료" arrow>
             <Chip
               size="small"
-              label="웹가입 완료"
+              label="가입"
               sx={{
                 height: 25,
                 fontSize: "0.75rem",
@@ -310,7 +371,14 @@ const MemberTableRow = ({
         {user.hasNotification ? (
           <Tooltip title="주일 리마인더 및 교회 소식 푸시 알림 수신 가능" arrow>
             <Chip
-              icon={<NotificationsActiveIcon sx={{ fontSize: "0.95rem !important", color: "#16a34a !important" }} />}
+              icon={
+                <NotificationsActiveIcon
+                  sx={{
+                    fontSize: "0.95rem !important",
+                    color: "#16a34a !important",
+                  }}
+                />
+              }
               label="수신중"
               size="small"
               sx={{
@@ -327,7 +395,14 @@ const MemberTableRow = ({
         ) : (
           <Tooltip title="등록된 알림 기기가 없습니다" arrow>
             <Chip
-              icon={<NotificationsOffIcon sx={{ fontSize: "0.95rem !important", color: "#9ca3af !important" }} />}
+              icon={
+                <NotificationsOffIcon
+                  sx={{
+                    fontSize: "0.95rem !important",
+                    color: "#9ca3af !important",
+                  }}
+                />
+              }
               label="미등록"
               size="small"
               sx={{

@@ -401,7 +401,7 @@ const MemberManagement = () => {
                           overflow: "auto",
                         }}
                       >
-                        <Table stickyHeader sx={{ minWidth: 850 }} aria-label="교적부 목록 테이블">
+                        <Table stickyHeader sx={{ minWidth: 950 }} aria-label="교적부 목록 테이블">
                           <TableHead
                             sx={{
                               "& th": {
@@ -427,6 +427,17 @@ const MemberManagement = () => {
                                     세대주 및 교인 (가정별)
                                   </TableSortLabel>
                                 </Tooltip>
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                sx={{
+                                  fontWeight: 700,
+                                  color: "#555",
+                                  py: 1.8,
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                생년월일
                               </TableCell>
                               <TableCell
                                 align="center"
