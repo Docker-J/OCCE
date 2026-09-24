@@ -112,7 +112,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
     category: "ADULT",
     orderNum: 0,
     leaderMemberId: null,
-    subLeaderMemberId: null,
+    subLeaderMemberIds: [],
     isActive: true,
   });
 
@@ -406,7 +406,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
       (g) =>
         (g.name || "").toLowerCase().includes(term) ||
         (g.leaderName || "").toLowerCase().includes(term) ||
-        (g.subLeaderName || "").toLowerCase().includes(term)
+        (g.subLeaderNames || "").toLowerCase().includes(term)
     );
   }, [gardens, searchTerm]);
 
@@ -418,7 +418,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
       category: "ADULT",
       orderNum: gardens.length > 0 ? Math.max(...gardens.map((g) => g.orderNum || 0)) + 1 : 1,
       leaderMemberId: null,
-      subLeaderMemberId: null,
+      subLeaderMemberIds: [],
       isActive: true,
     });
     setErrorMessage("");
@@ -434,7 +434,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
       category: garden.category || (garden.name === "나라" || garden.name === "새벽" ? "YOUNG_ADULT" : "ADULT"),
       orderNum: garden.orderNum ?? 0,
       leaderMemberId: garden.leaderMemberId || null,
-      subLeaderMemberId: garden.subLeaderMemberId || null,
+      subLeaderMemberIds: garden.subLeaderMemberIds || (garden.subLeaderMemberId ? [garden.subLeaderMemberId] : []),
       isActive: Boolean(garden.isActive),
     });
     setErrorMessage("");
@@ -468,7 +468,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
           category: formData.category,
           orderNum: Number(formData.orderNum) || 0,
           leaderMemberId: formData.leaderMemberId,
-          subLeaderMemberId: formData.category === "YOUNG_ADULT" ? formData.subLeaderMemberId : null,
+          subLeaderMemberIds: formData.category === "YOUNG_ADULT" ? formData.subLeaderMemberIds : [],
           isActive: formData.isActive,
         });
         setSuccessMessage(`[${formData.name}] 정원 정보가 수정되었습니다.`);
@@ -478,7 +478,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
           category: formData.category,
           orderNum: Number(formData.orderNum) || 0,
           leaderMemberId: formData.leaderMemberId,
-          subLeaderMemberId: formData.category === "YOUNG_ADULT" ? formData.subLeaderMemberId : null,
+          subLeaderMemberIds: formData.category === "YOUNG_ADULT" ? formData.subLeaderMemberIds : [],
           isActive: formData.isActive,
         });
         setSuccessMessage(`[${formData.name}] 신규 정원이 등록되었습니다.`);
@@ -1129,11 +1129,11 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
                             </Typography>
                           )}
 
-                          {g.subLeaderName && (
+                          {(g.subLeaderNames || g.subLeaderName) && (
                             <Tooltip title="청년 정원 부정원지기 (주일 출석체크 및 실무 보조)">
                               <Chip
                                 size="small"
-                                label={`부지기: ${g.subLeaderName}`}
+                                label={`부지기: ${g.subLeaderNames || g.subLeaderName}`}
                                 sx={{
                                   backgroundColor: "rgba(13, 148, 136, 0.08)",
                                   color: "#0f766e",
@@ -1362,7 +1362,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
                   setFormData((prev) => ({
                     ...prev,
                     category: newCategory,
-                    subLeaderMemberId: newCategory === "ADULT" ? null : prev.subLeaderMemberId,
+                    subLeaderMemberIds: newCategory === "ADULT" ? [] : prev.subLeaderMemberIds,
                   }));
                 }}
                 fullWidth
@@ -1409,7 +1409,13 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
                   options={candidateLeaders}
                   getOptionLabel={(opt) => opt.label || ""}
                   value={candidateLeaders.find((l) => l.id === formData.leaderMemberId) || null}
-                  onChange={(e, val) => setFormData((prev) => ({ ...prev, leaderMemberId: val?.id || null }))}
+                  onChange={(e, val) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      leaderMemberId: val?.id || null,
+                      subLeaderMemberIds: (prev.subLeaderMemberIds || []).filter((id) => id !== val?.id),
+                    }))
+                  }
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -1427,21 +1433,45 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
               )}
             </Grid>
 
-            {/* 부정원지기 선택 (청년 정원 전용) */}
+            {/* 부정원지기 선택 (청년 정원 전용: 복수 선택 지원) */}
             {formData.category === "YOUNG_ADULT" && (
               <Grid size={12}>
                 <Autocomplete
+                  multiple
                   size="small"
                   options={candidateSubLeaders}
                   getOptionLabel={(opt) => opt.label || ""}
-                  value={candidateSubLeaders.find((l) => l.id === formData.subLeaderMemberId) || null}
-                  onChange={(e, val) => setFormData((prev) => ({ ...prev, subLeaderMemberId: val?.id || null }))}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  value={candidateSubLeaders.filter((l) => (formData.subLeaderMemberIds || []).includes(l.id))}
+                  onChange={(e, val) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      subLeaderMemberIds: val.map((item) => item.id),
+                    }))
+                  }
+                  renderTags={(tagValue, getTagProps) =>
+                    tagValue.map((option, index) => (
+                      <Chip
+                        {...getTagProps({ index })}
+                        key={option.id}
+                        size="small"
+                        label={option.name}
+                        sx={{
+                          backgroundColor: "rgba(13, 148, 136, 0.12)",
+                          color: "#0f766e",
+                          fontWeight: 700,
+                          fontSize: "0.78rem",
+                          height: 24,
+                        }}
+                      />
+                    ))
+                  }
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="부정원지기 선택 (선택사항)"
+                      label="부정원지기 선택 (복수 선택 가능)"
                       placeholder="청년 교인 성명 검색..."
-                      helperText="청년 정원의 주일 출석체크 및 소그룹 모임을 도울 부정원지기를 지정합니다."
+                      helperText="청년 정원의 주일 출석체크 및 소그룹 모임을 도울 부정원지기들을 지정합니다 (1명 이상 복수 지정 가능)."
                       sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
                     />
                   )}
@@ -1585,9 +1615,9 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
                 sx={{ backgroundColor: "#f1f5f9", color: "#64748b", fontWeight: 600, height: 28 }}
               />
             )}
-            {viewingGarden?.subLeaderName && (
+            {(viewingGarden?.subLeaderNames || viewingGarden?.subLeaderName) && (
               <Chip
-                label={`부정원지기: ${viewingGarden.subLeaderName}`}
+                label={`부정원지기: ${viewingGarden.subLeaderNames || viewingGarden.subLeaderName}`}
                 sx={{
                   backgroundColor: "rgba(13, 148, 136, 0.1)",
                   color: "#0f766e",
@@ -1706,7 +1736,12 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
                     const relMeta = RELATIONSHIP_COLORS[relKey] || RELATIONSHIP_COLORS.OTHER;
                     const relLabel = RELATIONSHIP_LABELS[relKey] || (m.isHead ? "세대주" : "-");
                     const isLeader = viewingGarden?.leaderMemberId === m.id || viewingGarden?.leaderName === m.name;
-                    const isSubLeader = viewingGarden?.subLeaderMemberId === m.id || viewingGarden?.subLeaderName === m.name;
+                    const isSubLeader = Boolean(
+                      (viewingGarden?.subLeaderMemberIds && viewingGarden.subLeaderMemberIds.includes(m.id)) ||
+                      (viewingGarden?.subLeaderNames && viewingGarden.subLeaderNames.split(", ").includes(m.name)) ||
+                      viewingGarden?.subLeaderMemberId === m.id ||
+                      viewingGarden?.subLeaderName === m.name
+                    );
 
                     // 세대별 지브라 패턴 배경색 (가구 단위로 흰색/연회색 교차)
                     const rowBg = m.isZebra ? "#f8fafc" : "#ffffff";

@@ -37,6 +37,15 @@ CREATE INDEX IF NOT EXISTS idx_gardens_active_order ON gardens(is_active, order_
 CREATE INDEX IF NOT EXISTS idx_gardens_leader ON gardens(leader_member_id) WHERE leader_member_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_gardens_sub_leader ON gardens(sub_leader_member_id) WHERE sub_leader_member_id IS NOT NULL;
 
+-- 1-1. 정원 부정원지기(복수 지정 지원) 매핑 테이블
+CREATE TABLE IF NOT EXISTS garden_sub_leaders (
+  garden_id INTEGER NOT NULL REFERENCES gardens(id) ON DELETE CASCADE,
+  member_id INTEGER NOT NULL REFERENCES church_members(id) ON DELETE CASCADE,
+  PRIMARY KEY (garden_id, member_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_garden_sub_leaders_member ON garden_sub_leaders(member_id);
+
 -- 기본 정원 데이터 시드 (미배정)
 INSERT OR IGNORE INTO gardens (id, name, order_num, is_active) VALUES (1, '미배정', 999, 1);
 

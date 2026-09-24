@@ -1273,19 +1273,30 @@ export const listGardensController = async (c) => {
     const env = c.env;
     const { results } = await env.DB.prepare(`
       SELECT 
-        id, 
-        name, 
-        category,
-        leader_member_id as leaderMemberId, 
-        sub_leader_member_id as subLeaderMemberId, 
-        order_num as orderNum, 
-        is_active as isActive
-      FROM gardens
-      WHERE is_active = 1
-      ORDER BY order_num ASC, name ASC
+        g.id, 
+        g.name, 
+        g.category,
+        g.leader_member_id as leaderMemberId, 
+        (
+          SELECT GROUP_CONCAT(gsl.member_id, ',')
+          FROM garden_sub_leaders gsl
+          WHERE gsl.garden_id = g.id
+        ) as subLeaderMemberIdsStr,
+        g.order_num as orderNum, 
+        g.is_active as isActive
+      FROM gardens g
+      WHERE g.is_active = 1
+      ORDER BY g.order_num ASC, g.name ASC
     `).all();
 
-    return c.json({ gardens: results || [] });
+    const gardens = (results || []).map((g) => ({
+      ...g,
+      subLeaderMemberIds: g.subLeaderMemberIdsStr
+        ? g.subLeaderMemberIdsStr.split(",").map(Number).filter(Boolean)
+        : [],
+    }));
+
+    return c.json({ gardens });
   } catch (error) {
     console.error("listGardensController error:", error);
     return c.json({ error: "FetchGardensError", message: error.message }, 500);
@@ -1686,8 +1697,17 @@ export const manageGardensController = async (c) => {
         g.category,
         g.leader_member_id as leaderMemberId,
         cm.name as leaderName,
-        g.sub_leader_member_id as subLeaderMemberId,
-        sub_cm.name as subLeaderName,
+        (
+          SELECT GROUP_CONCAT(sub_m.name, ', ')
+          FROM garden_sub_leaders gsl
+          JOIN church_members sub_m ON gsl.member_id = sub_m.id
+          WHERE gsl.garden_id = g.id
+        ) as subLeaderNames,
+        (
+          SELECT GROUP_CONCAT(gsl.member_id, ',')
+          FROM garden_sub_leaders gsl
+          WHERE gsl.garden_id = g.id
+        ) as subLeaderMemberIdsStr,
         g.order_num as orderNum,
         g.is_active as isActive,
         (
@@ -1706,11 +1726,18 @@ export const manageGardensController = async (c) => {
         ) as memberCount
       FROM gardens g
       LEFT JOIN church_members cm ON g.leader_member_id = cm.id
-      LEFT JOIN church_members sub_cm ON g.sub_leader_member_id = sub_cm.id
       ORDER BY g.order_num ASC, g.name ASC
     `).all();
 
-    return c.json({ gardens: results || [] });
+    const gardens = (results || []).map((g) => ({
+      ...g,
+      subLeaderNames: g.subLeaderNames || "",
+      subLeaderMemberIds: g.subLeaderMemberIdsStr
+        ? g.subLeaderMemberIdsStr.split(",").map(Number).filter(Boolean)
+        : [],
+    }));
+
+    return c.json({ gardens });
   } catch (error) {
     console.error("manageGardensController error:", error);
     return c.json({ error: "ManageGardensError", message: error.message }, 500);
@@ -1729,7 +1756,9 @@ export const createGardenController = async (c) => {
     const category = body.category === "YOUNG_ADULT" ? "YOUNG_ADULT" : "ADULT";
     const orderNum = Number.isInteger(body.orderNum) ? body.orderNum : 0;
     const leaderMemberId = body.leaderMemberId ? Number(body.leaderMemberId) : null;
-    const subLeaderMemberId = category === "YOUNG_ADULT" && body.subLeaderMemberId ? Number(body.subLeaderMemberId) : null;
+    const subLeaderMemberIds = category === "YOUNG_ADULT" && Array.isArray(body.subLeaderMemberIds)
+      ? Array.from(new Set(body.subLeaderMemberIds.map(Number).filter(Boolean)))
+      : [];
     const isActive = body.isActive !== undefined ? (body.isActive ? 1 : 0) : 1;
 
     if (!name) {
@@ -1742,19 +1771,26 @@ export const createGardenController = async (c) => {
     }
 
     const res = await env.DB.prepare(`
-      INSERT INTO gardens (name, category, leader_member_id, sub_leader_member_id, order_num, is_active)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).bind(name, category, leaderMemberId, subLeaderMemberId, orderNum, isActive).run();
+      INSERT INTO gardens (name, category, leader_member_id, order_num, is_active)
+      VALUES (?, ?, ?, ?, ?)
+    `).bind(name, category, leaderMemberId, orderNum, isActive).run();
+
+    const newGardenId = res.meta.last_row_id;
+    for (const subId of subLeaderMemberIds) {
+      await env.DB.prepare(
+        "INSERT OR IGNORE INTO garden_sub_leaders (garden_id, member_id) VALUES (?, ?)"
+      ).bind(newGardenId, subId).run();
+    }
 
     return c.json({
       success: true,
       message: `[${name}] 정원이 성공적으로 등록되었습니다.`,
       garden: {
-        id: res.meta.last_row_id,
+        id: newGardenId,
         name,
         category,
         leaderMemberId,
-        subLeaderMemberId,
+        subLeaderMemberIds,
         orderNum,
         isActive,
       },
@@ -1792,13 +1828,11 @@ export const updateGardenController = async (c) => {
     const leaderMemberId = body.leaderMemberId !== undefined 
       ? (body.leaderMemberId ? Number(body.leaderMemberId) : null) 
       : existing.leader_member_id;
-    // 장년 정원은 부정원지기 옵션 X (null 강제)
-    const subLeaderMemberId = category === "YOUNG_ADULT" 
-      ? (body.subLeaderMemberId !== undefined 
-          ? (body.subLeaderMemberId ? Number(body.subLeaderMemberId) : null) 
-          : existing.sub_leader_member_id) 
-      : null;
     const isActive = body.isActive !== undefined ? (body.isActive ? 1 : 0) : existing.is_active;
+
+    const subLeaderMemberIds = category === "YOUNG_ADULT" && Array.isArray(body.subLeaderMemberIds)
+      ? Array.from(new Set(body.subLeaderMemberIds.map(Number).filter(Boolean)))
+      : [];
 
     if (!name) {
       return c.json({ error: "ValidationError", message: "정원 이름을 입력해 주세요." }, 400);
@@ -1816,11 +1850,18 @@ export const updateGardenController = async (c) => {
         name = ?,
         category = ?,
         leader_member_id = ?,
-        sub_leader_member_id = ?,
         order_num = ?,
         is_active = ?
       WHERE id = ?
-    `).bind(name, category, leaderMemberId, subLeaderMemberId, orderNum, isActive, id).run();
+    `).bind(name, category, leaderMemberId, orderNum, isActive, id).run();
+
+    // Update sub-leaders in junction table
+    await env.DB.prepare("DELETE FROM garden_sub_leaders WHERE garden_id = ?").bind(id).run();
+    for (const subId of subLeaderMemberIds) {
+      await env.DB.prepare(
+        "INSERT OR IGNORE INTO garden_sub_leaders (garden_id, member_id) VALUES (?, ?)"
+      ).bind(id, subId).run();
+    }
 
     return c.json({
       success: true,
@@ -1830,7 +1871,7 @@ export const updateGardenController = async (c) => {
         name,
         category,
         leaderMemberId,
-        subLeaderMemberId,
+        subLeaderMemberIds,
         orderNum,
         isActive,
       },
