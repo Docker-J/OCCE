@@ -200,7 +200,7 @@ export const useMemberManagement = () => {
       if (roleFilter === "pastor" && u.position !== "교역자") return false;
       if (roleFilter === "staff" && !u.isStaff) return false;
       if (roleFilter === "keeper" && !u.isGardenKeeper) return false;
-      if (roleFilter === "member" && (u.isGardenKeeper || u.isStaff || u.position === "교역자" || (u.department && u.department !== "장년부"))) return false;
+      if (roleFilter === "member" && (u.department || "장년부") !== "장년부") return false;
       if (roleFilter === "young_adult" && u.department !== "청년부") return false;
       if (roleFilter === "youth" && u.department !== "중고등부") return false;
       if (roleFilter === "elementary" && u.department !== "유초등부") return false;
