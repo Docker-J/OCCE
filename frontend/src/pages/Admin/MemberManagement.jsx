@@ -296,7 +296,23 @@ const MemberManagement = () => {
               <Tabs
                 value={adminTab}
                 onChange={(e, val) => setAdminTab(val)}
-                sx={{ mb: 3.5, borderBottom: "1px solid rgba(0, 0, 0, 0.08)" }}
+                variant="scrollable"
+                scrollButtons="auto"
+                allowScrollButtonsMobile
+                sx={{
+                  mb: 3.5,
+                  borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
+                  "& .MuiTabs-scrollButtons": {
+                    "&.Mui-disabled": { opacity: 0.3 },
+                  },
+                  "& .MuiTab-root": {
+                    whiteSpace: "nowrap",
+                    minWidth: "fit-content",
+                    px: { xs: 2, sm: 3 },
+                    fontSize: { xs: "0.85rem", sm: "0.95rem" },
+                    fontWeight: 700,
+                  },
+                }}
               >
                 <Tab
                   label="통합 교적부 관리"
