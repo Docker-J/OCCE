@@ -36,6 +36,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  TableSortLabel,
 } from "@mui/material";
 
 import ForestIcon from "@mui/icons-material/Forest";
@@ -114,6 +115,32 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
   // 소속 세대 및 교인 명단 확인 모달
   const [viewingGarden, setViewingGarden] = useState(null);
   const [modalSearchTerm, setModalSearchTerm] = useState("");
+  const [modalSortBy, setModalSortBy] = useState("household"); // 'household', 'birthDate', 'name'
+  const [modalSortOrder, setModalSortOrder] = useState("asc"); // 'asc', 'desc'
+
+  // 모달 닫힘 시 검색어 및 정렬 기준 초기화
+  useEffect(() => {
+    if (!viewingGarden) {
+      setModalSearchTerm("");
+      setModalSortBy("household");
+      setModalSortOrder("asc");
+    }
+  }, [viewingGarden]);
+
+  // 모달 테이블 컬럼 정렬 토글 (오름차순 -> 내림차순 -> 세대별 기본 정렬 순환)
+  const handleToggleModalSort = (column) => {
+    if (modalSortBy === column) {
+      if (modalSortOrder === "asc") {
+        setModalSortOrder("desc");
+      } else {
+        setModalSortBy("household");
+        setModalSortOrder("asc");
+      }
+    } else {
+      setModalSortBy(column);
+      setModalSortOrder("asc");
+    }
+  };
 
   // 삭제 확인 다이얼로그 대상
   const [gardenToDelete, setGardenToDelete] = useState(null);
@@ -188,7 +215,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
     return households;
   };
 
-  // 모달 내 세대별 정원 교인 명부 (가구 단위 지브라 패턴 적용 및 검색 필터링)
+  // 모달 내 세대별 정원 교인 명부 (가구 단위 지브라 패턴 적용, 검색 필터링 및 생년월일/성명 정렬 지원)
   const gardenRegistryMembers = useMemo(() => {
     if (!viewingGarden) return [];
     const households = getGardenHouseholds(viewingGarden);
@@ -210,17 +237,65 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
       });
     });
 
-    if (!modalSearchTerm.trim()) return list;
-    const term = modalSearchTerm.trim().toLowerCase();
-    return list.filter((m) => {
-      const inName = (m.name || "").toLowerCase().includes(term);
-      const inPhone = (m.phone || "").replace(/\D/g, "").includes(term);
-      const inPos = (m.position || "").toLowerCase().includes(term);
-      const inRel = (RELATIONSHIP_LABELS[m.relationship] || "").toLowerCase().includes(term);
-      const inBirth = (m.birthDate || "").includes(term);
-      return inName || inPhone || inPos || inRel || inBirth;
-    });
-  }, [viewingGarden, modalSearchTerm, gardens, users]);
+    let filtered = list;
+    if (modalSearchTerm.trim()) {
+      const term = modalSearchTerm.trim().toLowerCase();
+      filtered = list.filter((m) => {
+        const inName = (m.name || "").toLowerCase().includes(term);
+        const inPhone = (m.phone || "").replace(/\D/g, "").includes(term);
+        const inPos = (m.position || "").toLowerCase().includes(term);
+        const inRel = (RELATIONSHIP_LABELS[m.relationship] || "").toLowerCase().includes(term);
+        const inBirth = (m.birthDate || "").includes(term);
+        return inName || inPhone || inPos || inRel || inBirth;
+      });
+    }
+
+    // 1. 생년월일 정렬 (오름차순: 연장자순 / 내림차순: 연소자순)
+    if (modalSortBy === "birthDate") {
+      const getDateStr = (val) => {
+        if (!val) return "";
+        const s = String(val).split("T")[0].trim();
+        return s === "-" ? "" : s;
+      };
+
+      const sorted = [...filtered].sort((a, b) => {
+        const dateA = getDateStr(a.birthDate);
+        const dateB = getDateStr(b.birthDate);
+        if (!dateA && !dateB) return (a.name || "").localeCompare(b.name || "", "ko");
+        if (!dateA) return 1; // 생년월일 미등록자는 항상 맨 뒤로 배치
+        if (!dateB) return -1;
+        const cmp = dateA.localeCompare(dateB);
+        if (cmp !== 0) {
+          return modalSortOrder === "asc" ? cmp : -cmp;
+        }
+        return (a.name || "").localeCompare(b.name || "", "ko");
+      });
+
+      // 개별 정렬 시에는 행 단위 지브라 패턴 적용 및 가구 구분선 비활성화
+      return sorted.map((m, idx) => ({
+        ...m,
+        isZebra: idx % 2 === 1,
+        isFirstInHousehold: false,
+      }));
+    }
+
+    // 2. 성명 가나다순 정렬
+    if (modalSortBy === "name") {
+      const sorted = [...filtered].sort((a, b) => {
+        const cmp = (a.name || "").localeCompare(b.name || "", "ko");
+        return modalSortOrder === "asc" ? cmp : -cmp;
+      });
+
+      return sorted.map((m, idx) => ({
+        ...m,
+        isZebra: idx % 2 === 1,
+        isFirstInHousehold: false,
+      }));
+    }
+
+    // 3. 기본 세대별 가구 묶음 정렬
+    return filtered;
+  }, [viewingGarden, modalSearchTerm, modalSortBy, modalSortOrder, gardens, users]);
 
   // 정원지기(리더) 후보 목록 (해당 정원에 소속된 활동 교인만 선택 가능)
   const candidateLeaders = useMemo(() => {
@@ -1313,6 +1388,27 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
                 sx={{ backgroundColor: "#f1f5f9", color: "#64748b", fontWeight: 600, height: 28 }}
               />
             )}
+            {modalSortBy !== "household" && (
+              <Tooltip title="클릭하면 기본 세대(가구)별 정렬로 복귀합니다">
+                <Chip
+                  size="small"
+                  label={`정렬: ${modalSortBy === "birthDate" ? (modalSortOrder === "asc" ? "생년월일 연장자순 ↑" : "생년월일 연소자순 ↓") : (modalSortOrder === "asc" ? "성명 가나다순 ↑" : "성명 역순 ↓")} (세대별 복귀 ✕)`}
+                  onClick={() => {
+                    setModalSortBy("household");
+                    setModalSortOrder("asc");
+                  }}
+                  sx={{
+                    backgroundColor: "#e0f2fe",
+                    color: "#0369a1",
+                    fontWeight: 700,
+                    height: 28,
+                    cursor: "pointer",
+                    border: "1px solid #bae6fd",
+                    "&:hover": { backgroundColor: "#bae6fd" },
+                  }}
+                />
+              </Tooltip>
+            )}
           </Box>
 
           {/* 모달 내 검색창 */}
@@ -1359,10 +1455,38 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
               <Table size="small" sx={{ minWidth: 620, "& th, & td": { whiteSpace: "nowrap" } }}>
                 <TableHead>
                   <TableRow sx={{ "& th": { backgroundColor: "#f1f5f9", fontWeight: 800, color: "#334155", py: 1.3, fontSize: "0.82rem", whiteSpace: "nowrap" } }}>
-                    <TableCell sx={{ pl: 3, width: "15%" }}>성명</TableCell>
+                    <TableCell sx={{ pl: 3, width: "15%" }}>
+                      <TableSortLabel
+                        active={modalSortBy === "name"}
+                        direction={modalSortBy === "name" ? modalSortOrder : "asc"}
+                        onClick={() => handleToggleModalSort("name")}
+                        title="성명 순 정렬"
+                        sx={{
+                          fontWeight: 800,
+                          color: modalSortBy === "name" ? "#1d4ed8 !important" : "inherit",
+                          "& .MuiTableSortLabel-icon": { color: "#1d4ed8 !important" },
+                        }}
+                      >
+                        성명
+                      </TableSortLabel>
+                    </TableCell>
                     <TableCell align="center" sx={{ width: "11%" }}>가족관계</TableCell>
                     <TableCell align="center" sx={{ width: "10%" }}>직분</TableCell>
-                    <TableCell align="center" sx={{ width: "18%" }}>생년월일</TableCell>
+                    <TableCell align="center" sx={{ width: "18%" }}>
+                      <TableSortLabel
+                        active={modalSortBy === "birthDate"}
+                        direction={modalSortBy === "birthDate" ? modalSortOrder : "asc"}
+                        onClick={() => handleToggleModalSort("birthDate")}
+                        title="생년월일 순 정렬 (오름차순: 연장자순 / 내림차순: 연소자순)"
+                        sx={{
+                          fontWeight: 800,
+                          color: modalSortBy === "birthDate" ? "#1d4ed8 !important" : "inherit",
+                          "& .MuiTableSortLabel-icon": { color: "#1d4ed8 !important" },
+                        }}
+                      >
+                        생년월일
+                      </TableSortLabel>
+                    </TableCell>
                     <TableCell align="center" sx={{ width: "11%" }}>세례구분</TableCell>
                     <TableCell sx={{ pr: 3, width: "35%" }}>연락처</TableCell>
                   </TableRow>
