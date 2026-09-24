@@ -470,7 +470,7 @@ export const createMemberController = async (c) => {
     let targetHouseholdId = householdId;
 
     if (isNewHousehold || !targetHouseholdId) {
-      const hName = (householdName || `${name.trim()} 성도 가정`).trim();
+      const hName = householdName ? householdName.trim() : null;
       const hRes = await env.DB.prepare(`
         INSERT INTO households (household_name, garden_id, address, address_detail, city, province, postal_code, notes)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -588,7 +588,7 @@ export const updateMemberController = async (c) => {
 
     // 세대 독립(분가) 처리: 신규 세대 생성 후 해당 세대의 세대주(HEAD)로 설정
     if (isSeparateHousehold) {
-      const newHName = (householdName || `${name !== undefined ? name.trim() : currentMember.name} 성도 가정`).trim();
+      const newHName = householdName ? householdName.trim() : null;
       const newHRes = await env.DB.prepare(`
         INSERT INTO households (household_name, garden_id, address, address_detail, city, province, postal_code, notes)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -1477,7 +1477,7 @@ export const bulkSaveHouseholdController = async (c) => {
             notes = ?
           WHERE id = ?
         `).bind(
-          household.householdName !== undefined ? (household.householdName || "").trim() : curH.household_name,
+          household.householdName !== undefined ? (household.householdName ? household.householdName.trim() : null) : curH.household_name,
           household.gardenId !== undefined ? (household.gardenId || 1) : curH.garden_id,
           household.address !== undefined ? (household.address || "").trim() : curH.address,
           household.addressDetail !== undefined ? (household.addressDetail || "").trim() : curH.address_detail,
@@ -1490,9 +1490,7 @@ export const bulkSaveHouseholdController = async (c) => {
       }
     } else {
       // Create new household
-      const firstHead = members.find((m) => m.isHead || m.relationship === "HEAD") || members[0];
-      const defaultName = firstHead?.name ? `${firstHead.name.trim()} 성도 가정` : "새 성도 가정";
-      const hName = (household.householdName || defaultName).trim();
+      const hName = household.householdName ? household.householdName.trim() : null;
       const hRes = await env.DB.prepare(`
         INSERT INTO households (household_name, garden_id, address, address_detail, city, province, postal_code, notes)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)

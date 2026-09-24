@@ -40,7 +40,7 @@ INSERT OR IGNORE INTO gardens (id, name, order_num, is_active) VALUES (1, '미�
 -- ====================================================================
 CREATE TABLE IF NOT EXISTS households (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  household_name TEXT NOT NULL,                   -- 예: "김철수 성도 가정"
+  household_name TEXT,                            -- 세대명 (선택 사항 / 미사용 시 NULL)
   garden_id INTEGER NOT NULL DEFAULT 1,           -- gardens(id) 참조 (기본값: 1 미배정)
   address TEXT,                                   -- 도로명 주소 (Google Autocomplete 기본 주소)
   address_detail TEXT,                            -- 상세 주소 (Unit / Suite / Apt #)
