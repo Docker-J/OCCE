@@ -87,6 +87,7 @@ export const useMemberManagement = () => {
         staffCount: usersData?.staffCount ?? 0,
         keepers: usersData?.keepers ?? 0,
         clergyCount: usersData?.clergyCount ?? 0,
+        removedCount: usersData?.removedCount ?? 0,
       });
 
       if (gardensData?.gardens?.length) {
