@@ -694,10 +694,47 @@ const MemberFormModal = ({
 
                   {/* 기본 도로명 주소 (Street Address) */}
                   <Grid size={12}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.6 }}>
+                      <Typography variant="caption" sx={{ fontWeight: 700, color: "#475569", fontSize: "0.82rem" }}>
+                        기본 도로명 주소 (Street Address)
+                      </Typography>
+                      {householdData.address ? (
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
+                          {!isAddressManualEdit ? (
+                            <>
+                              <Chip
+                                size="small"
+                                label="공인 주소"
+                                color="success"
+                                variant="outlined"
+                                sx={{ height: 20, fontSize: "0.68rem", fontWeight: 700 }}
+                              />
+                              <Button
+                                size="small"
+                                variant="text"
+                                onClick={() => setIsAddressManualEdit(true)}
+                                sx={{ fontSize: "0.75rem", p: 0, minWidth: "auto", fontWeight: 700, color: "#2563eb" }}
+                              >
+                                직접 수정
+                              </Button>
+                            </>
+                          ) : (
+                            <Button
+                              size="small"
+                              variant="contained"
+                              color="warning"
+                              onClick={() => setIsAddressManualEdit(false)}
+                              sx={{ fontSize: "0.72rem", py: 0.2, px: 1, minWidth: "auto", fontWeight: 700, borderRadius: "6px" }}
+                            >
+                              수정 완료
+                            </Button>
+                          )}
+                        </Box>
+                      ) : null}
+                    </Box>
                     <TextField
                       fullWidth
                       size="medium"
-                      label="기본 도로명 주소 (Street Address)"
                       placeholder="상단 검색창에서 주소를 검색하여 선택하면 자동 입력됩니다"
                       value={householdData.address}
                       onChange={(e) => handleHouseholdChange("address", e.target.value)}
@@ -707,38 +744,6 @@ const MemberFormModal = ({
                           startAdornment: (
                             <InputAdornment position="start">
                               <LocationOnOutlinedIcon sx={{ color: householdData.address ? "#16a34a" : "#94a3b8" }} />
-                            </InputAdornment>
-                          ),
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              {householdData.address && !isAddressManualEdit ? (
-                                <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
-                                  <Chip
-                                    size="small"
-                                    label="공인 주소"
-                                    color="success"
-                                    variant="outlined"
-                                    sx={{ height: 22, fontSize: "0.72rem", fontWeight: 700 }}
-                                  />
-                                  <Button
-                                    size="small"
-                                    variant="text"
-                                    onClick={() => setIsAddressManualEdit(true)}
-                                    sx={{ fontSize: "0.75rem", minWidth: "auto", px: 1, py: 0.2 }}
-                                  >
-                                    직접 수정
-                                  </Button>
-                                </Box>
-                              ) : isAddressManualEdit ? (
-                                <Button
-                                  size="small"
-                                  variant="text"
-                                  onClick={() => setIsAddressManualEdit(false)}
-                                  sx={{ fontSize: "0.75rem", minWidth: "auto", px: 1, py: 0.2 }}
-                                >
-                                  완료
-                                </Button>
-                              ) : null}
                             </InputAdornment>
                           ),
                         },
@@ -1592,10 +1597,47 @@ const MemberFormModal = ({
 
             {/* 기본 도로명 주소 (Street Address) */}
             <Grid size={12}>
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.6 }}>
+                <Typography variant="caption" sx={{ fontWeight: 700, color: "#475569", fontSize: "0.82rem" }}>
+                  기본 도로명 주소 (Street Address)
+                </Typography>
+                {separateForm.address ? (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
+                    {!isSeparateAddressManualEdit ? (
+                      <>
+                        <Chip
+                          size="small"
+                          label="공인 주소"
+                          color="success"
+                          variant="outlined"
+                          sx={{ height: 20, fontSize: "0.68rem", fontWeight: 700 }}
+                        />
+                        <Button
+                          size="small"
+                          variant="text"
+                          onClick={() => setIsSeparateAddressManualEdit(true)}
+                          sx={{ fontSize: "0.75rem", p: 0, minWidth: "auto", fontWeight: 700, color: "#2563eb" }}
+                        >
+                          직접 수정
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        size="small"
+                        variant="contained"
+                        color="warning"
+                        onClick={() => setIsSeparateAddressManualEdit(false)}
+                        sx={{ fontSize: "0.72rem", py: 0.2, px: 1, minWidth: "auto", fontWeight: 700, borderRadius: "6px" }}
+                      >
+                        수정 완료
+                      </Button>
+                    )}
+                  </Box>
+                ) : null}
+              </Box>
               <TextField
                 fullWidth
                 size="small"
-                label="기본 도로명 주소 (Street Address)"
                 placeholder="상단 검색창에서 주소를 검색하여 선택하면 자동 입력됩니다"
                 value={separateForm.address}
                 onChange={(e) => setSeparateForm((prev) => ({ ...prev, address: e.target.value }))}
@@ -1605,38 +1647,6 @@ const MemberFormModal = ({
                     startAdornment: (
                       <InputAdornment position="start">
                         <LocationOnOutlinedIcon sx={{ color: separateForm.address ? "#16a34a" : "#94a3b8", fontSize: "1.2rem" }} />
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        {separateForm.address && !isSeparateAddressManualEdit ? (
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
-                            <Chip
-                              size="small"
-                              label="공인 주소"
-                              color="success"
-                              variant="outlined"
-                              sx={{ height: 22, fontSize: "0.72rem", fontWeight: 700 }}
-                            />
-                            <Button
-                              size="small"
-                              variant="text"
-                              onClick={() => setIsSeparateAddressManualEdit(true)}
-                              sx={{ fontSize: "0.75rem", minWidth: "auto", px: 1, py: 0.2 }}
-                            >
-                              직접 수정
-                            </Button>
-                          </Box>
-                        ) : isSeparateAddressManualEdit ? (
-                          <Button
-                            size="small"
-                            variant="text"
-                            onClick={() => setIsSeparateAddressManualEdit(false)}
-                            sx={{ fontSize: "0.75rem", minWidth: "auto", px: 1, py: 0.2 }}
-                          >
-                            완료
-                          </Button>
-                        ) : null}
                       </InputAdornment>
                     ),
                   },
