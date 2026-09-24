@@ -313,28 +313,39 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
             m.status !== "REMOVED" &&
             (m.department === "청년부" || m.gardenName === "나라" || m.gardenName === "새벽")
         )
-        .map((m) => ({
-          id: m.id,
-          name: m.name,
-          phone: m.phone,
-          position: m.position,
-          gardenName: m.gardenName || m.garden,
-          label: `${m.name}${m.gardenName ? ` (${m.gardenName})` : ""} · ${m.phone ? formatPhoneNumber(m.phone) : "연락처 미등록"}`,
-        }));
+        .map((m) => {
+          const birthStr = m.birthDate ? String(m.birthDate).split("T")[0] : "생년월일 미등록";
+          return {
+            id: m.id,
+            name: m.name,
+            birthDate: m.birthDate,
+            phone: m.phone,
+            phoneClean: m.phoneClean,
+            position: m.position,
+            gardenName: m.gardenName || m.garden,
+            label: `${m.name}${m.gardenName ? ` (${m.gardenName})` : ""} · ${birthStr}`,
+          };
+        });
     }
 
     if (!editingGarden) return [];
     const members = getGardenMembers(editingGarden);
     return members
       .filter((m) => m.status !== "REMOVED")
-      .map((m) => ({
-        id: m.id,
-        name: m.name,
-        phone: m.phone,
-        position: m.position,
-        gardenName: m.gardenName || m.garden,
-        label: `${m.name}${m.position ? ` (${m.position})` : ""} · ${m.phone ? formatPhoneNumber(m.phone) : "연락처 미등록"}`,
-      }));
+      .map((m) => {
+        const birthStr = m.birthDate ? String(m.birthDate).split("T")[0] : "생년월일 미등록";
+        const gardenTag = m.gardenName || editingGarden.name;
+        return {
+          id: m.id,
+          name: m.name,
+          birthDate: m.birthDate,
+          phone: m.phone,
+          phoneClean: m.phoneClean,
+          position: m.position,
+          gardenName: gardenTag,
+          label: `${m.name}${gardenTag ? ` (${gardenTag})` : ""} · ${birthStr}`,
+        };
+      });
   }, [editingGarden, formData.category, users, gardenMembersMap]);
 
   // 부정원지기 후보 목록 (청년 정원 전용: 청년부 전체 교인 중 선택)
@@ -347,14 +358,19 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
           (m.department === "청년부" || m.gardenName === "나라" || m.gardenName === "새벽") &&
           m.id !== formData.leaderMemberId // 정원지기와 중복 방지
       )
-      .map((m) => ({
-        id: m.id,
-        name: m.name,
-        phone: m.phone,
-        position: m.position,
-        gardenName: m.gardenName || m.garden,
-        label: `${m.name}${m.gardenName ? ` (${m.gardenName})` : ""} · ${m.phone ? formatPhoneNumber(m.phone) : "연락처 미등록"}`,
-      }));
+      .map((m) => {
+        const birthStr = m.birthDate ? String(m.birthDate).split("T")[0] : "생년월일 미등록";
+        return {
+          id: m.id,
+          name: m.name,
+          birthDate: m.birthDate,
+          phone: m.phone,
+          phoneClean: m.phoneClean,
+          position: m.position,
+          gardenName: m.gardenName || m.garden,
+          label: `${m.name}${m.gardenName ? ` (${m.gardenName})` : ""} · ${birthStr}`,
+        };
+      });
   }, [formData.category, formData.leaderMemberId, users]);
 
   // 정원 통계 목록 불러오기
@@ -1407,8 +1423,20 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
                 <Autocomplete
                   size="small"
                   options={candidateLeaders}
+                  autoHighlight
                   getOptionLabel={(opt) => opt.label || ""}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
                   value={candidateLeaders.find((l) => l.id === formData.leaderMemberId) || null}
+                  filterOptions={(options, { inputValue }) => {
+                    const term = (inputValue || "").trim().toLowerCase();
+                    if (!term) return options;
+                    return options.filter(
+                      (opt) =>
+                        (opt.label || "").toLowerCase().includes(term) ||
+                        (opt.phone || "").includes(term) ||
+                        (opt.phoneClean || "").includes(term)
+                    );
+                  }}
                   onChange={(e, val) =>
                     setFormData((prev) => ({
                       ...prev,
@@ -1420,7 +1448,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
                     <TextField
                       {...params}
                       label={formData.category === "YOUNG_ADULT" ? "정원지기(리더) 선택 (청년부 전체 대상)" : "정원지기(리더) 선택 (소속 교인 중)"}
-                      placeholder="교인 성명 검색..."
+                      placeholder="교인 성명, 생년월일 또는 소속정원 검색..."
                       helperText={
                         formData.category === "YOUNG_ADULT"
                           ? "청년 정원은 청년부 전체 교인(타 청년 정원 소속 포함) 중에서 정원지기를 지정할 수 있습니다."
@@ -1440,9 +1468,20 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
                   multiple
                   size="small"
                   options={candidateSubLeaders}
+                  autoHighlight
                   getOptionLabel={(opt) => opt.label || ""}
                   isOptionEqualToValue={(option, value) => option.id === value.id}
                   value={candidateSubLeaders.filter((l) => (formData.subLeaderMemberIds || []).includes(l.id))}
+                  filterOptions={(options, { inputValue }) => {
+                    const term = (inputValue || "").trim().toLowerCase();
+                    if (!term) return options;
+                    return options.filter(
+                      (opt) =>
+                        (opt.label || "").toLowerCase().includes(term) ||
+                        (opt.phone || "").includes(term) ||
+                        (opt.phoneClean || "").includes(term)
+                    );
+                  }}
                   onChange={(e, val) =>
                     setFormData((prev) => ({
                       ...prev,
