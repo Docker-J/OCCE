@@ -440,17 +440,6 @@ const MemberManagement = () => {
                                 직분 / 세례
                               </TableCell>
                               <TableCell
-                                align="center"
-                                sx={{
-                                  fontWeight: 700,
-                                  color: "#555",
-                                  py: 1.8,
-                                  whiteSpace: "nowrap",
-                                }}
-                              >
-                                웹 가입
-                              </TableCell>
-                              <TableCell
                                 sx={{
                                   fontWeight: 700,
                                   color: "#555",
@@ -470,6 +459,17 @@ const MemberManagement = () => {
                                 }}
                               >
                                 정원
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                sx={{
+                                  fontWeight: 700,
+                                  color: "#555",
+                                  py: 1.8,
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                웹 가입
                               </TableCell>
                               <TableCell
                                 align="center"

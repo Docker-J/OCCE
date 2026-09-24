@@ -79,7 +79,7 @@ const MemberTableRow = ({
           transition: "all 0.15s ease",
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, flexWrap: "wrap" }}>
           <Tooltip title={user.nameEn ? `영문명: ${user.nameEn}` : ""} disableHoverListener={!user.nameEn} arrow>
             <Typography
               variant="body1"
@@ -93,6 +93,20 @@ const MemberTableRow = ({
               {user.name || "(이름 없음)"}
             </Typography>
           </Tooltip>
+
+          {user.birthDate && (
+            <Typography
+              component="span"
+              sx={{
+                fontSize: "0.82rem",
+                color: isRemoved ? "#991b1b" : "#64748b",
+                fontWeight: 500,
+                whiteSpace: "nowrap",
+              }}
+            >
+              ({String(user.birthDate).split("T")[0]})
+            </Typography>
+          )}
 
           {isRemoved ? (
             <Chip
@@ -216,7 +230,45 @@ const MemberTableRow = ({
         </Stack>
       </TableCell>
 
-      {/* 3. 웹사이트 회원가입 여부 (핵심 요구사항) */}
+      {/* 3. 연락처 */}
+      <TableCell sx={{ py: 1.8, color: "#333", fontWeight: 500, whiteSpace: "nowrap" }}>
+        <Typography
+          component="span"
+          sx={{
+            display: "inline-block",
+            color: "#222",
+            fontWeight: 600,
+            fontSize: "0.875rem",
+          }}
+        >
+          {formatPhoneNumber(user.phone)}
+        </Typography>
+      </TableCell>
+
+      {/* 4. 소속 정원 */}
+      <TableCell align="center" sx={{ py: 1.8, whiteSpace: "nowrap" }}>
+        {user.gardenName || user.garden ? (
+          <Chip
+            label={user.gardenName || user.garden}
+            size="small"
+            sx={{
+              fontWeight: 700,
+              fontSize: "0.8rem",
+              height: 26,
+              borderRadius: "8px",
+              backgroundColor: "rgba(234, 88, 12, 0.08)",
+              color: "#c2410c",
+              border: "1px solid rgba(234, 88, 12, 0.25)",
+            }}
+          />
+        ) : (
+          <Typography variant="body2" sx={{ color: "#aaa" }}>
+            미배정
+          </Typography>
+        )}
+      </TableCell>
+
+      {/* 5. 웹사이트 회원가입 여부 (알림 전, 뒤에서 두번째) */}
       <TableCell align="center" sx={{ py: 1.8, whiteSpace: "nowrap" }}>
         {user.isRegistered ? (
           <Tooltip title="온교회 웹사이트 계정 생성 및 본인확인 완료" arrow>
@@ -250,44 +302,6 @@ const MemberTableRow = ({
               }}
             />
           </Tooltip>
-        )}
-      </TableCell>
-
-      {/* 4. 연락처 */}
-      <TableCell sx={{ py: 1.8, color: "#333", fontWeight: 500, whiteSpace: "nowrap" }}>
-        <Typography
-          component="span"
-          sx={{
-            display: "inline-block",
-            color: "#222",
-            fontWeight: 600,
-            fontSize: "0.875rem",
-          }}
-        >
-          {formatPhoneNumber(user.phone)}
-        </Typography>
-      </TableCell>
-
-      {/* 5. 소속 정원 */}
-      <TableCell align="center" sx={{ py: 1.8, whiteSpace: "nowrap" }}>
-        {user.gardenName || user.garden ? (
-          <Chip
-            label={user.gardenName || user.garden}
-            size="small"
-            sx={{
-              fontWeight: 700,
-              fontSize: "0.8rem",
-              height: 26,
-              borderRadius: "8px",
-              backgroundColor: "rgba(234, 88, 12, 0.08)",
-              color: "#c2410c",
-              border: "1px solid rgba(234, 88, 12, 0.25)",
-            }}
-          />
-        ) : (
-          <Typography variant="body2" sx={{ color: "#aaa" }}>
-            미배정
-          </Typography>
         )}
       </TableCell>
 
