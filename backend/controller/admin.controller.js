@@ -71,6 +71,7 @@ export const listUsersController = async (c) => {
   try {
     const env = c.env;
     const userPoolId = env.AWS_COGNITO_USER_POOL_ID;
+    const shouldSync = c.req.query("sync") === "true";
 
     // 1. Fetch church members joined with households and gardens from D1
     const membersPromise = env.DB.prepare(`
@@ -107,7 +108,12 @@ export const listUsersController = async (c) => {
           (SELECT hh.name FROM church_members hh WHERE hh.household_id = m.household_id AND hh.is_head = 1 AND hh.status != 'REMOVED' LIMIT 1),
           h.household_name,
           m.name
-        ) as headName
+        ) as headName,
+        EXISTS (
+          SELECT 1 FROM gardens gd WHERE gd.leader_member_id = m.id
+          UNION
+          SELECT 1 FROM garden_sub_leaders gsl WHERE gsl.member_id = m.id
+        ) as isGardenKeeper
       FROM church_members m
       JOIN households h ON m.household_id = h.id
       LEFT JOIN gardens g ON h.garden_id = g.id
@@ -122,7 +128,123 @@ export const listUsersController = async (c) => {
       WHERE expires_at > unixepoch() AND member_id IS NOT NULL
     `).all();
 
-    // 3. Fetch Cognito users & groups if configured
+    // 3. If NOT requested sync, perform fast path purely from D1 and cache (takes ~5ms)
+    if (!shouldSync) {
+      const [membersResult, fcmSubsResult] = await Promise.all([
+        membersPromise,
+        activeFcmSubsPromise,
+      ]);
+
+      const activeMemberIdSet = new Set((fcmSubsResult.results || []).map((r) => r.member_id));
+      const membersRaw = membersResult.results || [];
+
+      // Read staff usernames cache from KV if available
+      let staffUsernames = new Set();
+      try {
+        const cachedStaff = await env.weeklyupdate_kv?.get("cache:staff_usernames", "json");
+        if (Array.isArray(cachedStaff)) {
+          staffUsernames = new Set(cachedStaff);
+        }
+      } catch {
+        // KV lookup fallback
+      }
+
+      const members = membersRaw.map((m) => {
+        const phoneDigits = m.phoneClean || cleanPhone(m.phone);
+        const hasNotification = activeMemberIdSet.has(m.id);
+        const username = m.phone ? `+1${phoneDigits}` : `member_${m.id}`;
+        const isStaff = staffUsernames.has(username) || m.position === "교역자" || m.position === "간사";
+
+        return {
+          id: m.id,
+          householdId: m.householdId,
+          householdName: m.householdName,
+          isHead: !!m.isHead,
+          headName: m.headName || m.name,
+          relationship: m.relationship,
+          name: m.name,
+          nameEn: m.nameEn || "",
+          birthDate: m.birthDate,
+          gender: m.gender,
+          phone: m.phone,
+          phoneClean: phoneDigits,
+          baptismStatus: m.baptismStatus,
+          position: m.position,
+          department: m.department,
+          gardenId: m.gardenId,
+          gardenName: m.gardenName,
+          address: m.address || "",
+          addressDetail: m.addressDetail || "",
+          city: m.city || "Edmonton",
+          province: m.province || "AB",
+          postalCode: m.postalCode || "",
+          householdNotes: m.householdNotes || "",
+          registrationDate: m.registrationDate,
+          status: m.status,
+          isRegistered: Boolean(m.isRegistered),
+          hasNotification,
+          username,
+          email: "",
+          phoneVerified: Boolean(m.isRegistered),
+          isStaff,
+          isGardenKeeper: Boolean(m.isGardenKeeper),
+          enabled: m.status !== "REMOVED",
+        };
+      });
+
+      const users = members.map((m) => ({
+        id: m.id,
+        username: m.username,
+        name: m.name,
+        phone: m.phone,
+        phoneClean: m.phoneClean,
+        phoneVerified: m.phoneVerified,
+        email: m.email,
+        sub: m.cognitoSub || "",
+        isStaff: m.isStaff,
+        isGardenKeeper: m.isGardenKeeper,
+        hasNotification: m.hasNotification,
+        garden: m.gardenName,
+        enabled: m.enabled,
+        status: m.status,
+        householdId: m.householdId,
+        householdName: m.householdName,
+        isHead: m.isHead,
+        relationship: m.relationship,
+        position: m.position,
+        baptismStatus: m.baptismStatus,
+        department: m.department,
+        address: m.address,
+        addressDetail: m.addressDetail,
+        city: m.city,
+        province: m.province,
+        postalCode: m.postalCode,
+        isRegistered: m.isRegistered,
+      }));
+
+      const activeMembers = members.filter((m) => m.status !== "REMOVED");
+      const activeHouseholds = new Set(activeMembers.map((m) => m.householdId).filter(Boolean));
+      const removedCount = members.filter((m) => m.status === "REMOVED").length;
+
+      const metrics = {
+        total: activeMembers.length,
+        householdCount: activeHouseholds.size,
+        registeredCount: activeMembers.filter((m) => m.isRegistered).length,
+        notificationEnabled: activeMembers.filter((m) => m.hasNotification).length,
+        staffCount: activeMembers.filter((m) => m.isStaff).length,
+        keepers: activeMembers.filter((m) => m.isGardenKeeper).length,
+        clergyCount: activeMembers.filter((m) => m.position === "교역자").length,
+        removedCount,
+      };
+
+      return c.json({
+        ...metrics,
+        members,
+        users,
+      });
+    }
+
+    // 4. On-demand Synchronize with AWS Cognito (?sync=true)
     const fetchCognitoData = async () => {
       if (!userPoolId) return { cognitoUsers: [], keeperUsernames: new Set(), staffUsernames: new Set() };
       const client = getCognitoClient(env);
@@ -192,6 +314,15 @@ export const listUsersController = async (c) => {
 
     const activeMemberIdSet = new Set((fcmSubsResult.results || []).map((r) => r.member_id));
     const { cognitoUsers, keeperUsernames, staffUsernames } = cognitoData;
+
+    // Cache staff usernames in KV for subsequent non-sync fast requests
+    if (staffUsernames.size > 0 && env.weeklyupdate_kv) {
+      c.executionCtx?.waitUntil?.(
+        env.weeklyupdate_kv.put("cache:staff_usernames", JSON.stringify(Array.from(staffUsernames)), {
+          expirationTtl: 86400, // 24 hours
+        }).catch(() => {})
+      );
+    }
 
     // Index Cognito users by (name + phone) compound key, and sub
     const cognitoUserBySub = new Map();
@@ -270,9 +401,6 @@ export const listUsersController = async (c) => {
         }
       }
 
-      // Determine web registration status:
-      // Only true if matched with a valid Cognito account that shares BOTH name and phone.
-      // If Cognito API was temporarily unreachable (0 users fetched), fall back to existing D1 status.
       const isRegistered = cognitoUsers.length > 0
         ? Boolean(matchedCognito)
         : Boolean(m.isRegistered);
@@ -327,16 +455,16 @@ export const listUsersController = async (c) => {
         isRegistered,
         hasNotification,
         // Cognito linked properties
-        username: matchedCognito?.username || (m.phone ? `+1${phoneDigits}` : ""),
+        username: matchedCognito?.username || (m.phone ? `+1${phoneDigits}` : `member_${m.id}`),
         email: matchedCognito?.email || "",
-        phoneVerified: matchedCognito?.phoneVerified ?? false,
-        isStaff: matchedCognito?.isStaff ?? false,
-        isGardenKeeper: matchedCognito?.isGardenKeeper ?? false,
-        enabled: matchedCognito?.enabled ?? true,
+        phoneVerified: matchedCognito?.phoneVerified ?? Boolean(isRegistered),
+        isStaff: matchedCognito?.isStaff ?? (m.position === "교역자" || m.position === "간사"),
+        isGardenKeeper: Boolean(m.isGardenKeeper) || Boolean(matchedCognito?.isGardenKeeper),
+        enabled: matchedCognito?.enabled ?? (m.status !== "REMOVED"),
       };
     });
 
-    // Execute any pending async link updates in background
+    // Execute any pending sync link updates in background
     if (pendingD1LinkUpdates.length > 0) {
       c.executionCtx?.waitUntil?.(
         Promise.all(pendingD1LinkUpdates.map((p) => p.run())).catch((err) =>
@@ -345,10 +473,9 @@ export const listUsersController = async (c) => {
       );
     }
 
-    // Build fallback/legacy users array for backward compatibility
     const users = members.map((m) => ({
       id: m.id,
-      username: m.username || `member_${m.id}`,
+      username: m.username,
       name: m.name,
       phone: m.phone,
       phoneClean: m.phoneClean,
@@ -376,7 +503,7 @@ export const listUsersController = async (c) => {
       isRegistered: m.isRegistered,
     }));
 
-    // Include any Cognito users not yet matched in church_members (e.g. pending roster sync)
+    // Include any Cognito users not yet matched in church_members
     for (const uObj of cognitoUserList) {
       if (!matchedCognitoUsernames.has(uObj.username)) {
         users.push({
@@ -409,7 +536,7 @@ export const listUsersController = async (c) => {
       registeredCount: activeMembers.filter((m) => m.isRegistered).length,
       notificationEnabled: activeMembers.filter((m) => m.hasNotification).length,
       staffCount: staffUsernames.size,
-      keepers: keeperUsernames.size,
+      keepers: activeMembers.filter((m) => m.isGardenKeeper).length,
       clergyCount: activeMembers.filter((m) => m.position === "교역자").length,
       removedCount,
     };

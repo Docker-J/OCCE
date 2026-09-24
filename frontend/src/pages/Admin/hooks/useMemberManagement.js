@@ -71,7 +71,7 @@ export const useMemberManagement = () => {
 
     try {
       const [usersData, gardensData, householdsData] = await Promise.all([
-        getAdminUsers(),
+        getAdminUsers(isManualRefresh ? { sync: true } : {}),
         getAdminGardens().catch(() => ({ gardens: [] })),
         getAdminHouseholds().catch(() => ({ households: [] })),
       ]);

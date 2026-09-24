@@ -3,8 +3,8 @@ import axios from "axios";
 /**
  * Fetch all registered users / church members from D1 & Cognito
  */
-export const getAdminUsers = async (paginationToken) => {
-  const params = paginationToken ? { paginationToken } : {};
+export const getAdminUsers = async (options = {}) => {
+  const params = typeof options === "string" ? { paginationToken: options } : options;
   const res = await axios.get("/api/admin/users", { params });
   return res.data;
 };
