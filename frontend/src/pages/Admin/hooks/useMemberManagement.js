@@ -187,7 +187,7 @@ export const useMemberManagement = () => {
         const nameEnMatch = (u?.nameEn ?? "").toLowerCase().includes(search);
         const phoneMatch = (u?.phone ?? "").replace(/\D/g, "").includes(search);
         const householdMatch = (u?.householdName ?? "").toLowerCase().includes(search);
-        const addressMatch = (u?.address ?? "").toLowerCase().includes(search);
+        const addressMatch = ([u?.addressDetail, u?.address, u?.city, u?.postalCode].filter(Boolean).join(" ")).toLowerCase().includes(search);
         const headMatch = (headNameMap.get(u.householdId) ?? "").toLowerCase().includes(search);
         if (!nameMatch && !nameEnMatch && !phoneMatch && !householdMatch && !addressMatch && !headMatch) return false;
       }

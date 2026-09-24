@@ -221,7 +221,7 @@ const GardenManagementDashboard = ({ users = [], onGardensUpdated, onOpenEditMem
     const households = getGardenHouseholds(viewingGarden);
     const list = [];
     households.forEach((h, hIdx) => {
-      const fullAddress = [h.address, h.addressDetail, h.city, h.province, h.postalCode].filter(Boolean).join(" ");
+      const fullAddress = [h.addressDetail, h.address, h.city, h.province, h.postalCode].filter(Boolean).join(" ");
       h.members.forEach((m, mIdx) => {
         list.push({
           ...m,

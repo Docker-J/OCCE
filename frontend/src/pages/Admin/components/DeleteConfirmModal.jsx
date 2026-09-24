@@ -105,7 +105,6 @@ const DeleteConfirmModal = ({
         <DialogContentText sx={{ color: "#333", mb: 2, lineHeight: 1.6 }}>
           대상 교인: <strong>{user?.name || "교인"}</strong>
           {user?.phone ? ` (${formatPhoneNumber(user.phone)})` : ""}
-          {user?.householdName ? ` · ${user.householdName}` : ""}
         </DialogContentText>
 
         {/* 다인 가구일 경우: 세대 처리 옵션 선택 (세대주인 경우 승계 vs 세대 전체 제적 / 가구원인 경우 본인만 제적 vs 세대 전체 제적) */}

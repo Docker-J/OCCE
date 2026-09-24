@@ -477,8 +477,8 @@ const MemberFormModal = ({
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 800, color: "#111" }}>
               {isEdit
-                ? `${householdData.householdName || `${currentMember?.name || "교인"} 성도 가정`} 교적 및 세대원 관리`
-                : "새 세대(가구) 및 교인 등록"}
+                ? `[${currentMember?.name || "교인"}] 교적 및 세대원 관리`
+                : "새 세대 및 교인 등록"}
             </Typography>
             <Typography variant="caption" sx={{ color: "#666" }}>
               {isEdit
@@ -542,9 +542,10 @@ const MemberFormModal = ({
                 <Autocomplete
                   options={availableHouseholds}
                   getOptionLabel={(option) => {
-                    const addrPart = option.address ? ` - ${option.address}` : "";
+                    const headPart = option.headName ? `${option.headName} 세대` : "";
+                    const addrPart = option.address ? ` - ${[option.addressDetail, option.address].filter(Boolean).join(", ")}` : "";
                     const gardenPart = option.gardenName ? ` [${option.gardenName}]` : "";
-                    return `${option.householdName || "무명 가구"}${gardenPart}${addrPart}`;
+                    return `${headPart || option.address || "세대"}${gardenPart}${addrPart}`;
                   }}
                   onChange={(_, val) => handleHouseholdSelect(val?.id || "")}
                   renderInput={(params) => (
@@ -552,7 +553,7 @@ const MemberFormModal = ({
                       {...params}
                       size="small"
                       label="편입할 기존 세대 검색 및 선택"
-                      placeholder="세대명이나 주소로 검색..."
+                      placeholder="세대주 성명이나 주소로 검색..."
                       sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
                     />
                   )}
@@ -572,19 +573,6 @@ const MemberFormModal = ({
                 }}
               >
                 <Grid container spacing={2}>
-                  {/* 세대명 */}
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      label="세대명 (가구 명칭)"
-                      placeholder="예: 홍길동 성도 가정"
-                      value={householdData.householdName}
-                      onChange={(e) => handleHouseholdChange("householdName", e.target.value)}
-                      sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px", backgroundColor: "#fff" } }}
-                    />
-                  </Grid>
-
                   {/* 소속 정원 */}
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth size="small" sx={{ backgroundColor: "#fff" }}>

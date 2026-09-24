@@ -43,9 +43,10 @@ const MemberTableRow = ({
   const isRemoved = user.status === "REMOVED";
 
   const cityProvince = [user.city || "Edmonton", user.province || "AB"].filter(Boolean).join(", ");
-  const fullAddress = [user.address, user.addressDetail, cityProvince, user.postalCode]
+  const fullAddress = [user.addressDetail, user.address, cityProvince, user.postalCode]
     .filter(Boolean)
     .join(", ");
+  const displayAddress = [user.addressDetail, user.address].filter(Boolean).join(", ") || "주소 등록됨";
 
   return (
     <TableRow
@@ -156,12 +157,12 @@ const MemberTableRow = ({
             <Tooltip title={`세대 주소: ${fullAddress}`} arrow>
               <Chip
                 icon={<HomeOutlinedIcon sx={{ fontSize: "0.9rem !important", color: "#666 !important" }} />}
-                label={user.address || "주소 등록됨"}
+                label={displayAddress}
                 size="small"
                 sx={{
                   height: 20,
                   fontSize: "0.68rem",
-                  maxWidth: 240,
+                  maxWidth: 280,
                   color: "#555",
                   backgroundColor: "#f9fafb",
                   border: "1px solid #e5e7eb",

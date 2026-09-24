@@ -113,7 +113,7 @@ const MemberFilterToolbar = ({
       {/* 검색 입력창 */}
       <TextField
         size="small"
-        placeholder="교인 성명, 연락처, 세대명, 주소 검색..."
+        placeholder="교인 성명, 연락처, 주소 검색..."
         value={searchTerm}
         onChange={(e) => onSearchChange(e.target.value)}
         sx={{
