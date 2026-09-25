@@ -37,15 +37,9 @@ import {
   CircularProgress,
   TableSortLabel,
   Tooltip,
-  Tabs,
-  Tab,
 } from "@mui/material";
 
 import LoginIcon from "@mui/icons-material/Login";
-import BarChartIcon from "@mui/icons-material/BarChart";
-import PeopleIcon from "@mui/icons-material/People";
-import SchoolIcon from "@mui/icons-material/School";
-import ForestIcon from "@mui/icons-material/Forest";
 import CourseManagementDashboard from "./components/CourseManagementDashboard";
 
 const MemberManagement = () => {
@@ -305,72 +299,42 @@ const MemberManagement = () => {
             /* 4. 인증된 스태프 화면 */
             <>
               {/* 상단 행정 대시보드 홈 링크 */}
-              <Box sx={{ mb: 2.5, display: "flex", alignItems: "center" }}>
+              <Box
+                sx={{
+                  mb: 3,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: 1.5,
+                  pb: 2,
+                  borderBottom: "1px solid rgba(0, 0, 0, 0.06)",
+                }}
+              >
                 <Button
                   component={Link}
                   to="/admin"
                   startIcon={<ArrowBackIcon />}
                   sx={{
-                    color: "#64748b",
-                    fontWeight: 600,
-                    fontSize: "0.9rem",
+                    color: "#475569",
+                    fontWeight: 700,
+                    fontSize: "0.92rem",
                     textTransform: "none",
-                    borderRadius: "10px",
-                    px: 1.5,
-                    py: 0.6,
+                    borderRadius: "12px",
+                    px: 2,
+                    py: 0.8,
+                    backgroundColor: "#f8fafc",
+                    border: "1px solid #e2e8f0",
                     "&:hover": {
-                      backgroundColor: "rgba(0, 0, 0, 0.04)",
-                      color: "#1e293b",
+                      backgroundColor: "#f1f5f9",
+                      borderColor: "#cbd5e1",
+                      color: "#0f172a",
                     },
                   }}
                 >
                   행정 대시보드 홈으로
                 </Button>
               </Box>
-
-              {/* 대시보드 탭 */}
-              <Tabs
-                value={adminTab}
-                onChange={(e, val) => navigate(tabRoutes[val])}
-                variant="scrollable"
-                scrollButtons="auto"
-                allowScrollButtonsMobile
-                sx={{
-                  mb: 3.5,
-                  borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
-                  "& .MuiTabs-scrollButtons": {
-                    "&.Mui-disabled": { opacity: 0.3 },
-                  },
-                  "& .MuiTab-root": {
-                    whiteSpace: "nowrap",
-                    minWidth: "fit-content",
-                    px: { xs: 2, sm: 3 },
-                    fontSize: { xs: "0.85rem", sm: "0.95rem" },
-                    fontWeight: 700,
-                  },
-                }}
-              >
-                <Tab
-                  label="통합 교적부 관리"
-                  icon={<PeopleIcon sx={{ fontSize: "1.2rem" }} />}
-                  iconPosition="start"
-                />
-                <Tab
-                  label="출석 통계 대시보드"
-                  icon={<BarChartIcon sx={{ fontSize: "1.2rem" }} />}
-                  iconPosition="start"
-                />
-                <Tab
-                  label="양육·훈련 과정 관리"
-                  icon={<SchoolIcon sx={{ fontSize: "1.2rem" }} />}
-                  iconPosition="start"
-                />
-                <Tab
-                  label="정원 관리"
-                  icon={<ForestIcon sx={{ fontSize: "1.2rem" }} />}
-                  iconPosition="start"
-                />
-              </Tabs>
 
               {/* Tab 0: 통합 교적부 관리 */}
               <Box sx={{ display: adminTab === 0 ? "block" : "none" }}>
