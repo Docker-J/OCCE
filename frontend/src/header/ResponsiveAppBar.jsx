@@ -72,9 +72,9 @@ const ResponsiveAppBar = () => {
     ...(admin
       ? [
           {
-            title: "교인 및 출석 관리",
+            title: "교회 행정 대시보드",
             onClick: () => {
-              navigate("/admin/members");
+              navigate("/admin");
             },
           },
         ]

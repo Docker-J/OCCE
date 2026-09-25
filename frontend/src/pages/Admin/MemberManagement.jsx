@@ -5,9 +5,10 @@
  */
 
 import { useState, useMemo } from "react";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import useModals from "../../util/useModal";
 import AttendanceDashboard from "./AttendanceDashboard";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 // 커스텀 훅 & 유틸
 import { useMemberManagement } from "./hooks/useMemberManagement";
@@ -49,7 +50,18 @@ import CourseManagementDashboard from "./components/CourseManagementDashboard";
 
 const MemberManagement = () => {
   const { openModal } = useModals();
-  const [adminTab, setAdminTab] = useState(0);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const tabRoutes = [
+    "/admin/members",
+    "/admin/attendance",
+    "/admin/courses",
+    "/admin/gardens",
+  ];
+  const currentTabIndex = tabRoutes.indexOf(location.pathname);
+  const adminTab = currentTabIndex !== -1 ? currentTabIndex : 0;
+
 
   // 커스텀 훅에서 상태와 액션 추출
   const { state, actions } = useMemberManagement();
@@ -292,10 +304,34 @@ const MemberManagement = () => {
           ) : (
             /* 4. 인증된 스태프 화면 */
             <>
+              {/* 상단 행정 대시보드 홈 링크 */}
+              <Box sx={{ mb: 2.5, display: "flex", alignItems: "center" }}>
+                <Button
+                  component={Link}
+                  to="/admin"
+                  startIcon={<ArrowBackIcon />}
+                  sx={{
+                    color: "#64748b",
+                    fontWeight: 600,
+                    fontSize: "0.9rem",
+                    textTransform: "none",
+                    borderRadius: "10px",
+                    px: 1.5,
+                    py: 0.6,
+                    "&:hover": {
+                      backgroundColor: "rgba(0, 0, 0, 0.04)",
+                      color: "#1e293b",
+                    },
+                  }}
+                >
+                  행정 대시보드 홈으로
+                </Button>
+              </Box>
+
               {/* 대시보드 탭 */}
               <Tabs
                 value={adminTab}
-                onChange={(e, val) => setAdminTab(val)}
+                onChange={(e, val) => navigate(tabRoutes[val])}
                 variant="scrollable"
                 scrollButtons="auto"
                 allowScrollButtonsMobile
