@@ -1512,11 +1512,17 @@ export const listGardensController = async (c) => {
         g.name, 
         g.category,
         g.leader_member_id as leaderMemberId, 
-        (
-          SELECT GROUP_CONCAT(gsl.member_id, ',')
-          FROM garden_sub_leaders gsl
-          WHERE gsl.garden_id = g.id
-        ) as subLeaderMemberIdsStr,
+        COALESCE(
+          (
+            SELECT json_group_array(
+              json_object('id', sub_m.id, 'name', sub_m.name)
+            )
+            FROM garden_sub_leaders gsl
+            JOIN church_members sub_m ON gsl.member_id = sub_m.id
+            WHERE gsl.garden_id = g.id
+          ),
+          '[]'
+        ) as subLeadersJson,
         g.order_num as orderNum, 
         g.is_active as isActive
       FROM gardens g
@@ -1524,12 +1530,20 @@ export const listGardensController = async (c) => {
       ORDER BY g.order_num ASC, g.name ASC
     `).all();
 
-    const gardens = (results || []).map((g) => ({
-      ...g,
-      subLeaderMemberIds: g.subLeaderMemberIdsStr
-        ? g.subLeaderMemberIdsStr.split(",").map(Number).filter(Boolean)
-        : [],
-    }));
+    const gardens = (results || []).map((g) => {
+      let subLeaders = [];
+      try {
+        subLeaders = JSON.parse(g.subLeadersJson || "[]");
+      } catch {
+        subLeaders = [];
+      }
+      return {
+        ...g,
+        subLeaders,
+        subLeaderMemberIds: subLeaders.map((s) => s.id),
+        subLeaderNames: subLeaders.map((s) => s.name).join(", "),
+      };
+    });
 
     return c.json({ gardens });
   } catch (error) {
@@ -1948,17 +1962,17 @@ export const manageGardensController = async (c) => {
         g.category,
         g.leader_member_id as leaderMemberId,
         cm.name as leaderName,
-        (
-          SELECT GROUP_CONCAT(sub_m.name, ', ')
-          FROM garden_sub_leaders gsl
-          JOIN church_members sub_m ON gsl.member_id = sub_m.id
-          WHERE gsl.garden_id = g.id
-        ) as subLeaderNames,
-        (
-          SELECT GROUP_CONCAT(gsl.member_id, ',')
-          FROM garden_sub_leaders gsl
-          WHERE gsl.garden_id = g.id
-        ) as subLeaderMemberIdsStr,
+        COALESCE(
+          (
+            SELECT json_group_array(
+              json_object('id', sub_m.id, 'name', sub_m.name)
+            )
+            FROM garden_sub_leaders gsl
+            JOIN church_members sub_m ON gsl.member_id = sub_m.id
+            WHERE gsl.garden_id = g.id
+          ),
+          '[]'
+        ) as subLeadersJson,
         g.order_num as orderNum,
         g.is_active as isActive,
         (
@@ -1980,13 +1994,20 @@ export const manageGardensController = async (c) => {
       ORDER BY g.order_num ASC, g.name ASC
     `).all();
 
-    const gardens = (results || []).map((g) => ({
-      ...g,
-      subLeaderNames: g.subLeaderNames || "",
-      subLeaderMemberIds: g.subLeaderMemberIdsStr
-        ? g.subLeaderMemberIdsStr.split(",").map(Number).filter(Boolean)
-        : [],
-    }));
+    const gardens = (results || []).map((g) => {
+      let subLeaders = [];
+      try {
+        subLeaders = JSON.parse(g.subLeadersJson || "[]");
+      } catch {
+        subLeaders = [];
+      }
+      return {
+        ...g,
+        subLeaders,
+        subLeaderMemberIds: subLeaders.map((s) => s.id),
+        subLeaderNames: subLeaders.map((s) => s.name).join(", "),
+      };
+    });
 
     return c.json({ gardens });
   } catch (error) {
