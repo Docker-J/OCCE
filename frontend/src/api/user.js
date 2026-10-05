@@ -51,7 +51,7 @@ export const confirmSignUp = async (phone, confirmCode) => {
 
 export const resendSignUpConfirm = async (phone) => {
   try {
-    const res = await axios.get(`/api/user/resend-confirm?phone=${phone}`);
+    const res = await axios.post("/api/user/resend-confirm", { phone });
     return res.data;
   } catch (error) {
     const errorDetail = error.response?.data?.error || error.message;

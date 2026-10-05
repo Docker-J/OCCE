@@ -1,8 +1,5 @@
 import { Hono } from "hono";
-import {
-  validateJson,
-  validateQuery,
-} from "../middleware/validator.js";
+import { validateJson } from "../middleware/validator.js";
 import {
   confirmSignUpController,
   refreshSignInController,
@@ -34,14 +31,9 @@ router.post(
   confirmSignUpController
 );
 
-router.get(
+router.post(
   "/resend-confirm",
-  validateQuery({
-    phone: {
-      required: true,
-      message: "Phone number query parameter is required.",
-    },
-  }),
+  validateJson(["phone"]),
   requestConfirmController
 );
 

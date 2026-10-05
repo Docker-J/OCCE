@@ -353,8 +353,8 @@ export const confirmSignUpController = async (c) => {
 };
 
 export const requestConfirmController = async (c) => {
-  const phone = c.req.query("phone");
-  console.log(phone);
+  const body = (await c.req.json().catch(() => ({}))) || {};
+  const phone = body.phone || c.req.query("phone");
   const username = "+1" + phone;
 
   const env = c.env;
