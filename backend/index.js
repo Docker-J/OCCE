@@ -22,11 +22,25 @@ app.use("*", logger());
 // Security headers (X-Frame-Options, X-Content-Type-Options, etc.)
 app.use("*", secureHeaders());
 
+// Allowed origins regular expression:
+// - Local development: http://localhost:port or http://127.0.0.1:port
+// - Production & staging: https://oncce.ca, https://*.oncce.ca, https://*.workers.dev
+const ALLOWED_ORIGIN_REGEX =
+  /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$|^https:\/\/([a-z0-9-]+\.)*oncce\.ca$|^https:\/\/([a-z0-9-]+\.)*workers\.dev$/i;
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return false;
+  return ALLOWED_ORIGIN_REGEX.test(origin);
+};
+
 // CORS configuration with credentials and method control
 app.use(
   "*",
   cors({
-    origin: (origin) => origin || "*",
+    origin: (origin) => {
+      if (!origin) return "https://oncce.ca";
+      return isAllowedOrigin(origin) ? origin : "https://oncce.ca";
+    },
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
     exposeHeaders: ["Content-Length"],
@@ -57,11 +71,15 @@ app.onError((err, c) => {
     );
   }
 
-  // Handle unexpected internal server errors
+  const isDev = c.env?.ENVIRONMENT === "development";
+
+  // Handle unexpected internal server errors (mask details in non-development environments)
   return c.json(
     {
       error: "InternalServerError",
-      message: err.message || "An unexpected error occurred",
+      message: isDev
+        ? err.message || "An unexpected error occurred"
+        : "서버 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
     },
     500
   );

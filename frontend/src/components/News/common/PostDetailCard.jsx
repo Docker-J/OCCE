@@ -2,6 +2,7 @@ import { Box, Chip, Typography } from "@mui/material";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import { format } from "date-fns";
+import DOMPurify from "dompurify";
 import FontSizeController from "./FontSizeController";
 
 const PostDetailCard = ({
@@ -103,7 +104,10 @@ const PostDetailCard = ({
       <div
         className="ck-content"
         dangerouslySetInnerHTML={{
-          __html: body || "",
+          __html: DOMPurify.sanitize(body || "", {
+            ADD_TAGS: ["iframe"],
+            ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling"],
+          }),
         }}
         style={{
           wordBreak: "break-word",
