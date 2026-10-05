@@ -2,6 +2,7 @@ import { Typography, Button, Box, Card, CardContent, Grid, Divider } from "@mui/
 import { Link } from "react-router";
 import useAuthStore from "../../store/useAuthStore";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
+import BarChartIcon from "@mui/icons-material/BarChart";
 import NatureIcon from "@mui/icons-material/Nature";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import Diversity1Icon from "@mui/icons-material/Diversity1";
@@ -137,6 +138,26 @@ const SmallGroup = () => {
                     }}
                   >
                     정원 모임 보고하기
+                  </Button>
+                  <Button
+                    component={Link}
+                    to="/admin/attendance"
+                    variant="contained"
+                    size="large"
+                    startIcon={<BarChartIcon />}
+                    sx={{
+                      backgroundColor: "#2563eb",
+                      "&:hover": { backgroundColor: "#1d4ed8", transform: "translateY(-3px)", boxShadow: "0 8px 16px rgba(37, 99, 235, 0.3)" },
+                      borderRadius: "16px",
+                      px: { xs: 3, md: 5 },
+                      py: 1.8,
+                      fontWeight: 800,
+                      fontSize: "1.05em",
+                      boxShadow: "0 4px 12px 0 rgba(37, 99, 235, 0.2)",
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    출석 통계 대시보드
                   </Button>
                 </Box>
               </CardContent>

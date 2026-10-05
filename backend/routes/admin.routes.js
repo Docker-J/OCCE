@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { authStaff } from "../middleware/auth.js";
+import { authStaff, authLeader } from "../middleware/auth.js";
 import {
   validateJson,
   validateParam,
@@ -17,8 +17,11 @@ import {
 
 const router = new Hono();
 
-// All admin routes strictly require Staff authorization
-router.use("*", authStaff);
+// User membership management (strictly requires Staff authorization)
+router.use("/users*", authStaff);
+
+// Attendance administration & analytics (Accessible by Staff and Garden Keepers)
+router.use("/attendance*", authLeader);
 
 // User membership management
 router.get("/users", listUsersController);

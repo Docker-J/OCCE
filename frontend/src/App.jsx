@@ -189,8 +189,21 @@ const router = createBrowserRouter([
         lazy: lazyRetry(async () => ({ Component: (await import("./pages/News/NewComers/NewComers")).default })),
       },
       {
-        path: "/admin/members",
-        lazy: lazyRetry(async () => ({ Component: (await import("./pages/Admin/MemberManagement")).default })),
+        path: "/admin",
+        children: [
+          {
+            index: true,
+            lazy: lazyRetry(async () => ({ Component: (await import("./pages/Admin/AdminDashboardHome")).default })),
+          },
+          {
+            path: "members",
+            lazy: lazyRetry(async () => ({ Component: (await import("./pages/Admin/MemberManagement")).default })),
+          },
+          {
+            path: "attendance",
+            lazy: lazyRetry(async () => ({ Component: (await import("./pages/Admin/AttendanceDashboardPage")).default })),
+          },
+        ],
       },
       {
         path: "/community",

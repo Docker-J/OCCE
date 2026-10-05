@@ -38,6 +38,7 @@ const ResponsiveAppBar = () => {
 
   const authenticated = useAuthStore((state) => state.authenticated);
   const admin = useAuthStore((state) => state.admin);
+  const isLeader = useAuthStore((state) => state.isLeader);
   const deleteToken = useAuthStore((state) => state.deleteToken);
 
   const [scrolled, setScrolled] = useState(false);
@@ -69,12 +70,12 @@ const ResponsiveAppBar = () => {
   });
 
   const settings_signed = [
-    ...(admin
+    ...(isLeader
       ? [
           {
-            title: "교인 및 출석 관리",
+            title: admin ? "관리자 대시보드" : "정원지기 대시보드",
             onClick: () => {
-              navigate("/admin/members");
+              navigate("/admin");
             },
           },
         ]

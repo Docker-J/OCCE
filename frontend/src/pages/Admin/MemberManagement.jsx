@@ -7,7 +7,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import useModals from "../../util/useModal";
-import AttendanceDashboard from "./AttendanceDashboard";
 
 // 커스텀 훅 & 유틸
 import { useMemberManagement } from "./hooks/useMemberManagement";
@@ -35,17 +34,15 @@ import {
   CircularProgress,
   TablePagination,
   TableSortLabel,
-  Tabs,
-  Tab,
 } from "@mui/material";
 
 import LoginIcon from "@mui/icons-material/Login";
-import BarChartIcon from "@mui/icons-material/BarChart";
-import PeopleIcon from "@mui/icons-material/People";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import useAuthStore from "../../store/useAuthStore";
 
 const MemberManagement = () => {
   const { openModal } = useModals();
-  const [adminTab, setAdminTab] = useState(0);
+  const isLeader = useAuthStore((state) => state.isLeader);
 
   // 커스텀 훅에서 상태와 액션 추출
   const { state, actions } = useMemberManagement();
@@ -104,7 +101,7 @@ const MemberManagement = () => {
 
   return (
     <>
-      <title>{adminTab === 0 ? "교인 관리 대시보드 - OCCE" : "출석 통계 대시보드 - OCCE"}</title>
+      <title>교인 계정 관리 - OCCE</title>
 
       {/* 상단 타이틀 배너 */}
       <div className="title-wrapper" style={TITLE_BG_STYLE}>
@@ -113,7 +110,7 @@ const MemberManagement = () => {
             variant="h4"
             sx={{ fontWeight: 830, letterSpacing: "0.2em", pl: "0.2em", color: "white" }}
           >
-            {adminTab === 0 ? "교인 관리 대시보드" : "출석 통계 대시보드"}
+            교인 계정 관리
           </Typography>
           <Typography
             variant="h6"
@@ -124,9 +121,7 @@ const MemberManagement = () => {
               mt: "8px",
             }}
           >
-            {adminTab === 0
-              ? "온교회 등록 교인 계정 및 정원지기 역할을 관리합니다."
-              : "구글 드라이브 주간 출석부의 실시간 출석 현황과 통계를 분석합니다."}
+            온교회 등록 교인 계정 및 정원지기 역할을 관리합니다.
           </Typography>
         </div>
       </div>
@@ -136,6 +131,22 @@ const MemberManagement = () => {
           className="container"
           style={{ maxWidth: "1100px", width: "100%", margin: "0 auto", padding: "32px 16px" }}
         >
+          {/* 상단 네비게이션: 대시보드 홈으로 이동 */}
+          <Box sx={{ mb: 3, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <Button
+              component={Link}
+              to="/admin"
+              startIcon={<ArrowBackIcon />}
+              sx={{
+                color: "#64748b",
+                fontWeight: 700,
+                fontSize: "0.9rem",
+                "&:hover": { color: "#FF6B00", backgroundColor: "rgba(255, 107, 0, 0.05)" },
+              }}
+            >
+              관리자 대시보드 홈
+            </Button>
+          </Box>
           {/* 1. 인증 초기화 중 */}
           {!authInitialized ? (
             <Box
@@ -212,7 +223,7 @@ const MemberManagement = () => {
                 </Typography>
                 <Button
                   component={Link}
-                  to="/"
+                  to={isLeader ? "/admin" : "/"}
                   variant="contained"
                   size="large"
                   sx={{
@@ -224,51 +235,15 @@ const MemberManagement = () => {
                     fontWeight: 700,
                   }}
                 >
-                  홈으로 이동
+                  {isLeader ? "대시보드로 이동" : "홈으로 이동"}
                 </Button>
               </CardContent>
             </Card>
           ) : (
             /* 4. 인증된 스태프 화면 */
             <>
-              {/* 대시보드 탭 */}
-              <Tabs
-                value={adminTab}
-                onChange={(e, val) => setAdminTab(val)}
-                variant="scrollable"
-                scrollButtons="auto"
-                allowScrollButtonsMobile
-                sx={{
-                  mb: 3.5,
-                  borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
-                  "& .MuiTabs-scrollButtons": {
-                    "&.Mui-disabled": { opacity: 0.3 },
-                  },
-                  "& .MuiTab-root": {
-                    whiteSpace: "nowrap",
-                    minWidth: "fit-content",
-                    px: { xs: 2, sm: 3 },
-                    fontSize: { xs: "0.85rem", sm: "0.95rem" },
-                    fontWeight: 700,
-                  },
-                }}
-              >
-                <Tab
-                  label="교인 계정 관리"
-                  icon={<PeopleIcon sx={{ fontSize: "1.2rem" }} />}
-                  iconPosition="start"
-                />
-                <Tab
-                  label="출석 통계 대시보드"
-                  icon={<BarChartIcon sx={{ fontSize: "1.2rem" }} />}
-                  iconPosition="start"
-                />
-              </Tabs>
-
-              {/* Tab 0: 교인 계정 관리 */}
-              <Box sx={{ display: adminTab === 0 ? "block" : "none" }}>
-                {/* 1) 4대 통계 요약 카드 */}
-                <MemberStats metrics={metrics} />
+              {/* 1) 4대 통계 요약 카드 */}
+              <MemberStats metrics={metrics} />
 
                 {/* 2) 메인 테이블 카드 */}
                 <Card
@@ -434,14 +409,6 @@ const MemberManagement = () => {
                     </>
                   )}
                 </Card>
-              </Box>
-
-              {/* Tab 1: 출석 통계 대시보드 */}
-              {adminTab === 1 && (
-                <Box>
-                  <AttendanceDashboard />
-                </Box>
-              )}
             </>
           )}
         </div>
