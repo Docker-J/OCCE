@@ -81,6 +81,10 @@ export const NotificationProvider = ({ children }) => {
       try {
         if (forcePrompt) setIsLoading(true);
         const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+        const readyRegistration = await Promise.race([
+          navigator.serviceWorker.ready,
+          new Promise((resolve) => setTimeout(() => resolve(registration), 3000)),
+        ]);
 
         let permission = currentPermission;
         if (permission !== "granted") {
@@ -95,23 +99,29 @@ export const NotificationProvider = ({ children }) => {
 
           const token = await getToken(messaging, {
             vapidKey: "BOLDzFLzljc4HkyVktgjo4-_QoXFxx__XZS6xBmGouvsisXHHe--2dSUUJtQ2cerl3v7ONBhrAPM661xRbpQcqo",
-            serviceWorkerRegistration: registration,
+            serviceWorkerRegistration: readyRegistration || registration,
           });
 
           console.log("FCM Token:", token);
 
-          const lastRefresh = localStorage.getItem("last_fcm_token_refresh");
-          const now = Date.now();
-          // Refresh token TTL every 1 hour (3,600,000ms)
-          const shouldRefreshTTL = !lastRefresh || (now - parseInt(lastRefresh, 10) > 3600000);
+          if (token) {
+            const lastRefresh = localStorage.getItem("last_fcm_token_refresh");
+            const now = Date.now();
+            // Refresh token TTL every 1 hour (3,600,000ms)
+            const shouldRefreshTTL = !lastRefresh || (now - parseInt(lastRefresh, 10) > 3600000);
 
-          if (shouldRefreshTTL || forcePrompt) {
-            console.log("Registering / Refreshing FCM token in database...");
-            const isRemembered =
-              document.cookie.includes("remember=true") ||
-              localStorage.getItem("remember") === "true";
-            await registerToken(token, isRemembered);
-            localStorage.setItem("last_fcm_token_refresh", now.toString());
+            if (shouldRefreshTTL || forcePrompt) {
+              console.log("Registering / Refreshing FCM token in database...");
+              const isRemembered =
+                document.cookie.includes("remember=true") ||
+                localStorage.getItem("remember") === "true";
+              try {
+                await registerToken(token, isRemembered);
+                localStorage.setItem("last_fcm_token_refresh", now.toString());
+              } catch (regErr) {
+                console.warn("Failed to register FCM token with backend:", regErr);
+              }
+            }
           }
 
           setEnabled(true);
@@ -133,11 +143,12 @@ export const NotificationProvider = ({ children }) => {
           setEnabled(false);
         }
       } catch (e) {
-        console.error(e);
+        console.error("FCM initPushOptions error:", e);
         if (forcePrompt) {
           openSnackbar("error", "알림 설정 중 오류가 발생했습니다.");
+          setEnabled(false);
         }
-        setEnabled(false);
+        // Background sync failures will not disable the UI if browser permission is already granted
       } finally {
         if (forcePrompt) setIsLoading(false);
       }
@@ -153,6 +164,19 @@ export const NotificationProvider = ({ children }) => {
 
   useEffect(() => {
     initPushOptions(false);
+
+    if (typeof window !== "undefined" && "permissions" in navigator && navigator.permissions?.query) {
+      navigator.permissions
+        .query({ name: "notifications" })
+        .then((permissionStatus) => {
+          permissionStatus.onchange = () => {
+            const isGranted = permissionStatus.state === "granted";
+            const isOptedOut = localStorage.getItem("notifications_opt_out") === "true";
+            setEnabled(isGranted && !isOptedOut);
+          };
+        })
+        .catch(() => {});
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
