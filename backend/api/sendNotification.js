@@ -1,36 +1,33 @@
-import { ScanCommand } from "@aws-sdk/client-dynamodb";
-import { getDocClient, resetDocClient } from "./dynamodb.js";
 import { getGoogleAuth } from "./googleAuth.js";
 
-const TABLENAME = "FCMToken";
+async function getTokens(env, targetRole = "all") {
+  const db = env.DB;
+  const nowEpoch = Math.floor(Date.now() / 1000);
 
-async function scanTokensWithRetry(env, scanParam, maxRetries = 3) {
-  let attempt = 0;
-  while (attempt < maxRetries) {
-    attempt++;
-    try {
-      const docClient = getDocClient(env);
-      const command = new ScanCommand(scanParam);
-      return await docClient.send(command);
-    } catch (err) {
-      console.warn(`⚠️ DynamoDB Scan attempt ${attempt}/${maxRetries} failed:`, err.message);
-      // Reset the cached client to discard stale socket connections
-      resetDocClient();
-      if (attempt >= maxRetries) {
-        throw err;
-      }
-      // Wait before retrying (1s, 2s, 3s...)
-      await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
-    }
+  if (!targetRole || targetRole === "all") {
+    const res = await db
+      .prepare("SELECT token FROM fcm_tokens WHERE expires_at > ?")
+      .bind(nowEpoch)
+      .all();
+    return (res.results || []).map((r) => r.token);
   }
+
+  const roles = Array.isArray(targetRole) ? targetRole : [targetRole];
+  if (roles.length === 0) return [];
+
+  const placeholders = roles.map(() => "?").join(", ");
+  const sql = `
+    SELECT DISTINCT fcm_tokens.token 
+    FROM fcm_tokens, json_each(fcm_tokens.roles) 
+    WHERE json_each.value IN (${placeholders}) AND fcm_tokens.expires_at > ?
+  `;
+  const res = await db.prepare(sql).bind(...roles, nowEpoch).all();
+  return (res.results || []).map((r) => r.token);
 }
 
-async function sendMessages(env, scanParam, message, accessToken, projectId) {
+async function sendMessages(env, tokens, message, accessToken, projectId) {
   try {
-    const result = await scanTokensWithRetry(env, scanParam);
-    const tokens = result.Items ? result.Items.map((item) => item.token.S) : [];
-
-    if (tokens.length <= 0) {
+    if (!Array.isArray(tokens) || tokens.length === 0) {
       return;
     }
 
@@ -69,11 +66,6 @@ async function sendMessages(env, scanParam, message, accessToken, projectId) {
         console.error("Failed to enqueue FCM messages:", err);
       }
     }
-
-    if (typeof result.LastEvaluatedKey !== "undefined") {
-      scanParam.ExclusiveStartKey = result.LastEvaluatedKey;
-      await sendMessages(env, scanParam, message, accessToken, projectId); // Recursive call
-    }
   } catch (err) {
     console.error("FCM Send Messages Error:", err);
     throw err;
@@ -81,29 +73,11 @@ async function sendMessages(env, scanParam, message, accessToken, projectId) {
 }
 
 const sendNotification = async (env, title, body, pathname, targetRole = "all") => {
-  const scanParam = {
-    TableName: TABLENAME,
-    ProjectionExpression: "#tkn",
-    ExpressionAttributeNames: { "#tkn": "token" },
-    Limit: 499,
-  };
+  const tokens = await getTokens(env, targetRole);
 
-  if (targetRole && targetRole !== "all") {
-    scanParam.ExpressionAttributeNames["#roles"] = "roles";
-    if (Array.isArray(targetRole)) {
-      scanParam.FilterExpression = targetRole
-        .map((_, idx) => `contains(#roles, :role${idx})`)
-        .join(" OR ");
-      scanParam.ExpressionAttributeValues = {};
-      targetRole.forEach((role, idx) => {
-        scanParam.ExpressionAttributeValues[`:role${idx}`] = { S: role };
-      });
-    } else {
-      scanParam.FilterExpression = "contains(#roles, :role)";
-      scanParam.ExpressionAttributeValues = {
-        ":role": { S: targetRole },
-      };
-    }
+  if (!tokens || tokens.length === 0) {
+    console.log("No active FCM tokens found for target role:", targetRole);
+    return;
   }
 
   const cleanPath = pathname.replace(/^\/+/, "");
@@ -163,7 +137,7 @@ const sendNotification = async (env, title, body, pathname, targetRole = "all") 
   const tokenResponse = await client.getAccessToken();
   const accessToken = tokenResponse.token;
 
-  await sendMessages(env, scanParam, message, accessToken, projectId);
+  await sendMessages(env, tokens, message, accessToken, projectId);
 };
 
 export default sendNotification;

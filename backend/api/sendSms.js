@@ -1,9 +1,7 @@
 import { PublishCommand } from "@aws-sdk/client-sns";
 import { ListUsersCommand } from "@aws-sdk/client-cognito-identity-provider";
-import { ScanCommand } from "@aws-sdk/lib-dynamodb";
 import { getSnsClient } from "./sns.js";
 import { getCognitoClient } from "./cognito.js";
-import { getDocClient } from "./dynamodb.js";
 
 /**
  * Normalizes phone numbers to standard E.164 format.
@@ -49,25 +47,25 @@ async function fetchAllCognitoUsers(env) {
 }
 
 /**
- * Fetch subs of users who currently have active Web Push tokens in DynamoDB FCMToken table.
+ * Fetch subs of users who currently have active Web Push tokens in D1 fcm_tokens table.
  */
 async function fetchActiveNotificationSubs(env) {
   try {
-    const docClient = getDocClient(env);
-    const res = await docClient.send(
-      new ScanCommand({
-        TableName: "FCMToken",
-        ProjectionExpression: "#sub",
-        ExpressionAttributeNames: { "#sub": "sub" },
-      })
-    );
+    const db = env.DB;
+    const nowEpoch = Math.floor(Date.now() / 1000);
+    const res = await db
+      .prepare(
+        "SELECT DISTINCT sub FROM fcm_tokens WHERE sub IS NOT NULL AND expires_at > ?"
+      )
+      .bind(nowEpoch)
+      .all();
     return new Set(
-      (res.Items || [])
-        .map((item) => (item.sub?.S ? item.sub.S : item.sub))
+      (res.results || [])
+        .map((item) => item.sub)
         .filter(Boolean)
     );
   } catch (err) {
-    console.warn("Could not scan FCM tokens for active push users:", err.message);
+    console.warn("Could not query D1 for active push users:", err.message);
     return new Set();
   }
 }

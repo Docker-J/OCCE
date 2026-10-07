@@ -1,10 +1,6 @@
-import { getDocClient } from "../api/dynamodb.js";
-import { PutCommand, DeleteCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { getUserVerifier } from "../middleware/auth.js";
 import sendNotification from "../api/sendNotification.js";
 import sendBroadcastSms from "../api/sendSms.js";
-
-const TABLENAME = "FCMToken";
 
 function getExpirationEpoch() {
   const now = new Date();
@@ -15,7 +11,11 @@ function getExpirationEpoch() {
 export const registerController = async (c) => {
   try {
     const body = await c.req.json();
-    const docClient = getDocClient(c.env);
+    if (!body?.token) {
+      return c.json({ error: "BadRequest", message: "Token is required." }, 400);
+    }
+
+    const db = c.env.DB;
     let roles = [];
     let sub = null;
 
@@ -42,21 +42,21 @@ export const registerController = async (c) => {
       }
     }
 
-    const item = {
-      token: body.token,
-      roles: roles,
-      expiresAt: getExpirationEpoch(),
-    };
-    if (sub) {
-      item.sub = sub;
-    }
+    const expiresAt = getExpirationEpoch();
+    const rolesJson = JSON.stringify(roles || []);
 
-    const command = new PutCommand({
-      TableName: TABLENAME,
-      Item: item,
-    });
+    await db
+      .prepare(
+        `INSERT INTO fcm_tokens (token, sub, roles, expires_at)
+         VALUES (?, ?, ?, ?)
+         ON CONFLICT(token) DO UPDATE SET
+           sub = excluded.sub,
+           roles = excluded.roles,
+           expires_at = excluded.expires_at`
+      )
+      .bind(body.token, sub, rolesJson, expiresAt)
+      .run();
 
-    await docClient.send(command);
     return c.json({ success: true }, 200);
   } catch (err) {
     console.error("Register notification token error:", err);
@@ -70,24 +70,13 @@ export const unlinkRoleController = async (c) => {
     if (!body?.token) {
       return c.json({ error: "BadRequest", message: "Token is required." }, 400);
     }
-    const docClient = getDocClient(c.env);
+    const db = c.env.DB;
 
-    const command = new UpdateCommand({
-      TableName: TABLENAME,
-      Key: {
-        token: body.token,
-      },
-      UpdateExpression: "SET #roles = :emptyRoles REMOVE #sub",
-      ExpressionAttributeNames: {
-        "#roles": "roles",
-        "#sub": "sub",
-      },
-      ExpressionAttributeValues: {
-        ":emptyRoles": [],
-      },
-    });
+    await db
+      .prepare("UPDATE fcm_tokens SET roles = '[]', sub = NULL WHERE token = ?")
+      .bind(body.token)
+      .run();
 
-    await docClient.send(command);
     return c.json({ success: true }, 200);
   } catch (err) {
     console.error("Unlink notification token role error:", err);
@@ -98,16 +87,16 @@ export const unlinkRoleController = async (c) => {
 export const unregisterController = async (c) => {
   try {
     const body = await c.req.json();
-    const docClient = getDocClient(c.env);
+    if (!body?.token) {
+      return c.json({ error: "BadRequest", message: "Token is required." }, 400);
+    }
+    const db = c.env.DB;
 
-    const command = new DeleteCommand({
-      TableName: TABLENAME,
-      Key: {
-        token: body.token,
-      },
-    });
+    await db
+      .prepare("DELETE FROM fcm_tokens WHERE token = ?")
+      .bind(body.token)
+      .run();
 
-    await docClient.send(command);
     return c.json({ success: true }, 200);
   } catch (err) {
     console.error("Unregister notification token error:", err);

@@ -4,15 +4,29 @@ import { getSchedules } from "../controller/schedules.controller.js";
 import sendNotification from "../api/sendNotification.js";
 
 /**
- * 1. 매일 06:01 UTC: 주간 일정 리프레시
+ * 1. 매일 06:01 UTC: 주간 일정 리프레시 및 만료 FCM 토큰 정리
  */
-async function handleDailyScheduleRefresh(env) {
+async function handleDailyMaintenance(env) {
   console.log("🕒 Triggering daily schedule refresh...");
   try {
     await getSchedules(env);
     console.log("✅ Schedule refreshed successfully.");
   } catch (error) {
     console.error("❌ Failed to refresh schedule:", error);
+  }
+
+  try {
+    const db = env.DB;
+    const nowEpoch = Math.floor(Date.now() / 1000);
+    const res = await db
+      .prepare("DELETE FROM fcm_tokens WHERE expires_at < ?")
+      .bind(nowEpoch)
+      .run();
+    if (res.meta?.changes > 0) {
+      console.log(`🧹 Cleaned up ${res.meta.changes} expired FCM tokens.`);
+    }
+  } catch (error) {
+    console.warn("Failed to clean up expired FCM tokens:", error.message);
   }
 }
 
@@ -83,7 +97,7 @@ async function handleSundayAttendanceReminderFCM(env) {
 export async function handleScheduled(event, env, ctx) {
   switch (event.cron) {
     case "1 6 * * *":
-      await handleDailyScheduleRefresh(env);
+      await handleDailyMaintenance(env);
       break;
 
     case "30 12 * * *":

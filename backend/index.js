@@ -3,9 +3,7 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 import { HTTPException } from "hono/http-exception";
-import { DeleteItemCommand } from "@aws-sdk/client-dynamodb";
 
-import { getDocClient } from "./api/dynamodb.js";
 import apiRouter from "./routes/index.js";
 import { handleScheduled } from "./jobs/scheduled.js";
 import { linkPreviewMiddleware } from "./middleware/linkPreview.js";
@@ -118,9 +116,6 @@ export default {
   async queue(batch, env, ctx) {
     console.log(`[Queue] Processing FCM batch of ${batch.messages.length} message(s)`);
 
-    // Lazily instantiate DynamoDB client once per batch
-    let docClient = null;
-
     const sendPromises = batch.messages.flatMap((msg) => {
       const { tokens, payloadTemplate, accessToken, projectId } = msg.body || {};
 
@@ -153,23 +148,20 @@ export default {
             const errText = await res.text();
             console.error(`[FCM] Send error for token ${token}:`, errText);
 
-            // Clean up stale / unregistered tokens from DynamoDB
+            // Clean up stale / unregistered tokens from D1
             if (
               errText.includes("UNREGISTERED") ||
               errText.includes("NotRegistered")
             ) {
-              console.log(`[FCM] Token ${token} is unregistered. Removing from DynamoDB...`);
-              if (!docClient) {
-                docClient = getDocClient(env);
+              console.log(`[FCM] Token ${token} is unregistered. Removing from D1 fcm_tokens...`);
+              try {
+                await env.DB.prepare("DELETE FROM fcm_tokens WHERE token = ?")
+                  .bind(token)
+                  .run();
+                console.log(`[FCM] Successfully deleted unregistered token: ${token}`);
+              } catch (delErr) {
+                console.error(`[FCM] Failed to delete token ${token} from D1:`, delErr);
               }
-              const deleteCmd = new DeleteItemCommand({
-                TableName: "FCMToken",
-                Key: {
-                  token: { S: token },
-                },
-              });
-              await docClient.send(deleteCmd);
-              console.log(`[FCM] Successfully deleted unregistered token: ${token}`);
             }
           } else {
             // Cancel response body stream to release worker socket and avoid memory leaks

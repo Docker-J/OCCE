@@ -10,8 +10,6 @@ import {
   AdminDeleteUserAttributesCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { getCognitoClient } from "../api/cognito.js";
-import { getDocClient } from "../api/dynamodb.js";
-import { ScanCommand } from "@aws-sdk/lib-dynamodb";
 
 /**
  * GET /api/admin/users
@@ -77,24 +75,24 @@ export const listUsersController = async (c) => {
       return all;
     };
 
-    // Fetch active notification subscriptions from DynamoDB FCMToken table
+    // Fetch active notification subscriptions from D1 fcm_tokens table
     const fetchActiveNotificationSubs = async () => {
       try {
-        const docClient = getDocClient(env);
-        const res = await docClient.send(
-          new ScanCommand({
-            TableName: "FCMToken",
-            ProjectionExpression: "#sub",
-            ExpressionAttributeNames: { "#sub": "sub" },
-          }),
-        );
+        const db = env.DB;
+        const nowEpoch = Math.floor(Date.now() / 1000);
+        const res = await db
+          .prepare(
+            "SELECT DISTINCT sub FROM fcm_tokens WHERE sub IS NOT NULL AND expires_at > ?"
+          )
+          .bind(nowEpoch)
+          .all();
         return new Set(
-          (res.Items || [])
-            .map((item) => (item.sub?.S ? item.sub.S : item.sub))
-            .filter(Boolean),
+          (res.results || [])
+            .map((item) => item.sub)
+            .filter(Boolean)
         );
       } catch (err) {
-        console.warn("Could not scan FCM tokens for user notification status:", err.message);
+        console.warn("Could not query D1 for user notification status:", err.message);
         return new Set();
       }
     };

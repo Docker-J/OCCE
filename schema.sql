@@ -17,3 +17,14 @@ CREATE TABLE IF NOT EXISTS Columns (
   images TEXT,
   timestamp TEXT
 );
+
+CREATE TABLE IF NOT EXISTS fcm_tokens (
+  token TEXT PRIMARY KEY,
+  sub TEXT,
+  roles TEXT DEFAULT '[]',
+  expires_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_fcm_tokens_sub ON fcm_tokens(sub);
+CREATE INDEX IF NOT EXISTS idx_fcm_tokens_expires ON fcm_tokens(expires_at);
+
