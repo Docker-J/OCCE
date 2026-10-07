@@ -18,7 +18,7 @@ async function getTokens(env, targetRole = "all") {
   const placeholders = roles.map(() => "?").join(", ");
   const sql = `
     SELECT DISTINCT fcm_tokens.token 
-    FROM fcm_tokens, json_each(fcm_tokens.roles) 
+    FROM fcm_tokens, json_each(COALESCE(NULLIF(fcm_tokens.roles, ''), '[]')) 
     WHERE json_each.value IN (${placeholders}) AND fcm_tokens.expires_at > ?
   `;
   const res = await db.prepare(sql).bind(...roles, nowEpoch).all();
