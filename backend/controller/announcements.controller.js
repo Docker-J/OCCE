@@ -110,9 +110,11 @@ export const deleteAnnouncementController = async (c) => {
   const getParams = [id];
 
   const result = await executeD1Query(db, getSql, getParams);
-  const images = result.result[0].results[0].images
-    ? result.result[0].results[0].images.split(",")
-    : [];
+  const row = result?.result?.[0]?.results?.[0];
+  if (!row) {
+    return c.json({ error: "NotFound", message: "공지사항을 찾을 수 없습니다." }, 404);
+  }
+  const images = row.images ? row.images.split(",") : [];
 
   if (images.length > 0) {
     await deleteImages(c.env, images);

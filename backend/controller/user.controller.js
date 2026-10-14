@@ -70,7 +70,6 @@ export const signInController = async (c) => {
   const phone = credentials.slice(0, colonIndex);
   const password = credentials.slice(colonIndex + 1);
 
-  console.log("PHONE: ", phone);
   console.log("Sign In requested");
 
   const env = c.env;
@@ -116,7 +115,6 @@ export const signInController = async (c) => {
     return c.json({
       accessToken: accessToken,
       idToken: idToken,
-      refreshToken: refreshToken,
       group: group,
       remember: !!remember,
     });
@@ -189,7 +187,6 @@ export const refreshSignInController = async (c) => {
     return c.json({
       accessToken: accessToken,
       idToken: idToken,
-      refreshToken: tokenToPersist,
       group: group,
       remember: isRemembered,
     });
