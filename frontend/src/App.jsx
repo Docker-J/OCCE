@@ -9,7 +9,6 @@ import ResponsiveAppBar from "./header/ResponsiveAppBar";
 import Footer from "./header/Footer";
 import { NotificationProvider } from "./context/NotificationContext";
 import UserManager from "./manager/UserManager";
-import RequestManager from "./manager/RequestManager";
 import { ErrorBoundary } from "react-error-boundary";
 import FullScreenLoading from "./common/FullScreenLoading";
 import GlobalLoader from "./common/GlobalLoader";
@@ -32,7 +31,6 @@ const Managers = () => {
   return (
     <>
       <UserManager />
-      <RequestManager />
     </>
   );
 };

@@ -7,6 +7,7 @@ import { HTTPException } from "hono/http-exception";
 import apiRouter from "./routes/index.js";
 import { handleScheduled } from "./jobs/scheduled.js";
 import { linkPreviewMiddleware } from "./middleware/linkPreview.js";
+import { processSmsQueueMessage } from "./api/sendSms.js";
 
 const app = new Hono();
 
@@ -111,19 +112,27 @@ export default {
   },
 
   /**
-   * Cloudflare Queue handler to process asynchronous background tasks (e.g. FCM push notifications).
+   * Cloudflare Queue handler to process asynchronous background tasks (FCM push notifications & broadcast SMS).
    */
   async queue(batch, env, ctx) {
-    console.log(`[Queue] Processing FCM batch of ${batch.messages.length} message(s)`);
+    console.log(`[Queue] Processing batch of ${batch.messages.length} message(s)`);
 
-    const sendPromises = batch.messages.flatMap((msg) => {
-      const { tokens, payloadTemplate, accessToken, projectId } = msg.body || {};
+    const tasks = batch.messages.map(async (msg) => {
+      const body = msg.body || {};
 
-      if (!Array.isArray(tokens) || tokens.length === 0) {
-        return [];
+      if (body.type === "sms" || body.phoneNumbers) {
+        console.log(`[Queue] Processing SMS chunk of ${body.phoneNumbers?.length || 0} recipient(s)`);
+        await processSmsQueueMessage(env, body);
+        return;
       }
 
-      return tokens.map(async (token) => {
+      // FCM push notification processing
+      const { tokens, payloadTemplate, accessToken, projectId } = body;
+      if (!Array.isArray(tokens) || tokens.length === 0) {
+        return;
+      }
+
+      const sendPromises = tokens.map(async (token) => {
         const payload = {
           message: {
             token: token,
@@ -171,9 +180,11 @@ export default {
           console.error(`[FCM] Network exception for token ${token}:`, err);
         }
       });
+
+      await Promise.all(sendPromises);
     });
 
-    await Promise.all(sendPromises);
+    await Promise.all(tasks);
   },
 
   /**

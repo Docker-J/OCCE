@@ -30,23 +30,17 @@ const UserManager = () => {
     let cancelled = false;
 
     const initAuth = async () => {
-      const timeoutId = setTimeout(() => {
-        if (!cancelled) signInfail();
-      }, 4000);
-
       const legacyToken =
         localStorage.getItem("refreshToken") ||
         sessionStorage.getItem("refreshToken");
 
       try {
         await performTokenRefresh(legacyToken);
-        clearTimeout(timeoutId);
         if (cancelled) return;
         localStorage.removeItem("refreshToken");
         sessionStorage.removeItem("refreshToken");
         localStorage.removeItem("remember");
       } catch {
-        clearTimeout(timeoutId);
         if (cancelled) return;
         signInfail();
       }

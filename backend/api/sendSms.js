@@ -145,11 +145,46 @@ export const sendBroadcastSms = async (
     };
   }
 
+  // If Cloudflare Queue is available, decouple into worker queue batches
+  if (env.FCM_QUEUE) {
+    const recipientsPerMessage = 20; // 20 SNS calls per queue invocation stays well within 50 subrequests limit
+    const messagesPerBatch = 100;
+    const recipientsPerBatch = recipientsPerMessage * messagesPerBatch;
+
+    for (let i = 0; i < recipients.length; i += recipientsPerBatch) {
+      const chunk = recipients.slice(i, i + recipientsPerBatch);
+      const batchMessages = [];
+
+      for (let j = 0; j < chunk.length; j += recipientsPerMessage) {
+        const phoneGroup = chunk.slice(j, j + recipientsPerMessage);
+        batchMessages.push({
+          body: {
+            type: "sms",
+            phoneNumbers: phoneGroup,
+            messageText,
+          },
+        });
+      }
+
+      await env.FCM_QUEUE.sendBatch(batchMessages);
+      console.log(`[SMS] Queued ${batchMessages.length} message(s) for ${chunk.length} recipients in FCM_QUEUE.`);
+    }
+
+    return {
+      totalRecipients,
+      sentCount: totalRecipients,
+      failedCount: 0,
+      skippedPushCount,
+      queued: true,
+    };
+  }
+
+  // Fallback: synchronous sending when queue binding is not present
+  console.warn("FCM_QUEUE binding not available; sending SMS synchronously.");
   const snsClient = getSnsClient(env);
   let sentCount = 0;
   let failedCount = 0;
 
-  // 3. Send SMS in small concurrent batches (concurrency: 5)
   const CONCURRENCY = 5;
   for (let i = 0; i < recipients.length; i += CONCURRENCY) {
     const batch = recipients.slice(i, i + CONCURRENCY);
@@ -184,4 +219,44 @@ export const sendBroadcastSms = async (
   };
 };
 
+/**
+ * Cloudflare Queue worker consumer handler for processing SMS message chunks.
+ *
+ * @param {object} env - Cloudflare Worker environment.
+ * @param {object} body - Decoupled queue message payload { phoneNumbers, messageText }.
+ */
+export const processSmsQueueMessage = async (env, body) => {
+  const { phoneNumbers, messageText } = body || {};
+  if (!Array.isArray(phoneNumbers) || phoneNumbers.length === 0 || !messageText) {
+    return;
+  }
+
+  const snsClient = getSnsClient(env);
+  const CONCURRENCY = 5;
+
+  for (let i = 0; i < phoneNumbers.length; i += CONCURRENCY) {
+    const batch = phoneNumbers.slice(i, i + CONCURRENCY);
+    await Promise.all(
+      batch.map(async (phoneNumber) => {
+        try {
+          const command = new PublishCommand({
+            PhoneNumber: phoneNumber,
+            Message: messageText,
+            MessageAttributes: {
+              "AWS.SNS.SMS.SMSType": {
+                DataType: "String",
+                StringValue: "Transactional",
+              },
+            },
+          });
+          await snsClient.send(command);
+        } catch (err) {
+          console.error(`[Queue SMS] Failed to send SMS to ${phoneNumber}:`, err.message);
+        }
+      })
+    );
+  }
+};
+
 export default sendBroadcastSms;
+

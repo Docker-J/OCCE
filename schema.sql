@@ -28,3 +28,7 @@ CREATE TABLE IF NOT EXISTS fcm_tokens (
 CREATE INDEX IF NOT EXISTS idx_fcm_tokens_sub ON fcm_tokens(sub);
 CREATE INDEX IF NOT EXISTS idx_fcm_tokens_expires ON fcm_tokens(expires_at);
 
+CREATE INDEX IF NOT EXISTS idx_announcements_pin_timestamp ON Announcements(pin, timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_announcements_timestamp ON Announcements(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_columns_timestamp ON Columns(timestamp DESC);
+
