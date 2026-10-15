@@ -142,7 +142,12 @@ export const getAttendanceStatsController = async (c) => {
 
           if (index > 0 && env.weeklyupdate_kv) {
             try {
-              await env.weeklyupdate_kv.put(kvKey, JSON.stringify(weekSummary));
+              // index 1-3 (recent month): 1 day TTL (with instant invalidation on attendance submit)
+              // index 4+ (older than month, finalized): 70 days TTL (auto-cleaned by Cloudflare after 10 weeks)
+              const ttlSeconds = index <= 3 ? 86400 : 86400 * 70;
+              await env.weeklyupdate_kv.put(kvKey, JSON.stringify(weekSummary), {
+                expirationTtl: ttlSeconds,
+              });
             } catch (kvPutErr) {
               console.warn(`Failed to put KV cache for ${kvKey}:`, kvPutErr);
             }

@@ -8,6 +8,10 @@ import FullScreenLoading from "../common/FullScreenLoading";
 
 import LaunchIcon from "@mui/icons-material/Launch";
 
+const VAPID_KEY =
+  import.meta.env.VITE_APP_FCM_VAPID_KEY ||
+  "BOLDzFLzljc4HkyVktgjo4-_QoXFxx__XZS6xBmGouvsisXHHe--2dSUUJtQ2cerl3v7ONBhrAPM661xRbpQcqo";
+
 export const NotificationContext = createContext();
 
 export const useNotification = () => useContext(NotificationContext);
@@ -98,7 +102,7 @@ export const NotificationProvider = ({ children }) => {
           const messaging = getMessaging(firebaseInstance);
 
           const token = await getToken(messaging, {
-            vapidKey: "BOLDzFLzljc4HkyVktgjo4-_QoXFxx__XZS6xBmGouvsisXHHe--2dSUUJtQ2cerl3v7ONBhrAPM661xRbpQcqo",
+            vapidKey: VAPID_KEY,
             serviceWorkerRegistration: readyRegistration || registration,
           });
 
@@ -192,7 +196,7 @@ export const NotificationProvider = ({ children }) => {
         const messaging = getMessaging(firebaseInstance);
         const registration = await navigator.serviceWorker.ready;
         const token = await getToken(messaging, {
-          vapidKey: "BOLDzFLzljc4HkyVktgjo4-_QoXFxx__XZS6xBmGouvsisXHHe--2dSUUJtQ2cerl3v7ONBhrAPM661xRbpQcqo",
+          vapidKey: VAPID_KEY,
           serviceWorkerRegistration: registration,
         });
 
@@ -241,7 +245,7 @@ export const NotificationProvider = ({ children }) => {
 
       try {
         const token = await getToken(messaging, {
-          vapidKey: "BOLDzFLzljc4HkyVktgjo4-_QoXFxx__XZS6xBmGouvsisXHHe--2dSUUJtQ2cerl3v7ONBhrAPM661xRbpQcqo",
+          vapidKey: VAPID_KEY,
         });
         if (token) {
           await unregisterToken(token);

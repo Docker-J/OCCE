@@ -219,7 +219,10 @@ const checkUserInSheet = async (env, name, phone) => {
       const drive = getDriveClient(env, [
         "https://www.googleapis.com/auth/drive.readonly",
       ]);
-      const fileId = "1Uk154FmBfVHIcv8xU5V_CuTBte4QXn6D";
+      const fileId =
+        env?.CHURCH_REGISTRY_FILE_ID ||
+        (typeof c !== "undefined" ? c?.env?.CHURCH_REGISTRY_FILE_ID : undefined) ||
+        "1Uk154FmBfVHIcv8xU5V_CuTBte4QXn6D";
 
       // 1. Download the file as a buffer (binary data)
       const response = await drive.files.get(

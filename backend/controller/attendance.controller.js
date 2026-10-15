@@ -504,6 +504,18 @@ export const postReportController = async (c) => {
     // Cache fileId for fast subsequent lookups
     setDriveFileIdCache(folderId, fileName, weeklySpreadsheetId);
 
+    // Invalidate admin attendance dashboard KV summary cache for this weekly sheet
+    if (env.weeklyupdate_kv && weeklySpreadsheetId) {
+      try {
+        await env.weeklyupdate_kv.delete(`admin_att_summary_${weeklySpreadsheetId}`);
+      } catch (kvDelErr) {
+        console.warn(
+          `[Attendance] Failed to invalidate KV cache for ${weeklySpreadsheetId}:`,
+          kvDelErr,
+        );
+      }
+    }
+
     console.log(
       `✅ Attendance reported successfully for ${gardenName} on ${date} (Weekly Sheet updated with native checkboxes and comments)`,
     );

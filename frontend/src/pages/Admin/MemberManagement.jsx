@@ -6,11 +6,11 @@
 
 import { useState } from "react";
 import { Link } from "react-router";
-import useModals from "../../util/useModal";
 
 // 커스텀 훅 & 유틸
 import { useMemberManagement } from "./hooks/useMemberManagement";
 import { TITLE_BG_STYLE } from "./utils/memberUtils";
+import ProtectedRoute from "../../common/ProtectedRoute";
 
 // 분리된 하위 컴포넌트들
 import MemberStats from "./components/MemberStats";
@@ -23,7 +23,6 @@ import {
   Typography,
   Box,
   Card,
-  CardContent,
   Button,
   Table,
   TableBody,
@@ -36,20 +35,12 @@ import {
   TableSortLabel,
 } from "@mui/material";
 
-import LoginIcon from "@mui/icons-material/Login";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import useAuthStore from "../../store/useAuthStore";
 
 const MemberManagement = () => {
-  const { openModal } = useModals();
-  const isLeader = useAuthStore((state) => state.isLeader);
-
   // 커스텀 훅에서 상태와 액션 추출
   const { state, actions } = useMemberManagement();
   const {
-    authInitialized,
-    authenticated,
-    admin,
     loading,
     refreshing,
     searchTerm,
@@ -87,12 +78,6 @@ const MemberManagement = () => {
     handleConfirmDelete,
     setAvailableGardens,
   } = actions;
-
-  // 로그인 모달 동적 로드
-  const handleLoginClick = async () => {
-    const { default: SignInModal } = await import("../../components/User/SignInModal");
-    openModal(SignInModal, {});
-  };
 
   // 커스텀 정원 추가
   const handleAddAvailableGarden = (newGarden) => {
@@ -147,103 +132,9 @@ const MemberManagement = () => {
               관리자 대시보드 홈
             </Button>
           </Box>
-          {/* 1. 인증 초기화 중 */}
-          {!authInitialized ? (
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                py: 10,
-              }}
-            >
-              <CircularProgress sx={{ color: "#FF6B00", mb: 2 }} />
-              <Typography variant="body1" sx={{ color: "#666" }}>
-                사용자 권한을 확인하는 중입니다...
-              </Typography>
-            </Box>
-          ) : !authenticated ? (
-            /* 2. 비로그인 사용자 */
-            <Card
-              sx={{
-                background: "rgba(255, 255, 255, 0.85)",
-                backdropFilter: "blur(12px)",
-                border: "1px solid rgba(255, 255, 255, 0.4)",
-                borderRadius: "20px",
-                boxShadow: "0 10px 40px rgba(0, 0, 0, 0.06)",
-                textAlign: "center",
-                p: 5,
-              }}
-            >
-              <CardContent>
-                <Typography variant="h5" sx={{ fontWeight: 700, mb: 2, color: "#dc2626" }}>
-                  로그인이 필요한 서비스입니다
-                </Typography>
-                <Typography variant="body1" sx={{ color: "#555", mb: 4, lineHeight: 1.6 }}>
-                  교인 관리 대시보드는 온교회 스태프(Staff) 권한을 가진 계정만 접근하실 수 있습니다.
-                </Typography>
-                <Button
-                  variant="contained"
-                  size="large"
-                  onClick={handleLoginClick}
-                  startIcon={<LoginIcon />}
-                  sx={{
-                    backgroundColor: "#FF6B00",
-                    "&:hover": { backgroundColor: "#e65100" },
-                    borderRadius: "24px",
-                    px: 4,
-                    py: 1.5,
-                    fontWeight: 700,
-                  }}
-                >
-                  로그인하기
-                </Button>
-              </CardContent>
-            </Card>
-          ) : !admin ? (
-            /* 3. 스태프 권한 없는 사용자 */
-            <Card
-              sx={{
-                background: "rgba(255, 255, 255, 0.85)",
-                backdropFilter: "blur(12px)",
-                border: "1px solid rgba(255, 255, 255, 0.4)",
-                borderRadius: "20px",
-                boxShadow: "0 10px 40px rgba(0, 0, 0, 0.06)",
-                textAlign: "center",
-                p: 5,
-              }}
-            >
-              <CardContent>
-                <Typography variant="h5" sx={{ fontWeight: 700, mb: 2, color: "#dc2626" }}>
-                  접근 권한이 없습니다
-                </Typography>
-                <Typography variant="body1" sx={{ color: "#555", mb: 4, lineHeight: 1.6 }}>
-                  본 페이지는 온교회 스태프(Staff) 권한 보유자 전용 대시보드입니다.
-                </Typography>
-                <Button
-                  component={Link}
-                  to={isLeader ? "/admin" : "/"}
-                  variant="contained"
-                  size="large"
-                  sx={{
-                    backgroundColor: "#FF6B00",
-                    "&:hover": { backgroundColor: "#e65100" },
-                    borderRadius: "24px",
-                    px: 4,
-                    py: 1.5,
-                    fontWeight: 700,
-                  }}
-                >
-                  {isLeader ? "대시보드로 이동" : "홈으로 이동"}
-                </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            /* 4. 인증된 스태프 화면 */
-            <>
-              {/* 1) 4대 통계 요약 카드 */}
-              <MemberStats metrics={metrics} />
+          <ProtectedRoute requiredRole="admin">
+            {/* 1) 4대 통계 요약 카드 */}
+            <MemberStats metrics={metrics} />
 
                 {/* 2) 메인 테이블 카드 */}
                 <Card
@@ -409,8 +300,7 @@ const MemberManagement = () => {
                     </>
                   )}
                 </Card>
-            </>
-          )}
+          </ProtectedRoute>
         </div>
       </div>
 
