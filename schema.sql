@@ -32,3 +32,25 @@ CREATE INDEX IF NOT EXISTS idx_announcements_pin_timestamp ON Announcements(pin,
 CREATE INDEX IF NOT EXISTS idx_announcements_timestamp ON Announcements(timestamp DESC);
 CREATE INDEX IF NOT EXISTS idx_columns_timestamp ON Columns(timestamp DESC);
 
+CREATE TABLE IF NOT EXISTS Albums (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  timestamp TEXT NOT NULL,
+  cover TEXT NOT NULL,
+  images TEXT NOT NULL,
+  year INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_albums_year_timestamp ON Albums(year, timestamp DESC, id DESC);
+CREATE INDEX IF NOT EXISTS idx_albums_timestamp ON Albums(timestamp DESC, id DESC);
+
+CREATE TABLE IF NOT EXISTS MeditationON (
+  id TEXT PRIMARY KEY,
+  timestamp TEXT NOT NULL,
+  cover TEXT NOT NULL,
+  images TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_meditationon_timestamp ON MeditationON(timestamp DESC, id DESC);
+
+

@@ -1,5 +1,4 @@
-import { DeleteCommand, PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
-import { getDocClient } from "../api/dynamodb.js";
+import { executeD1Query } from "../api/d1.js";
 import { deleteImages, uploadImage } from "./images.controller.js";
 import { purgeCache } from "../api/cloudflare.js";
 
@@ -11,58 +10,64 @@ export const getAlbumsController = async (c) => {
   const year = yearStr ? parseInt(yearStr, 10) : null;
   const lastVisibleID = c.req.query("lastVisible");
   const timeStamp = c.req.query("timeStamp");
+  const db = c.env.DB;
 
-  const docClient = getDocClient(c.env);
+  let sql = "";
+  const params = [];
 
-  const param = {
-    TableName: TABLENAME,
-    IndexName: year ? "yearTimeStamp" : "sortTimestamp",
-    Limit: PAGE_SIZE,
-    ProjectionExpression: "ID, Title, #t, Cover",
-    ScanIndexForward: false,
-    KeyConditionExpression: year ? "#year = :year" : "#sort = :sort",
-    ExpressionAttributeNames: {
-      "#t": "Timestamp",
-      ...(year ? { "#year": "year" } : { "#sort": "sort" }),
-    },
-    ExpressionAttributeValues: year ? { ":year": year } : { ":sort": 0 },
-  };
-
-  if (lastVisibleID != null) {
-    param.ExclusiveStartKey = {
-      ID: lastVisibleID,
-      Timestamp: timeStamp,
-      ...(year ? { year: year } : { sort: 0 }),
-    };
+  if (year) {
+    if (lastVisibleID && timeStamp) {
+      sql = `SELECT id, title, timestamp, cover FROM ${TABLENAME} WHERE year = ? AND (timestamp < ? OR (timestamp = ? AND id < ?)) ORDER BY timestamp DESC, id DESC LIMIT ?`;
+      params.push(year, timeStamp, timeStamp, lastVisibleID, PAGE_SIZE);
+    } else {
+      sql = `SELECT id, title, timestamp, cover FROM ${TABLENAME} WHERE year = ? ORDER BY timestamp DESC, id DESC LIMIT ?`;
+      params.push(year, PAGE_SIZE);
+    }
+  } else {
+    if (lastVisibleID && timeStamp) {
+      sql = `SELECT id, title, timestamp, cover FROM ${TABLENAME} WHERE timestamp < ? OR (timestamp = ? AND id < ?) ORDER BY timestamp DESC, id DESC LIMIT ?`;
+      params.push(timeStamp, timeStamp, lastVisibleID, PAGE_SIZE);
+    } else {
+      sql = `SELECT id, title, timestamp, cover FROM ${TABLENAME} ORDER BY timestamp DESC, id DESC LIMIT ?`;
+      params.push(PAGE_SIZE);
+    }
   }
 
-  const command = new QueryCommand(param);
+  const result = await executeD1Query(db, sql, params);
+  const rows = result.result[0]?.results || [];
 
-  const result = await docClient.send(command);
-  return c.json(result.Items || []);
+  const items = rows.map((row) => ({
+    ID: row.id,
+    Title: row.title,
+    Timestamp: row.timestamp,
+    Cover: row.cover,
+  }));
+
+  return c.json(items);
 };
 
 export const getAlbumController = async (c) => {
   const id = c.req.param("id");
-  const docClient = getDocClient(c.env);
+  const db = c.env.DB;
 
-  const queryParam = {
-    TableName: TABLENAME,
-    ProjectionExpression: "Title, Images",
-    KeyConditionExpression: "ID = :albumID",
-    ExpressionAttributeValues: {
-      ":albumID": id,
-    },
-  };
+  const sql = `SELECT title, images FROM ${TABLENAME} WHERE id = ?`;
+  const result = await executeD1Query(db, sql, [id]);
+  const row = result.result[0]?.results?.[0];
 
-  const command = new QueryCommand(queryParam);
-  const result = await docClient.send(command);
-
-  if (!result.Items || result.Items.length === 0) {
+  if (!row) {
     return c.json({ error: "NotFound", message: "앨범을 찾을 수 없습니다." }, 404);
   }
 
-  return c.json({ title: result.Items[0].Title, images: result.Items[0].Images });
+  let images = {};
+  if (row.images) {
+    try {
+      images = typeof row.images === "string" ? JSON.parse(row.images) : row.images;
+    } catch {
+      images = {};
+    }
+  }
+
+  return c.json({ title: row.title, images });
 };
 
 export const postAlbumController = async (c) => {
@@ -72,11 +77,11 @@ export const postAlbumController = async (c) => {
   const coverIndex = parseInt(formData.get("cover") || "0", 10);
   const images = formData.getAll("images"); // Array of File objects
 
-  if (images.length === 0) {
+  if (!images || images.length === 0) {
     return c.text("No images provided", 400);
   }
 
-  const docClient = getDocClient(c.env);
+  const db = c.env.DB;
 
   const results = await Promise.all(
     images.map((image) => uploadImage(c.env, image))
@@ -87,21 +92,21 @@ export const postAlbumController = async (c) => {
     ids[index] = result;
   });
 
-  const command = new PutCommand({
-    TableName: TABLENAME,
-    Item: {
-      ID: crypto.randomUUID(), // Native crypto API in Cloudflare Workers
-      Title: title,
-      Timestamp: date,
-      Cover: ids[coverIndex] || ids[0],
-      Images: ids,
-      year: new Date(date).getFullYear(),
-      sort: 0,
-    },
-  });
+  const id = crypto.randomUUID();
+  const year = new Date(date).getFullYear();
+  const cover = ids[coverIndex] || ids[0] || "";
 
-  const response = await docClient.send(command);
-  console.log(response);
+  const sql = `INSERT INTO ${TABLENAME} (id, title, timestamp, cover, images, year) VALUES (?, ?, ?, ?, ?, ?)`;
+  const params = [
+    id,
+    title,
+    date,
+    cover,
+    JSON.stringify(ids),
+    year,
+  ];
+
+  await executeD1Query(db, sql, params);
 
   await purgeCache(c.env, ["oncce.ca/api/albums"]);
   return c.body(null, 201);
@@ -109,41 +114,32 @@ export const postAlbumController = async (c) => {
 
 export const deleteAlbumController = async (c) => {
   const id = c.req.param("id");
-  const docClient = getDocClient(c.env);
+  const db = c.env.DB;
 
-  const getAlbumCommand = new QueryCommand({
-    TableName: TABLENAME,
-    ProjectionExpression: "Images, #t",
-    KeyConditionExpression: "ID = :albumID",
-    ExpressionAttributeNames: {
-      "#t": "Timestamp",
-    },
-    ExpressionAttributeValues: {
-      ":albumID": id,
-    },
-  });
+  const getSql = `SELECT images FROM ${TABLENAME} WHERE id = ?`;
+  const result = await executeD1Query(db, getSql, [id]);
+  const row = result.result[0]?.results?.[0];
 
-  const result = await docClient.send(getAlbumCommand);
-
-  if (!result.Items || result.Items.length === 0) {
+  if (!row) {
     return c.json({ error: "NotFound", message: "앨범을 찾을 수 없습니다." }, 404);
   }
 
-  const images = Object.values(result.Items[0].Images);
+  let imagesObj = {};
+  if (row.images) {
+    try {
+      imagesObj = typeof row.images === "string" ? JSON.parse(row.images) : row.images;
+    } catch {
+      imagesObj = {};
+    }
+  }
 
+  const images = Object.values(imagesObj);
   if (images.length > 0) {
     await deleteImages(c.env, images);
   }
 
-  const deleteAlbumCommand = new DeleteCommand({
-    TableName: TABLENAME,
-    Key: {
-      ID: id,
-      Timestamp: result.Items[0].Timestamp,
-    },
-  });
-
-  await docClient.send(deleteAlbumCommand);
+  const deleteSql = `DELETE FROM ${TABLENAME} WHERE id = ?`;
+  await executeD1Query(db, deleteSql, [id]);
 
   await purgeCache(c.env, ["oncce.ca/api/albums"]);
   return c.json({ success: true, id }, 200);

@@ -1,5 +1,4 @@
-import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
-import { getDocClient } from "../api/dynamodb.js";
+import { executeD1Query } from "../api/d1.js";
 import { uploadImage } from "./images.controller.js";
 import { purgeCache } from "../api/cloudflare.js";
 
@@ -9,62 +8,57 @@ const PAGE_SIZE = 12;
 export const getMeditationONsController = async (c) => {
   const lastVisibleID = c.req.query("lastVisible");
   const timeStamp = c.req.query("timeStamp");
-  const docClient = getDocClient(c.env);
+  const db = c.env.DB;
 
-  const scanParam = {
-    TableName: TABLENAME,
-    IndexName: "SortTimestamp",
-    Limit: PAGE_SIZE,
-    ProjectionExpression: "ID, #t, Cover",
-    ScanIndexForward: false,
-    KeyConditionExpression: "#sort = :sort",
-    ExpressionAttributeNames: {
-      "#t": "Timestamp",
-      "#sort": "sort",
-    },
-    ExpressionAttributeValues: {
-      ":sort": 0,
-    },
-  };
+  let sql = "";
+  const params = [];
 
-  if (lastVisibleID != null) {
-    scanParam.ExclusiveStartKey = {
-      ID: lastVisibleID,
-      Timestamp: timeStamp,
-      sort: 0,
-    };
+  if (lastVisibleID && timeStamp) {
+    sql = `SELECT id, timestamp, cover FROM ${TABLENAME} WHERE timestamp < ? OR (timestamp = ? AND id < ?) ORDER BY timestamp DESC, id DESC LIMIT ?`;
+    params.push(timeStamp, timeStamp, lastVisibleID, PAGE_SIZE);
+  } else {
+    sql = `SELECT id, timestamp, cover FROM ${TABLENAME} ORDER BY timestamp DESC, id DESC LIMIT ?`;
+    params.push(PAGE_SIZE);
   }
 
-  const command = new QueryCommand(scanParam);
+  const result = await executeD1Query(db, sql, params);
+  const rows = result.result[0]?.results || [];
 
-  const result = await docClient.send(command);
-  return c.json(result.Items || []);
+  const items = rows.map((row) => ({
+    ID: row.id,
+    Timestamp: row.timestamp,
+    Cover: row.cover,
+  }));
+
+  return c.json(items);
 };
 
 export const getMeditationONController = async (c) => {
   const id = c.req.param("id");
-  const docClient = getDocClient(c.env);
+  const db = c.env.DB;
 
-  const scanParam = {
-    TableName: TABLENAME,
-    ProjectionExpression: "Images, #ts ",
-    KeyConditionExpression: "ID = :postID",
-    ExpressionAttributeValues: {
-      ":postID": id,
-    },
-    ExpressionAttributeNames: {
-      "#ts": "Timestamp",
-    },
-  };
+  const sql = `SELECT id, timestamp, images FROM ${TABLENAME} WHERE id = ?`;
+  const result = await executeD1Query(db, sql, [id]);
+  const row = result.result[0]?.results?.[0];
 
-  const command = new QueryCommand(scanParam);
-  const result = await docClient.send(command);
-
-  if (!result.Items || result.Items.length === 0) {
+  if (!row) {
     return c.json({ error: "NotFound", message: "묵상ON 게시글을 찾을 수 없습니다." }, 404);
   }
 
-  return c.json(result.Items[0]);
+  let images = {};
+  if (row.images) {
+    try {
+      images = typeof row.images === "string" ? JSON.parse(row.images) : row.images;
+    } catch {
+      images = {};
+    }
+  }
+
+  return c.json({
+    ID: row.id,
+    Timestamp: row.timestamp,
+    Images: images,
+  });
 };
 
 export const postMeditationONController = async (c) => {
@@ -81,7 +75,7 @@ export const postMeditationONController = async (c) => {
       return c.json({ error: "Date parameter is required" }, 400);
     }
 
-    const docClient = getDocClient(c.env);
+    const db = c.env.DB;
 
     const results = await Promise.all(
       images.map((image) => uploadImage(c.env, image))
@@ -92,19 +86,18 @@ export const postMeditationONController = async (c) => {
       ids[index] = result;
     });
 
-    const command = new PutCommand({
-      TableName: TABLENAME,
-      Item: {
-        ID: crypto.randomUUID(), // Native crypto API in Cloudflare Workers
-        Timestamp: date,
-        Cover: ids[0] || "",
-        Images: ids,
-        sort: 0,
-      },
-    });
+    const id = crypto.randomUUID();
+    const cover = ids[0] || "";
 
-    const response = await docClient.send(command);
-    console.log("MeditationON created:", response);
+    const sql = `INSERT INTO ${TABLENAME} (id, timestamp, cover, images) VALUES (?, ?, ?, ?)`;
+    const params = [
+      id,
+      date,
+      cover,
+      JSON.stringify(ids),
+    ];
+
+    await executeD1Query(db, sql, params);
 
     await purgeCache(c.env, ["oncce.ca/api/meditation-on"]);
     return c.json({ success: true, message: "MeditationON created successfully" }, 201);
