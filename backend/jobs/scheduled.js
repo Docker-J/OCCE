@@ -70,7 +70,7 @@ async function handleSundayAttendancePrecreation(env) {
 }
 
 /**
- * 1. 매일 06:01 UTC: 주간 일정 리프레시 및 만료 FCM 토큰 정리, 주일 출석부 사전 생성
+ * 1. 매일 06:01 UTC: 주간 일정 리프레시 및 만료 FCM 토큰 정리
  */
 async function handleDailyMaintenance(env) {
   console.log("🕒 Triggering daily schedule refresh...");
@@ -93,12 +93,6 @@ async function handleDailyMaintenance(env) {
     }
   } catch (error) {
     console.warn("Failed to clean up expired FCM tokens:", error.message);
-  }
-
-  try {
-    await handleSundayAttendancePrecreation(env);
-  } catch (error) {
-    console.error("Failed to execute Sunday attendance precreation:", error);
   }
 }
 
@@ -170,6 +164,10 @@ export async function handleScheduled(event, env, ctx) {
   switch (event.cron) {
     case "1 6 * * *":
       await handleDailyMaintenance(env);
+      break;
+
+    case "1 6 * * SUN":
+      await handleSundayAttendancePrecreation(env);
       break;
 
     case "30 12 * * *":

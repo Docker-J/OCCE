@@ -308,6 +308,18 @@ export const postReportController = async (c) => {
       );
     }
 
+    // Verify that the reported date is actually a Sunday (0)
+    const reportDate = new Date(`${date}T12:00:00Z`);
+    if (isNaN(reportDate.getTime()) || reportDate.getUTCDay() !== 0) {
+      return c.json(
+        {
+          error: "InvalidSundayDate",
+          message: "주일 출석 보고서는 주일(일요일) 날짜로만 보고 및 생성이 가능합니다.",
+        },
+        400,
+      );
+    }
+
     const isStaff = user["cognito:groups"]?.includes("Staff") || false;
 
     if (!isStaff) {
