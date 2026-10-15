@@ -2,9 +2,75 @@ import { subHours, format } from "date-fns";
 import schedule from "../data/schedule.json";
 import { getSchedules } from "../controller/schedules.controller.js";
 import sendNotification from "../api/sendNotification.js";
+import {
+  getDriveClient,
+  getSheetsClient,
+  findDriveFileId,
+  setDriveFileIdCache,
+} from "../api/googleClients.js";
+import { initializeWeeklySpreadsheet } from "../controller/attendance.helpers.js";
 
 /**
- * 1. 매일 06:01 UTC: 주간 일정 리프레시 및 만료 FCM 토큰 정리
+ * 주일 06:01 UTC (현지 00:01): 주일 정원출석부 스프레드시트 사전 생성
+ */
+async function handleSundayAttendancePrecreation(env) {
+  const edmontonDate = subHours(new Date(), 6);
+  // getUTCDay(): 0 is Sunday in Edmonton (UTC-6)
+  if (edmontonDate.getUTCDay() !== 0) {
+    return;
+  }
+
+  const date = format(edmontonDate, "yyyy-MM-dd");
+  const folderId = env.ATTENDANCE_DRIVE_FOLDER_ID;
+  const masterSheetId = env.ATTENDANCE_SHEET_ID;
+
+  if (!folderId || !masterSheetId) {
+    console.warn("⚠️ ATTENDANCE_DRIVE_FOLDER_ID or ATTENDANCE_SHEET_ID not configured for Sunday attendance pre-creation.");
+    return;
+  }
+
+  const fileName = `OCCE_정원출석부_${date}`;
+  console.log(`🕒 Checking Sunday attendance sheet pre-creation for ${fileName}...`);
+
+  try {
+    const drive = getDriveClient(env);
+    const existingFileId = await findDriveFileId(drive, folderId, fileName);
+
+    if (existingFileId) {
+      console.log(`ℹ️ Sunday attendance sheet '${fileName}' already exists: ${existingFileId}`);
+      return;
+    }
+
+    console.log(`📋 Copying master spreadsheet (${masterSheetId}) to folder ${folderId} as '${fileName}'...`);
+    const copyResponse = await drive.files.copy({
+      fileId: masterSheetId,
+      requestBody: {
+        name: fileName,
+        parents: [folderId],
+      },
+      supportsAllDrives: true,
+    });
+
+    const newFileId = copyResponse.data?.id;
+    if (newFileId) {
+      setDriveFileIdCache(folderId, fileName, newFileId);
+      console.log(`✅ Successfully pre-created Sunday attendance spreadsheet: ${fileName} (${newFileId})`);
+
+      try {
+        const sheets = getSheetsClient(env);
+        await initializeWeeklySpreadsheet(sheets, newFileId);
+        console.log(`✅ Successfully initialized weekly attendance structure and 종합통계 for ${fileName}`);
+      } catch (initErr) {
+        console.error(`⚠️ Failed to initialize structure for pre-created attendance sheet '${fileName}':`, initErr);
+      }
+    }
+  } catch (error) {
+    console.error(`❌ Failed to pre-create Sunday attendance sheet '${fileName}':`, error);
+  }
+}
+
+/**
+ * 1. 매일 06:01 UTC: 주간 일정 리프레시 및 만료 FCM 토큰 정리, 주일 출석부 사전 생성
  */
 async function handleDailyMaintenance(env) {
   console.log("🕒 Triggering daily schedule refresh...");
@@ -27,6 +93,12 @@ async function handleDailyMaintenance(env) {
     }
   } catch (error) {
     console.warn("Failed to clean up expired FCM tokens:", error.message);
+  }
+
+  try {
+    await handleSundayAttendancePrecreation(env);
+  } catch (error) {
+    console.error("Failed to execute Sunday attendance precreation:", error);
   }
 }
 

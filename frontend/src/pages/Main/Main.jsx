@@ -13,7 +13,12 @@ import CustomCarousel from "../../common/CustomCarousel";
 import AdminComponent from "../../common/AdminComponent";
 import BroadcastModal from "../../components/Main/BroadcastModal";
 
-const MainImage = ({ src, backgroundImage, alt = "OCCE Church" }) => {
+const MainImage = ({
+  src,
+  backgroundImage,
+  alt = "OCCE Church",
+  priority = false,
+}) => {
   const imgSrc =
     src ||
     (backgroundImage
@@ -33,7 +38,8 @@ const MainImage = ({ src, backgroundImage, alt = "OCCE Church" }) => {
           className="main-hero-image"
           src={imgSrc}
           alt={alt}
-          loading="lazy"
+          loading={priority ? "eager" : "lazy"}
+          {...(priority ? { fetchPriority: "high" } : {})}
         />
       </div>
 
@@ -71,7 +77,7 @@ const Main = () => {
           </Button>
         </div>
 
-        <MainImage backgroundImage={"url(/img/Main/img1.webp)"} />
+        <MainImage backgroundImage={"url(/img/Main/img1.webp)"} priority={true} />
         <MainImage backgroundImage={"url(/img/Main/img2.webp)"} />
         <MainImage backgroundImage={"url(/img/Main/img3.webp)"} />
       </CustomCarousel>

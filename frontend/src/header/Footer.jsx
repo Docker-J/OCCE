@@ -1,9 +1,37 @@
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import { Typography } from "@mui/material";
-import GoogleMap from "./GoogleMap";
 import SocialIconsBar from "./SocialIconsBar";
 import { Link } from "react-router";
 
+const GoogleMap = React.lazy(() => import("./GoogleMap"));
+
 const Footer = () => {
+  const [showMap, setShowMap] = useState(false);
+  const mapContainerRef = useRef(null);
+
+  useEffect(() => {
+    if (showMap) return;
+    if (typeof window === "undefined" || !("IntersectionObserver" in window)) {
+      setShowMap(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setShowMap(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    if (mapContainerRef.current) {
+      observer.observe(mapContainerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [showMap]);
+
   return (
     <div
       style={{
@@ -30,7 +58,15 @@ const Footer = () => {
         <SocialIconsBar />
       </div>
 
-      <GoogleMap />
+      <div ref={mapContainerRef} style={{ width: "100%", minHeight: 300 }}>
+        {showMap ? (
+          <Suspense fallback={<div style={{ height: 300 }} />}>
+            <GoogleMap />
+          </Suspense>
+        ) : (
+          <div style={{ height: 300 }} />
+        )}
+      </div>
     </div>
   );
 };

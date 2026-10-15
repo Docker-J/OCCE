@@ -36,8 +36,6 @@ const MeditationON = () => {
   const [end, setEnd] = useState(false);
 
   const onLoad = async () => {
-    console.log("test getPosts");
-
     const result = await getPosts(posts);
 
     if (result.data.length > 0) {
@@ -93,14 +91,12 @@ const MeditationON = () => {
   const scrollRef = useRef();
 
   useEffect(() => {
+    let timer;
     if (scrollRef.current && !end && posts.length >= 12) {
-      setTimeout(() => {
+      timer = setTimeout(() => {
         try {
           const contentHeight = scrollRef.current.clientHeight;
           const screenHeight = window.innerHeight - 500;
-
-          console.log("test content", contentHeight);
-          console.log("test screen", screenHeight);
 
           if (contentHeight > 100 && contentHeight < screenHeight) {
             onLoad();
@@ -109,7 +105,9 @@ const MeditationON = () => {
       }, 500);
     }
 
-    // re-run effect when items change
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   }, [posts]);
 
   return (

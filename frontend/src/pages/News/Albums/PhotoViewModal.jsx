@@ -146,7 +146,7 @@ const PhotoViewModal = ({ isOpen, onClose, photos, initialIndex = 0 }) => {
               >
                 <img
                   loading="lazy"
-                  src={`https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${photo}/MeditationON`}
+                  src={`https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${photo}/thumbnail`}
                   alt={`thumbnail ${index + 1}`}
                 />
               </button>

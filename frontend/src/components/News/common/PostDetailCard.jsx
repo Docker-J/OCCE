@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Box, Chip, Typography } from "@mui/material";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import PushPinIcon from "@mui/icons-material/PushPin";
@@ -20,6 +21,15 @@ const PostDetailCard = ({
   const formattedDate = timestamp
     ? format(new Date(timestamp), "yyyy년 M월 d일")
     : "";
+
+  const sanitizedBody = useMemo(
+    () =>
+      DOMPurify.sanitize(body || "", {
+        ADD_TAGS: ["iframe"],
+        ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling"],
+      }),
+    [body]
+  );
 
   return (
     <Box
@@ -104,10 +114,7 @@ const PostDetailCard = ({
       <div
         className="ck-content"
         dangerouslySetInnerHTML={{
-          __html: DOMPurify.sanitize(body || "", {
-            ADD_TAGS: ["iframe"],
-            ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling"],
-          }),
+          __html: sanitizedBody,
         }}
         style={{
           wordBreak: "break-word",

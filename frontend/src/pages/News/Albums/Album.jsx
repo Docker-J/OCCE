@@ -1,6 +1,6 @@
 import { useLoaderData, useNavigate, useParams } from "react-router";
 
-import { Fab, ImageList, ImageListItem, Typography } from "@mui/material";
+import { Fab, ImageList, ImageListItem, Typography, useMediaQuery, useTheme } from "@mui/material";
 
 import useModals from "../../../util/useModal";
 import PhotoViewModal from "./PhotoViewModal";
@@ -20,6 +20,11 @@ const Album = () => {
   const navigate = useNavigate();
   let { albumID } = useParams();
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
+  const cols = isMobile ? 1 : isTablet ? 2 : 3;
+
   const { openModal } = useModals();
   const { openSnackbar } = useSnackbar();
   const { title, images } = useLoaderData();
@@ -27,7 +32,6 @@ const Album = () => {
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState(false);
 
   const handleDeleteAlbum = async () => {
-    console.log("try delete");
     await deleteAlbum(albumID);
     openSnackbar("success", "The album deleted successfully");
     setDeleteConfirmDialog(false);
@@ -52,7 +56,7 @@ const Album = () => {
       </div>
       <div className="container-wrapper">
         <div className="container">
-          <ImageList variant="masonry" cols={3} gap={8}>
+          <ImageList variant="masonry" cols={cols} gap={8}>
             {Object.values(images).map((image, index) => (
               <ImageListItem
                 key={image}

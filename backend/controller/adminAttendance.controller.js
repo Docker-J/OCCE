@@ -52,8 +52,21 @@ export const getAttendanceStatsController = async (c) => {
     const targetFiles = weeklyFiles.slice(0, 8);
 
     const parsedWeeks = await Promise.all(
-      targetFiles.map(async (file) => {
+      targetFiles.map(async (file, index) => {
         const date = file.name.replace("OCCE_정원출석부_", "").trim();
+        const kvKey = `admin_att_summary_${file.id}`;
+
+        if (index > 0 && env.weeklyupdate_kv) {
+          try {
+            const cached = await env.weeklyupdate_kv.get(kvKey, "json");
+            if (cached) {
+              return cached;
+            }
+          } catch (kvErr) {
+            console.warn(`Failed to read KV cache for ${kvKey}:`, kvErr);
+          }
+        }
+
         try {
           const summaryResponse = await sheets.spreadsheets.values.get({
             spreadsheetId: file.id,
@@ -112,7 +125,7 @@ export const getAttendanceStatsController = async (c) => {
               ? Math.round((totalAttendees / totalMembers) * 1000) / 10
               : 0;
 
-          return {
+          const weekSummary = {
             date,
             summary: {
               totalMembers,
@@ -126,6 +139,16 @@ export const getAttendanceStatsController = async (c) => {
             },
             gardenStats,
           };
+
+          if (index > 0 && env.weeklyupdate_kv) {
+            try {
+              await env.weeklyupdate_kv.put(kvKey, JSON.stringify(weekSummary));
+            } catch (kvPutErr) {
+              console.warn(`Failed to put KV cache for ${kvKey}:`, kvPutErr);
+            }
+          }
+
+          return weekSummary;
         } catch (err) {
           console.warn(`Failed to parse file ${file.name}:`, err);
           return null;

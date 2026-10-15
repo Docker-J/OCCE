@@ -130,10 +130,9 @@ export const uploadWeeklyUpdateController = async (c) => {
   const formData = await c.req.formData();
   const files = formData.getAll("pdfs"); // files is an array of File objects
 
-  const promises = files.map(async (file, index) => {
-    const arrayBuffer = await file.arrayBuffer();
+  const promises = files.map((file, index) => {
     const key = `${date}${index === 1 ? "_member" : ""}`;
-    return bucket.put(key, arrayBuffer, {
+    return bucket.put(key, file.stream(), {
       httpMetadata: { contentType: "application/pdf" },
     });
   });

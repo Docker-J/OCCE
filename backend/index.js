@@ -23,9 +23,9 @@ app.use("*", secureHeaders());
 
 // Allowed origins regular expression:
 // - Local development: http://localhost:port or http://127.0.0.1:port
-// - Production & staging: https://oncce.ca, https://*.oncce.ca, https://*.workers.dev
+// - Production & staging: https://oncce.ca, https://*.oncce.ca, project-specific workers.dev (oncce, oncce-dev)
 const ALLOWED_ORIGIN_REGEX =
-  /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$|^https:\/\/([a-z0-9-]+\.)*oncce\.ca$|^https:\/\/([a-z0-9-]+\.)*workers\.dev$/i;
+  /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$|^https:\/\/([a-z0-9-]+\.)*oncce\.ca$|^https:\/\/oncce(-dev)?(\.[a-z0-9-]+)?\.workers\.dev$/i;
 
 const isAllowedOrigin = (origin) => {
   if (!origin) return false;

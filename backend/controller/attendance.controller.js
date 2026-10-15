@@ -7,6 +7,7 @@ import {
 
 import {
   getUserAssignedGardens,
+  initializeWeeklySpreadsheet,
 } from "./attendance.helpers.js";
 
 export const getGardensController = async (c) => {
@@ -360,6 +361,13 @@ export const postReportController = async (c) => {
         (s) => s.properties.title === "종합통계",
       );
       summaryTabId = summaryTab ? summaryTab.properties.sheetId : null;
+      if (!summaryTabId) {
+        console.log(`⚠️ '종합통계' tab missing from ${fileName}, initializing...`);
+        summaryTabId = await initializeWeeklySpreadsheet(
+          sheets,
+          weeklySpreadsheetId,
+        );
+      }
     } else {
       // 3. File does not exist: Copy master spreadsheet to folderId
       console.log(
@@ -379,13 +387,16 @@ export const postReportController = async (c) => {
       );
 
       // 4. Initialize the copied weekly spreadsheet: Add '종합통계' tab and configure all garden tabs
+      summaryTabId = await initializeWeeklySpreadsheet(
+        sheets,
+        weeklySpreadsheetId,
+      );
+
       const weeklySpreadsheetInfo = await sheets.spreadsheets.get({
         spreadsheetId: weeklySpreadsheetId,
         fields: "sheets(properties(sheetId,title))",
       });
       const weeklySheets = weeklySpreadsheetInfo.data.sheets || [];
-      const weeklySheetNames = weeklySheets.map((s) => s.properties.title);
-
       const targetTab = weeklySheets.find(
         (s) => s.properties.title === gardenName,
       );
@@ -399,169 +410,6 @@ export const postReportController = async (c) => {
         );
       }
       targetTabId = targetTab.properties.sheetId;
-
-      // Create '종합통계' sheet tab at index 0
-      console.log("Creating '종합통계' tab...");
-      const batchRequests = [
-        {
-          addSheet: {
-            properties: {
-              title: "종합통계",
-              index: 0,
-            },
-          },
-        },
-      ];
-
-      const batchResponseUpdate = await sheets.spreadsheets.batchUpdate({
-        spreadsheetId: weeklySpreadsheetId,
-        requestBody: {
-          requests: batchRequests,
-        },
-      });
-
-      summaryTabId =
-        batchResponseUpdate.data.replies[0].addSheet.properties.sheetId;
-
-      // Filter to get only garden tabs
-      const gardenTabs = weeklySheetNames.filter(
-        (name) =>
-          name !== "정원지기" &&
-          name !== "종합통계" &&
-          name !== "정원모임보고" &&
-          !/^\d{4}-\d{2}-\d{2}$/.test(name),
-      );
-
-      // Fetch members count of all garden tabs to populate '종합통계' and initialize checkboxes
-      const ranges = gardenTabs.map((name) => `${name}!A:A`);
-      const batchResponse = await sheets.spreadsheets.values.batchGet({
-        spreadsheetId: weeklySpreadsheetId,
-        ranges,
-      });
-
-      const summaryRows = [
-        ["보고여부", "정원", "총원", "출석", "결석", "출석율"],
-      ];
-
-      const validationRequests = [];
-      const updateValueRequests = [
-        {
-          range: "종합통계!A1",
-          values: summaryRows,
-        },
-      ];
-
-      gardenTabs.forEach((gardenTabName, idx) => {
-        const vr = batchResponse.data.valueRanges[idx];
-        const rows = vr.values || [];
-        const members = rows
-          .map((r) => r[0]?.toString().trim())
-          .filter((name) => name && name !== "이름" && name !== "성명");
-
-        const memberCount = members.length;
-        const rowIdx = idx + 2; // 1-based index (header is 1)
-
-        summaryRows.push([
-          false,
-          gardenTabName,
-          `=COUNTA('${gardenTabName}'!A1:A200)`,
-          `=COUNTIF('${gardenTabName}'!B1:B200, TRUE)`,
-          `=COUNTIF('${gardenTabName}'!B1:B200, FALSE)`,
-          `=IFERROR(D${rowIdx}/C${rowIdx}, 0)`,
-        ]);
-
-        const currentTab = weeklySheets.find(
-          (s) => s.properties.title === gardenTabName,
-        );
-        const currentTabId = currentTab ? currentTab.properties.sheetId : null;
-
-        if (currentTabId && memberCount > 0) {
-          const falseValues = Array(memberCount).fill([false]);
-          updateValueRequests.push({
-            range: `${gardenTabName}!B1:B${memberCount}`,
-            values: falseValues,
-          });
-
-          validationRequests.push({
-            setDataValidation: {
-              range: {
-                sheetId: currentTabId,
-                startRowIndex: 0,
-                endRowIndex: memberCount,
-                startColumnIndex: 1,
-                endColumnIndex: 2,
-              },
-              rule: {
-                condition: {
-                  type: "BOOLEAN",
-                },
-                showCustomUi: true,
-              },
-            },
-          });
-        }
-      });
-
-      // Write '종합통계' values and initialize checkboxes in a single batch values update
-      await sheets.spreadsheets.values.batchUpdate({
-        spreadsheetId: weeklySpreadsheetId,
-        requestBody: {
-          valueInputOption: "USER_ENTERED",
-          data: updateValueRequests,
-        },
-      });
-
-      // Add '종합통계' percentage formatting and column-wide checkbox data validation
-      if (summaryTabId && gardenTabs.length > 0) {
-        validationRequests.push({
-          repeatCell: {
-            range: {
-              sheetId: summaryTabId,
-              startRowIndex: 1,
-              endRowIndex: gardenTabs.length + 1,
-              startColumnIndex: 5,
-              endColumnIndex: 6,
-            },
-            cell: {
-              userEnteredFormat: {
-                numberFormat: {
-                  type: "PERCENT",
-                  pattern: "0%",
-                },
-              },
-            },
-            fields: "userEnteredFormat.numberFormat",
-          },
-        });
-
-        validationRequests.push({
-          setDataValidation: {
-            range: {
-              sheetId: summaryTabId,
-              startRowIndex: 1,
-              endRowIndex: gardenTabs.length + 1,
-              startColumnIndex: 0,
-              endColumnIndex: 1,
-            },
-            rule: {
-              condition: {
-                type: "BOOLEAN",
-              },
-              showCustomUi: true,
-            },
-          },
-        });
-      }
-
-      // Apply batch validations and formatting
-      if (validationRequests.length > 0) {
-        await sheets.spreadsheets.batchUpdate({
-          spreadsheetId: weeklySpreadsheetId,
-          requestBody: {
-            requests: validationRequests,
-          },
-        });
-      }
     }
 
     // 5. Update reported garden attendance in its tab & update '보고여부' in '종합통계' sheet in a single batch
