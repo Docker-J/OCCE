@@ -42,15 +42,29 @@ export const postColumn = async (id, title, body, selectedDate) => {
       images: imageIDs,
       date: selectedDate,
     });
-  } catch {
-    throw new Error();
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      (typeof error.response?.data?.error === "string"
+        ? error.response.data.error
+        : null) ||
+      error.message ||
+      "오류가 발생했습니다.";
+    throw new Error(message);
   }
 };
 
 export const deleteColumn = async (id) => {
   try {
     await axios.delete(`/api/columns/column/${id}`);
-  } catch {
-    throw new Error();
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      (typeof error.response?.data?.error === "string"
+        ? error.response.data.error
+        : null) ||
+      error.message ||
+      "오류가 발생했습니다.";
+    throw new Error(message);
   }
 };

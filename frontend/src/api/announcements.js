@@ -45,16 +45,30 @@ export const postAnnouncement = async (id, title, body) => {
         video: hasVideo ? 1 : 0,
       }
     );
-  } catch {
-    throw new Error();
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      (typeof error.response?.data?.error === "string"
+        ? error.response.data.error
+        : null) ||
+      error.message ||
+      "오류가 발생했습니다.";
+    throw new Error(message);
   }
 };
 
 export const deleteAnnouncement = async (id) => {
   try {
     await axios.delete(`/api/announcements/announcement/${id}`);
-  } catch {
-    throw new Error();
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      (typeof error.response?.data?.error === "string"
+        ? error.response.data.error
+        : null) ||
+      error.message ||
+      "오류가 발생했습니다.";
+    throw new Error(message);
   }
 };
 
@@ -63,7 +77,15 @@ export const pinAnnouncement = async (id, pin) => {
     await axios.put(`/api/announcements/announcement/${id}/pin`, {
       pin: !pin ? 1 : 0,
     });
-  } catch {
-    throw new Error();
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      (typeof error.response?.data?.error === "string"
+        ? error.response.data.error
+        : null) ||
+      error.message ||
+      "오류가 발생했습니다.";
+    throw new Error(message);
   }
 };
+

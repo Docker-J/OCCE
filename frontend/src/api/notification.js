@@ -6,8 +6,15 @@ export const registerToken = async (token, isRemembered = false) => {
       token: token,
       isRemembered: !!isRemembered,
     });
-  } catch {
-    throw new Error();
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      (typeof error.response?.data?.error === "string"
+        ? error.response.data.error
+        : null) ||
+      error.message ||
+      "오류가 발생했습니다.";
+    throw new Error(message);
   }
 };
 
@@ -16,8 +23,15 @@ export const unlinkTokenRole = async (token) => {
     await axios.post("/api/notification/unlink", {
       token: token,
     });
-  } catch {
-    throw new Error();
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      (typeof error.response?.data?.error === "string"
+        ? error.response.data.error
+        : null) ||
+      error.message ||
+      "오류가 발생했습니다.";
+    throw new Error(message);
   }
 };
 
@@ -28,8 +42,15 @@ export const unregisterToken = async (token) => {
         token: token,
       },
     });
-  } catch {
-    throw new Error();
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      (typeof error.response?.data?.error === "string"
+        ? error.response.data.error
+        : null) ||
+      error.message ||
+      "오류가 발생했습니다.";
+    throw new Error(message);
   }
 };
 
@@ -51,8 +72,15 @@ export const broadcastNotification = async (
       smsTarget: options.smsTarget || "no_push_only",
     });
     return res.data;
-  } catch (err) {
-    throw err;
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      (typeof error.response?.data?.error === "string"
+        ? error.response.data.error
+        : null) ||
+      error.message ||
+      "오류가 발생했습니다.";
+    throw new Error(message);
   }
 };
 
