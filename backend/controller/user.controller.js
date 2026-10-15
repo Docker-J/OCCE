@@ -310,10 +310,13 @@ export const signUpController = async (c) => {
   const command = new SignUpCommand(params);
   try {
     const response = await cognitoClient.send(command);
-    console.log(response);
-    return c.json(response);
+    return c.json({
+      success: true,
+      userSub: response.UserSub,
+      userConfirmed: response.UserConfirmed,
+      codeDeliveryDetails: response.CodeDeliveryDetails || null,
+    });
   } catch (error) {
-    console.log(error);
     return c.json(
       {
         error: error.name,
@@ -338,10 +341,9 @@ export const confirmSignUpController = async (c) => {
   const command = new ConfirmSignUpCommand(input);
 
   try {
-    const response = await cognitoClient.send(command);
-    return c.json(response);
+    await cognitoClient.send(command);
+    return c.json({ success: true });
   } catch (error) {
-    console.log(error);
     return c.json(
       {
         error: error.name,
@@ -398,10 +400,11 @@ export const requestConfirmController = async (c) => {
 
   try {
     const response = await cognitoClient.send(command);
-    console.log(response);
-    return c.json(response);
+    return c.json({
+      success: true,
+      codeDeliveryDetails: response.CodeDeliveryDetails || null,
+    });
   } catch (error) {
-    console.log(error);
     return c.json(
       {
         error: error.name,
@@ -452,10 +455,11 @@ export const forgotPasswordController = async (c) => {
 
   try {
     const response = await cognitoClient.send(command);
-    console.log(response);
-    return c.json(response);
+    return c.json({
+      success: true,
+      codeDeliveryDetails: response.CodeDeliveryDetails || null,
+    });
   } catch (error) {
-    console.log(error);
     return c.json(
       {
         error: error.name,
@@ -486,11 +490,9 @@ export const confirmForgotPasswordController = async (c) => {
   const command = new ConfirmForgotPasswordCommand(input);
 
   try {
-    const response = await cognitoClient.send(command);
-    console.log(response);
-    return c.json(response);
+    await cognitoClient.send(command);
+    return c.json({ success: true });
   } catch (error) {
-    console.log(error);
     return c.json(
       {
         error: error.name,

@@ -7,6 +7,18 @@ const PAGE_SIZE = 10;
 
 
 
+const serializeImages = (images) => {
+  if (!images) return null;
+  if (Array.isArray(images)) {
+    const valid = images.filter((img) => typeof img === "string" && img.trim().length > 0);
+    return valid.length > 0 ? valid.join(",") : null;
+  }
+  if (typeof images === "string" && images.trim().length > 0) {
+    return images.trim();
+  }
+  return null;
+};
+
 export const getAnnouncementsController = async (c) => {
   const pageParsed = parseInt(c.req.query("page") || "1", 10);
   const page = isNaN(pageParsed) || pageParsed < 1 ? 1 : pageParsed;
@@ -53,7 +65,7 @@ export const postAnnouncementController = async (c) => {
     crypto.randomUUID(), // Native crypto API in Cloudflare Workers
     body.title,
     body.body,
-    body.images && body.images.length > 0 ? body.images : null,
+    serializeImages(body.images),
     new Date().toISOString(),
     body.video || null,
   ];
@@ -72,13 +84,15 @@ export const editAnnouncementController = async (c) => {
   const getParams = [id];
 
   const result = await executeD1Query(db, getSql, getParams);
-  const images = result.result[0]?.results?.[0]?.images
-    ? result.result[0].results[0].images.split(",")
+  const currentImagesStr = result.result[0]?.results?.[0]?.images;
+  const images = currentImagesStr
+    ? currentImagesStr.split(",").map((s) => s.trim()).filter(Boolean)
     : [];
 
-  const incomingImages = Array.isArray(body.images)
-    ? body.images
-    : (typeof body.images === "string" && body.images ? body.images.split(",") : []);
+  const serializedImages = serializeImages(body.images);
+  const incomingImages = serializedImages
+    ? serializedImages.split(",").map((s) => s.trim()).filter(Boolean)
+    : [];
 
   const missingImages = images.filter(
     (item) => !incomingImages.includes(item)
@@ -92,7 +106,7 @@ export const editAnnouncementController = async (c) => {
   const params = [
     body.title,
     body.body,
-    body.images && body.images.length > 0 ? body.images : null,
+    serializedImages,
     body.video || null,
     id,
   ];
@@ -114,7 +128,9 @@ export const deleteAnnouncementController = async (c) => {
   if (!row) {
     return c.json({ error: "NotFound", message: "공지사항을 찾을 수 없습니다." }, 404);
   }
-  const images = row.images ? row.images.split(",") : [];
+  const images = row.images
+    ? row.images.split(",").map((s) => s.trim()).filter(Boolean)
+    : [];
 
   if (images.length > 0) {
     await deleteImages(c.env, images);
