@@ -199,6 +199,8 @@ export const initializeWeeklySpreadsheet = async (
     (name) =>
       name !== "정원지기" &&
       name !== "종합통계" &&
+      name !== "출석부" &&
+      name !== "출석보고" &&
       name !== "정원모임보고" &&
       !/^\d{4}-\d{2}-\d{2}$/.test(name),
   );

@@ -10,7 +10,7 @@ import FileUploadComponent from "../../../common/FileUploadComponent";
 import CustomModal from "../../../common/CustomModal";
 import imageCompression from "browser-image-compression";
 
-const AlbumUploadModal = ({ isOpen, onClose }) => {
+const AlbumUploadModal = ({ isOpen, onClose, onSuccess }) => {
   const { openSnackbar } = useSnackbar();
 
   const handleClose = () => {
@@ -62,6 +62,7 @@ const AlbumUploadModal = ({ isOpen, onClose }) => {
     try {
       await uploadAlbum(form);
       openSnackbar("success", "Uploaded Succesfully!");
+      if (onSuccess) onSuccess();
       handleClose();
       return { success: true };
     } catch (error) {

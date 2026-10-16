@@ -1,6 +1,7 @@
 import {
   ListUsersCommand,
   ListUsersInGroupCommand,
+  AdminGetUserCommand,
   AdminAddUserToGroupCommand,
   AdminRemoveUserFromGroupCommand,
   AdminEnableUserCommand,
@@ -10,6 +11,22 @@ import {
   AdminDeleteUserAttributesCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { getCognitoClient } from "../api/cognito.js";
+
+const getCognitoUserSub = async (client, userPoolId, username) => {
+  try {
+    const res = await client.send(
+      new AdminGetUserCommand({
+        UserPoolId: userPoolId,
+        Username: username,
+      }),
+    );
+    const subAttr = (res.UserAttributes || []).find((a) => a.Name === "sub");
+    return subAttr?.Value || null;
+  } catch (err) {
+    console.warn("Could not fetch user sub from Cognito:", err.message);
+    return null;
+  }
+};
 
 /**
  * GET /api/admin/users
@@ -251,6 +268,39 @@ export const updateUserRoleController = async (c) => {
       }
     }
 
+    // Sync D1 fcm_tokens roles immediately when GardenKeeper role is assigned or removed
+    if (env.DB && (action === "assign" || action === "remove")) {
+      const sub = await getCognitoUserSub(client, userPoolId, username);
+      if (sub) {
+        try {
+          const rowsRes = await env.DB
+            .prepare("SELECT token, roles FROM fcm_tokens WHERE sub = ?")
+            .bind(sub)
+            .all();
+          const rows = rowsRes.results || [];
+          for (const row of rows) {
+            let currentRoles = [];
+            try {
+              currentRoles = JSON.parse(row.roles || "[]");
+              if (!Array.isArray(currentRoles)) currentRoles = [];
+            } catch {
+              currentRoles = [];
+            }
+            const nextRoles =
+              action === "assign"
+                ? Array.from(new Set([...currentRoles, "GardenKeeper"]))
+                : currentRoles.filter((r) => r !== "GardenKeeper");
+            await env.DB
+              .prepare("UPDATE fcm_tokens SET roles = ? WHERE token = ?")
+              .bind(JSON.stringify(nextRoles), row.token)
+              .run();
+          }
+        } catch (dbErr) {
+          console.warn("Failed to sync FCM token roles in D1:", dbErr.message);
+        }
+      }
+    }
+
     return c.json({
       success: true,
       isGardenKeeper: action !== "remove",
@@ -299,6 +349,20 @@ export const updateUserStatusController = async (c) => {
           Username: username,
         }),
       );
+
+      if (env.DB) {
+        const sub = await getCognitoUserSub(client, userPoolId, username);
+        if (sub) {
+          try {
+            await env.DB
+              .prepare("UPDATE fcm_tokens SET roles = '[]' WHERE sub = ?")
+              .bind(sub)
+              .run();
+          } catch (dbErr) {
+            console.warn("Failed to clear FCM token roles for disabled user:", dbErr.message);
+          }
+        }
+      }
     }
 
     return c.json({ success: true, enabled });
@@ -339,12 +403,25 @@ export const deleteUserController = async (c) => {
     }
 
     const client = getCognitoClient(env);
+    const sub = env.DB ? await getCognitoUserSub(client, userPoolId, username) : null;
+
     await client.send(
       new AdminDeleteUserCommand({
         UserPoolId: userPoolId,
         Username: username,
       }),
     );
+
+    if (sub && env.DB) {
+      try {
+        await env.DB
+          .prepare("DELETE FROM fcm_tokens WHERE sub = ?")
+          .bind(sub)
+          .run();
+      } catch (dbErr) {
+        console.warn("Failed to delete FCM tokens for deleted user:", dbErr.message);
+      }
+    }
 
     return c.json({ success: true, message: "교인 계정이 성공적으로 삭제되었습니다." });
   } catch (error) {

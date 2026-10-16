@@ -106,7 +106,12 @@ export const postAlbumController = async (c) => {
     year,
   ];
 
-  await executeD1Query(db, sql, params);
+  try {
+    await executeD1Query(db, sql, params);
+  } catch (dbErr) {
+    await deleteImages(c.env, results.filter(Boolean)).catch(() => {});
+    throw dbErr;
+  }
 
   await purgeCache(c.env, ["oncce.ca/api/albums"]);
   return c.body(null, 201);

@@ -23,38 +23,39 @@ export const MeditationONComp = ({ posts, cols }) => {
 
   return Object.keys(grouped)
     .reverse()
-    .map((year) => (
-      <>
-        <ImageListItem key={year} cols={cols}>
-          <ListSubheader component="div">{year}</ListSubheader>
+    .flatMap((year) => [
+      <ImageListItem key={`header-${year}`} cols={cols}>
+        <ListSubheader component="div">{year}</ListSubheader>
+      </ImageListItem>,
+      ...grouped[year].map((post) => (
+        <ImageListItem
+          key={post.ID}
+          component={Link}
+          to={post.ID}
+          sx={{ textDecoration: "none" }}
+        >
+          <img
+            src={`https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${post.Cover}/thumbnail`}
+            alt="thumbnail"
+            loading="lazy"
+          />
+          <ImageListItemBar
+            title={<Typography color="black">{post.Title}</Typography>}
+            subtitle={
+              <Typography
+                color="black"
+                sx={{
+                  fontSize: "small",
+                }}
+              >
+                {format(post.Timestamp, "MMdd")}
+              </Typography>
+            }
+            position="below"
+          />
         </ImageListItem>
-        {grouped[year].map((post) => (
-          <ImageListItem
-            key={post.ID}
-            component={Link}
-            to={post.ID}
-            sx={{ textDecoration: "none" }}
-          >
-            <img
-              src={`https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${post.Cover}/thumbnail`}
-              alt="thumbnail"
-              loading="lazy"
-            />
-            <ImageListItemBar
-              title={<Typography color="black">{post.Title}</Typography>}
-              subtitle={
-                <Typography color="black" sx={{
-                  fontSize: "small"
-                }}>
-                  {format(post.Timestamp, "MMdd")}
-                </Typography>
-              }
-              position="below"
-            />
-          </ImageListItem>
-        ))}
-      </>
-    ));
+      )),
+    ]);
 };
 
 export const MemoizedMeditationONComp = MeditationONComp;

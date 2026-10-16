@@ -22,7 +22,7 @@ import AlbumUploadModal from "./AlbumUploadModal";
 
 import { MemoizedMeditationONComp } from "./MeditationONImageListItem";
 import ButtonYearPicker from "../../../common/ButtonYearPicker";
-import { useSearchParams } from "react-router";
+import { useSearchParams, useNavigationType } from "react-router";
 
 const PAGE_SIZE = 12;
 
@@ -33,42 +33,49 @@ const titleBackground = {
 
 const Albums = () => {
   const matches = useMediaQuery("(min-width:1200px)");
-  let [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navType = useNavigationType();
   const { openModal } = useModals();
 
   const [isLoading, setIsLoading] = useState(false);
   const [selectedYear, setSelectedYear] = useState(
-    searchParams.has("year") ? new Date(searchParams.get("year"), 0, 1) : null
+    searchParams.has("year") ? new Date(Number(searchParams.get("year")), 0, 1) : null
   );
   const [albums, setAlbums] = useState([]);
   const [end, setEnd] = useState(false);
-  const [restored, setRestored] = useState(null);
+  const isInitialMount = useRef(true);
 
-  useEffect(() => {
-    setAlbums([]);
+  const fetchInitialAlbums = async (yearValue) => {
+    setIsLoading(true);
     setEnd(false);
-    console.log(selectedYear);
-    selectedYear
-      ? setSearchParams({ year: selectedYear.getFullYear() })
-      : setSearchParams((prev) => prev.delete("year"));
-  }, [selectedYear, setSearchParams]);
-
-  useEffect(() => {
-    if (restored !== null) {
-      onLoad();
+    try {
+      const result = await getAlbums([], yearValue);
+      const data = result.data || [];
+      setAlbums(data);
+      if (data.length === 0 || data.length % PAGE_SIZE !== 0) {
+        setEnd(true);
+      }
+    } finally {
+      setIsLoading(false);
     }
-  }, [searchParams.get("year")]);
+  };
 
   const onLoad = async () => {
-    if (isLoading) return;
+    if (isLoading || end) return;
 
     setIsLoading(true);
-
     try {
       const result = await getAlbums(albums, selectedYear?.getFullYear());
+      const data = result.data || [];
 
-      if (result.data.length > 0) {
-        setAlbums((prev) => [...prev, ...result.data]);
+      if (data.length > 0) {
+        setAlbums((prev) => {
+          const next = [...prev, ...data];
+          if (next.length % PAGE_SIZE !== 0) {
+            setEnd(true);
+          }
+          return next;
+        });
       } else {
         setEnd(true);
       }
@@ -77,57 +84,70 @@ const Albums = () => {
     }
   };
 
-  useEffect(() => {
-    if (albums.length % PAGE_SIZE !== 0) {
-      setEnd(true);
-    }
-  }, [albums]);
+  const refreshAlbums = async () => {
+    sessionStorage.removeItem("albums");
+    await fetchInitialAlbums(selectedYear?.getFullYear());
+  };
 
   useEffect(() => {
-    window.onpopstate = () => {
-      setRestored(true);
-      console.log("test restore");
-      setAlbums(JSON.parse(sessionStorage.getItem("albums")));
-    };
-    setRestored(false);
-    return () => {
-      window.onpopstate = () => {};
-    };
+    if (navType === "POP" && sessionStorage.getItem("albums")) {
+      try {
+        const cached = JSON.parse(sessionStorage.getItem("albums"));
+        if (Array.isArray(cached) && cached.length > 0) {
+          setAlbums(cached);
+          if (cached.length % PAGE_SIZE !== 0) {
+            setEnd(true);
+          }
+          return;
+        }
+      } catch {}
+    }
+    fetchInitialAlbums(selectedYear?.getFullYear());
   }, []);
 
   useEffect(() => {
-    if (restored !== null && !restored) {
-      onLoad();
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
     }
-  }, [restored]);
+    sessionStorage.removeItem("albums");
+    if (selectedYear) {
+      setSearchParams({ year: String(selectedYear.getFullYear()) });
+    } else {
+      setSearchParams({});
+    }
+    fetchInitialAlbums(selectedYear?.getFullYear());
+  }, [selectedYear]);
 
   useEffect(() => {
     return () => {
-      sessionStorage.setItem("albums", JSON.stringify(albums));
+      if (albums.length > 0) {
+        sessionStorage.setItem("albums", JSON.stringify(albums));
+      }
     };
-  });
+  }, [albums]);
 
   const scrollRef = useRef();
 
   useEffect(() => {
-    if (scrollRef.current && !end && albums.length >= 12) {
-      setTimeout(() => {
+    let timer;
+    if (scrollRef.current && !end && albums.length >= PAGE_SIZE) {
+      timer = setTimeout(() => {
         try {
           const contentHeight = scrollRef.current.clientHeight;
           const screenHeight = window.innerHeight - 500;
 
-          console.log("test content", contentHeight);
-          console.log("test screen", screenHeight);
-
           if (contentHeight > 100 && contentHeight < screenHeight) {
             onLoad();
           }
-        } catch (error) {}
+        } catch {}
       }, 500);
     }
 
-    // re-run effect when items change
-  }, [albums]);
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [albums, end]);
 
   return (
     <>
@@ -200,7 +220,7 @@ const Albums = () => {
         <Fab
           variant="primary"
           style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
-          onClick={() => openModal(AlbumUploadModal, {})}
+          onClick={() => openModal(AlbumUploadModal, { onSuccess: refreshAlbums })}
         >
           <AddIcon />
         </Fab>

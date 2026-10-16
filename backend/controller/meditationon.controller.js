@@ -1,5 +1,5 @@
 import { executeD1Query } from "../api/d1.js";
-import { uploadImage } from "./images.controller.js";
+import { deleteImages, uploadImage } from "./images.controller.js";
 import { purgeCache } from "../api/cloudflare.js";
 
 const TABLENAME = "MeditationON";
@@ -97,7 +97,12 @@ export const postMeditationONController = async (c) => {
       JSON.stringify(ids),
     ];
 
-    await executeD1Query(db, sql, params);
+    try {
+      await executeD1Query(db, sql, params);
+    } catch (dbErr) {
+      await deleteImages(c.env, results.filter(Boolean)).catch(() => {});
+      throw dbErr;
+    }
 
     await purgeCache(c.env, ["oncce.ca/api/meditation-on"]);
     return c.json({ success: true, message: "MeditationON created successfully" }, 201);

@@ -21,11 +21,11 @@ async function handleSundayAttendancePrecreation(env) {
   }
 
   const date = format(edmontonDate, "yyyy-MM-dd");
-  const folderId = env.ATTENDANCE_DRIVE_FOLDER_ID;
+  const folderId = env.DRIVE_WEEKLY_FOLDER_ID;
   const masterSheetId = env.ATTENDANCE_SHEET_ID;
 
   if (!folderId || !masterSheetId) {
-    console.warn("⚠️ ATTENDANCE_DRIVE_FOLDER_ID or ATTENDANCE_SHEET_ID not configured for Sunday attendance pre-creation.");
+    console.warn("⚠️ DRIVE_WEEKLY_FOLDER_ID or ATTENDANCE_SHEET_ID not configured for Sunday attendance pre-creation.");
     return;
   }
 

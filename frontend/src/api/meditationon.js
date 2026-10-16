@@ -1,26 +1,32 @@
 import axios from "axios";
 
+const extractErrorMessage = (error, fallback = "오류가 발생했습니다.") =>
+  error.response?.data?.message ||
+  (typeof error.response?.data?.error === "string"
+    ? error.response.data.error
+    : null) ||
+  error.message ||
+  fallback;
+
 export const getPosts = async (posts) => {
   try {
-    return await axios.get(
-      `/api/meditation-on${
-        posts.length === 0
-          ? ""
-          : `?lastVisible=${posts.at(-1).ID}&timeStamp=${
-              posts.at(-1).Timestamp
-            }`
-      }`
-    );
-  } catch {
-    throw new Error();
+    const params = {};
+    if (posts && posts.length > 0) {
+      const last = posts.at(-1);
+      params.lastVisible = last.ID;
+      params.timeStamp = last.Timestamp;
+    }
+    return await axios.get("/api/meditation-on", { params });
+  } catch (error) {
+    throw new Error(extractErrorMessage(error));
   }
 };
 
 export const getPost = async (id) => {
   try {
     return await axios.get(`/api/meditation-on/${id}`);
-  } catch {
-    throw new Error();
+  } catch (error) {
+    throw new Error(extractErrorMessage(error));
   }
 };
 
@@ -32,6 +38,6 @@ export const uploadImages = async (form, date) => {
       },
     });
   } catch (err) {
-    throw new Error(err.response?.data?.error || err.message || "Failed to upload images");
+    throw new Error(extractErrorMessage(err, "Failed to upload images"));
   }
 };

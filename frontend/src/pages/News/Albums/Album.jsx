@@ -33,6 +33,7 @@ const Album = () => {
 
   const handleDeleteAlbum = async () => {
     await deleteAlbum(albumID);
+    sessionStorage.removeItem("albums");
     openSnackbar("success", "The album deleted successfully");
     setDeleteConfirmDialog(false);
     navigate("/albums");
