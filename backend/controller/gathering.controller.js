@@ -227,8 +227,11 @@ export const getGatheringHistoryController = async (c) => {
 
     const allFiles = subfolderList.data.files || [];
 
+    const escapedGardenName = gardenName
+      .trim()
+      .replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const datePattern = new RegExp(
-      `^${gardenName.trim()}_(\\d{4}-\\d{2}-\\d{2})`,
+      `^${escapedGardenName}_(\\d{4}-\\d{2}-\\d{2})`,
     );
     const dateSet = new Set();
 
@@ -314,6 +317,7 @@ export const postGatheringReportController = async (c) => {
 
     // 2. Search for existing file named '[GardenName]_[Date]' in garden subfolder or root folder
     const fileName = `${gardenName}_${date}`;
+    const escapedFileName = fileName.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
     const gardenFolderId = await getGardenFolderId(
       drive,
       env,
@@ -326,7 +330,7 @@ export const postGatheringReportController = async (c) => {
       `Searching for existing file '${fileName}' in garden folder '${gardenFolderId}'...`,
     );
     let searchResponse = await drive.files.list({
-      q: `name = '${fileName}' and '${gardenFolderId}' in parents and trashed = false`,
+      q: `name = '${escapedFileName}' and '${gardenFolderId}' in parents and trashed = false`,
       spaces: "drive",
       fields: "files(id, name)",
       supportsAllDrives: true,
@@ -450,10 +454,9 @@ export const postGatheringReportController = async (c) => {
     const memberCount = members.length;
 
     // 6. Write gathering info to '모임정보' tab and attendance checkboxes in a single batch values update
-    const localNow = new Date();
-    const kstOffset = 9 * 60 * 60 * 1000;
-    const kstNow = new Date(localNow.getTime() + kstOffset);
-    const timestamp = kstNow.toISOString().replace("T", " ").substring(0, 16);
+    const edmontonOffset = -6 * 60 * 60 * 1000;
+    const edmontonNow = new Date(Date.now() + edmontonOffset);
+    const timestamp = edmontonNow.toISOString().replace("T", " ").substring(0, 16);
     const gatheringDateTime = `${date} ${time}`;
 
     const infoRows = [

@@ -1,5 +1,5 @@
 import { Button, CircularProgress, TextField } from "@mui/material";
-import { useState, useActionState } from "react";
+import { useState, useActionState, startTransition } from "react";
 import update from "immutability-helper";
 
 import useSnackbar from "../../../util/useSnackbar";
@@ -13,11 +13,6 @@ import imageCompression from "browser-image-compression";
 const AlbumUploadModal = ({ isOpen, onClose, onSuccess }) => {
   const { openSnackbar } = useSnackbar();
 
-  const handleClose = () => {
-    removeAllImage();
-    onClose();
-  };
-
   const today = new Date();
 
   const [title, setTitle] = useState("");
@@ -25,6 +20,13 @@ const AlbumUploadModal = ({ isOpen, onClose, onSuccess }) => {
   const [filesToUpload, setFilesToUpload] = useState([]);
   const [coverImage, setCoverImage] = useState(0);
   const [imagesPreview, setImagesPreview] = useState([]);
+
+  const handleClose = () => {
+    removeAllImage();
+    setTitle("");
+    setDate(new Date());
+    onClose();
+  };
 
   const handleChangeFile = (files) => {
     setFilesToUpload((prev) => [...prev, ...files]);
@@ -79,6 +81,7 @@ const AlbumUploadModal = ({ isOpen, onClose, onSuccess }) => {
     imagesPreview.forEach((preview) => URL.revokeObjectURL(preview));
     setFilesToUpload([]);
     setImagesPreview([]);
+    setCoverImage(0);
   };
 
   return (
@@ -104,6 +107,7 @@ const AlbumUploadModal = ({ isOpen, onClose, onSuccess }) => {
               id="filled-basic"
               label="Album Title"
               variant="outlined"
+              value={title}
               sx={{ flexGrow: 1, ml: 4 }}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -134,7 +138,7 @@ const AlbumUploadModal = ({ isOpen, onClose, onSuccess }) => {
             <Button
               variant="outlined"
               disabled={isPending || title.trim() === "" || filesToUpload.length <= 0}
-              onClick={formAction}
+              onClick={() => startTransition(() => formAction())}
               fullWidth
             >
               Submit

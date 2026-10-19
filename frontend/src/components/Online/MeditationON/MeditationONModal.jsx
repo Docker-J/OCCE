@@ -1,5 +1,5 @@
 import { Button, CircularProgress } from "@mui/material";
-import { useState, useActionState } from "react";
+import { useState, useActionState, startTransition } from "react";
 import update from "immutability-helper";
 
 import { format } from "date-fns";
@@ -112,7 +112,7 @@ const MeditationONModal = ({ isOpen, onClose, onSuccess }) => {
             <Button
               variant="outlined"
               disabled={isPending || filesToUpload.length <= 0}
-              onClick={formAction}
+              onClick={() => startTransition(() => formAction())}
               fullWidth
             >
               Submit

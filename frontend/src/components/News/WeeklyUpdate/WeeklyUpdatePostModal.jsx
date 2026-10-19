@@ -1,4 +1,4 @@
-import { useEffect, useState, useActionState } from "react";
+import { useEffect, useState, useActionState, startTransition } from "react";
 import { Button, CircularProgress } from "@mui/material";
 import ButtonDatePicker from "../../../common/ButtonDatePicker";
 import { Document, Page } from "react-pdf";
@@ -166,7 +166,7 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
           <Button
             fullWidth
             variant="outlined"
-            onClick={formAction}
+            onClick={() => startTransition(() => formAction())}
             disabled={isPending || !weeklyUpdate || !memberWeeklyUpdate}
             sx={{ mt: "1.5em" }}
           >

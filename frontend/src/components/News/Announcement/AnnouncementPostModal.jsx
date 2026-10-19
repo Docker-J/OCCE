@@ -1,5 +1,5 @@
 import { Button, CircularProgress, TextField } from "@mui/material";
-import { useEffect, useState, useActionState, lazy, Suspense } from "react";
+import { useEffect, useState, useActionState, startTransition, lazy, Suspense } from "react";
 
 const TextEditor = lazy(() => import("./TextEditor"));
 import useSnackbar from "../../../util/useSnackbar";
@@ -77,7 +77,7 @@ const AnnouncementPostModal = ({
           <Button
             variant="outlined"
             disabled={isPending || title.trim() === "" || body.trim() === ""}
-            onClick={formAction}
+            onClick={() => startTransition(() => formAction())}
             fullWidth
             sx={{ marginTop: "1.5em" }}
           >

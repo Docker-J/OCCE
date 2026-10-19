@@ -6,10 +6,6 @@
 
 import { Typography, Box } from "@mui/material";
 import useModals from "../../util/useModal";
-import {
-  submitAttendanceReport,
-  submitGatheringReport,
-} from "../../api/attendance";
 
 // 커스텀 훅
 import { useSmallGroupReport } from "./hooks/useSmallGroupReport";

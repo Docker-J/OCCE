@@ -27,6 +27,14 @@ const ImagePreviews = ({
         ],
       })
     );
+    if (setCoverImage) {
+      setCoverImage((prevCover) => {
+        if (prevCover === dragIndex) return hoverIndex;
+        if (dragIndex < prevCover && hoverIndex >= prevCover) return prevCover - 1;
+        if (dragIndex > prevCover && hoverIndex <= prevCover) return prevCover + 1;
+        return prevCover;
+      });
+    }
   };
 
   const removeImage = (i) => {
@@ -41,6 +49,13 @@ const ImagePreviews = ({
         $splice: [[i, 1]],
       })
     );
+    if (setCoverImage) {
+      setCoverImage((prevCover) => {
+        if (i === prevCover) return 0;
+        if (i < prevCover) return Math.max(0, prevCover - 1);
+        return prevCover;
+      });
+    }
   };
 
   const renderCard = (image, index) => {

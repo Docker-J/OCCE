@@ -34,11 +34,8 @@ export const uploadImage = async (env, file) => {
     const CLOUDFLARE_ACCOUNT_ID = env.CLOUDFLARE_ACCOUNT_ID;
     const CLOUDFLARE_API_KEY = env.CLOUDFLARE_API_KEY;
 
-    const arrayBuffer = await file.arrayBuffer();
-    const blob = new Blob([arrayBuffer], { type: file.type });
-
     const formData = new FormData();
-    formData.append("file", blob, file.name);
+    formData.append("file", file, file.name);
 
     const res = await fetch(
       `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1`,
