@@ -44,24 +44,34 @@ const images = [
 
 const ImageButton = styled(ButtonBase)(({ theme }) => ({
   height: 200,
+  borderRadius: "16px",
+  overflow: "hidden",
+  position: "relative",
+  boxShadow: "0 6px 20px rgba(0, 0, 0, 0.08)",
+  transition: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
   [theme.breakpoints.down("md")]: {
-    width: "48% !important", // Overrides inline-style
-    height: 180,
+    width: "48% !important",
+    height: 170,
   },
   [theme.breakpoints.down("sm")]: {
-    width: "100% !important", // Overrides inline-style
+    width: "100% !important",
     height: 120,
+    borderRadius: "14px",
   },
   "&:hover, &.Mui-focusVisible": {
-    zIndex: 1,
+    zIndex: 2,
+    transform: "translateY(-4px)",
+    boxShadow: "0 14px 32px rgba(0, 0, 0, 0.18)",
+    "& .MuiImageSrc-root": {
+      transform: "scale(1.08)",
+    },
     "& .MuiImageBackdrop-root": {
-      opacity: 0.15,
+      background:
+        "linear-gradient(180deg, rgba(15, 23, 42, 0.15) 0%, rgba(255, 107, 0, 0.65) 100%)",
     },
     "& .MuiImageMarked-root": {
-      opacity: 0,
-    },
-    "& .MuiTypography-root": {
-      border: "4px solid currentColor",
+      width: 32,
+      backgroundColor: "#ffffff",
     },
   },
 }));
@@ -74,6 +84,7 @@ const ImageSrc = styled("span")({
   bottom: 0,
   backgroundSize: "cover",
   backgroundPosition: "center 40%",
+  transition: "transform 0.45s cubic-bezier(0.4, 0, 0.2, 1)",
 });
 
 const Image = styled("span")(({ theme }) => ({
@@ -86,6 +97,7 @@ const Image = styled("span")(({ theme }) => ({
   alignItems: "center",
   justifyContent: "center",
   color: theme.palette.common.white,
+  zIndex: 1,
 }));
 
 const ImageBackdrop = styled("span")(({ theme }) => ({
@@ -94,29 +106,21 @@ const ImageBackdrop = styled("span")(({ theme }) => ({
   right: 0,
   top: 0,
   bottom: 0,
-  backgroundColor: theme.palette.common.black,
-  opacity: 0.3,
-  transition: theme.transitions.create("opacity"),
+  background:
+    "linear-gradient(180deg, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.65) 100%)",
+  transition: "background 0.35s ease, opacity 0.35s ease",
 }));
 
 const ImageMarked = styled("span")(({ theme }) => ({
   height: 3,
-  width: 18,
-  backgroundColor: theme.palette.common.white,
+  width: 20,
+  backgroundColor: "rgba(255, 255, 255, 0.8)",
+  borderRadius: 2,
   position: "absolute",
-  bottom: -3,
-  left: "calc(50% - 9px)",
-  transition: theme.transitions.create("opacity"),
-}));
-
-const ImageMarkedUpper = styled("span")(({ theme }) => ({
-  height: 3,
-  width: 18,
-  backgroundColor: theme.palette.common.white,
-  position: "absolute",
-  top: -3,
-  left: "calc(50% - 9px)",
-  transition: theme.transitions.create("opacity"),
+  bottom: -4,
+  left: "50%",
+  transform: "translateX(-50%)",
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
 }));
 
 export default function ButtonBases() {
@@ -129,34 +133,39 @@ export default function ButtonBases() {
         alignItems: "center",
         justifyContent: "space-evenly",
         width: "100%",
-        minWidth: "550",
-        my: "0.5em",
+        my: { xs: 1, sm: 1.5 },
+        px: { xs: 1, sm: 2 },
+        gap: { xs: 1.5, md: 2 },
       }}
     >
       {images.map((image) => (
         <ImageButton
-          component={image.to && Link}
-          sx={{ m: 0.5, width: "32%" }}
+          component={image.to ? Link : "a"}
+          sx={{ width: { xs: "100%", sm: "48%", md: "31.5%" } }}
           key={image.title}
           href={image.link}
           target={image.target}
           to={image.to}
         >
-          <ImageSrc style={{ backgroundImage: `url(${image.url})` }} />
+          <ImageSrc
+            className="MuiImageSrc-root"
+            style={{ backgroundImage: `url(${image.url})` }}
+          />
           <ImageBackdrop className="MuiImageBackdrop-root" />
           <Image>
             <Typography
               component="span"
-              variant="h5"
               sx={{
                 color: "inherit",
                 position: "relative",
-                p: 4,
-                pt: 2,
-                pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
+                fontSize: { xs: "1.15rem", sm: "1.3rem", md: "1.4rem" },
+                fontWeight: 800,
+                letterSpacing: "-0.3px",
+                textShadow: "0 2px 12px rgba(0, 0, 0, 0.6)",
+                px: 2,
+                py: 1,
               }}
             >
-              <ImageMarkedUpper className="MuiImageMarked-root" />
               {image.title}
               <ImageMarked className="MuiImageMarked-root" />
             </Typography>
