@@ -75,7 +75,7 @@ const SubmenuMobileDrawer = ({
                 letterSpacing: "-0.3px",
               }}
             >
-              온교회 메뉴
+              전체메뉴
             </Typography>
           </Box>
           <IconButton onClick={onClose} edge="end" size="small" sx={{ color: "#64748b" }}>
