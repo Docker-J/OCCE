@@ -12,6 +12,7 @@ import UserManager from "./manager/UserManager";
 import { ErrorBoundary } from "react-error-boundary";
 import FullScreenLoading from "./common/FullScreenLoading";
 import GlobalLoader from "./common/GlobalLoader";
+import ConfirmProvider from "./common/ConfirmProvider";
 import { lazyRetry, handleChunkReload, isChunkLoadError } from "./util/lazyRetry";
 
 window.addEventListener("vite:preloadError", () => {
@@ -315,9 +316,11 @@ const router = createBrowserRouter([
 const App = () => {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <Suspense fallback={<FullScreenLoading />}>
-        <RouterProvider router={router} />
-      </Suspense>
+      <ConfirmProvider>
+        <Suspense fallback={<FullScreenLoading />}>
+          <RouterProvider router={router} />
+        </Suspense>
+      </ConfirmProvider>
     </ErrorBoundary>
   );
 };
