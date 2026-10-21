@@ -15,7 +15,7 @@ import ReportStatusView from "./components/ReportStatusView";
 import ReportTypeTabs from "./components/ReportTypeTabs";
 import GatheringForm from "./GatheringForm";
 import SundayForm from "./SundayForm";
-import ConfirmSubmitDialog from "./ConfirmSubmitDialog";
+import { useConfirm } from "../../common/ConfirmProvider";
 
 const TITLE_BG_STYLE = {
   backgroundImage: 'url("/img/Community/SmallGroup.webp")',
@@ -24,6 +24,7 @@ const TITLE_BG_STYLE = {
 
 const SmallGroupReport = () => {
   const { openModal } = useModals();
+  const confirm = useConfirm();
 
   const { state, actions } = useSmallGroupReport();
 
@@ -43,7 +44,6 @@ const SmallGroupReport = () => {
     checkingReport,
     submitting,
     reportType,
-    confirmOpen,
     gatheringDate,
     gatheringDateStr,
     gatheringTime,
@@ -68,10 +68,24 @@ const SmallGroupReport = () => {
     handleAbsenceReasonChange,
     handleCheckAll,
     handleUncheckAll,
+    validateForm,
     handleFormSubmit,
     handleConfirmSubmit,
-    setConfirmOpen,
   } = actions;
+
+  const handleSubmitWithConfirm = async () => {
+    if (validateForm && !validateForm()) return;
+    if (
+      await confirm({
+        title: "보고서 제출",
+        message: "작성하신 보고서를 제출하시겠습니까?",
+        confirmText: "제출",
+        cancelText: "취소",
+      })
+    ) {
+      handleConfirmSubmit();
+    }
+  };
 
   const handleLoginClick = async () => {
     const { default: SignInModal } = await import("../../components/User/SignInModal");
@@ -172,7 +186,7 @@ const SmallGroupReport = () => {
                   handleToggleMember={handleToggleMember}
                   handleCheckAll={handleCheckAll}
                   handleUncheckAll={handleUncheckAll}
-                  handleFormSubmit={handleFormSubmit}
+                  handleFormSubmit={handleSubmitWithConfirm}
                   submitting={submitting}
                   membersList={membersList}
                 />
@@ -194,7 +208,7 @@ const SmallGroupReport = () => {
                   handleUncheckAll={handleUncheckAll}
                   absenceReasons={absenceReasons}
                   handleAbsenceReasonChange={handleAbsenceReasonChange}
-                  handleFormSubmit={handleFormSubmit}
+                  handleFormSubmit={handleSubmitWithConfirm}
                   submitting={submitting}
                   membersList={membersList}
                 />
@@ -203,24 +217,6 @@ const SmallGroupReport = () => {
           )}
         </div>
       </div>
-
-      {/* 제출 확인 다이얼로그 */}
-      {confirmOpen && (
-        <ConfirmSubmitDialog
-          open={confirmOpen}
-          onClose={() => setConfirmOpen(false)}
-          onConfirm={handleConfirmSubmit}
-          reportType={reportType}
-          isReported={isReported}
-          selectedGarden={selectedGarden}
-          selectedDate={selectedDate}
-          gatheringDate={gatheringDate}
-          gatheringTime={gatheringTime}
-          gatheringLocation={gatheringLocation}
-          attendees={attendees}
-          absentees={absentees}
-        />
-      )}
     </>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, Suspense } from "react";
 import { Typography } from "@mui/material";
 import SocialIconsBar from "./SocialIconsBar";
 import { Link } from "react-router";
+import OCCEErrorBoundary from "../common/OCCEErrorBoundary";
 
 const GoogleMap = React.lazy(() => import("./GoogleMap"));
 
@@ -60,9 +61,18 @@ const Footer = () => {
 
       <div ref={mapContainerRef} style={{ width: "100%", minHeight: 300 }}>
         {showMap ? (
-          <Suspense fallback={<div style={{ height: 300 }} />}>
-            <GoogleMap />
-          </Suspense>
+          <OCCEErrorBoundary
+            title="지도를 불러올 수 없습니다"
+            fallbackLink={{
+              label: "Google 지도에서 보기",
+              url: "https://goo.gl/maps/gqpiA88gJSvbjfDD9",
+            }}
+            compact
+          >
+            <Suspense fallback={<div style={{ height: 300 }} />}>
+              <GoogleMap />
+            </Suspense>
+          </OCCEErrorBoundary>
         ) : (
           <div style={{ height: 300 }} />
         )}

@@ -5,6 +5,7 @@ const TextEditor = lazy(() => import("./TextEditor"));
 import useSnackbar from "../../../util/useSnackbar";
 import { postAnnouncement } from "../../../api/announcements";
 import CustomModal from "../../../common/CustomModal";
+import OCCEErrorBoundary from "../../../common/OCCEErrorBoundary";
 
 const AnnouncementPostModal = ({
   isOpen,
@@ -69,9 +70,14 @@ const AnnouncementPostModal = ({
           />
 
           <div style={{ height: "65svh", width: "100%", marginTop: "1em" }}>
-            <Suspense fallback={<CircularProgress />}>
-              <TextEditor body={body} getBody={setBody} />
-            </Suspense>
+            <OCCEErrorBoundary
+              title="본문 편집기를 불러오는 중 오류가 발생했습니다"
+              resetKeys={[body]}
+            >
+              <Suspense fallback={<CircularProgress />}>
+                <TextEditor body={body} getBody={setBody} />
+              </Suspense>
+            </OCCEErrorBoundary>
           </div>
 
           <Button

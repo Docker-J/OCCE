@@ -15,6 +15,7 @@ import AttendanceWeekNavigator from "./components/AttendanceWeekNavigator";
 import AttendanceSummaryCards from "./components/AttendanceSummaryCards";
 import AttendanceTrendChart from "./components/AttendanceTrendChart";
 import GardenAttendanceTable from "./components/GardenAttendanceTable";
+import OCCEErrorBoundary from "../../common/OCCEErrorBoundary";
 
 const AttendanceDashboard = () => {
   const { state, actions } = useAttendanceDashboard();
@@ -106,20 +107,32 @@ const AttendanceDashboard = () => {
       <AttendanceSummaryCards summary={summary} />
 
       {/* 3. 최근 주차별 출석 추이 막대 차트 */}
-      <AttendanceTrendChart
-        trend={trend}
-        selectedDate={selectedDate}
-        onDateChange={handleDateChange}
-      />
+      <OCCEErrorBoundary
+        title="출석 통계 차트를 불러오는 중 오류가 발생했습니다"
+        resetKeys={[trend, selectedDate]}
+        onReset={() => fetchData(true)}
+      >
+        <AttendanceTrendChart
+          trend={trend}
+          selectedDate={selectedDate}
+          onDateChange={handleDateChange}
+        />
+      </OCCEErrorBoundary>
 
       {/* 4. 정원별 출석 현황 테이블 */}
-      <GardenAttendanceTable
-        stats={sortedGardenStats}
-        sortField={sortField}
-        sortDirection={sortDirection}
-        onSort={handleSort}
-        onOpenDetail={handleOpenDetailModal}
-      />
+      <OCCEErrorBoundary
+        title="출석 통계 차트를 불러오는 중 오류가 발생했습니다"
+        resetKeys={[sortedGardenStats, selectedDate]}
+        onReset={() => fetchData(true)}
+      >
+        <GardenAttendanceTable
+          stats={sortedGardenStats}
+          sortField={sortField}
+          sortDirection={sortDirection}
+          onSort={handleSort}
+          onOpenDetail={handleOpenDetailModal}
+        />
+      </OCCEErrorBoundary>
 
       {/* 5. 정원별 상세 출석 팝업 모달 */}
       <GardenAttendanceDetailModal

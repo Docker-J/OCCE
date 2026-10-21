@@ -10,6 +10,7 @@ import {
   useWeeklyUpdate,
   useBulletinDimensions,
 } from "../../../components/News/WeeklyUpdate";
+import OCCEErrorBoundary from "../../../common/OCCEErrorBoundary";
 import "./WeeklyUpdate.css";
 
 const PDFReader = lazy(
@@ -72,17 +73,22 @@ const WeeklyUpdate = () => {
             maxDate={maxDate}
           />
 
-          <Suspense
-            fallback={
-              <BulletinSkeleton documentDimension={documentDimension} />
-            }
+          <OCCEErrorBoundary
+            title="주보 PDF를 불러오는 중 오류가 발생했습니다"
+            resetKeys={[bulletin, selectedDate]}
           >
-            <PDFReader
-              file={bulletin}
-              loading={loading}
-              documentDimension={documentDimension}
-            />
-          </Suspense>
+            <Suspense
+              fallback={
+                <BulletinSkeleton documentDimension={documentDimension} />
+              }
+            >
+              <PDFReader
+                file={bulletin}
+                loading={loading}
+                documentDimension={documentDimension}
+              />
+            </Suspense>
+          </OCCEErrorBoundary>
         </div>
       </div>
 

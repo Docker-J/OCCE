@@ -3,9 +3,10 @@
  * @description 온교회 소그룹 출석 보고서 및 정원 모임 보고서 상태와 비즈니스 로직을 총괄하는 커스텀 훅
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useOptimistic, startTransition } from "react";
 import { useSearchParams, useSubmit, useActionData, useNavigation } from "react-router";
 import { format } from "date-fns";
+import { useShallow } from "zustand/react/shallow";
 import useAuthStore from "../../../store/useAuthStore";
 import useSnackbar from "../../../util/useSnackbar";
 import {
@@ -15,13 +16,19 @@ import {
   getGatheringHistory,
 } from "../../../api/attendance";
 import { getRecentSundays, formatDateString } from "../SmallGroupReportUtils";
+import { useConfirm } from "../../../common/ConfirmProvider";
 
 export const useSmallGroupReport = () => {
   const { openSnackbar } = useSnackbar();
+  const confirm = useConfirm();
 
-  const authenticated = useAuthStore((state) => state.authenticated);
-  const authInitialized = useAuthStore((state) => state.authInitialized);
-  const isLeader = useAuthStore((state) => state.isLeader);
+  const { authenticated, authInitialized, isLeader } = useAuthStore(
+    useShallow((state) => ({
+      authenticated: state.authenticated,
+      authInitialized: state.authInitialized,
+      isLeader: state.isLeader,
+    }))
+  );
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -33,6 +40,10 @@ export const useSmallGroupReport = () => {
   const [checkedMembers, setCheckedMembers] = useState({});
   const [absenceReasons, setAbsenceReasons] = useState({});
   const [isReported, setIsReported] = useState(false);
+  const [optimisticIsReported, setOptimisticIsReported] = useOptimistic(
+    isReported,
+    (_, next) => next
+  );
   const [checkingReport, setCheckingReport] = useState(false);
 
   const submit = useSubmit();
@@ -43,8 +54,6 @@ export const useSmallGroupReport = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialType = searchParams.get("type") === "gathering" ? "gathering" : "sunday";
   const [reportType, setReportType] = useState(initialType);
-
-  const [confirmOpen, setConfirmOpen] = useState(false);
 
   // 모임 보고서 전용 상태
   const [gatheringDate, setGatheringDate] = useState(new Date());
@@ -95,24 +104,32 @@ export const useSmallGroupReport = () => {
     }
   }, [searchParams]);
 
-  const handleReportTypeChange = (type) => {
+  const handleReportTypeChange = async (type) => {
     if (type === reportType) return;
     if (isDirty) {
-      const confirmLeave = window.confirm(
-        "작성 중인 내용이 있습니다. 탭을 전환하면 입력한 내용이 사라질 수 있습니다. 계속 진행하시겠습니까?"
-      );
+      const confirmLeave = await confirm({
+        title: "작성 내용 변경 안내",
+        message:
+          "작성 중인 내용이 있습니다. 탭을 전환하면 입력한 내용이 사라질 수 있습니다. 계속 진행하시겠습니까?",
+        confirmText: "전환하기",
+        cancelText: "취소",
+      });
       if (!confirmLeave) return;
     }
     setReportType(type);
     setSearchParams({ type });
   };
 
-  const handleGardenChange = (newGarden) => {
+  const handleGardenChange = async (newGarden) => {
     if (newGarden === selectedGarden) return;
     if (isDirty) {
-      const confirmChange = window.confirm(
-        "작성 중인 내용이 있습니다. 정원을 변경하면 작성 중인 내용이 초기화됩니다. 변경하시겠습니까?"
-      );
+      const confirmChange = await confirm({
+        title: "정원 변경 안내",
+        message:
+          "작성 중인 내용이 있습니다. 정원을 변경하면 작성 중인 내용이 초기화됩니다. 변경하시겠습니까?",
+        confirmText: "변경하기",
+        cancelText: "취소",
+      });
       if (!confirmChange) return;
     }
     setSelectedGarden(newGarden);
@@ -371,54 +388,70 @@ export const useSmallGroupReport = () => {
     setCheckedMembers(updated);
   };
 
-  const handleFormSubmit = () => {
+  const validateForm = () => {
     if (!selectedGarden) {
       openSnackbar("error", "정원을 선택해 주세요.");
-      return;
+      return false;
     }
     if (reportType === "sunday" && !selectedDate) {
       openSnackbar("error", "보고 주일을 선택해 주세요.");
-      return;
+      return false;
     }
     if (reportType === "gathering") {
       if (!gatheringDate) {
         openSnackbar("error", "모임 날짜를 입력해 주세요.");
-        return;
+        return false;
       }
       if (!gatheringLocation.trim()) {
         openSnackbar("error", "모임 장소를 입력해 주세요.");
-        return;
+        return false;
       }
     }
-    setConfirmOpen(true);
+    return true;
+  };
+
+  const handleFormSubmit = async () => {
+    if (!validateForm()) return;
+    if (
+      await confirm({
+        title: "보고서 제출",
+        message: "작성하신 보고서를 제출하시겠습니까?",
+        confirmText: "제출",
+        cancelText: "취소",
+      })
+    ) {
+      handleConfirmSubmit();
+    }
   };
 
   const handleConfirmSubmit = () => {
-    setConfirmOpen(false);
+    startTransition(() => {
+      setOptimisticIsReported(true);
 
-    if (reportType === "gathering") {
-      const payload = {
-        date: format(gatheringDate, "yyyy-MM-dd"),
-        time: format(gatheringTime, "HH:mm"),
-        location: gatheringLocation,
-        notes: gatheringNotes,
-        gardenName: selectedGarden,
-        attendees,
-        absentees,
-      };
+      if (reportType === "gathering") {
+        const payload = {
+          date: format(gatheringDate, "yyyy-MM-dd"),
+          time: format(gatheringTime, "HH:mm"),
+          location: gatheringLocation,
+          notes: gatheringNotes,
+          gardenName: selectedGarden,
+          attendees,
+          absentees,
+        };
 
-      submit({ reportType, payload }, { method: "post", encType: "application/json" });
-    } else {
-      const payload = {
-        date: selectedDate,
-        gardenName: selectedGarden,
-        attendees,
-        absentees,
-        absenceReasons,
-      };
+        submit({ reportType, payload }, { method: "post", encType: "application/json" });
+      } else {
+        const payload = {
+          date: selectedDate,
+          gardenName: selectedGarden,
+          attendees,
+          absentees,
+          absenceReasons,
+        };
 
-      submit({ reportType, payload }, { method: "post", encType: "application/json" });
-    }
+        submit({ reportType, payload }, { method: "post", encType: "application/json" });
+      }
+    });
   };
 
   return {
@@ -436,11 +469,11 @@ export const useSmallGroupReport = () => {
       recentSundays,
       checkedMembers,
       absenceReasons,
-      isReported,
+      isReported: optimisticIsReported,
+      optimisticIsReported,
       checkingReport,
       submitting,
       reportType,
-      confirmOpen,
       gatheringDate,
       gatheringDateStr,
       gatheringTime,
@@ -464,9 +497,10 @@ export const useSmallGroupReport = () => {
       handleAbsenceReasonChange,
       handleCheckAll,
       handleUncheckAll,
+      validateForm,
       handleFormSubmit,
       handleConfirmSubmit,
-      setConfirmOpen,
+      setOptimisticIsReported,
     },
   };
 };

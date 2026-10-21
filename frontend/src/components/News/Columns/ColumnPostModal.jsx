@@ -6,6 +6,7 @@ import { postColumn } from "../../../api/columns";
 import useSnackbar from "../../../util/useSnackbar";
 import CustomModal from "../../../common/CustomModal";
 import ButtonDatePicker from "../../../common/ButtonDatePicker";
+import OCCEErrorBoundary from "../../../common/OCCEErrorBoundary";
 
 const ColumnPostModal = ({
   isOpen,
@@ -80,9 +81,14 @@ const ColumnPostModal = ({
           </div>
 
           <div style={{ height: "65svh", width: "100%", marginTop: "1em" }}>
-            <Suspense fallback={<CircularProgress />}>
-              <TextEditor body={body} getBody={setBody} />
-            </Suspense>
+            <OCCEErrorBoundary
+              title="본문 편집기를 불러오는 중 오류가 발생했습니다"
+              resetKeys={[body]}
+            >
+              <Suspense fallback={<CircularProgress />}>
+                <TextEditor body={body} getBody={setBody} />
+              </Suspense>
+            </OCCEErrorBoundary>
           </div>
 
           <Button
