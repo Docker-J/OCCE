@@ -5,12 +5,15 @@ import {
   CircularProgress,
   Fab,
   ImageList,
+  ImageListItem,
+  Skeleton,
   Stack,
   Typography,
   useMediaQuery,
 } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
+import PhotoLibraryOutlinedIcon from "@mui/icons-material/PhotoLibraryOutlined";
 
 import InfiniteScroll from "react-infinite-scroll-component";
 import useModals from "../../../util/useModal";
@@ -182,13 +185,46 @@ const Albums = () => {
           }}
         >
           {albums.length <= 0 ? (
-            <Stack
-              sx={{
-                alignItems: "center",
-                py: 8
-              }}>
-              {isLoading ? <CircularProgress /> : "사진이 존재하지 않습니다"}
-            </Stack>
+            isLoading ? (
+              <Box sx={{ width: "100%", py: 3 }}>
+                <ImageList cols={matches ? 4 : 3} gap={12}>
+                  {Array.from({ length: matches ? 8 : 6 }).map((_, i) => (
+                    <ImageListItem key={i}>
+                      <Skeleton
+                        variant="rounded"
+                        sx={{
+                          width: "100%",
+                          height: 0,
+                          paddingBottom: "100%",
+                          borderRadius: "12px",
+                        }}
+                      />
+                    </ImageListItem>
+                  ))}
+                </ImageList>
+              </Box>
+            ) : (
+              <Stack
+                sx={{
+                  alignItems: "center",
+                  py: 10,
+                  gap: 1,
+                }}
+              >
+                <PhotoLibraryOutlinedIcon
+                  sx={{ fontSize: 52, color: "text.disabled", mb: 0.5 }}
+                />
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: 700, color: "text.secondary" }}
+                >
+                  등록된 사진이 없습니다
+                </Typography>
+                <Typography variant="body2" sx={{ color: "text.disabled" }}>
+                  선택하신 연도에는 등록된 사진 앨범이 없습니다.
+                </Typography>
+              </Stack>
+            )
           ) : (
             <InfiniteScroll
               dataLength={albums.length}

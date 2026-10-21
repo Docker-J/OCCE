@@ -49,6 +49,7 @@ const Album = () => {
 
   return (
     <>
+      <title>{`${title || "사진"} - OCCE`}</title>
       <div className="title-wrapper" style={titleBackground}>
         <div className="title">
           <Typography
@@ -65,7 +66,7 @@ const Album = () => {
       </div>
       <div className="container-wrapper">
         <div className="container">
-          <ImageList variant="masonry" cols={cols} gap={8}>
+          <ImageList variant="masonry" cols={cols} gap={10}>
             {Object.values(images).map((image, index) => (
               <ImageListItem
                 key={image}
@@ -75,11 +76,22 @@ const Album = () => {
                     initialIndex: index,
                   })
                 }
+                sx={{
+                  borderRadius: "12px",
+                  overflow: "hidden",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+                  transition: "transform 0.25s ease, box-shadow 0.25s ease",
+                  "&:hover": {
+                    transform: "scale(1.02)",
+                    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
+                    cursor: "pointer",
+                  },
+                }}
               >
                 <img
-                  style={{ objectFit: "contain" }}
+                  style={{ objectFit: "contain", width: "100%", display: "block" }}
                   src={`https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${image}/MeditationON`}
-                  alt="test"
+                  alt={title ? `${title} - 사진 ${index + 1}` : `교회사진 ${index + 1}`}
                   loading="lazy"
                 />
               </ImageListItem>

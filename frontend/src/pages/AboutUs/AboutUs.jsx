@@ -12,7 +12,9 @@ import Section5 from "./Section5";
 
 const About = () => {
   return (
-    <ReactFullpage
+    <>
+      <title>교회소개 - OCCE</title>
+      <ReactFullpage
       //fullpage options
       licenseKey={"YOUR_KEY_HERE"}
       scrollingSpeed={1000} /* Options here */
@@ -54,6 +56,7 @@ const About = () => {
         );
       }}
     />
+    </>
   );
 };
 

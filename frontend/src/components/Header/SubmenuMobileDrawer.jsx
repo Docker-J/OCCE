@@ -33,14 +33,16 @@ const SubmenuMobileDrawer = ({
       onClose={onClose}
       sx={{
         "& .MuiDrawer-paper": {
-          width: "200px",
-          maxWidth: "85vw",
-          bgcolor: "rgba(255, 255, 255, 0.9)",
-          backdropFilter: "blur(20px)",
+          width: "280px",
+          maxWidth: "82vw",
+          bgcolor: "rgba(255, 255, 255, 0.95)",
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          borderRight: "1px solid rgba(255, 255, 255, 0.3)",
+          borderRight: "1px solid rgba(0, 0, 0, 0.08)",
+          boxShadow: "4px 0 24px rgba(0, 0, 0, 0.08)",
           overflowX: "hidden",
           boxSizing: "border-box",
         },
@@ -53,22 +55,31 @@ const SubmenuMobileDrawer = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            p: 2,
+            px: 2.5,
+            py: 2,
             borderBottom: "1px solid rgba(0, 0, 0, 0.06)",
+            background: "linear-gradient(to right, rgba(255, 107, 0, 0.05), transparent)",
           }}
         >
-          <Typography
-            sx={{
-              fontSize: "18px",
-              fontWeight: "700",
-              color: "#555",
-              letterSpacing: "-0.5px",
-            }}
-          >
-            전체메뉴
-          </Typography>
-          <IconButton onClick={onClose} edge="end" color="inherit">
-            <CloseIcon />
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <img
+              src="/favicons/favicon-32x32.png"
+              alt="OCCE Logo"
+              style={{ width: 22, height: 22, borderRadius: 4 }}
+            />
+            <Typography
+              sx={{
+                fontSize: "17px",
+                fontWeight: "800",
+                color: "#1e293b",
+                letterSpacing: "-0.3px",
+              }}
+            >
+              온교회 메뉴
+            </Typography>
+          </Box>
+          <IconButton onClick={onClose} edge="end" size="small" sx={{ color: "#64748b" }}>
+            <CloseIcon fontSize="small" />
           </IconButton>
         </Box>
 
@@ -132,18 +143,24 @@ const SubmenuMobileDrawer = ({
                             to={subpage.to}
                             onClick={onClose}
                             sx={{
-                              borderRadius: "8px",
-                              py: 1.2,
-                              mb: 0.2,
-                              color: "#555",
+                              borderRadius: "10px",
+                              py: 1.1,
+                              px: 1.5,
+                              mb: 0.3,
+                              color: "#475569",
+                              minHeight: "42px",
                               transition: "all 0.2s ease-in-out",
-                              "&:hover": { bgcolor: "rgba(0, 0, 0, 0.03)" },
-                              "&.active": {
-                                bgcolor: "rgba(255, 107, 0, 0.08)",
+                              "&:hover": {
+                                bgcolor: "rgba(255, 107, 0, 0.05)",
                                 color: "#FF6B00",
+                              },
+                              "&.active": {
+                                bgcolor: "rgba(255, 107, 0, 0.12)",
+                                color: "#FF6B00",
+                                fontWeight: 700,
                                 "& .MuiTypography-root": {
-                                  fontWeight: "650 !important",
-                                }
+                                  fontWeight: "700 !important",
+                                },
                               },
                             }}
                           >
@@ -151,7 +168,7 @@ const SubmenuMobileDrawer = ({
                               primary={
                                 <Typography
                                   sx={{
-                                    fontSize: "16px",
+                                    fontSize: "15px",
                                     fontWeight: 500,
                                     color: "inherit",
                                   }}
@@ -172,16 +189,20 @@ const SubmenuMobileDrawer = ({
                     onClick={onClose}
                     sx={{
                       borderRadius: "10px",
-                      py: 1.5,
-                      color: "#2b2b2b",
+                      py: 1.3,
+                      px: 1.5,
+                      color: "#1e293b",
                       transition: "all 0.2s ease-in-out",
-                      "&:hover": { bgcolor: "rgba(0, 0, 0, 0.04)" },
+                      "&:hover": {
+                        bgcolor: "rgba(255, 107, 0, 0.05)",
+                        color: "#FF6B00",
+                      },
                       "&.active": {
-                        bgcolor: "rgba(255, 107, 0, 0.08)",
+                        bgcolor: "rgba(255, 107, 0, 0.12)",
                         color: "#FF6B00",
                         "& .MuiTypography-root": {
                           fontWeight: "700 !important",
-                        }
+                        },
                       },
                     }}
                   >
@@ -189,8 +210,8 @@ const SubmenuMobileDrawer = ({
                       primary={
                         <Typography
                           sx={{
-                            fontSize: "18px",
-                            fontWeight: 550,
+                            fontSize: "17px",
+                            fontWeight: 600,
                             color: "inherit",
                           }}
                         >

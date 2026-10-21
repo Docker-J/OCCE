@@ -53,6 +53,7 @@ const Main = () => {
 
   return (
     <>
+      <title>에드먼튼 온누리교회 - OCCE</title>
       <CustomCarousel
         className={carouselStyles.carousel}
         showArrows={false}
@@ -69,8 +70,23 @@ const Main = () => {
             size="small"
             sx={{
               color: "white",
-              borderColor: "white",
-              ":hover": { borderColor: "white", bgcolor: "#FF6B00" },
+              borderColor: "rgba(255, 255, 255, 0.7)",
+              borderRadius: "20px",
+              px: 2.5,
+              py: 0.75,
+              fontWeight: 600,
+              fontSize: "0.875rem",
+              letterSpacing: "0.5px",
+              backdropFilter: "blur(6px)",
+              bgcolor: "rgba(0, 0, 0, 0.25)",
+              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.2)",
+              transition: "all 0.25s ease-in-out",
+              ":hover": {
+                borderColor: "#FF6B00",
+                bgcolor: "#FF6B00",
+                boxShadow: "0 4px 16px rgba(255, 107, 0, 0.45)",
+                transform: "translateY(-1px)",
+              },
             }}
           >
             온 교회 이야기
