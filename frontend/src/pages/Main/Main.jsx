@@ -53,7 +53,7 @@ const Main = () => {
 
   return (
     <>
-      <title>에드먼튼 온누리교회 - OCCE</title>
+      <title>에드먼턴 온 교회 - OCCE</title>
       <CustomCarousel
         className={carouselStyles.carousel}
         showArrows={false}
