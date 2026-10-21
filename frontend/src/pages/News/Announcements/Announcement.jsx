@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useOptimistic, startTransition } from "react";
 import { Container, Typography } from "@mui/material";
 import { useLoaderData, useNavigate, useRevalidator } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -34,28 +34,34 @@ const Announcement = () => {
   const { id, title, body, timestamp, pin } = useLoaderData();
   const queryClient = useQueryClient();
 
+  const [optimisticPin, setOptimisticPin] = useOptimistic(
+    pin,
+    (current, next) => next
+  );
+
   const [isLoading, setIsLoading] = useState(false);
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState(false);
   const { fontSize, increaseFont, decreaseFont, resetFont } = usePostFontSize();
 
-  const onPin = async () => {
-    setIsLoading(true);
-    try {
-      await pinAnnouncement(id, pin);
-      queryClient.invalidateQueries({ queryKey: ["announcements"] });
-      revalidator.revalidate();
-      openSnackbar(
-        "success",
-        `The announcement is successfully ${pin ? "unpinned" : "pinned"}`,
-      );
-    } catch {
-      openSnackbar(
-        "error",
-        "Error Occured. Please contact to the administrator.",
-      );
-    } finally {
-      setIsLoading(false);
-    }
+  const onPin = () => {
+    startTransition(async () => {
+      const nextPin = optimisticPin === 1 ? 0 : 1;
+      setOptimisticPin(nextPin);
+      try {
+        await pinAnnouncement(id, pin);
+        queryClient.invalidateQueries({ queryKey: ["announcements"] });
+        revalidator.revalidate();
+        openSnackbar(
+          "success",
+          `The announcement is successfully ${pin ? "unpinned" : "pinned"}`,
+        );
+      } catch {
+        openSnackbar(
+          "error",
+          "Error Occured. Please contact to the administrator.",
+        );
+      }
+    });
   };
 
   const onDelete = async () => {
@@ -93,8 +99,8 @@ const Announcement = () => {
       },
     },
     {
-      icon: pin ? <PushPinIcon /> : <PushPinOutlinedIcon />,
-      name: pin ? "Unpin" : "Pin",
+      icon: optimisticPin ? <PushPinIcon /> : <PushPinOutlinedIcon />,
+      name: optimisticPin ? "Unpin" : "Pin",
       onClick: onPin,
     },
     {
@@ -134,7 +140,7 @@ const Announcement = () => {
             title={title}
             body={body}
             timestamp={timestamp}
-            isPinned={pin === 1}
+            isPinned={optimisticPin === 1}
             fontSize={fontSize}
             onIncreaseFont={increaseFont}
             onDecreaseFont={decreaseFont}

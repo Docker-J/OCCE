@@ -19,6 +19,7 @@ import FullScreenLoading from "../common/FullScreenLoading";
 import Submenu from "../components/Header/Submenu";
 import SubmenuMobileDrawer from "../components/Header/SubmenuMobileDrawer";
 
+import { useShallow } from "zustand/react/shallow";
 import useAuthStore from "../store/useAuthStore";
 import { signOut } from "../api/user.js";
 import {
@@ -36,10 +37,14 @@ const ResponsiveAppBar = () => {
   const { openModal } = useModals();
   const { openSnackbar } = useSnackbar();
 
-  const authenticated = useAuthStore((state) => state.authenticated);
-  const admin = useAuthStore((state) => state.admin);
-  const isLeader = useAuthStore((state) => state.isLeader);
-  const deleteToken = useAuthStore((state) => state.deleteToken);
+  const { authenticated, admin, isLeader, deleteToken } = useAuthStore(
+    useShallow((state) => ({
+      authenticated: state.authenticated,
+      admin: state.admin,
+      isLeader: state.isLeader,
+      deleteToken: state.deleteToken,
+    }))
+  );
 
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);

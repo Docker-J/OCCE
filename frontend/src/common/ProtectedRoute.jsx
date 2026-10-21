@@ -16,6 +16,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
+import { useShallow } from "zustand/react/shallow";
 import useAuthStore from "../store/useAuthStore";
 import useModals from "../util/useModal";
 
@@ -27,10 +28,14 @@ const ProtectedRoute = ({
 }) => {
   const { openModal } = useModals();
 
-  const authInitialized = useAuthStore((state) => state.authInitialized);
-  const authenticated = useAuthStore((state) => state.authenticated);
-  const admin = useAuthStore((state) => state.admin);
-  const isLeader = useAuthStore((state) => state.isLeader);
+  const { authInitialized, authenticated, admin, isLeader } = useAuthStore(
+    useShallow((state) => ({
+      authInitialized: state.authInitialized,
+      authenticated: state.authenticated,
+      admin: state.admin,
+      isLeader: state.isLeader,
+    }))
+  );
 
   const handleLoginClick = async () => {
     const { default: SignInModal } = await import("../components/User/SignInModal");

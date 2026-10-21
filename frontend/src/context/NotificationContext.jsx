@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { registerToken, unregisterToken, unlinkTokenRole } from "../api/notification";
+import { useShallow } from "zustand/react/shallow";
 import useAuthStore from "../store/useAuthStore";
 import useSnackbar from "../util/useSnackbar";
 import { IconButton } from "@mui/material";
@@ -160,10 +161,19 @@ export const NotificationProvider = ({ children }) => {
     [action, openSnackbar]
   );
 
-  const authenticated = useAuthStore((state) => state.authenticated);
-  const isLeader = useAuthStore((state) => state.isLeader);
-  const admin = useAuthStore((state) => state.admin);
-  const isRememberedStore = useAuthStore((state) => state.isRemembered);
+  const {
+    authenticated,
+    isLeader,
+    admin,
+    isRemembered: isRememberedStore,
+  } = useAuthStore(
+    useShallow((state) => ({
+      authenticated: state.authenticated,
+      isLeader: state.isLeader,
+      admin: state.admin,
+      isRemembered: state.isRemembered,
+    }))
+  );
   const prevAuthRef = useRef(authenticated);
 
   useEffect(() => {

@@ -7,13 +7,18 @@
  */
 
 import { useEffect } from "react";
+import { useShallow } from "zustand/react/shallow";
 import useAuthStore from "../store/useAuthStore";
 import { performTokenRefresh } from "../util/authRefresh";
 
 const UserManager = () => {
-  const authenticated = useAuthStore((state) => state.authenticated);
-  const expireTime = useAuthStore((state) => state.expireTime);
-  const deleteToken = useAuthStore((state) => state.deleteToken);
+  const { authenticated, expireTime, deleteToken } = useAuthStore(
+    useShallow((state) => ({
+      authenticated: state.authenticated,
+      expireTime: state.expireTime,
+      deleteToken: state.deleteToken,
+    }))
+  );
 
   const signInfail = () => {
     deleteToken();

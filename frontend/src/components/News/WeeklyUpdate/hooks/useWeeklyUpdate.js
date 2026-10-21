@@ -13,13 +13,18 @@ import {
   subDays,
 } from "date-fns";
 import { deleteWeeklyUpdate, getWeeklyUpdate } from "../../../../api/weeklyupdate";
+import { useShallow } from "zustand/react/shallow";
 import useAuthStore from "../../../../store/useAuthStore";
 import { MIN_DATE } from "../../../../constants/WeeklyUpdate";
 
 export const useWeeklyUpdate = (queryDate, maxDate) => {
   const navigate = useNavigate();
-  const authenticated = useAuthStore((state) => state.authenticated);
-  const authInitialized = useAuthStore((state) => state.authInitialized);
+  const { authenticated, authInitialized } = useAuthStore(
+    useShallow((state) => ({
+      authenticated: state.authenticated,
+      authInitialized: state.authInitialized,
+    }))
+  );
 
   const [bulletin, setBulletin] = useState(null);
   const [selectedDate, setSelectedDate] = useState(queryDate);
