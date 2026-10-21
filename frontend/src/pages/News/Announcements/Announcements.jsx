@@ -16,6 +16,7 @@ import useModals from "../../../util/useModal";
 import AdminComponent from "../../../common/AdminComponent";
 import { Suspense } from "react";
 import ForumPostBoardSkeleton from "../../../common/Forum/ForumPostBoardSkeleton";
+import OCCEFallbackCard from "../../../common/OCCEFallbackCard";
 
 const titleBackground = {
   backgroundImage: 'url("/img/News/Announcements/Announcements.webp")',
@@ -67,7 +68,13 @@ const Announcements = () => {
           <Suspense key={page} fallback={<ForumPostBoardSkeleton />}>
             <Await
               resolve={data.announcementsData}
-              errorElement={<p>Error loading!</p>}
+              errorElement={
+                <OCCEFallbackCard
+                  title="공지사항을 불러오지 못했습니다"
+                  description="일시적인 네트워크 오류이거나 서버에 연결할 수 없습니다."
+                  onReset={() => revalidator.revalidate()}
+                />
+              }
             >
               {({ data }) => {
                 return data.announcements.length === 0 ? (

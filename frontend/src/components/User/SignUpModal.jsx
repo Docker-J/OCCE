@@ -78,8 +78,15 @@ const SignUpModal = ({ isOpen, onClose }) => {
           sx={{ width: "100%", mt: "1em" }}
           label="이름(한글)"
           required
-          {...register("name", { required: true })}
+          {...register("name", {
+            required: "성명을 입력해주세요.",
+            minLength: {
+              value: 2,
+              message: "2자 이상의 이름을 입력해주세요.",
+            },
+          })}
           error={!!errors.name}
+          helperText={errors.name?.message}
         />
 
         <Controller
@@ -87,10 +94,8 @@ const SignUpModal = ({ isOpen, onClose }) => {
           control={control}
           rules={{
             required: "전화번호를 입력해주세요.",
-            pattern: {
-              value: /^\d{10}$/,
-              message: "전화번호 10자리를 모두 입력해주세요.",
-            },
+            validate: (value) =>
+              value?.length === 10 || "전화번호 10자리를 모두 입력해주세요.",
           }}
           render={({ field: { onChange, name, value } }) => (
             <PatternFormat
@@ -119,13 +124,19 @@ const SignUpModal = ({ isOpen, onClose }) => {
           type="password"
           required
           {...register("password", {
-            required: true,
-            minLength: 8,
-            maxLength: 24,
+            required: "비밀번호를 입력해주세요.",
+            minLength: {
+              value: 8,
+              message: "최소 8자 이상 입력해주세요.",
+            },
+            maxLength: {
+              value: 24,
+              message: "최대 24자까지 입력 가능합니다.",
+            },
             pattern: {
               value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,24}$/,
               message:
-                "8-24자, 숫자, 소문자, 대문자, 특수문자를 모두 포함해주세요.",
+                "8-24자, 숫자, 영문 대/소문자, 특수문자를 모두 포함해야 합니다.",
             },
             deps: ["confirmPassword"],
           })}
@@ -139,13 +150,12 @@ const SignUpModal = ({ isOpen, onClose }) => {
           type="password"
           required
           {...register("confirmPassword", {
-            required: true,
-            validate: (value) => value === watch("password"),
+            required: "비밀번호 확인을 입력해주세요.",
+            validate: (value) =>
+              value === watch("password") || "비밀번호가 일치하지 않습니다.",
           })}
           error={!!errors.confirmPassword}
-          helperText={
-            errors.confirmPassword ? "비밀번호가 일치하지 않습니다." : ""
-          }
+          helperText={errors.confirmPassword?.message}
         />
 
         <Button

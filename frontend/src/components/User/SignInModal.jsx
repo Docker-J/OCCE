@@ -15,13 +15,21 @@ import { PatternFormat } from "react-number-format"; // Added PatternFormat
 import CustomModal from "../../common/CustomModal";
 import useModals from "../../util/useModal";
 import ResetPasswordRequestModal from "./ResetPasswordRequestModal";
+import SignUpConfirmModal from "./SignUpConfirmModal";
 
 const SignInModal = ({ isOpen, onClose }) => {
   const setToken = useAuthStore((state) => state.setToken);
   const { openModal } = useModals();
 
   // We use control and handleSubmit for the third-party input integration
-  const { control, handleSubmit, reset, getValues } = useForm({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    getValues,
+    formState: { errors, isValid },
+  } = useForm({
+    mode: "onChange",
     defaultValues: {
       phoneNumber: "",
       password: "",
@@ -51,23 +59,7 @@ const SignInModal = ({ isOpen, onClose }) => {
     handleClose();
   };
 
-  const signInFail = () => {
-    openSnackbar("error", "Wrong User Credentials");
-  };
-
   const handleSignIn = async (data) => {
-    // data.phoneNumber will contain the formatted string "(123) 456-7890"
-    const PASSWORD_REGEX = /^(?=.*[\d])(?=.*[!@#$%^&*])[\w!@#$%^&*]/;
-    const isValid =
-      data.password.length >= 8 &&
-      data.password.length <= 24 &&
-      PASSWORD_REGEX.test(data.password);
-
-    if (!isValid) {
-      signInFail();
-      return;
-    }
-
     setIsLoading(true);
     try {
       const result = await signIn(
@@ -76,8 +68,25 @@ const SignInModal = ({ isOpen, onClose }) => {
         getValues("remember")
       );
       signInSuccess(result);
-    } catch {
-      signInFail();
+    } catch (err) {
+      const errName = err.response?.data?.error;
+      const errMsg = err.response?.data?.message || err.message;
+
+      if (errName === "UserNotConfirmedException") {
+        openSnackbar(
+          "warning",
+          "전화번호 인증이 완료되지 않았습니다. 인증번호 입력창으로 이동합니다."
+        );
+        handleClose();
+        openModal(SignUpConfirmModal, { phone: data.phoneNumber });
+      } else if (
+        errName === "NotAuthorizedException" ||
+        errName === "UserNotFoundException"
+      ) {
+        openSnackbar("error", "전화번호 또는 비밀번호가 일치하지 않습니다.");
+      } else {
+        openSnackbar("error", errMsg || "로그인에 실패했습니다.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -128,15 +137,28 @@ const SignInModal = ({ isOpen, onClose }) => {
           )}
         />
 
-        <TextField
-          sx={{ width: "100%", mt: "1em" }}
-          label="비밀번호"
-          type="password"
-          required
-          disabled={isLoading}
-          {...control.register("password", {
-            required: "비밀번호를 입력해주세요",
-          })}
+        <Controller
+          name="password"
+          control={control}
+          rules={{
+            required: "비밀번호를 입력해주세요.",
+            minLength: {
+              value: 8,
+              message: "비밀번호는 최소 8자 이상이어야 합니다.",
+            },
+          }}
+          render={({ field, fieldState: { error } }) => (
+            <TextField
+              {...field}
+              sx={{ width: "100%", mt: "1em" }}
+              label="비밀번호"
+              type="password"
+              required
+              disabled={isLoading}
+              error={!!error}
+              helperText={error?.message}
+            />
+          )}
         />
 
         <FormControlLabel
@@ -161,7 +183,7 @@ const SignInModal = ({ isOpen, onClose }) => {
           sx={{ width: "100%", mt: "1em", height: "3em" }}
           variant="outlined"
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || !isValid}
         >
           {isLoading ? (
             <CircularProgress size={24} color="inherit" />
