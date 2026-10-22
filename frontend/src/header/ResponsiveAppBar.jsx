@@ -14,6 +14,9 @@ import Container from "@mui/material/Container";
 import PersonIcon from "@mui/icons-material/Person";
 import MenuItem from "@mui/material/MenuItem";
 import Slide from "@mui/material/Slide";
+import Chip from "@mui/material/Chip";
+import Badge from "@mui/material/Badge";
+import Tooltip from "@mui/material/Tooltip";
 import FullScreenLoading from "../common/FullScreenLoading";
 
 import Submenu from "../components/Header/Submenu";
@@ -37,12 +40,13 @@ const ResponsiveAppBar = () => {
   const { openModal } = useModals();
   const { openSnackbar } = useSnackbar();
 
-  const { authenticated, admin, isLeader, deleteToken } = useAuthStore(
+  const { authenticated, admin, isLeader, deleteToken, userProfile } = useAuthStore(
     useShallow((state) => ({
       authenticated: state.authenticated,
       admin: state.admin,
       isLeader: state.isLeader,
       deleteToken: state.deleteToken,
+      userProfile: state.userProfile,
     }))
   );
 
@@ -226,15 +230,39 @@ const ResponsiveAppBar = () => {
             </Box>
   
             <Box sx={{ ml: "16px", flexGrow: 0 }}>
-              <IconButton
-                size="large"
-                color="inherit"
-                sx={{ pl: 0 }}
-                {...bindTrigger(userPopupState)}
+              <Tooltip
+                title={
+                  authenticated
+                    ? userProfile?.name
+                      ? `${userProfile.name} 님`
+                      : "내 계정"
+                    : "로그인 / 회원가입"
+                }
+                arrow
               >
-                <PersonIcon fontSize="large" />
-              </IconButton>
-  
+                <IconButton
+                  size="large"
+                  color="inherit"
+                  sx={{ pl: 0 }}
+                  {...bindTrigger(userPopupState)}
+                >
+                  <Badge
+                    color="primary"
+                    variant="dot"
+                    invisible={!authenticated}
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        backgroundColor: "#FF6B00",
+                        right: 4,
+                        top: 6,
+                      },
+                    }}
+                  >
+                    <PersonIcon fontSize="large" />
+                  </Badge>
+                </IconButton>
+              </Tooltip>
+
               <Menu
                 id="menu-appbar"
                 anchorOrigin={{
@@ -252,6 +280,57 @@ const ResponsiveAppBar = () => {
                 TransitionComponent={Slide}
                 TransitionProps={{ direction: "left", timeout: 350 }}
               >
+                {authenticated && (
+                  <Box
+                    sx={{
+                      px: 2,
+                      py: 1.5,
+                      borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
+                      mb: 0.5,
+                      textAlign: "left",
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: "15px",
+                        fontWeight: 700,
+                        color: "#1e293b",
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {userProfile?.name ? `${userProfile.name} 님` : "온교회 교인"}
+                    </Typography>
+                    <Box sx={{ mt: 0.6, display: "flex", gap: 0.5 }}>
+                      <Chip
+                        label={
+                          admin
+                            ? "관리자 (Staff)"
+                            : isLeader
+                            ? "정원지기"
+                            : "교인"
+                        }
+                        size="small"
+                        sx={{
+                          height: "22px",
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          bgcolor: admin
+                            ? "rgba(255, 107, 0, 0.12)"
+                            : isLeader
+                            ? "rgba(16, 185, 129, 0.12)"
+                            : "rgba(100, 116, 139, 0.12)",
+                          color: admin
+                            ? "#FF6B00"
+                            : isLeader
+                            ? "#059669"
+                            : "#475569",
+                          borderRadius: "6px",
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                )}
+
                 {(authenticated ? settings_signed : settings_not_signed).map(
                   (setting) => (
                     <MenuItem
