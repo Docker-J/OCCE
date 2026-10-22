@@ -259,10 +259,10 @@ export const NotificationProvider = ({ children }) => {
         });
         if (token) {
           await unregisterToken(token);
-          console.log("Deleted token from DynamoDB.");
+          console.log("Deleted token from database.");
         }
       } catch (e) {
-        console.warn("Failed to delete token from DynamoDB:", e);
+        console.warn("Failed to delete token from database:", e);
       }
 
       try {
