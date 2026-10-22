@@ -8,6 +8,42 @@ const titleBackground = {
   backgroundPositionX: "52%",
 };
 
+/**
+ * Safely extracts or normalizes YouTube playlist embed URL from various link formats.
+ */
+const getYoutubeEmbedUrl = (link) => {
+  if (!link || typeof link !== "string") return "";
+
+  // 1. Direct embed URL already provided
+  if (link.includes("youtube.com/embed")) {
+    return link;
+  }
+
+  // 2. Query parameter: ?list=... or &list=...
+  try {
+    const url = new URL(link);
+    const listId = url.searchParams.get("list");
+    if (listId) {
+      return `https://www.youtube.com/embed/videoseries?list=${listId}`;
+    }
+  } catch {
+    // If not a full URL, fallback to regex search
+  }
+
+  const listMatch = link.match(/[?&]list=([^#&?]+)/);
+  if (listMatch?.[1]) {
+    return `https://www.youtube.com/embed/videoseries?list=${listMatch[1]}`;
+  }
+
+  // 3. Fallback for "PL-" or "PL" playlist ID pattern
+  const plMatch = link.match(/(PL[-a-zA-Z0-9_]+)/);
+  if (plMatch?.[1]) {
+    return `https://www.youtube.com/embed/videoseries?list=${plMatch[1]}`;
+  }
+
+  return link;
+};
+
 const Bible291 = () => {
   const { today, match } = useLoaderData();
 
@@ -60,11 +96,7 @@ const Bible291 = () => {
                 입니다.
               </Typography>
               <br />
-              <YoutubePlaylist
-                src={`https://www.youtube.com/embed/videoseries?list=PL-${
-                  match.link.split("PL-")[1]
-                }`}
-              />
+              <YoutubePlaylist src={getYoutubeEmbedUrl(match.link)} />
             </>
           ) : (
             <Typography
