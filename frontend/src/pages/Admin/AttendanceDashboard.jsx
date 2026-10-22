@@ -121,7 +121,7 @@ const AttendanceDashboard = () => {
 
       {/* 4. 정원별 출석 현황 테이블 */}
       <OCCEErrorBoundary
-        title="출석 통계 차트를 불러오는 중 오류가 발생했습니다"
+        title="정원별 출석 현황 테이블을 불러오는 중 오류가 발생했습니다"
         resetKeys={[sortedGardenStats, selectedDate]}
         onReset={() => fetchData(true)}
       >
