@@ -49,6 +49,10 @@ const useAuthStore = create((set) => ({
     } catch {}
 
     const idPayload = payload.idToken ? parseJwt(payload.idToken) : null;
+    const accessPayload = payload.accessToken
+      ? parseJwt(payload.accessToken)
+      : null;
+
     const userProfile = idPayload
       ? {
           name: idPayload.name || "",
@@ -58,14 +62,24 @@ const useAuthStore = create((set) => ({
         }
       : null;
 
+    const tokenGroups = [
+      ...(accessPayload?.["cognito:groups"] || []),
+      ...(idPayload?.["cognito:groups"] || []),
+    ];
+    const allGroups = [
+      ...new Set([
+        ...tokenGroups,
+        ...(Array.isArray(payload.groups) ? payload.groups : []),
+        ...(payload.group ? [payload.group] : []),
+      ]),
+    ];
+
     set({
       authenticated: true,
       authInitialized: true,
-      admin: payload.groups?.some((group) => group === "Staff") || false,
+      admin: allGroups.includes("Staff"),
       isLeader:
-        payload.groups?.some(
-          (group) => group === "Staff" || group === "GardenKeeper"
-        ) || false,
+        allGroups.includes("Staff") || allGroups.includes("GardenKeeper"),
       isRemembered: payload.remember ?? false,
       accessToken: payload.accessToken,
       idToken: payload.idToken || null,

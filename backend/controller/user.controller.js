@@ -13,6 +13,15 @@ import { getCookie, setCookie, deleteCookie } from "hono/cookie";
 import { getDriveClient } from "../api/googleClients.js";
 import * as XLSX from "xlsx";
 
+export const normalizePhone = (raw) => {
+  if (!raw) return "";
+  let digits = String(raw).replace(/\D/g, "");
+  if (digits.length === 11 && digits.startsWith("1")) {
+    digits = digits.slice(1);
+  }
+  return digits;
+};
+
 const getRefreshTokenCookieOptions = (remember = false) => {
   const options = {
     httpOnly: true,
@@ -69,6 +78,7 @@ export const signInController = async (c) => {
 
   const phone = credentials.slice(0, colonIndex);
   const password = credentials.slice(colonIndex + 1);
+  const cleanPhone = normalizePhone(phone);
 
   console.log("Sign In requested");
 
@@ -80,7 +90,7 @@ export const signInController = async (c) => {
     AuthFlow: "USER_PASSWORD_AUTH",
     ClientId: AWS_COGNITO_CLIENT_ID,
     AuthParameters: {
-      USERNAME: "+1" + phone,
+      USERNAME: "+1" + cleanPhone,
       PASSWORD: password,
     },
   };
@@ -96,7 +106,8 @@ export const signInController = async (c) => {
     const payload = JSON.parse(
       Buffer.from(accessToken.split(".")[1], "base64"),
     );
-    const group = payload["cognito:groups"]?.[0] || null;
+    const groups = payload["cognito:groups"] || [];
+    const group = groups[0] || null;
 
     if (refreshToken) {
       setCookie(
@@ -116,6 +127,7 @@ export const signInController = async (c) => {
       accessToken: accessToken,
       idToken: idToken,
       group: group,
+      groups: groups,
       remember: !!remember,
     });
   } catch (error) {
@@ -167,10 +179,11 @@ export const refreshSignInController = async (c) => {
     const accessToken = response.AuthenticationResult.AccessToken;
     const newRefreshToken = response.AuthenticationResult.RefreshToken;
     const idToken = response.AuthenticationResult.IdToken;
-    const group =
-      JSON.parse(Buffer.from(accessToken.split(".")[1], "base64"))[
-        "cognito:groups"
-      ]?.[0] || null;
+    const payload = JSON.parse(
+      Buffer.from(accessToken.split(".")[1], "base64"),
+    );
+    const groups = payload["cognito:groups"] || [];
+    const group = groups[0] || null;
 
     const isRemembered = getCookie(c, "remember") === "true";
     const tokenToPersist = newRefreshToken || tokenToUse;
@@ -188,6 +201,7 @@ export const refreshSignInController = async (c) => {
       accessToken: accessToken,
       idToken: idToken,
       group: group,
+      groups: groups,
       remember: isRemembered,
     });
   } catch (error) {
@@ -259,11 +273,11 @@ const checkUserInSheet = async (env, name, phone) => {
     const statusRaw = row[3];
 
     const rowName = rowNameRaw?.toString().trim();
-    const rowPhoneClean = rowPhoneRaw?.toString().replace(/\D/g, "");
+    const rowPhoneClean = normalizePhone(rowPhoneRaw);
     const status = statusRaw?.toString().trim();
 
-    const inputName = name.trim();
-    const inputPhoneClean = phone.replace(/\D/g, "");
+    const inputName = String(name || "").trim();
+    const inputPhoneClean = normalizePhone(phone);
 
     const isNameMatch = rowName === inputName;
     const isPhoneMatch = rowPhoneClean === inputPhoneClean;
@@ -278,9 +292,11 @@ const checkUserInSheet = async (env, name, phone) => {
 export const signUpController = async (c) => {
   const body = await c.req.json();
   const env = c.env;
+  const cleanPhone = normalizePhone(body.phone);
+  const cleanName = String(body.name || "").trim();
 
   try {
-    const member = await checkUserInSheet(env, body.name, body.phone);
+    const member = await checkUserInSheet(env, cleanName, cleanPhone);
 
     if (!member) {
       return c.json({ error: "NonMemberException" }, 403);
@@ -297,12 +313,12 @@ export const signUpController = async (c) => {
 
   const params = {
     ClientId: AWS_COGNITO_CLIENT_ID,
-    Username: "+1" + body.phone,
+    Username: "+1" + cleanPhone,
     Password: body.password,
     UserAttributes: [
       {
         Name: "name",
-        Value: body.name,
+        Value: cleanName,
       },
     ],
   };
@@ -332,10 +348,11 @@ export const confirmSignUpController = async (c) => {
   const env = c.env;
   const AWS_COGNITO_CLIENT_ID = env.AWS_COGNITO_CLIENT_ID;
   const cognitoClient = getCognitoClient(env);
+  const cleanPhone = normalizePhone(body.phone);
 
   const input = {
     ClientId: AWS_COGNITO_CLIENT_ID,
-    Username: "+1" + body.phone,
+    Username: "+1" + cleanPhone,
     ConfirmationCode: body.confirmCode,
   };
   const command = new ConfirmSignUpCommand(input);
@@ -357,7 +374,8 @@ export const confirmSignUpController = async (c) => {
 export const requestConfirmController = async (c) => {
   const body = (await c.req.json().catch(() => ({}))) || {};
   const phone = body.phone || c.req.query("phone");
-  const username = "+1" + phone;
+  const cleanPhone = normalizePhone(phone);
+  const username = "+1" + cleanPhone;
 
   const env = c.env;
   const AWS_COGNITO_CLIENT_ID = env.AWS_COGNITO_CLIENT_ID;
@@ -440,8 +458,8 @@ export const signOutController = async (c) => {
 
 export const forgotPasswordController = async (c) => {
   const body = await c.req.json();
-  const phone = body.phone;
-  const username = "+1" + phone;
+  const cleanPhone = normalizePhone(body.phone);
+  const username = "+1" + cleanPhone;
 
   const env = c.env;
   const AWS_COGNITO_CLIENT_ID = env.AWS_COGNITO_CLIENT_ID;
@@ -472,8 +490,8 @@ export const forgotPasswordController = async (c) => {
 
 export const confirmForgotPasswordController = async (c) => {
   const body = await c.req.json();
-  const phone = body.phone;
-  const username = "+1" + phone;
+  const cleanPhone = normalizePhone(body.phone);
+  const username = "+1" + cleanPhone;
   const code = body.confirmCode;
   const password = body.password;
 
