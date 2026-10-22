@@ -19,15 +19,24 @@ const NewComersTimeline = () => {
   const [anchorEl, setAnchorEl] = useState({ anchor: null, popoverID: null });
 
   const handlePopoverOpen = (event, popoverID) => {
-    setAnchorEl({ anchor: event.currentTarget, popoverID: popoverID });
+    setAnchorEl({ anchor: event.currentTarget, popoverID });
   };
 
   const handlePopoverClose = () => {
     setAnchorEl({ anchor: null, popoverID: null });
   };
 
-  const openRegister = anchorEl.popoverID === 1 && anchorEl.anchor;
-  const openDiscipline = anchorEl.popoverID === 2 && anchorEl.anchor;
+  const handleTogglePopover = (event, popoverID) => {
+    event.stopPropagation();
+    setAnchorEl((prev) =>
+      prev.popoverID === popoverID
+        ? { anchor: null, popoverID: null }
+        : { anchor: event.currentTarget, popoverID }
+    );
+  };
+
+  const openRegister = anchorEl.popoverID === 1 && Boolean(anchorEl.anchor);
+  const openDiscipline = anchorEl.popoverID === 2 && Boolean(anchorEl.anchor);
 
   return (
     <Timeline position="alternate" sx={{ pb: 0, mb: 0 }}>
@@ -39,12 +48,16 @@ const NewComersTimeline = () => {
           <TimelineConnector sx={{ height: "45px" }} />
         </TimelineSeparator>
         <TimelineContent sx={{ py: "24px" }}>
-          <Typography sx={{
-            fontWeight: 700,
-            fontSize: "1.05rem",
-            color: "#2b2b2b",
-            letterSpacing: "-0.5px"
-          }}>방문카드 작성</Typography>
+          <Typography
+            sx={{
+              fontWeight: 700,
+              fontSize: "1.05rem",
+              color: "#2b2b2b",
+              letterSpacing: "-0.5px",
+            }}
+          >
+            방문카드 작성
+          </Typography>
         </TimelineContent>
       </TimelineItem>
       <TimelineItem>
@@ -58,21 +71,29 @@ const NewComersTimeline = () => {
           <Typography
             onMouseEnter={(e) => handlePopoverOpen(e, 1)}
             onMouseLeave={handlePopoverClose}
+            onClick={(e) => handleTogglePopover(e, 1)}
             sx={{
               fontWeight: 700,
               fontSize: "1.05rem",
               color: "#2b2b2b",
-              letterSpacing: "-0.5px"
+              letterSpacing: "-0.5px",
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 0.5,
+              userSelect: "none",
             }}
           >
-            등록 <HelpOutlineIcon fontSize="small" color="primary" sx={{ verticalAlign: "middle", ml: 0.5 }} />
+            등록{" "}
+            <HelpOutlineIcon
+              fontSize="small"
+              color="primary"
+              sx={{ verticalAlign: "middle" }}
+            />
           </Typography>
 
           <Popover
             id="mouse-over-popover"
-            sx={{
-              pointerEvents: "none",
-            }}
             open={openRegister}
             anchorEl={anchorEl.anchor}
             anchorOrigin={{
@@ -86,8 +107,17 @@ const NewComersTimeline = () => {
             onClose={handlePopoverClose}
             disableRestoreFocus
             disableScrollLock
+            PaperProps={{
+              sx: {
+                p: 1.5,
+                borderRadius: "12px",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+                border: "1px solid rgba(0,0,0,0.06)",
+                maxWidth: 280,
+              },
+            }}
           >
-            <Typography sx={{ p: 1 }}>
+            <Typography sx={{ fontSize: "0.9rem", color: "#334155" }}>
               QR코드 온라인 등록 또는 오프라인 등록 양식 작성
             </Typography>
           </Popover>
@@ -104,21 +134,29 @@ const NewComersTimeline = () => {
           <Typography
             onMouseEnter={(e) => handlePopoverOpen(e, 2)}
             onMouseLeave={handlePopoverClose}
+            onClick={(e) => handleTogglePopover(e, 2)}
             sx={{
               fontWeight: 700,
               fontSize: "1.05rem",
               color: "#2b2b2b",
-              letterSpacing: "-0.5px"
+              letterSpacing: "-0.5px",
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 0.5,
+              userSelect: "none",
             }}
           >
-            새가족 교육 <HelpOutlineIcon fontSize="small" color="primary" sx={{ verticalAlign: "middle", ml: 0.5 }} />
+            새가족 교육{" "}
+            <HelpOutlineIcon
+              fontSize="small"
+              color="primary"
+              sx={{ verticalAlign: "middle" }}
+            />
           </Typography>
         </TimelineContent>
         <Popover
           id="mouse-over-popover2"
-          sx={{
-            pointerEvents: "none",
-          }}
           open={openDiscipline}
           anchorEl={anchorEl.anchor}
           anchorOrigin={{
@@ -132,8 +170,17 @@ const NewComersTimeline = () => {
           onClose={handlePopoverClose}
           disableRestoreFocus
           disableScrollLock
+          PaperProps={{
+            sx: {
+              p: 1.5,
+              borderRadius: "12px",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+              border: "1px solid rgba(0,0,0,0.06)",
+              maxWidth: 280,
+            },
+          }}
         >
-          <Typography sx={{ p: 1 }}>
+          <Typography sx={{ fontSize: "0.9rem", color: "#334155" }}>
             4주 과정, 주일 오후 4시 15분 새가족실(1층 미팅룸)
           </Typography>
         </Popover>
