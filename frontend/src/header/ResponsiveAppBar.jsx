@@ -15,7 +15,6 @@ import PersonIcon from "@mui/icons-material/Person";
 import MenuItem from "@mui/material/MenuItem";
 import Slide from "@mui/material/Slide";
 import Chip from "@mui/material/Chip";
-import Badge from "@mui/material/Badge";
 import Tooltip from "@mui/material/Tooltip";
 import FullScreenLoading from "../common/FullScreenLoading";
 
@@ -246,20 +245,7 @@ const ResponsiveAppBar = () => {
                   sx={{ pl: 0 }}
                   {...bindTrigger(userPopupState)}
                 >
-                  <Badge
-                    color="primary"
-                    variant="dot"
-                    invisible={!authenticated}
-                    sx={{
-                      "& .MuiBadge-badge": {
-                        backgroundColor: "#FF6B00",
-                        right: 4,
-                        top: 6,
-                      },
-                    }}
-                  >
-                    <PersonIcon fontSize="large" />
-                  </Badge>
+                  <PersonIcon fontSize="large" />
                 </IconButton>
               </Tooltip>
 
@@ -287,7 +273,10 @@ const ResponsiveAppBar = () => {
                       py: 1.5,
                       borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
                       mb: 0.5,
-                      textAlign: "left",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-end",
+                      textAlign: "right",
                     }}
                   >
                     <Typography
@@ -296,15 +285,16 @@ const ResponsiveAppBar = () => {
                         fontWeight: 700,
                         color: "#1e293b",
                         lineHeight: 1.3,
+                        textAlign: "right",
                       }}
                     >
                       {userProfile?.name ? `${userProfile.name} 님` : "온교회 교인"}
                     </Typography>
-                    <Box sx={{ mt: 0.6, display: "flex", gap: 0.5 }}>
+                    <Box sx={{ mt: 0.6, display: "flex", justifyContent: "flex-end" }}>
                       <Chip
                         label={
                           admin
-                            ? "관리자 (Staff)"
+                            ? "관리자"
                             : isLeader
                             ? "정원지기"
                             : "교인"
