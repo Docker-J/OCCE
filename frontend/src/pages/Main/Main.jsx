@@ -16,8 +16,10 @@ import BroadcastModal from "../../components/Main/BroadcastModal";
 const MainImage = ({
   src,
   backgroundImage,
-  alt = "OCCE Church",
+  alt = "에드먼턴 온 교회",
   priority = false,
+  width,
+  height,
 }) => {
   const imgSrc =
     src ||
@@ -38,8 +40,10 @@ const MainImage = ({
           className="main-hero-image"
           src={imgSrc}
           alt={alt}
+          width={width}
+          height={height}
           loading={priority ? "eager" : "lazy"}
-          {...(priority ? { fetchPriority: "high" } : {})}
+          {...(priority ? { fetchPriority: "high" } : { fetchPriority: "low" })}
         />
       </div>
 
@@ -93,9 +97,22 @@ const Main = () => {
           </Button>
         </div>
 
-        <MainImage backgroundImage={"url(/img/Main/img1.webp)"} priority={true} />
-        <MainImage backgroundImage={"url(/img/Main/img2.webp)"} />
-        <MainImage backgroundImage={"url(/img/Main/img3.webp)"} />
+        <MainImage
+          backgroundImage={"url(/img/Main/img1.webp)"}
+          priority={true}
+          width={1244}
+          height={700}
+        />
+        <MainImage
+          backgroundImage={"url(/img/Main/img2.webp)"}
+          width={1050}
+          height={700}
+        />
+        <MainImage
+          backgroundImage={"url(/img/Main/img3.webp)"}
+          width={933}
+          height={700}
+        />
       </CustomCarousel>
 
       <div
