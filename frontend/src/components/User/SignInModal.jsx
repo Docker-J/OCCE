@@ -6,7 +6,11 @@ import {
   TextField,
   Typography,
   CircularProgress,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { signIn } from "../../api/user";
 import useAuthStore from "../../store/useAuthStore";
 import useSnackbar from "../../util/useSnackbar";
@@ -39,6 +43,7 @@ const SignInModal = ({ isOpen, onClose }) => {
 
   const { openSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const signInSuccess = (result) => {
     const data = {
@@ -94,6 +99,7 @@ const SignInModal = ({ isOpen, onClose }) => {
 
   const handleClose = () => {
     reset();
+    setShowPassword(false);
     onClose();
   };
 
@@ -152,11 +158,36 @@ const SignInModal = ({ isOpen, onClose }) => {
               {...field}
               sx={{ width: "100%", mt: "1em" }}
               label="비밀번호"
-              type="password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="current-password"
               required
               disabled={isLoading}
               error={!!error}
               helperText={error?.message}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label={
+                          showPassword ? "비밀번호 숨기기" : "비밀번호 보기"
+                        }
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        onMouseDown={(e) => e.preventDefault()}
+                        edge="end"
+                        size="small"
+                        disabled={isLoading}
+                      >
+                        {showPassword ? (
+                          <VisibilityOff fontSize="small" />
+                        ) : (
+                          <Visibility fontSize="small" />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
             />
           )}
         />

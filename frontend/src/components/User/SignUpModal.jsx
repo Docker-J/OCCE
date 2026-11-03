@@ -1,4 +1,14 @@
-import { Button, Stack, TextField, Typography } from "@mui/material";
+import { useState } from "react";
+import {
+  Button,
+  Stack,
+  TextField,
+  Typography,
+  IconButton,
+  InputAdornment,
+} from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { signUp } from "../../api/user";
 import useModals from "../../util/useModal";
 import useSnackbar from "../../util/useSnackbar";
@@ -13,6 +23,8 @@ import CustomModal from "../../common/CustomModal";
 const SignUpModal = ({ isOpen, onClose }) => {
   const { openModal } = useModals();
   const { openSnackbar } = useSnackbar();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -64,6 +76,8 @@ const SignUpModal = ({ isOpen, onClose }) => {
 
   const handleClose = () => {
     reset();
+    setShowPassword(false);
+    setShowConfirmPassword(false);
     onClose();
   };
 
@@ -121,7 +135,8 @@ const SignUpModal = ({ isOpen, onClose }) => {
         <TextField
           sx={{ width: "100%", mt: "1em" }}
           label="비밀번호"
-          type="password"
+          type={showPassword ? "text" : "password"}
+          autoComplete="new-password"
           required
           {...register("password", {
             required: "비밀번호를 입력해주세요.",
@@ -142,12 +157,36 @@ const SignUpModal = ({ isOpen, onClose }) => {
           })}
           error={!!errors.password}
           helperText={errors.password?.message}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label={
+                      showPassword ? "비밀번호 숨기기" : "비밀번호 보기"
+                    }
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    onMouseDown={(e) => e.preventDefault()}
+                    edge="end"
+                    size="small"
+                  >
+                    {showPassword ? (
+                      <VisibilityOff fontSize="small" />
+                    ) : (
+                      <Visibility fontSize="small" />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+          }}
         />
 
         <TextField
           sx={{ width: "100%", mt: "1em" }}
           label="비밀번호 확인"
-          type="password"
+          type={showConfirmPassword ? "text" : "password"}
+          autoComplete="new-password"
           required
           {...register("confirmPassword", {
             required: "비밀번호 확인을 입력해주세요.",
@@ -156,6 +195,31 @@ const SignUpModal = ({ isOpen, onClose }) => {
           })}
           error={!!errors.confirmPassword}
           helperText={errors.confirmPassword?.message}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label={
+                      showConfirmPassword
+                        ? "비밀번호 확인 숨기기"
+                        : "비밀번호 확인 보기"
+                    }
+                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                    onMouseDown={(e) => e.preventDefault()}
+                    edge="end"
+                    size="small"
+                  >
+                    {showConfirmPassword ? (
+                      <VisibilityOff fontSize="small" />
+                    ) : (
+                      <Visibility fontSize="small" />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+          }}
         />
 
         <Button
