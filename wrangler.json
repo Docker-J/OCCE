@@ -26,7 +26,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_id": "1de4220d-820c-4074-ae4f-b4aabeacf83e"
+      "database_id": "1de4220d-820c-4074-ae4f-b4aabeacf83e",
+      "remote": true
     }
   ],
   "r2_buckets": [
@@ -80,7 +81,8 @@
         {
           "binding": "DB",
           "database_name": "occe-dev-db",
-          "database_id": "dbebb972-d10d-4adb-869f-374fa0faa13f"
+          "database_id": "dbebb972-d10d-4adb-869f-374fa0faa13f",
+          "remote": true
         }
       ],
       "r2_buckets": [

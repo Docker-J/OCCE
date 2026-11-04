@@ -96,7 +96,6 @@ const Albums = () => {
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
-      handleScroll();
       window.removeEventListener("scroll", handleScroll);
     };
   }, [location.pathname]);
@@ -109,9 +108,11 @@ const Albums = () => {
         const targetY = parseInt(savedPos, 10);
         if (!isNaN(targetY) && targetY > 0) {
           const rafId = requestAnimationFrame(() => {
-            if (Math.abs(window.scrollY - targetY) > 2) {
-              window.scrollTo({ top: targetY, behavior: "instant" });
-            }
+            const prevBehavior = document.documentElement.style.scrollBehavior;
+            document.documentElement.style.scrollBehavior = "auto";
+            window.scrollTo({ top: targetY, behavior: "instant" });
+            document.documentElement.scrollTop = targetY;
+            document.documentElement.style.scrollBehavior = prevBehavior;
           });
           return () => cancelAnimationFrame(rafId);
         }
