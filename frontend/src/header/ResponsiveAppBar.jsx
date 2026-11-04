@@ -186,7 +186,7 @@ const ResponsiveAppBar = () => {
             >
               <IconButton
                 size="large"
-                aria-label="menus"
+                aria-label="전체 메뉴 열기"
                 aria-controls="menu-appbar"
                 aria-haspopup="true"
                 color="inherit"

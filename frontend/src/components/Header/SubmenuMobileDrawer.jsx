@@ -78,7 +78,13 @@ const SubmenuMobileDrawer = ({
               전체메뉴
             </Typography>
           </Box>
-          <IconButton onClick={onClose} edge="end" size="small" sx={{ color: "#64748b" }}>
+          <IconButton
+            onClick={onClose}
+            edge="end"
+            size="small"
+            aria-label="메뉴 닫기"
+            sx={{ color: "#64748b" }}
+          >
             <CloseIcon fontSize="small" />
           </IconButton>
         </Box>
