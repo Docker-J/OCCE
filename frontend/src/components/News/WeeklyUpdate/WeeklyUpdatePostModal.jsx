@@ -8,7 +8,6 @@ import { uploadWeeklyUpdate } from "../../../api/weeklyupdate";
 import { MIN_DATE } from "../../../constants/WeeklyUpdate";
 import FileUploadComponent from "../../../common/FileUploadComponent";
 import CustomModal from "../../../common/CustomModal";
-import { isMobile } from "react-device-detect";
 
 const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
   const { openSnackbar } = useSnackbar();
@@ -37,15 +36,16 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
 
   useEffect(() => {
     const updateDimensions = () => {
-      const width = isMobile
-        ? document.documentElement.clientWidth
-        : window.innerWidth;
+      const clientWidth =
+        typeof window !== "undefined"
+          ? document.documentElement.clientWidth || window.innerWidth
+          : 600;
 
-      setWidth(Math.min(width * 0.8, 1300) / 2 - 24);
+      setWidth(Math.min(clientWidth * 0.8, 1300) / 2 - 24);
     };
 
     updateDimensions(); // Initial calculation
-    window.addEventListener("resize", updateDimensions); // Update on resize
+    window.addEventListener("resize", updateDimensions, { passive: true }); // Update on resize
 
     return () => window.removeEventListener("resize", updateDimensions); // Clean up
   }, []);

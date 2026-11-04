@@ -1,6 +1,5 @@
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import update from "immutability-helper";
 import ImagePreviewCard from "./ImagePreviewCard";
 
 const ImagePreviews = ({
@@ -11,22 +10,14 @@ const ImagePreviews = ({
   setFilesToUpload,
 }) => {
   const movePhoto = (dragIndex, hoverIndex) => {
-    setFilesToUpload((prev) =>
-      update(prev, {
-        $splice: [
-          [dragIndex, 1],
-          [hoverIndex, 0, prev[dragIndex]],
-        ],
-      })
-    );
-    setImagesPreview((prev) =>
-      update(prev, {
-        $splice: [
-          [dragIndex, 1],
-          [hoverIndex, 0, prev[dragIndex]],
-        ],
-      })
-    );
+    const reorder = (arr) => {
+      const copy = [...arr];
+      const [item] = copy.splice(dragIndex, 1);
+      copy.splice(hoverIndex, 0, item);
+      return copy;
+    };
+    setFilesToUpload(reorder);
+    setImagesPreview(reorder);
     if (setCoverImage) {
       setCoverImage((prevCover) => {
         if (prevCover === dragIndex) return hoverIndex;
@@ -39,16 +30,8 @@ const ImagePreviews = ({
 
   const removeImage = (i) => {
     URL.revokeObjectURL(imagesPreview[i]);
-    setFilesToUpload((prev) =>
-      update(prev, {
-        $splice: [[i, 1]],
-      })
-    );
-    setImagesPreview((prev) =>
-      update(prev, {
-        $splice: [[i, 1]],
-      })
-    );
+    setFilesToUpload((prev) => prev.filter((_, idx) => idx !== i));
+    setImagesPreview((prev) => prev.filter((_, idx) => idx !== i));
     if (setCoverImage) {
       setCoverImage((prevCover) => {
         if (i === prevCover) return 0;

@@ -1,6 +1,5 @@
 import { Button, CircularProgress } from "@mui/material";
 import { useState, useActionState, startTransition } from "react";
-import update from "immutability-helper";
 
 import { format } from "date-fns";
 import { fromZonedTime } from "date-fns-tz";
@@ -28,11 +27,8 @@ const MeditationONModal = ({ isOpen, onClose, onSuccess }) => {
 
   const handleChangeFile = (files) => {
     setFilesToUpload((prev) => [...prev, ...files]);
-    files.forEach((image) => {
-      setImagesPreview((prev) =>
-        update(prev, { $push: [URL.createObjectURL(image)] })
-      );
-    });
+    const newPreviews = files.map((image) => URL.createObjectURL(image));
+    setImagesPreview((prev) => [...prev, ...newPreviews]);
   };
 
   const [, formAction, isPending] = useActionState(async () => {

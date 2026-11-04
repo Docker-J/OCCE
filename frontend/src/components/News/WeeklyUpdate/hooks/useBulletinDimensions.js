@@ -1,16 +1,11 @@
 import { useState, useEffect } from "react";
-import { isMobile } from "react-device-detect";
 
 const calculateDimensions = () => {
   if (typeof window === "undefined") {
     return { width: null, height: null };
   }
-  const width = isMobile
-    ? document.documentElement.clientWidth
-    : window.innerWidth;
-  const height = isMobile
-    ? document.documentElement.clientHeight
-    : window.innerHeight;
+  const width = document.documentElement.clientWidth || window.innerWidth;
+  const height = document.documentElement.clientHeight || window.innerHeight;
 
   const aspectRatio = height / width;
   const isPortrait = aspectRatio >= 16 / 10;
@@ -29,7 +24,7 @@ export const useBulletinDimensions = () => {
       setDimensions(calculateDimensions());
     };
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize, { passive: true });
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
