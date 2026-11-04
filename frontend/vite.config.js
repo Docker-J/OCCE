@@ -62,7 +62,7 @@ export default defineConfig(({ mode }) => {
               id.includes("node_modules/react-pdf") ||
               id.includes("node_modules/pdfjs-dist")
             ) {
-              return undefined;
+              return "pdfVendor";
             }
             if (id.includes("node_modules/firebase")) {
               return "firebase";
