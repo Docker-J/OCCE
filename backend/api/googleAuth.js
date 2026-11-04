@@ -1,4 +1,4 @@
-import { google } from "googleapis";
+import { GoogleAuth } from "google-auth-library";
 
 /**
  * Dynamically gets a Google Auth client using environment variables.
@@ -23,7 +23,7 @@ export const getGoogleAuth = (env, scopes) => {
     throw new Error("GOOGLE_SERVICE_ACCOUNT_JSON environment variable is not defined or invalid.");
   }
 
-  return new google.auth.GoogleAuth({
+  return new GoogleAuth({
     credentials,
     scopes,
   });

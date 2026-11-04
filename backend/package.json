@@ -5,6 +5,7 @@
     "aws-jwt-verify": "^5.2.1",
     "date-fns": "^4.4.0",
     "dotenv": "^17.4.2",
+    "google-auth-library": "^11.0.2",
     "googleapis": "^178.1.1",
     "hono": "^4.13.7",
     "nodemon": "^3.1.14",

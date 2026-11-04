@@ -1,4 +1,5 @@
-import { google } from "googleapis";
+import { sheets } from "googleapis/build/src/apis/sheets/index.js";
+import { drive } from "googleapis/build/src/apis/drive/index.js";
 import { getGoogleAuth } from "./googleAuth.js";
 
 const DEFAULT_SCOPES = [
@@ -13,7 +14,7 @@ const DEFAULT_SCOPES = [
  */
 export const getSheetsClient = (env, scopes = DEFAULT_SCOPES) => {
   const auth = getGoogleAuth(env, scopes);
-  return google.sheets({ version: "v4", auth });
+  return sheets({ version: "v4", auth });
 };
 
 /**
@@ -23,7 +24,7 @@ export const getSheetsClient = (env, scopes = DEFAULT_SCOPES) => {
  */
 export const getDriveClient = (env, scopes = DEFAULT_SCOPES) => {
   const auth = getGoogleAuth(env, scopes);
-  return google.drive({ version: "v3", auth });
+  return drive({ version: "v3", auth });
 };
 
 // In-memory cache for drive file IDs (3 minutes TTL): key = `${folderId}_${fileName}` -> fileId
