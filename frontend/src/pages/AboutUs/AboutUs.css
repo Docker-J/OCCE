@@ -170,6 +170,7 @@
   white-space: nowrap;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  scroll-behavior: smooth;
 }
 
 .aboutQuickNav::-webkit-scrollbar {
@@ -192,6 +193,7 @@
   cursor: pointer;
   min-height: 40px;
   box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .aboutNavPill:hover {

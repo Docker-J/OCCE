@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const navItems = [
   { id: "beginning", label: "첫걸음과 고백" },
@@ -11,7 +11,10 @@ const navItems = [
 
 const AboutHero = ({ onScrollTo }) => {
   const [activeId, setActiveId] = useState("");
+  const navContainerRef = useRef(null);
+  const pillRefs = useRef({});
 
+  // 1. Detect which section is currently active as user scrolls through the page
   useEffect(() => {
     let ticking = false;
 
@@ -41,6 +44,25 @@ const AboutHero = ({ onScrollTo }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // 2. Automatically scroll horizontal quick nav bar to keep active pill centered on narrow screens
+  useEffect(() => {
+    if (!activeId) return;
+    const container = navContainerRef.current;
+    const activePill = pillRefs.current[activeId];
+
+    if (container && activePill) {
+      if (container.scrollWidth > container.clientWidth) {
+        const targetScrollLeft =
+          activePill.offsetLeft - (container.clientWidth / 2) + (activePill.offsetWidth / 2);
+
+        container.scrollTo({
+          left: Math.max(0, targetScrollLeft),
+          behavior: "smooth",
+        });
+      }
+    }
+  }, [activeId]);
+
   return (
     <>
       <header className="aboutHero">
@@ -55,12 +77,13 @@ const AboutHero = ({ onScrollTo }) => {
       </header>
 
       <nav className="aboutQuickNavContainer" aria-label="교회소개 바로가기 메뉴">
-        <div className="aboutQuickNav">
+        <div className="aboutQuickNav" ref={navContainerRef}>
           {navItems.map((item) => {
             const isActive = activeId === item.id;
             return (
               <button
                 key={item.id}
+                ref={(el) => (pillRefs.current[item.id] = el)}
                 type="button"
                 className={`aboutNavPill ${item.isHighlight ? "aboutNavPillHighlight" : ""} ${
                   isActive ? "aboutNavPillActive" : ""
