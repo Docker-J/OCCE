@@ -49,6 +49,14 @@ vi.mock("../../../../util/useSnackbar", () => ({
   }),
 }));
 
+// Mock @tanstack/react-query
+const mockInvalidateQueries = vi.fn();
+vi.mock("@tanstack/react-query", () => ({
+  useQueryClient: () => ({
+    invalidateQueries: mockInvalidateQueries,
+  }),
+}));
+
 describe("Album.jsx R1 Confirmation Flow Empirical Tests", () => {
   beforeEach(() => {
     vi.clearAllMocks();

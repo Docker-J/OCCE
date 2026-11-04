@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 import {
   Box,
@@ -22,7 +22,8 @@ import AdminComponent from "../../../common/AdminComponent";
 import Footer from "../../../header/Footer";
 import useModals from "../../../util/useModal";
 import { getPosts } from "../../../api/meditationon";
-import { useNavigationType } from "react-router";
+import { useNavigationType, useLocation } from "react-router";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 
 const PAGE_SIZE = 12;
 const titleBackground = {
@@ -32,80 +33,85 @@ const titleBackground = {
 const MeditationON = () => {
   const matches = useMediaQuery("(min-width:1200px)");
   const navType = useNavigationType();
-
+  const location = useLocation();
   const { openModal } = useModals();
+  const queryClient = useQueryClient();
 
-  const [posts, setPosts] = useState([]);
-  const [end, setEnd] = useState(false);
-
-  const onLoad = async () => {
-    const result = await getPosts(posts);
-
-    if (result.data.length > 0) {
-      setPosts((prev) => [...prev, ...result.data]);
-      if (result.data.length < PAGE_SIZE) {
-        setEnd(true);
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isLoading,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["meditation-on"],
+    queryFn: async ({ pageParam = null }) => {
+      const res = await getPosts(pageParam ? [pageParam] : []);
+      return res.data || [];
+    },
+    initialPageParam: null,
+    getNextPageParam: (lastPage) => {
+      if (!lastPage || lastPage.length === 0 || lastPage.length < PAGE_SIZE) {
+        return undefined;
       }
-    } else {
-      setEnd(true);
-    }
-  };
+      return lastPage.at(-1);
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
 
-  const refreshPosts = async () => {
+  const posts = data ? data.pages.flat() : [];
+  const end = !hasNextPage;
+
+  const refreshPosts = () => {
     sessionStorage.removeItem("posts");
-    setEnd(false);
-    try {
-      const result = await getPosts([]);
-      if (result.data.length > 0) {
-        setPosts(result.data);
-        if (result.data.length < PAGE_SIZE) {
-          setEnd(true);
-        }
-      } else {
-        setPosts([]);
-        setEnd(true);
-      }
-    } catch (err) {
-      console.error("Failed to refresh posts:", err);
-    }
+    queryClient.invalidateQueries({ queryKey: ["meditation-on"] });
   };
 
+  // Track and persist scroll position for POP navigation
   useEffect(() => {
-    if (navType === "POP" && sessionStorage.getItem("posts")) {
-      try {
-        const cached = JSON.parse(sessionStorage.getItem("posts"));
-        if (Array.isArray(cached) && cached.length > 0) {
-          setPosts(cached);
-          if (cached.length % PAGE_SIZE !== 0) {
-            setEnd(true);
-          }
-          return;
-        }
-      } catch {}
-    }
-    onLoad();
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (posts.length > 0) {
-        sessionStorage.setItem("posts", JSON.stringify(posts));
+    const handleScroll = () => {
+      if (window.scrollY > 0) {
+        sessionStorage.setItem(`scroll_pos_${location.pathname}`, String(window.scrollY));
       }
     };
-  }, [posts]);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      handleScroll();
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [location.pathname]);
+
+  // Restore scroll position when returning from meditation post details (POP navigation)
+  useLayoutEffect(() => {
+    if (navType === "POP") {
+      const savedPos = sessionStorage.getItem(`scroll_pos_${location.pathname}`);
+      if (savedPos) {
+        const targetY = parseInt(savedPos, 10);
+        if (!isNaN(targetY) && targetY > 0) {
+          const rafId = requestAnimationFrame(() => {
+            if (Math.abs(window.scrollY - targetY) > 2) {
+              window.scrollTo({ top: targetY, behavior: "instant" });
+            }
+          });
+          return () => cancelAnimationFrame(rafId);
+        }
+      }
+    }
+  }, [navType, location.pathname]);
 
   const scrollRef = useRef();
 
   useEffect(() => {
     let timer;
-    if (scrollRef.current && !end && posts.length >= 12) {
+    if (scrollRef.current && hasNextPage && !isFetchingNextPage && posts.length >= PAGE_SIZE) {
       timer = setTimeout(() => {
         try {
           const contentHeight = scrollRef.current.clientHeight;
           const screenHeight = window.innerHeight - 500;
 
           if (contentHeight > 100 && contentHeight < screenHeight) {
-            onLoad();
+            fetchNextPage();
           }
         } catch (error) {}
       }, 500);
@@ -114,7 +120,7 @@ const MeditationON = () => {
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [posts]);
+  }, [posts.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
     <>
@@ -127,8 +133,9 @@ const MeditationON = () => {
               fontWeight: 830,
               letterSpacing: "0.4em",
               pl: "0.4em",
-              color: "white"
-            }}>
+              color: "white",
+            }}
+          >
             묵상 ON
           </Typography>
         </div>
@@ -142,7 +149,7 @@ const MeditationON = () => {
           }}
         >
           {posts.length <= 0 ? (
-            !end ? (
+            isLoading ? (
               <Box sx={{ width: "100%", py: 3 }}>
                 <ImageList cols={matches ? 4 : 3} gap={12}>
                   {Array.from({ length: matches ? 8 : 6 }).map((_, i) => (
@@ -175,37 +182,29 @@ const MeditationON = () => {
                   variant="h6"
                   sx={{ fontWeight: 700, color: "text.secondary" }}
                 >
-                  등록된 묵상이 없습니다
+                  등록된 게시물이 없습니다
+                </Typography>
+                <Typography variant="body2" sx={{ color: "text.disabled" }}>
+                  현재 등록된 묵상 ON 게시물이 없습니다.
                 </Typography>
               </Stack>
             )
           ) : (
             <InfiniteScroll
               dataLength={posts.length}
-              next={onLoad}
-              hasMore={!end}
+              next={fetchNextPage}
+              hasMore={Boolean(hasNextPage)}
               loader={
-                <Stack sx={{
-                  alignItems: "center"
-                }}>
-                  <CircularProgress />
+                <Stack sx={{ alignItems: "center", py: 2 }}>
+                  <CircularProgress size={32} />
                 </Stack>
               }
-              scrollThreshold={1}
+              scrollThreshold={0.8}
               style={{ overflowY: "hidden" }}
             >
-              {
-                <ImageList
-                  ref={scrollRef}
-                  cols={matches ? 4 : 3}
-                  gap={3}
-                  sx={{
-                    my: { xs: "0", md: "16px" },
-                  }}
-                >
-                  <MemoizedMeditationONComp posts={posts} />
-                </ImageList>
-              }
+              <ImageList ref={scrollRef} cols={matches ? 4 : 3} gap={3}>
+                <MemoizedMeditationONComp posts={posts} />
+              </ImageList>
             </InfiniteScroll>
           )}
         </Box>
@@ -216,9 +215,8 @@ const MeditationON = () => {
           style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
           onClick={async () => {
             const { default: MeditationONModalComponent } = await import(
-              "../../../components/Online/MeditationON/MeditationONModal" // Use the correct path
+              "../../../components/Online/MeditationON/MeditationONModal"
             );
-
             openModal(MeditationONModalComponent, {
               onSuccess: refreshPosts,
             });

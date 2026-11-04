@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 import {
   Box,
@@ -25,7 +25,8 @@ import AlbumUploadModal from "./AlbumUploadModal";
 
 import { MemoizedMeditationONComp } from "./MeditationONImageListItem";
 import ButtonYearPicker from "../../../common/ButtonYearPicker";
-import { useSearchParams, useNavigationType } from "react-router";
+import { useSearchParams, useNavigationType, useLocation } from "react-router";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 
 const PAGE_SIZE = 12;
 
@@ -38,110 +39,98 @@ const Albums = () => {
   const matches = useMediaQuery("(min-width:1200px)");
   const [searchParams, setSearchParams] = useSearchParams();
   const navType = useNavigationType();
+  const location = useLocation();
   const { openModal } = useModals();
+  const queryClient = useQueryClient();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedYear, setSelectedYear] = useState(
-    searchParams.has("year") ? new Date(Number(searchParams.get("year")), 0, 1) : null
-  );
-  const [albums, setAlbums] = useState([]);
-  const [end, setEnd] = useState(false);
-  const isInitialMount = useRef(true);
+  const yearParam = searchParams.get("year");
+  const selectedYear = yearParam ? new Date(Number(yearParam), 0, 1) : null;
+  const yearValue = selectedYear ? selectedYear.getFullYear() : undefined;
+  const queryKey = ["albums", yearValue ?? "all"];
 
-  const fetchInitialAlbums = async (yearValue) => {
-    setIsLoading(true);
-    setEnd(false);
-    try {
-      const result = await getAlbums([], yearValue);
-      const data = result.data || [];
-      setAlbums(data);
-      if (data.length === 0 || data.length % PAGE_SIZE !== 0) {
-        setEnd(true);
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isLoading,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey,
+    queryFn: async ({ pageParam = null }) => {
+      const res = await getAlbums(pageParam ? [pageParam] : [], yearValue);
+      return res.data || [];
+    },
+    initialPageParam: null,
+    getNextPageParam: (lastPage) => {
+      if (!lastPage || lastPage.length === 0 || lastPage.length < PAGE_SIZE) {
+        return undefined;
       }
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      return lastPage.at(-1);
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
 
-  const onLoad = async () => {
-    if (isLoading || end) return;
+  const albums = data ? data.pages.flat() : [];
+  const end = !hasNextPage;
 
-    setIsLoading(true);
-    try {
-      const result = await getAlbums(albums, selectedYear?.getFullYear());
-      const data = result.data || [];
-
-      if (data.length > 0) {
-        setAlbums((prev) => {
-          const next = [...prev, ...data];
-          if (next.length % PAGE_SIZE !== 0) {
-            setEnd(true);
-          }
-          return next;
-        });
-      } else {
-        setEnd(true);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const refreshAlbums = async () => {
-    sessionStorage.removeItem("albums");
-    await fetchInitialAlbums(selectedYear?.getFullYear());
-  };
-
-  useEffect(() => {
-    if (navType === "POP" && sessionStorage.getItem("albums")) {
-      try {
-        const cached = JSON.parse(sessionStorage.getItem("albums"));
-        if (Array.isArray(cached) && cached.length > 0) {
-          setAlbums(cached);
-          if (cached.length % PAGE_SIZE !== 0) {
-            setEnd(true);
-          }
-          return;
-        }
-      } catch {}
-    }
-    fetchInitialAlbums(selectedYear?.getFullYear());
-  }, []);
-
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-    sessionStorage.removeItem("albums");
-    if (selectedYear) {
-      setSearchParams({ year: String(selectedYear.getFullYear()) });
+  const handleYearChange = (newYear) => {
+    if (newYear) {
+      setSearchParams({ year: String(newYear.getFullYear()) });
     } else {
       setSearchParams({});
     }
-    fetchInitialAlbums(selectedYear?.getFullYear());
-  }, [selectedYear]);
+  };
 
+  const refreshAlbums = () => {
+    sessionStorage.removeItem("albums");
+    queryClient.invalidateQueries({ queryKey: ["albums"] });
+  };
+
+  // Track and persist scroll position for POP navigation
   useEffect(() => {
-    return () => {
-      if (albums.length > 0) {
-        sessionStorage.setItem("albums", JSON.stringify(albums));
+    const handleScroll = () => {
+      if (window.scrollY > 0) {
+        sessionStorage.setItem(`scroll_pos_${location.pathname}`, String(window.scrollY));
       }
     };
-  }, [albums]);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      handleScroll();
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [location.pathname]);
+
+  // Restore scroll position when returning from album details (POP navigation)
+  useLayoutEffect(() => {
+    if (navType === "POP") {
+      const savedPos = sessionStorage.getItem(`scroll_pos_${location.pathname}`);
+      if (savedPos) {
+        const targetY = parseInt(savedPos, 10);
+        if (!isNaN(targetY) && targetY > 0) {
+          const rafId = requestAnimationFrame(() => {
+            if (Math.abs(window.scrollY - targetY) > 2) {
+              window.scrollTo({ top: targetY, behavior: "instant" });
+            }
+          });
+          return () => cancelAnimationFrame(rafId);
+        }
+      }
+    }
+  }, [navType, location.pathname]);
 
   const scrollRef = useRef();
 
   useEffect(() => {
     let timer;
-    if (scrollRef.current && !end && albums.length >= PAGE_SIZE) {
+    if (scrollRef.current && hasNextPage && !isFetchingNextPage && albums.length >= PAGE_SIZE) {
       timer = setTimeout(() => {
         try {
           const contentHeight = scrollRef.current.clientHeight;
           const screenHeight = window.innerHeight - 500;
 
           if (contentHeight > 100 && contentHeight < screenHeight) {
-            onLoad();
+            fetchNextPage();
           }
         } catch {}
       }, 500);
@@ -150,7 +139,7 @@ const Albums = () => {
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [albums, end]);
+  }, [albums.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
     <>
@@ -163,8 +152,9 @@ const Albums = () => {
               fontWeight: 830,
               letterSpacing: "0.4em",
               pl: "0.4em",
-              color: "white"
-            }}>
+              color: "white",
+            }}
+          >
             교회사진
           </Typography>
           <ButtonYearPicker
@@ -172,7 +162,7 @@ const Albums = () => {
             value={selectedYear}
             minDate={new Date("2022/04/03")}
             maxDate={new Date()}
-            onChange={setSelectedYear}
+            onChange={handleYearChange}
           />
         </div>
       </div>
@@ -228,26 +218,27 @@ const Albums = () => {
           ) : (
             <InfiniteScroll
               dataLength={albums.length}
-              next={onLoad}
-              hasMore={!end}
+              next={fetchNextPage}
+              hasMore={Boolean(hasNextPage)}
               loader={
-                <Stack sx={{
-                  alignItems: "center"
-                }}>
-                  <CircularProgress />
+                <Stack
+                  sx={{
+                    alignItems: "center",
+                    py: 2,
+                  }}
+                >
+                  <CircularProgress size={32} />
                 </Stack>
               }
-              scrollThreshold={1}
+              scrollThreshold={0.8}
               style={{ overflowY: "hidden" }}
             >
-              {
-                <ImageList ref={scrollRef} cols={matches ? 4 : 3} gap={3}>
-                  <MemoizedMeditationONComp
-                    posts={albums}
-                    cols={matches ? 4 : 3}
-                  />
-                </ImageList>
-              }
+              <ImageList ref={scrollRef} cols={matches ? 4 : 3} gap={3}>
+                <MemoizedMeditationONComp
+                  posts={albums}
+                  cols={matches ? 4 : 3}
+                />
+              </ImageList>
             </InfiniteScroll>
           )}
         </Box>

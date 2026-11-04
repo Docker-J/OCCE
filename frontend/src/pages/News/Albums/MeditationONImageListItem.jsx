@@ -32,15 +32,30 @@ export const MeditationONComp = ({ posts, cols }) => {
           key={post.ID}
           component={Link}
           to={post.ID}
-          sx={{ textDecoration: "none" }}
+          sx={{
+            textDecoration: "none",
+            borderRadius: "8px",
+            overflow: "hidden",
+            transition: "transform 0.2s ease",
+            "&:hover": {
+              transform: "scale(1.02)",
+            },
+          }}
         >
           <img
             src={`https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${post.Cover}/thumbnail`}
-            alt="thumbnail"
+            alt={post.Title || "thumbnail"}
             loading="lazy"
+            style={{
+              aspectRatio: "1 / 1",
+              width: "100%",
+              height: "auto",
+              objectFit: "cover",
+              display: "block",
+            }}
           />
           <ImageListItemBar
-            title={<Typography color="black">{post.Title}</Typography>}
+            title={<Typography color="black" sx={{ fontWeight: 600, fontSize: "0.95rem" }}>{post.Title}</Typography>}
             subtitle={
               <Typography
                 color="black"

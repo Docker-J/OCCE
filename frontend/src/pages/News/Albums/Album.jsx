@@ -9,6 +9,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { deleteAlbum } from "../../../api/albums";
 import useSnackbar from "../../../util/useSnackbar";
 import { useConfirm } from "../../../common/ConfirmProvider";
+import { useQueryClient } from "@tanstack/react-query";
 
 const titleBackground = {
   backgroundImage: 'url("/img/News/Albums/Albums.webp")',
@@ -28,6 +29,7 @@ const Album = () => {
   const { openSnackbar } = useSnackbar();
   const { title, images } = useLoaderData();
   const confirm = useConfirm();
+  const queryClient = useQueryClient();
 
   const handleDeleteAlbum = async () => {
     if (
@@ -42,6 +44,7 @@ const Album = () => {
     ) {
       await deleteAlbum(albumID);
       sessionStorage.removeItem("albums");
+      queryClient?.invalidateQueries({ queryKey: ["albums"] });
       openSnackbar("success", "The album deleted successfully");
       navigate("/albums");
     }
