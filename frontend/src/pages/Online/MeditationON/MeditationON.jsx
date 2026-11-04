@@ -43,6 +43,9 @@ const MeditationON = () => {
 
     if (result.data.length > 0) {
       setPosts((prev) => [...prev, ...result.data]);
+      if (result.data.length < PAGE_SIZE) {
+        setEnd(true);
+      }
     } else {
       setEnd(true);
     }
@@ -55,6 +58,9 @@ const MeditationON = () => {
       const result = await getPosts([]);
       if (result.data.length > 0) {
         setPosts(result.data);
+        if (result.data.length < PAGE_SIZE) {
+          setEnd(true);
+        }
       } else {
         setPosts([]);
         setEnd(true);
@@ -65,17 +71,14 @@ const MeditationON = () => {
   };
 
   useEffect(() => {
-    if (posts.length % PAGE_SIZE !== 0) {
-      setEnd(true);
-    }
-  }, [posts]);
-
-  useEffect(() => {
     if (navType === "POP" && sessionStorage.getItem("posts")) {
       try {
         const cached = JSON.parse(sessionStorage.getItem("posts"));
         if (Array.isArray(cached) && cached.length > 0) {
           setPosts(cached);
+          if (cached.length % PAGE_SIZE !== 0) {
+            setEnd(true);
+          }
           return;
         }
       } catch {}
