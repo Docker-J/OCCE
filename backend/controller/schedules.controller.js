@@ -1,13 +1,13 @@
-import { google } from "googleapis";
+import { calendar } from "googleapis/build/src/apis/calendar/index.js";
 import { addMonths } from "date-fns";
 import { getGoogleAuth } from "../api/googleAuth.js";
 
 export const getSchedules = async (env) => {
   try {
     const auth = getGoogleAuth(env, ["https://www.googleapis.com/auth/calendar.readonly"]);
-    const calendar = google.calendar({ version: "v3", auth });
+    const calendarClient = calendar({ version: "v3", auth });
 
-    const response = await calendar.events.list({
+    const response = await calendarClient.events.list({
       calendarId: env.GOOGLE_CALENDAR_ID,
       timeMin: new Date().toISOString(),
       timeMax: addMonths(new Date(), 2).toISOString(),
