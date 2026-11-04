@@ -31,22 +31,35 @@
   background-color: #ffffff;
   color: var(--about-text-primary);
   font-family: inherit;
-  overflow-x: hidden;
+  overflow-x: clip;
   padding-bottom: 4rem;
 }
 
-/* Anchor margin offset for sticky header */
+/* Anchor margin offset for sticky AppBar + sticky QuickNav */
 .aboutSection,
 .aboutAnchor {
-  scroll-margin-top: 84px;
+  scroll-margin-top: 160px;
+}
+
+@media (min-width: 900px) {
+  .aboutSection,
+  .aboutAnchor {
+    scroll-margin-top: 190px;
+  }
 }
 
 .aboutAnchor {
   display: block;
   position: relative;
   visibility: hidden;
-  top: -84px;
+  top: -160px;
   height: 0;
+}
+
+@media (min-width: 900px) {
+  .aboutAnchor {
+    top: -190px;
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -130,13 +143,20 @@
 /* Quick Navigation Bar */
 .aboutQuickNavContainer {
   position: sticky;
-  top: 64px;
-  z-index: 40;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  top: 90px;
+  z-index: 30;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--about-border);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+  transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 900px) {
+  .aboutQuickNavContainer {
+    top: 116px;
+  }
 }
 
 .aboutQuickNav {
@@ -187,10 +207,23 @@
   outline-offset: 2px;
 }
 
+.aboutNavPillActive {
+  background-color: var(--about-navy) !important;
+  color: #ffffff !important;
+  border-color: var(--about-navy) !important;
+  box-shadow: 0 2px 8px rgba(23, 37, 61, 0.25) !important;
+}
+
 .aboutNavPillHighlight {
   background-color: var(--about-gold-bg);
   border-color: var(--about-gold-border);
   color: var(--about-gold);
+}
+
+.aboutNavPillHighlight.aboutNavPillActive {
+  background-color: var(--about-gold) !important;
+  color: #ffffff !important;
+  border-color: var(--about-gold) !important;
 }
 
 /* --------------------------------------------------------------------------

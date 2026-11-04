@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+
 const navItems = [
   { id: "beginning", label: "첫걸음과 고백" },
   { id: "calling", label: "이름과 사명" },
@@ -8,6 +10,37 @@ const navItems = [
 ];
 
 const AboutHero = ({ onScrollTo }) => {
+  const [activeId, setActiveId] = useState("");
+
+  useEffect(() => {
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollOffset = window.innerWidth >= 900 ? 220 : 190;
+          const scrollPos = window.scrollY + scrollOffset;
+
+          for (let i = navItems.length - 1; i >= 0; i--) {
+            const el = document.getElementById(navItems[i].id);
+            if (el && el.offsetTop <= scrollPos) {
+              setActiveId(navItems[i].id);
+              ticking = false;
+              return;
+            }
+          }
+          setActiveId("");
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <>
       <header className="aboutHero">
@@ -23,16 +56,21 @@ const AboutHero = ({ onScrollTo }) => {
 
       <nav className="aboutQuickNavContainer" aria-label="교회소개 바로가기 메뉴">
         <div className="aboutQuickNav">
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={`aboutNavPill ${item.isHighlight ? "aboutNavPillHighlight" : ""}`}
-              onClick={() => onScrollTo(item.id)}
-            >
-              {item.label}
-            </button>
-          ))}
+          {navItems.map((item) => {
+            const isActive = activeId === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                className={`aboutNavPill ${item.isHighlight ? "aboutNavPillHighlight" : ""} ${
+                  isActive ? "aboutNavPillActive" : ""
+                }`}
+                onClick={() => onScrollTo(item.id)}
+              >
+                {item.label}
+              </button>
+            );
+          })}
         </div>
       </nav>
     </>
