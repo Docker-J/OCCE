@@ -33,9 +33,10 @@ const Submenu = ({ page, scrolled }) => {
         key={page.title}
         sx={{
           my: 1.75,
-          ml: 0.8,
+          ml: { md: 0.4, lg: 0.8 },
+          px: { md: 0.8, lg: 1.2 },
           color: isAnySubpageActive ? (scrolled ? "#FF6B00" : "#FFE082") : "inherit",
-          fontSize: { xs: "17px", md: "17px", lg: "20.5px" },
+          fontSize: { xs: "18.5px", md: "19px", lg: "20.5px" },
           fontWeight: "600",
           textTransform: "none",
           whiteSpace: "nowrap",

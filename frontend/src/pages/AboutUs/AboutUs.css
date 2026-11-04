@@ -127,26 +127,36 @@
   word-break: keep-all;
 }
 
-/* Quick Navigation Bar */
+/* Quick Navigation Bar - Floating Rounded Capsule Design Language */
 .aboutQuickNavContainer {
   position: sticky;
   top: var(--appbar-bottom, 90px);
   z-index: 30;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--about-border);
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+  pointer-events: none;
+  padding: 8px 12px 12px;
   transition: top 0.15s ease;
 }
 
+@media (min-width: 900px) {
+  .aboutQuickNavContainer {
+    padding: 8px 24px 12px;
+  }
+}
+
 .aboutQuickNav {
-  max-width: 1200px;
+  pointer-events: auto;
+  max-width: fit-content;
   margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
+  gap: 6px;
+  padding: 6px 10px;
+  background: rgba(252, 251, 249, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 107, 0, 0.16);
+  border-radius: 24px;
+  box-shadow: 0 10px 32px rgba(255, 107, 0, 0.07), 0 3px 12px rgba(0, 0, 0, 0.04);
   overflow-x: auto;
   white-space: nowrap;
   -webkit-overflow-scrolling: touch;
@@ -162,51 +172,56 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.5rem 1rem;
-  border-radius: var(--about-radius-full);
-  background-color: var(--about-bg-alt);
-  color: var(--about-text-secondary);
-  font-size: 0.88rem;
+  padding: 0.45rem 1rem;
+  border-radius: 20px;
+  background-color: transparent;
+  color: #374151;
+  font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
-  border: 1px solid var(--about-border);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  min-height: 40px;
+  min-height: 38px;
   box-sizing: border-box;
   flex-shrink: 0;
 }
 
 .aboutNavPill:hover {
-  background-color: #ffffff;
-  color: var(--about-navy);
-  border-color: var(--about-gold);
+  background-color: rgba(255, 107, 0, 0.08);
+  color: #ff6b00;
+  border-color: rgba(255, 107, 0, 0.2);
   transform: translateY(-1px);
-  box-shadow: var(--about-shadow-sm);
 }
 
 .aboutNavPill:focus-visible {
-  outline: 2px solid var(--about-gold);
+  outline: 2px solid #ff6b00;
   outline-offset: 2px;
 }
 
 .aboutNavPillActive {
-  background-color: var(--about-navy) !important;
+  background-color: #17253d !important;
   color: #ffffff !important;
-  border-color: var(--about-navy) !important;
-  box-shadow: 0 2px 8px rgba(23, 37, 61, 0.25) !important;
+  border-color: #17253d !important;
+  box-shadow: 0 4px 14px rgba(23, 37, 61, 0.3) !important;
 }
 
 .aboutNavPillHighlight {
-  background-color: var(--about-gold-bg);
-  border-color: var(--about-gold-border);
-  color: var(--about-gold);
+  color: #ff6b00;
+  background-color: rgba(255, 107, 0, 0.07);
+  border-color: rgba(255, 107, 0, 0.2);
+  font-weight: 700;
+}
+
+.aboutNavPillHighlight:hover {
+  background-color: rgba(255, 107, 0, 0.14);
 }
 
 .aboutNavPillHighlight.aboutNavPillActive {
-  background-color: var(--about-gold) !important;
+  background: linear-gradient(135deg, #ff6b00 0%, #ff8533 100%) !important;
   color: #ffffff !important;
-  border-color: var(--about-gold) !important;
+  border-color: #ff6b00 !important;
+  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4) !important;
 }
 
 /* --------------------------------------------------------------------------
