@@ -1,16 +1,18 @@
-import { useLoaderData } from "react-router";
+import { useLoaderData, useNavigate } from "react-router";
 
 import { Box, Typography } from "@mui/material";
 
 import { formatInTimeZone } from "date-fns-tz";
 
 import CustomCarousel from "../../../common/CustomCarousel";
+import { BackToListFab } from "../../../components/News/common";
 
 const titleBackground = {
   backgroundImage: 'url("/img/Online/MeditationON.webp")',
 };
 
 const MeditationONPost = () => {
+  const navigate = useNavigate();
   const { Images, Timestamp } = useLoaderData();
   const timestamp = formatInTimeZone(
     Timestamp,
@@ -89,6 +91,16 @@ const MeditationONPost = () => {
             </CustomCarousel>
           </div>
         </Box>
+        <BackToListFab
+          themeColor="#2563eb"
+          onClick={() => {
+            if (window.history.length > 1) {
+              navigate(-1);
+            } else {
+              navigate("/online/meditationON");
+            }
+          }}
+        />
       </div>
     </>
   );

@@ -1,5 +1,6 @@
-import axios from "axios";
 import { redirect } from "react-router";
+import { queryClient } from "../index";
+import { getColumns } from "../api/columns";
 
 export async function loader({ request }) {
   const page = new URL(request.url).searchParams.get("page");
@@ -7,7 +8,12 @@ export async function loader({ request }) {
     return redirect("?page=1");
   }
 
-  const getAnnouncements = axios.get(`/api/columns?page=${page}`);
+  // Pre-fetch page data into TanStack Query cache before component mounts
+  queryClient.prefetchQuery({
+    queryKey: ["columns", page],
+    queryFn: () => getColumns(page),
+    staleTime: 5 * 60 * 1000,
+  });
 
-  return { announcementsData: getAnnouncements };
+  return { page };
 }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Container, Typography } from "@mui/material";
 import { useLoaderData, useNavigate, useRevalidator } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -27,6 +28,7 @@ const Column = () => {
   const { openModal } = useModals();
   const { openSnackbar } = useSnackbar();
   const { id, title, body, timestamp } = useLoaderData();
+  const queryClient = useQueryClient();
 
   const [isLoading, setIsLoading] = useState(false);
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState(false);
@@ -36,6 +38,7 @@ const Column = () => {
     setIsLoading(true);
     try {
       await deleteColumn(id);
+      queryClient.invalidateQueries({ queryKey: ["columns"] });
       openSnackbar("success", "The column is successfully deleted!");
       navigate("/columns");
     } catch {
@@ -117,7 +120,16 @@ const Column = () => {
           </PostDetailCard>
         </Container>
 
-        <BackToListFab onClick={() => navigate("/columns")} />
+        <BackToListFab
+          themeColor="#1a365d"
+          onClick={() => {
+            if (window.history.length > 1) {
+              navigate(-1);
+            } else {
+              navigate("/columns");
+            }
+          }}
+        />
       </div>
     </>
   );

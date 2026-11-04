@@ -247,6 +247,7 @@ const Albums = () => {
       <AdminComponent>
         <Fab
           variant="primary"
+          aria-label="앨범 업로드"
           style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
           onClick={() => openModal(AlbumUploadModal, { onSuccess: refreshAlbums })}
         >

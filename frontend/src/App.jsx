@@ -122,6 +122,7 @@ const router = createBrowserRouter([
           ]);
           return { Component: m.default, loader: l.loader };
         }),
+        shouldRevalidate: () => false,
       },
       {
         path: "/announcements/:announcementID",
@@ -163,6 +164,7 @@ const router = createBrowserRouter([
           ]);
           return { Component: m.default, loader: l.loader };
         }),
+        shouldRevalidate: () => false,
       },
       {
         path: "/columns/:columnID",

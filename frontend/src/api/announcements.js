@@ -1,6 +1,11 @@
 import axios from "axios";
 import { uploadImage } from "./images";
 
+export const getAnnouncements = async (page = 1) => {
+  const result = await axios.get(`/api/announcements?page=${page}`);
+  return result.data;
+};
+
 export const postAnnouncement = async (id, title, body) => {
   const regex = /(<img[^>]+src=")([^">]+)"/g;
   const matches = Array.from(body.matchAll(regex));

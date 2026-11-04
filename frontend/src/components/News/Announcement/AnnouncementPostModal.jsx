@@ -6,6 +6,7 @@ import useSnackbar from "../../../util/useSnackbar";
 import { postAnnouncement } from "../../../api/announcements";
 import CustomModal from "../../../common/CustomModal";
 import OCCEErrorBoundary from "../../../common/OCCEErrorBoundary";
+import { queryClient } from "../../../index";
 
 const AnnouncementPostModal = ({
   isOpen,
@@ -35,7 +36,8 @@ const AnnouncementPostModal = ({
   const [, formAction, isPending] = useActionState(async () => {
     try {
       await postAnnouncement(id, title, body);
-      revalidator();
+      queryClient.invalidateQueries({ queryKey: ["announcements"] });
+      revalidator?.();
       openSnackbar("success", "The announcement is successfully posted!");
       handleClose();
       return { success: true };

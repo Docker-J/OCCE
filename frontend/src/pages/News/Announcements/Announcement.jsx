@@ -156,7 +156,16 @@ const Announcement = () => {
           </PostDetailCard>
         </Container>
 
-        <BackToListFab onClick={() => navigate("/announcements")} />
+        <BackToListFab
+          themeColor="#FF6B00"
+          onClick={() => {
+            if (window.history.length > 1) {
+              navigate(-1);
+            } else {
+              navigate("/announcements");
+            }
+          }}
+        />
       </div>
     </>
   );

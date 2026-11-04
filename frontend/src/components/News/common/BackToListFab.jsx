@@ -9,6 +9,7 @@ const BackToListFab = ({
   return (
     <Fab
       variant="extended"
+      aria-label={label}
       onClick={onClick}
       sx={{
         position: "fixed",

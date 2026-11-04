@@ -10,6 +10,7 @@ import { deleteAlbum } from "../../../api/albums";
 import useSnackbar from "../../../util/useSnackbar";
 import { useConfirm } from "../../../common/ConfirmProvider";
 import { useQueryClient } from "@tanstack/react-query";
+import { BackToListFab } from "../../../components/News/common";
 
 const titleBackground = {
   backgroundImage: 'url("/img/News/Albums/Albums.webp")',
@@ -101,10 +102,21 @@ const Album = () => {
             ))}
           </ImageList>
         </div>
+        <BackToListFab
+          themeColor="#1e3a8a"
+          onClick={() => {
+            if (window.history.length > 1) {
+              navigate(-1);
+            } else {
+              navigate("/albums");
+            }
+          }}
+        />
       </div>
       <AdminComponent>
         <Fab
           variant="primary"
+          aria-label="앨범 삭제"
           style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
           onClick={handleDeleteAlbum}
         >

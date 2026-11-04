@@ -1,12 +1,12 @@
+import { useEffect, useLayoutEffect } from "react";
 import {
-  Await,
-  useLoaderData,
-  useRevalidator,
   useSearchParams,
+  useNavigationType,
+  useLocation,
 } from "react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { CircularProgress, Fab, Typography } from "@mui/material";
-
+import { Fab, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
 import ForumPostBoard from "../../../common/Forum/ForumPostBoard";
@@ -14,22 +14,79 @@ import BoardPagination from "../../../components/News/Announcement/BoardPaginati
 
 import useModals from "../../../util/useModal";
 import AdminComponent from "../../../common/AdminComponent";
-import { Suspense } from "react";
 import ForumPostBoardSkeleton from "../../../common/Forum/ForumPostBoardSkeleton";
 import OCCEFallbackCard from "../../../common/OCCEFallbackCard";
+import { getAnnouncements } from "../../../api/announcements";
 
 const titleBackground = {
   backgroundImage: 'url("/img/News/Announcements/Announcements.webp")',
 };
 
 const Announcements = () => {
-  let revalidator = useRevalidator();
-
-  const data = useLoaderData();
   const [searchParams] = useSearchParams();
   const page = searchParams.get("page") || "1";
 
   const { openModal } = useModals();
+  const queryClient = useQueryClient();
+  const navType = useNavigationType();
+  const location = useLocation();
+
+  const {
+    data,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["announcements", page],
+    queryFn: () => getAnnouncements(page),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
+
+  // Prefetch next page in background for instant pagination
+  useEffect(() => {
+    const nextPage = parseInt(page, 10) + 1;
+    if (data?.count && nextPage <= Math.ceil(data.count / 10)) {
+      queryClient.prefetchQuery({
+        queryKey: ["announcements", String(nextPage)],
+        queryFn: () => getAnnouncements(String(nextPage)),
+        staleTime: 5 * 60 * 1000,
+      });
+    }
+  }, [page, data?.count, queryClient]);
+
+  // Track and persist scroll position for POP navigation
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 0) {
+        sessionStorage.setItem(`scroll_pos_${location.pathname}`, String(window.scrollY));
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [location.pathname]);
+
+  // Restore scroll position when returning from post details (POP navigation)
+  useLayoutEffect(() => {
+    if (navType === "POP") {
+      const savedPos = sessionStorage.getItem(`scroll_pos_${location.pathname}`);
+      if (savedPos) {
+        const targetY = parseInt(savedPos, 10);
+        if (!isNaN(targetY) && targetY > 0) {
+          const rafId = requestAnimationFrame(() => {
+            const prevBehavior = document.documentElement.style.scrollBehavior;
+            document.documentElement.style.scrollBehavior = "auto";
+            window.scrollTo({ top: targetY, behavior: "instant" });
+            document.documentElement.scrollTop = targetY;
+            document.documentElement.style.scrollBehavior = prevBehavior;
+          });
+          return () => cancelAnimationFrame(rafId);
+        }
+      }
+    }
+  }, [navType, location.pathname]);
 
   return (
     <>
@@ -65,55 +122,44 @@ const Announcements = () => {
             justifyContent: "center",
           }}
         >
-          <Suspense key={page} fallback={<ForumPostBoardSkeleton />}>
-            <Await
-              resolve={data.announcementsData}
-              errorElement={
-                <OCCEFallbackCard
-                  title="공지사항을 불러오지 못했습니다"
-                  description="일시적인 네트워크 오류이거나 서버에 연결할 수 없습니다."
-                  onReset={() => revalidator.revalidate()}
-                />
-              }
-            >
-              {({ data }) => {
-                return data.announcements.length === 0 ? (
-                  <Typography align="center">
-                    게시물이 존재하지 않습니다.
-                  </Typography>
-                ) : (
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      width: "100%",
-                    }}
-                  >
-                    <ForumPostBoard
-                      announcements={data.announcements}
-                    />
-                    <BoardPagination
-                      pages={Math.ceil(data.count / 10)}
-                      currentPage={page}
-                    />
-                  </div>
-                );
+          {isLoading ? (
+            <ForumPostBoardSkeleton />
+          ) : isError ? (
+            <OCCEFallbackCard
+              title="공지사항을 불러오지 못했습니다"
+              description="일시적인 네트워크 오류이거나 서버에 연결할 수 없습니다."
+              onReset={refetch}
+            />
+          ) : !data || data.announcements.length === 0 ? (
+            <Typography align="center">게시물이 존재하지 않습니다.</Typography>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                width: "100%",
               }}
-            </Await>
-          </Suspense>
+            >
+              <ForumPostBoard announcements={data.announcements} />
+              <BoardPagination
+                pages={Math.ceil(data.count / 10)}
+                currentPage={page}
+              />
+            </div>
+          )}
         </div>
       </div>
       <AdminComponent>
         <Fab
+          aria-label="공지사항 작성"
           style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
           onClick={async () => {
             const { default: AnnouncementPostModalComponent } = await import(
-              "../../../components/News/Announcement/AnnouncementPostModal" // Use the correct path
+              "../../../components/News/Announcement/AnnouncementPostModal"
             );
 
             openModal(AnnouncementPostModalComponent, {
-              revalidator: revalidator.revalidate,
               origTitle: "",
               origBody: "",
             });

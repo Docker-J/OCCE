@@ -1,6 +1,11 @@
 import axios from "axios";
 import { uploadImage } from "./images";
 
+export const getColumns = async (page = 1) => {
+  const result = await axios.get(`/api/columns?page=${page}`);
+  return result.data;
+};
+
 export const getColumn = async (id) => {
   const result = await axios.get(`/api/columns/column/${id}`);
 

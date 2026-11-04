@@ -7,6 +7,7 @@ import useSnackbar from "../../../util/useSnackbar";
 import CustomModal from "../../../common/CustomModal";
 import ButtonDatePicker from "../../../common/ButtonDatePicker";
 import OCCEErrorBoundary from "../../../common/OCCEErrorBoundary";
+import { queryClient } from "../../../index";
 
 const ColumnPostModal = ({
   isOpen,
@@ -37,8 +38,8 @@ const ColumnPostModal = ({
   const [, formAction, isPending] = useActionState(async () => {
     try {
       await postColumn(id, title, body, selectedDate);
-
-      revalidator();
+      queryClient.invalidateQueries({ queryKey: ["columns"] });
+      revalidator?.();
       openSnackbar("success", "The column is successfully posted!");
       handleClose();
       return { success: true };

@@ -213,6 +213,7 @@ const MeditationON = () => {
       <AdminComponent>
         <Fab
           variant="primary"
+          aria-label="묵상ON 업로드"
           style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
           onClick={async () => {
             const { default: MeditationONModalComponent } = await import(
