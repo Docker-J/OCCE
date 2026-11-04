@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, TextField, IconButton, InputAdornment } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import useModals from "../../util/useModal";
 import useSnackbar from "../../util/useSnackbar";
 import { confirmForgotPassword, forgotPassword } from "../../api/user";
@@ -33,6 +34,15 @@ const ResetPasswordConfirmModal = ({ phone, isOpen, onClose }) => {
       confirmPassword: "",
     },
   });
+
+  const passwordValue = watch("password");
+  const confirmPasswordValue = watch("confirmPassword");
+  const isPasswordMatch = Boolean(
+    confirmPasswordValue &&
+      passwordValue &&
+      confirmPasswordValue === passwordValue &&
+      !errors.password
+  );
 
   useEffect(() => {
     let interval = null;
@@ -185,12 +195,31 @@ const ResetPasswordConfirmModal = ({ phone, isOpen, onClose }) => {
           })}
           error={!!errors.confirmPassword}
           helperText={
-            errors.confirmPassword ? "비밀번호가 일치하지 않습니다." : ""
+            errors.confirmPassword
+              ? "비밀번호가 일치하지 않습니다."
+              : isPasswordMatch
+              ? "비밀번호가 일치합니다."
+              : ""
           }
           slotProps={{
+            formHelperText: {
+              sx: {
+                color:
+                  !errors.confirmPassword && isPasswordMatch
+                    ? "#16a34a"
+                    : undefined,
+                fontWeight: isPasswordMatch ? 600 : undefined,
+              },
+            },
             input: {
               endAdornment: (
                 <InputAdornment position="end">
+                  {isPasswordMatch && (
+                    <CheckCircleIcon
+                      fontSize="small"
+                      sx={{ color: "#16a34a", mr: 0.5 }}
+                    />
+                  )}
                   <IconButton
                     aria-label={
                       showConfirmPassword

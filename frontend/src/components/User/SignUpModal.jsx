@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { signUp } from "../../api/user";
 import useModals from "../../util/useModal";
 import useSnackbar from "../../util/useSnackbar";
@@ -43,6 +44,15 @@ const SignUpModal = ({ isOpen, onClose }) => {
       confirmPassword: "",
     },
   });
+
+  const passwordValue = watch("password");
+  const confirmPasswordValue = watch("confirmPassword");
+  const isPasswordMatch = Boolean(
+    confirmPasswordValue &&
+      passwordValue &&
+      confirmPasswordValue === passwordValue &&
+      !errors.password
+  );
 
   const handleSignUp = async (data) => {
     try {
@@ -194,11 +204,29 @@ const SignUpModal = ({ isOpen, onClose }) => {
               value === watch("password") || "비밀번호가 일치하지 않습니다.",
           })}
           error={!!errors.confirmPassword}
-          helperText={errors.confirmPassword?.message}
+          helperText={
+            errors.confirmPassword?.message ||
+            (isPasswordMatch ? "비밀번호가 일치합니다." : "")
+          }
           slotProps={{
+            formHelperText: {
+              sx: {
+                color:
+                  !errors.confirmPassword && isPasswordMatch
+                    ? "#16a34a"
+                    : undefined,
+                fontWeight: isPasswordMatch ? 600 : undefined,
+              },
+            },
             input: {
               endAdornment: (
                 <InputAdornment position="end">
+                  {isPasswordMatch && (
+                    <CheckCircleIcon
+                      fontSize="small"
+                      sx={{ color: "#16a34a", mr: 0.5 }}
+                    />
+                  )}
                   <IconButton
                     aria-label={
                       showConfirmPassword
