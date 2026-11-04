@@ -31,6 +31,7 @@ const CustomModal = ({ isOpen, onClose, children, sx, ...props }) => {
       <Box className="custom-modal-box" sx={{ ...style, ...props, ...sx }}>
         <IconButton
           onClick={onClose}
+          aria-label="닫기"
           sx={{ position: "absolute", top: 8, right: 8 }}
         >
           <CloseIcon />

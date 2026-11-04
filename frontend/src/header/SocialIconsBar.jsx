@@ -50,6 +50,8 @@ const SocialIconsBar = () => {
     width: 42,
     height: 42,
     cursor: "pointer",
+    border: "none",
+    p: 0,
     transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
     boxShadow: "0 2px 8px rgba(0, 0, 0, 0.12)",
     "&:hover": {
@@ -76,7 +78,10 @@ const SocialIconsBar = () => {
         arrow
       >
         <Avatar
+          component="button"
+          type="button"
           onClick={handleNotificationClick}
+          aria-label={enabled ? "새 소식 알림 끄기" : "새 소식 알림 켜기"}
           sx={{
             ...avatarBaseSx,
             bgcolor: enabled ? "#FF6B00" : "#475569",
@@ -101,6 +106,7 @@ const SocialIconsBar = () => {
           href="https://www.youtube.com/@oncce"
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="에드먼튼 온 교회 유튜브 채널"
           sx={{
             ...avatarBaseSx,
             bgcolor: "#1e293b",
@@ -119,6 +125,7 @@ const SocialIconsBar = () => {
         <Avatar
           component="a"
           href="mailto:office@oncce.ca"
+          aria-label="교회 사무실 이메일 문의"
           sx={{
             ...avatarBaseSx,
             bgcolor: "#1e293b",

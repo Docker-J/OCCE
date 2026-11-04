@@ -128,6 +128,7 @@ const Main = () => {
       <AdminComponent>
         <Fab
           color="primary"
+          aria-label="교인 공지 발송"
           style={{
             position: "fixed",
             right: "2vw",

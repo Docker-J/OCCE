@@ -211,7 +211,7 @@ const Albums = () => {
                 >
                   등록된 사진이 없습니다
                 </Typography>
-                <Typography variant="body2" sx={{ color: "text.disabled" }}>
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
                   선택하신 연도에는 등록된 사진 앨범이 없습니다.
                 </Typography>
               </Stack>

@@ -59,7 +59,8 @@ const HeaderFooterWrapper = () => {
       }}
     >
       <ResponsiveAppBar />
-      <div
+      <main
+        id="main-content"
         style={{
           display: "flex",
           flexDirection: "column",
@@ -67,7 +68,7 @@ const HeaderFooterWrapper = () => {
         }}
       >
         <Outlet />
-      </div>
+      </main>
       <Footer />
     </div>
   );
@@ -84,7 +85,8 @@ const HeaderWrapper = () => {
       }}
     >
       <ResponsiveAppBar />
-      <div
+      <main
+        id="main-content"
         style={{
           display: "flex",
           flexDirection: "column",
@@ -92,7 +94,7 @@ const HeaderWrapper = () => {
         }}
       >
         <Outlet />
-      </div>
+      </main>
     </div>
   );
 };

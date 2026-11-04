@@ -31,6 +31,7 @@ const WeeklyUpdateAdminFabs = ({ selectedDate, onDateChange, onDeleteConfirm }) 
     <AdminComponent>
       <Fab
         id="uploadBulletinButton"
+        aria-label="주보 업로드"
         onClick={handleUploadClick}
       >
         <UploadIcon />
@@ -38,6 +39,7 @@ const WeeklyUpdateAdminFabs = ({ selectedDate, onDateChange, onDeleteConfirm }) 
 
       <Fab
         id="deleteBulletinButton"
+        aria-label="주보 삭제"
         sx={{
           backgroundColor: "#d10000",
           color: "white",
