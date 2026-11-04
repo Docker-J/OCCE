@@ -1,76 +1,1144 @@
-.section {
-  display: flex !important;
+/* ==========================================================================
+   에드먼턴 온 교회 (OCCE) - 교회소개 (About Us) Stylesheet
+   Modern Editorial Sanctuary Layout (Natural Vertical Scrolling)
+   ========================================================================== */
+
+:root {
+  --about-navy: #17253d;
+  --about-navy-light: #243b61;
+  --about-gold: #c4893b;
+  --about-gold-hover: #b0782e;
+  --about-gold-bg: rgba(196, 137, 59, 0.08);
+  --about-gold-border: rgba(196, 137, 59, 0.28);
+  --about-text-primary: #1e293b;
+  --about-text-secondary: #475569;
+  --about-text-muted: #64748b;
+  --about-bg-alt: #f8fafc;
+  --about-border: #e2e8f0;
+  --about-border-subtle: rgba(226, 232, 240, 0.8);
+  --about-shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
+  --about-shadow-md: 0 6px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  --about-shadow-lg: 0 14px 32px -4px rgba(15, 23, 42, 0.1), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+  --about-radius-sm: 8px;
+  --about-radius-md: 14px;
+  --about-radius-lg: 20px;
+  --about-radius-full: 9999px;
+}
+
+/* Page Root */
+.aboutPage {
+  min-height: 100vh;
+  background-color: #ffffff;
+  color: var(--about-text-primary);
+  font-family: inherit;
+  overflow-x: hidden;
+  padding-bottom: 4rem;
+}
+
+/* Anchor margin offset for sticky header */
+.aboutSection,
+.aboutAnchor {
+  scroll-margin-top: 84px;
+}
+
+.aboutAnchor {
+  display: block;
+  position: relative;
+  visibility: hidden;
+  top: -84px;
+  height: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Hero Section
+   -------------------------------------------------------------------------- */
+.aboutHero {
+  position: relative;
+  min-height: 380px;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  background-image: var(--bg-image);
-  background-position: var(--bg-pos, center);
+  padding: 5rem 1.5rem 4rem;
+  background-image: url("/img/About/AboutUs.webp");
+  background-position: center 48%;
   background-repeat: no-repeat;
   background-size: cover;
-  overflow: hidden;
+  color: #ffffff;
+  text-align: center;
+}
+
+.aboutHeroOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.72) 0%,
+    rgba(23, 37, 61, 0.82) 60%,
+    rgba(15, 23, 42, 0.94) 100%
+  );
   z-index: 1;
 }
 
-.section::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, var(--bg-tint, 0.3));
-  z-index: -1;
-}
-
-#section1 {
+.aboutHeroContent {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+  margin: 0 auto;
   display: flex;
-  --bg-image: url("/img/About/FirstStep.webp");
-  --bg-pos: 83%;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
 
-#section2 {
-  --bg-image: url("/img/About/Calling.webp");
-  --bg-pos: 35%;
+.aboutHeroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 1rem;
+  border-radius: var(--about-radius-full);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #f8fafc;
+  text-transform: uppercase;
 }
 
-#section3 {
-  --bg-image: url("/img/About/Direction.webp");
+.aboutHeroTitle {
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.5px;
+  color: #ffffff;
+  margin: 0;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 }
 
-@media (max-height: 915px) {
-  .lovegod {
-    height: max(33vh, 14em) !important;
-    overflow-y: auto;
+.aboutHeroSubtitle {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  font-weight: 500;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 680px;
+  margin: 0;
+  word-break: keep-all;
+}
+
+/* Quick Navigation Bar */
+.aboutQuickNavContainer {
+  position: sticky;
+  top: 64px;
+  z-index: 40;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--about-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.aboutQuickNav {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.aboutQuickNav::-webkit-scrollbar {
+  display: none;
+}
+
+.aboutNavPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--about-radius-full);
+  background-color: var(--about-bg-alt);
+  color: var(--about-text-secondary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid var(--about-border);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  min-height: 40px;
+  box-sizing: border-box;
+}
+
+.aboutNavPill:hover {
+  background-color: #ffffff;
+  color: var(--about-navy);
+  border-color: var(--about-gold);
+  transform: translateY(-1px);
+  box-shadow: var(--about-shadow-sm);
+}
+
+.aboutNavPill:focus-visible {
+  outline: 2px solid var(--about-gold);
+  outline-offset: 2px;
+}
+
+.aboutNavPillHighlight {
+  background-color: var(--about-gold-bg);
+  border-color: var(--about-gold-border);
+  color: var(--about-gold);
+}
+
+/* --------------------------------------------------------------------------
+   Common Section Architecture
+   -------------------------------------------------------------------------- */
+.aboutSection {
+  padding: clamp(3.5rem, 6vw, 5.5rem) 1.5rem;
+}
+
+.aboutSectionAlt {
+  background-color: var(--about-bg-alt);
+}
+
+.aboutSectionContainer {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.aboutSectionHeader {
+  text-align: center;
+  margin-bottom: clamp(2rem, 4vw, 3.5rem);
+}
+
+.aboutSectionBadge {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--about-gold);
+  margin-bottom: 0.6rem;
+}
+
+.aboutSectionTitle {
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 800;
+  color: var(--about-navy);
+  line-height: 1.3;
+  margin: 0 0 0.75rem 0;
+  letter-spacing: -0.5px;
+}
+
+.aboutSectionSubtitle {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  font-weight: 500;
+  color: var(--about-text-muted);
+  max-width: 680px;
+  margin: 0 auto;
+  line-height: 1.6;
+  word-break: keep-all;
+}
+
+/* --------------------------------------------------------------------------
+   Section 1: 첫걸음 (Beginning & Confession)
+   -------------------------------------------------------------------------- */
+.beginningCard {
+  background: #ffffff;
+  border: 1px solid var(--about-border);
+  border-radius: var(--about-radius-lg);
+  padding: clamp(1.75rem, 4vw, 3rem);
+  box-shadow: var(--about-shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.beginningHighlightBox {
+  border-left: 4px solid var(--about-gold);
+  background: var(--about-gold-bg);
+  padding: 1.5rem 1.75rem;
+  border-radius: 0 var(--about-radius-md) var(--about-radius-md) 0;
+  margin-bottom: 2rem;
+}
+
+.beginningHighlightText {
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  font-weight: 700;
+  color: var(--about-navy);
+  line-height: 1.65;
+  margin: 0;
+  word-break: keep-all;
+}
+
+.beginningBodyText {
+  font-size: clamp(0.95rem, 1.8vw, 1.05rem);
+  font-weight: 450;
+  line-height: 1.85;
+  color: var(--about-text-secondary);
+  margin-bottom: 1.5rem;
+  word-break: keep-all;
+}
+
+.beginningBodyText:last-of-type {
+  margin-bottom: 2.25rem;
+}
+
+.beginningPillars {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--about-border-subtle);
+}
+
+.beginningPillarItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 0.75rem;
+  background-color: var(--about-bg-alt);
+  border-radius: var(--about-radius-md);
+}
+
+.beginningPillarIcon {
+  color: var(--about-gold);
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+.beginningPillarLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--about-text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.2rem;
+}
+
+.beginningPillarValue {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--about-navy);
+}
+
+/* --------------------------------------------------------------------------
+   Section 2: 이름, 부르심과 사명 (Name & Calling)
+   -------------------------------------------------------------------------- */
+.callingGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .callingGrid {
+    grid-template-columns: 1fr;
   }
 }
 
-#section4 {
-  --bg-image: url("/img/About/Servers.webp");
-  --bg-pos: 0;
+.callingCard {
+  background: #ffffff;
+  border: 1px solid var(--about-border);
+  border-radius: var(--about-radius-lg);
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  box-shadow: var(--about-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  position: relative;
 }
 
-#section5 {
-  --bg-image: url("/img/About/AboutUs.webp");
-  --bg-pos: center 55%;
-  --bg-tint: 0.6;
+.callingCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--about-shadow-lg);
+  border-color: var(--about-gold-border);
 }
 
-.sectionBody,
-.section4Body,
-.section5Body {
-  z-index: 2; /* Higher than the :before's z-index */
+.callingCardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
 }
 
-.sectionBody {
-  max-width: 1500px;
-  margin: auto;
-  padding: 0 5vw;
+.callingIndexBadge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--about-gold);
+  background: var(--about-gold-bg);
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--about-radius-full);
 }
 
-.section4Body {
-  height: 100vh;
-  padding: 0;
+.callingKeywordBadge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--about-text-muted);
 }
 
-.section5Body {
-  margin: 0 1em;
-  padding: 2.5em 0;
+.callingCardTitle {
+  font-size: clamp(1.35rem, 2.5vw, 1.7rem);
+  font-weight: 800;
+  color: var(--about-navy);
+  margin: 0 0 1rem 0;
+  line-height: 1.3;
+}
+
+.callingBlock {
+  margin-bottom: 1rem;
+}
+
+.callingBlock:last-child {
+  margin-bottom: 0;
+}
+
+.callingLabel {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--about-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.35rem;
+}
+
+.callingText {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--about-text-secondary);
+  margin: 0;
+  word-break: keep-all;
+}
+
+/* --------------------------------------------------------------------------
+   Section 3: 공동체의 발걸음 (Two Pillars)
+   -------------------------------------------------------------------------- */
+.pillarsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.75rem;
+}
+
+@media (max-width: 860px) {
+  .pillarsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pillarCard {
+  background: #ffffff;
+  border: 1px solid var(--about-border);
+  border-radius: var(--about-radius-lg);
+  padding: clamp(1.75rem, 4vw, 2.75rem);
+  box-shadow: var(--about-shadow-md);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pillarCardTopAccent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+}
+
+.pillarCardGod .pillarCardTopAccent {
+  background: linear-gradient(90deg, #c4893b, #e0aa5d);
+}
+
+.pillarCardNeighbor .pillarCardTopAccent {
+  background: linear-gradient(90deg, #17253d, #324e7b);
+}
+
+.pillarBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--about-radius-full);
+}
+
+.pillarCardGod .pillarBadge {
+  background: var(--about-gold-bg);
+  color: var(--about-gold);
+}
+
+.pillarCardNeighbor .pillarBadge {
+  background: rgba(23, 37, 61, 0.08);
+  color: var(--about-navy);
+}
+
+.pillarTitle {
+  font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+  font-weight: 800;
+  color: var(--about-navy);
+  margin: 0 0 1rem 0;
+  line-height: 1.3;
+}
+
+.pillarQuote {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--about-navy-light);
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+  word-break: keep-all;
+}
+
+.pillarDescription {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--about-text-secondary);
+  margin: 0;
+  word-break: keep-all;
+}
+
+/* --------------------------------------------------------------------------
+   Section 4: 섬기는 사람들 (Ministers & Servants)
+   -------------------------------------------------------------------------- */
+.ministersContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Senior Pastor Feature Card */
+.seniorPastorCard {
+  background: #ffffff;
+  border: 1px solid var(--about-border);
+  border-radius: var(--about-radius-lg);
+  box-shadow: var(--about-shadow-md);
+  padding: clamp(1.75rem, 4vw, 3rem);
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+@media (max-width: 860px) {
+  .seniorPastorCard {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+}
+
+.pastorImageWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--about-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--about-shadow-sm);
+  background-color: var(--about-bg-alt);
+}
+
+.pastorImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pastorInfoWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pastorRoleBadge {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--about-gold);
+  background: var(--about-gold-bg);
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--about-radius-full);
+}
+
+@media (max-width: 860px) {
+  .pastorRoleBadge {
+    align-self: center;
+  }
+}
+
+.pastorName {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 800;
+  color: var(--about-navy);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.pastorGreeting {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--about-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  word-break: keep-all;
+}
+
+.pastorDetailsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--about-border-subtle);
+  text-align: left;
+}
+
+.pastorDetailRow {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.pastorDetailTag {
+  font-weight: 700;
+  color: var(--about-gold);
+}
+
+.pastorDetailContent {
+  color: var(--about-text-secondary);
+  word-break: keep-all;
+}
+
+/* Associate Pastoral Staff Grid */
+.pastoralStaffGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.staffCard {
+  background: #ffffff;
+  border: 1px solid var(--about-border);
+  border-radius: var(--about-radius-lg);
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: var(--about-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.staffCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--about-shadow-md);
+  border-color: var(--about-gold-border);
+}
+
+.staffImageWrapper {
+  width: 140px;
+  height: 140px;
+  border-radius: var(--about-radius-full);
+  overflow: hidden;
+  background-color: var(--about-bg-alt);
+  box-shadow: var(--about-shadow-sm);
+  margin-bottom: 0.5rem;
+}
+
+.staffImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.staffName {
+  font-size: 1.2rem;
+  font-weight: 750;
+  color: var(--about-navy);
+  margin: 0;
+}
+
+.staffPosition {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--about-text-muted);
+  background-color: var(--about-bg-alt);
+  padding: 0.3rem 0.85rem;
+  border-radius: var(--about-radius-full);
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Section 5: 예배 및 모임 안내 (Worship & Gatherings)
+   -------------------------------------------------------------------------- */
+.worshipContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Main Sunday Service Hero Card */
+.sundayHeroCard {
+  background: linear-gradient(135deg, #17253d 0%, #243b61 100%);
+  color: #ffffff;
+  border-radius: var(--about-radius-lg);
+  padding: clamp(1.75rem, 4vw, 3rem);
+  box-shadow: var(--about-shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sundayHeroTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.sundayHeroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(196, 137, 59, 0.2);
+  border: 1px solid rgba(196, 137, 59, 0.4);
+  color: #f7d794;
+  padding: 0.35rem 0.9rem;
+  border-radius: var(--about-radius-full);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.sundayHeroTitle {
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 800;
+  margin: 0.25rem 0 0 0;
+  line-height: 1.2;
+}
+
+.sundayHeroDetails {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.sundayDetailItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.sundayDetailIcon {
+  color: #f7d794;
+  font-size: 1.4rem;
+  margin-top: 0.2rem;
+}
+
+.sundayDetailLabel {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.sundayDetailValue {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-top: 0.15rem;
+}
+
+.sundayDetailSub {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 0.2rem;
+}
+
+.sundayMapBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--about-gold);
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--about-radius-full);
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  min-height: 44px;
+}
+
+.sundayMapBtn:hover {
+  background-color: var(--about-gold-hover);
+  transform: translateY(-2px);
+}
+
+/* Gatherings Schedule Grid */
+.scheduleCategoriesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.scheduleCategoryCard {
+  background: #ffffff;
+  border: 1px solid var(--about-border);
+  border-radius: var(--about-radius-lg);
+  padding: 1.75rem;
+  box-shadow: var(--about-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.scheduleCategoryHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--about-border);
+}
+
+.scheduleCategoryIcon {
+  color: var(--about-gold);
+  font-size: 1.35rem;
+}
+
+.scheduleCategoryTitle {
+  font-size: 1.15rem;
+  font-weight: 750;
+  color: var(--about-navy);
+  margin: 0;
+}
+
+.scheduleItemList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.scheduleItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed var(--about-border-subtle);
+}
+
+.scheduleItem:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.scheduleItemName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--about-text-primary);
+}
+
+.scheduleItemMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  color: var(--about-text-secondary);
+}
+
+.scheduleItemTime {
+  font-weight: 600;
+  color: var(--about-navy-light);
+}
+
+.scheduleItemPlace {
+  color: var(--about-text-muted);
+  background-color: var(--about-bg-alt);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--about-radius-sm);
+  font-size: 0.8rem;
+}
+
+/* --------------------------------------------------------------------------
+   Section 6: 헌금 안내 (Offering & Giving)
+   -------------------------------------------------------------------------- */
+.offeringGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+
+@media (max-width: 860px) {
+  .offeringGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.offeringCard {
+  background: #ffffff;
+  border: 1px solid var(--about-border);
+  border-radius: var(--about-radius-lg);
+  padding: clamp(1.75rem, 4vw, 2.75rem);
+  box-shadow: var(--about-shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.offeringCardEtransfer {
+  border-color: var(--about-gold-border);
+}
+
+.offeringBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--about-radius-full);
+  align-self: flex-start;
+}
+
+.offeringCardEtransfer .offeringBadge {
+  background: var(--about-gold-bg);
+  color: var(--about-gold);
+}
+
+.offeringCardCheque .offeringBadge {
+  background: rgba(23, 37, 61, 0.08);
+  color: var(--about-navy);
+}
+
+.offeringCardTitle {
+  font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+  font-weight: 800;
+  color: var(--about-navy);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.offeringCopyField {
+  background: var(--about-bg-alt);
+  border: 1px solid var(--about-border);
+  border-radius: var(--about-radius-md);
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.offeringFieldLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--about-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.2rem;
+}
+
+.offeringFieldValue {
+  font-size: clamp(0.95rem, 3.8vw, 1.05rem);
+  font-weight: 750;
+  color: var(--about-navy);
+  font-family: inherit;
+  word-break: break-all;
+}
+
+@media (max-width: 480px) {
+  .offeringCopyField {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .offeringCopyBtn {
+    justify-content: center;
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
+.offeringCopyBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--about-radius-sm);
+  background: #ffffff;
+  color: var(--about-navy);
+  border: 1px solid var(--about-border);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  min-height: 38px;
+}
+
+.offeringCopyBtn:hover {
+  background: var(--about-gold-bg);
+  border-color: var(--about-gold);
+  color: var(--about-gold);
+}
+
+.offeringCopyBtn:focus-visible {
+  outline: 2px solid var(--about-gold);
+  outline-offset: 2px;
+}
+
+.offeringNoticeBox {
+  background: var(--about-gold-bg);
+  border-left: 3px solid var(--about-gold);
+  padding: 1rem 1.25rem;
+  border-radius: 0 var(--about-radius-md) var(--about-radius-md) 0;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--about-navy);
+  word-break: keep-all;
+}
+
+.offeringNoticeBox strong {
+  color: var(--about-navy);
+  font-weight: 750;
+}
+
+.offeringChequeInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--about-text-secondary);
+}
+
+.offeringChequePayTo {
+  background: var(--about-bg-alt);
+  border: 1px solid var(--about-border);
+  border-radius: var(--about-radius-md);
+  padding: 1rem;
+}
+
+.offeringChequePayToLabel {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--about-text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.offeringChequePayToValue {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--about-navy);
+}
+
+/* --------------------------------------------------------------------------
+   Closing Sanctuary Callout
+   -------------------------------------------------------------------------- */
+.sanctuaryCallout {
+  margin-top: clamp(2rem, 5vw, 4rem);
+  background: linear-gradient(135deg, #17253d 0%, #1c2e4a 100%);
+  border-radius: var(--about-radius-lg);
+  padding: clamp(2rem, 5vw, 3.5rem);
+  text-align: center;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: var(--about-shadow-lg);
+}
+
+.sanctuaryCalloutTitle {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.sanctuaryCalloutText {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 620px;
+  margin: 0;
+  line-height: 1.7;
+  word-break: keep-all;
+}
+
+.sanctuaryCalloutBtns {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.sanctuaryBtnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--about-gold);
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.8rem 1.6rem;
+  border-radius: var(--about-radius-full);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.sanctuaryBtnPrimary:hover {
+  background-color: var(--about-gold-hover);
+  transform: translateY(-2px);
+}
+
+.sanctuaryBtnSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.8rem 1.6rem;
+  border-radius: var(--about-radius-full);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.sanctuaryBtnSecondary:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
 }
