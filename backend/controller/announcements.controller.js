@@ -1,5 +1,6 @@
+import { HTTPException } from "hono/http-exception";
 import { deleteImages } from "../controller/images.controller.js";
-import { executeD1Query } from "../api/d1.js";
+import { executeD1Query, executeD1Batch } from "../api/d1.js";
 import { purgeCache } from "../api/cloudflare.js";
 
 const TABLENAME = "Announcements";
@@ -29,10 +30,11 @@ export const getAnnouncementsController = async (c) => {
   const dataSql = `SELECT * FROM ${TABLENAME} WHERE pin = 0 OR pin IS NULL ORDER BY timestamp DESC LIMIT ? OFFSET ?`;
   const offset = (page - 1) * PAGE_SIZE;
 
-  const [countResult, pinResult, dataResult] = await Promise.all([
-    executeD1Query(db, countSql),
-    executeD1Query(db, pinSql),
-    executeD1Query(db, dataSql, [PAGE_SIZE, offset]),
+  // Execute count, pinned items, and paged data in ONE single atomic D1 batch round-trip
+  const [countResult, pinResult, dataResult] = await executeD1Batch(db, [
+    { sql: countSql },
+    { sql: pinSql },
+    { sql: dataSql, params: [PAGE_SIZE, offset] },
   ]);
 
   const count = countResult.result[0]?.results?.[0]?.count ?? 0;
@@ -52,7 +54,7 @@ export const getAnnouncementController = async (c) => {
 
   const result = await executeD1Query(db, sql, params);
   if (!result.result[0]?.results || result.result[0].results.length === 0) {
-    return c.json({ error: "NotFound", message: "공지사항을 찾을 수 없습니다." }, 404);
+    throw new HTTPException(404, { message: "공지사항을 찾을 수 없습니다." });
   }
   return c.json(result.result[0].results[0]);
 };
@@ -126,7 +128,7 @@ export const deleteAnnouncementController = async (c) => {
   const result = await executeD1Query(db, getSql, getParams);
   const row = result?.result?.[0]?.results?.[0];
   if (!row) {
-    return c.json({ error: "NotFound", message: "공지사항을 찾을 수 없습니다." }, 404);
+    throw new HTTPException(404, { message: "공지사항을 찾을 수 없습니다." });
   }
   const images = row.images
     ? row.images.split(",").map((s) => s.trim()).filter(Boolean)

@@ -59,14 +59,33 @@ app.use("*", (c, next) => linkPreviewMiddleware(c, next, app));
 app.onError((err, c) => {
   console.error(`[Global Error] ${c.req.method} ${c.req.url} -`, err);
 
-  // Handle Hono HTTP exceptions (e.g. 400 Bad Request, 401 Unauthorized)
+  // Handle Hono HTTP exceptions (e.g. 400 Bad Request, 401 Unauthorized, 404 Not Found)
   if (err instanceof HTTPException) {
+    if (err.res) {
+      return err.res;
+    }
+    const status = err.status || 500;
+    const errorName =
+      status === 400
+        ? "BadRequest"
+        : status === 401
+        ? "Unauthorized"
+        : status === 403
+        ? "Forbidden"
+        : status === 404
+        ? "NotFound"
+        : status === 409
+        ? "Conflict"
+        : err.name && err.name !== "HTTPException"
+        ? err.name
+        : "HTTPException";
+
     return c.json(
       {
-        error: err.name || "HTTPException",
+        error: errorName,
         message: err.message,
       },
-      err.status
+      status
     );
   }
 

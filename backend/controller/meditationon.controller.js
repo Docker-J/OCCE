@@ -1,3 +1,4 @@
+import { HTTPException } from "hono/http-exception";
 import { executeD1Query } from "../api/d1.js";
 import { deleteImages, uploadImage } from "./images.controller.js";
 import { purgeCache } from "../api/cloudflare.js";
@@ -42,7 +43,7 @@ export const getMeditationONController = async (c) => {
   const row = result.result[0]?.results?.[0];
 
   if (!row) {
-    return c.json({ error: "NotFound", message: "묵상ON 게시글을 찾을 수 없습니다." }, 404);
+    throw new HTTPException(404, { message: "묵상ON 게시글을 찾을 수 없습니다." });
   }
 
   let images = {};
