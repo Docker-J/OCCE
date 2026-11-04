@@ -29,6 +29,10 @@ backend/church-4385c-ceedf27e8d20.json
 /.agents
 /.claude
 /agent
+/.codex
+/.github/skills
+/.github/agents
+/.github/hooks
 db_backup.sql
 schema.sql
 
