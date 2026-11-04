@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import {
   addDays,
@@ -16,51 +16,61 @@ import { deleteWeeklyUpdate, getWeeklyUpdate } from "../../../../api/weeklyupdat
 import { useShallow } from "zustand/react/shallow";
 import useAuthStore from "../../../../store/useAuthStore";
 import { MIN_DATE } from "../../../../constants/WeeklyUpdate";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useWeeklyUpdate = (queryDate, maxDate) => {
   const navigate = useNavigate();
-  const { authenticated, authInitialized } = useAuthStore(
+  const queryClient = useQueryClient();
+
+  const { authenticated } = useAuthStore(
     useShallow((state) => ({
       authenticated: state.authenticated,
-      authInitialized: state.authInitialized,
     }))
   );
 
-  const [bulletin, setBulletin] = useState(null);
   const [selectedDate, setSelectedDate] = useState(queryDate);
-  const [loading, setLoading] = useState(true);
+  const [prevQueryDate, setPrevQueryDate] = useState(queryDate);
 
-  const loadFile = useCallback(async () => {
-    setLoading(true);
-    setBulletin(null);
-    try {
+  // Sync state if route queryDate changes (e.g. browser back/forward)
+  if (prevQueryDate !== queryDate) {
+    setPrevQueryDate(queryDate);
+    setSelectedDate(queryDate);
+  }
+
+  const dateKey = format(selectedDate, "yyyyMMdd");
+
+  const {
+    data: bulletin = null,
+    isLoading,
+  } = useQuery({
+    queryKey: ["weekly-update", dateKey, authenticated],
+    queryFn: async () => {
       const result = await getWeeklyUpdate(selectedDate);
-      setBulletin(result.data);
-    } catch (err) {
-      console.error("Failed to fetch weekly update:", err);
-      setBulletin(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedDate]);
+      return result.data;
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
 
   const previousSunday = () => {
     setSelectedDate((prev) =>
       isSunday(prev)
         ? subDays(prev, 7)
-        : startOfWeek(prev, { weekStartsOn: 0 }),
+        : startOfWeek(prev, { weekStartsOn: 0 })
     );
   };
 
   const nextSunday = () => {
     setSelectedDate((prev) =>
-      isSunday(prev) ? addDays(prev, 7) : endOfWeek(prev, { weekStartsOn: 1 }),
+      isSunday(prev) ? addDays(prev, 7) : endOfWeek(prev, { weekStartsOn: 1 })
     );
   };
 
   const deleteFile = async () => {
     try {
       const result = await deleteWeeklyUpdate(selectedDate);
+      queryClient.removeQueries({ queryKey: ["weekly-update", dateKey] });
+      queryClient.invalidateQueries({ queryKey: ["weekly-update"] });
       const rawDate =
         typeof result?.data === "string" ? result.data.trim() : "";
       if (rawDate) {
@@ -73,30 +83,29 @@ export const useWeeklyUpdate = (queryDate, maxDate) => {
     }
   };
 
+  // Sync URL when selectedDate changes (without redundant navigation)
   useEffect(() => {
-    if (!authInitialized) return;
-
-    loadFile();
-    navigate("/weeklyupdate/" + format(selectedDate, "yyyyMMdd"), {
-      replace: true,
-    });
-  }, [selectedDate, authenticated, authInitialized, loadFile, navigate]);
+    const formatted = format(selectedDate, "yyyyMMdd");
+    if (!window.location.pathname.endsWith(formatted)) {
+      navigate("/weeklyupdate/" + formatted, { replace: true });
+    }
+  }, [selectedDate, navigate]);
 
   const canGoPrevious =
     !isSameDay(selectedDate, MIN_DATE) &&
     !isBefore(selectedDate, MIN_DATE) &&
-    !loading;
+    !isLoading;
 
   const canGoNext =
     !isSameDay(selectedDate, maxDate) &&
     !isAfter(selectedDate, maxDate) &&
-    !loading;
+    !isLoading;
 
   return {
     selectedDate,
     setSelectedDate,
     bulletin,
-    loading,
+    loading: isLoading,
     previousSunday,
     nextSunday,
     canGoPrevious,

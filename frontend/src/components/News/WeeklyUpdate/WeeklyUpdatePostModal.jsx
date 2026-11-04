@@ -8,9 +8,11 @@ import { uploadWeeklyUpdate } from "../../../api/weeklyupdate";
 import { MIN_DATE } from "../../../constants/WeeklyUpdate";
 import FileUploadComponent from "../../../common/FileUploadComponent";
 import CustomModal from "../../../common/CustomModal";
+import { useQueryClient } from "@tanstack/react-query";
 
 const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
   const { openSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
 
   const [selectedDate, setSelectedDate] = useState(
     startOfDay(add(endOfWeek(new Date()), { days: 1 }))
@@ -59,6 +61,7 @@ const WeeklyUpdatePostModal = ({ isOpen, onClose, setParentDate }) => {
       await uploadWeeklyUpdate(format(selectedDate, "yyyyMMdd"), form);
 
       openSnackbar("success", "Uploaded Succesfully!");
+      queryClient.invalidateQueries({ queryKey: ["weekly-update"] });
       setParentDate(selectedDate);
       handleClose();
       return { success: true };
