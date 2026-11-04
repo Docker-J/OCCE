@@ -40,6 +40,8 @@ const ForumPostCard = ({ post, themeColor, themeBg, themeHover }) => {
         border: "1px solid rgba(0, 0, 0, 0.08)",
         position: "relative",
         overflow: "hidden",
+        contentVisibility: "auto",
+        containIntrinsicSize: "auto 140px",
         transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
         "&:hover": {
           transform: "translateY(-2px)",
