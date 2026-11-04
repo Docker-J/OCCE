@@ -101,6 +101,13 @@ const SignUpModal = ({ isOpen, onClose }) => {
         <TextField
           sx={{ width: "100%", mt: "1em" }}
           label="이름(한글)"
+          autoComplete="name"
+          slotProps={{
+            htmlInput: {
+              autoComplete: "name",
+              enterKeyHint: "next",
+            },
+          }}
           required
           {...register("name", {
             required: "성명을 입력해주세요.",
@@ -131,6 +138,15 @@ const SignUpModal = ({ isOpen, onClose }) => {
               customInput={TextField}
               label="전화번호"
               type="tel"
+              autoComplete="tel"
+              inputMode="tel"
+              slotProps={{
+                htmlInput: {
+                  autoComplete: "tel",
+                  inputMode: "tel",
+                  enterKeyHint: "next",
+                },
+              }}
               fullWidth
               sx={{ mt: "1em" }}
               error={!!errors.phone}
@@ -168,6 +184,9 @@ const SignUpModal = ({ isOpen, onClose }) => {
           error={!!errors.password}
           helperText={errors.password?.message}
           slotProps={{
+            htmlInput: {
+              enterKeyHint: "next",
+            },
             input: {
               endAdornment: (
                 <InputAdornment position="end">
@@ -209,6 +228,9 @@ const SignUpModal = ({ isOpen, onClose }) => {
             (isPasswordMatch ? "비밀번호가 일치합니다." : "")
           }
           slotProps={{
+            htmlInput: {
+              enterKeyHint: "done",
+            },
             formHelperText: {
               sx: {
                 color:

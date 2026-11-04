@@ -129,11 +129,20 @@ const SignInModal = ({ isOpen, onClose }) => {
               required
               label="전화번호"
               type="tel"
+              autoComplete="username tel"
+              inputMode="tel"
               fullWidth
               sx={{ mt: "1.5em" }}
               error={!!error}
               helperText={error?.message}
               disabled={isLoading}
+              slotProps={{
+                htmlInput: {
+                  autoComplete: "username tel",
+                  inputMode: "tel",
+                  enterKeyHint: "next",
+                },
+              }}
               onValueChange={(values) => {
                 // .value provides just digits (1234567890)
                 // .formattedValue provides the string ((123) 456-7890)
@@ -161,6 +170,9 @@ const SignInModal = ({ isOpen, onClose }) => {
               error={!!error}
               helperText={error?.message}
               slotProps={{
+                htmlInput: {
+                  enterKeyHint: "done",
+                },
                 input: {
                   endAdornment: (
                     <InputAdornment position="end">

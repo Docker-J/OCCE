@@ -58,6 +58,15 @@ const ResetPasswordRequestModal = ({ isOpen, onClose }) => {
         sx={{ width: "100%", mt: "1em" }}
         label="전화번호"
         type="tel"
+        autoComplete="tel"
+        inputMode="tel"
+        slotProps={{
+          htmlInput: {
+            autoComplete: "tel",
+            inputMode: "tel",
+            enterKeyHint: "done",
+          },
+        }}
         format="(###) ###-####"
         mask="_"
         allowEmptyFormatting={true}
