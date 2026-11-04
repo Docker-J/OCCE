@@ -221,6 +221,8 @@ const ResponsiveAppBar = () => {
               sx={{
                 ml: "auto",
                 display: { xs: "none", md: "flex" },
+                alignItems: "center",
+                flexWrap: "nowrap",
               }}
             >
               {pages.map((page) => (

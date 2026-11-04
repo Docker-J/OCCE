@@ -35,31 +35,18 @@
   padding-bottom: 4rem;
 }
 
-/* Anchor margin offset for sticky AppBar + sticky QuickNav */
+/* Anchor margin offset for dynamic sticky AppBar + sticky QuickNav */
 .aboutSection,
 .aboutAnchor {
-  scroll-margin-top: 160px;
-}
-
-@media (min-width: 900px) {
-  .aboutSection,
-  .aboutAnchor {
-    scroll-margin-top: 190px;
-  }
+  scroll-margin-top: calc(var(--appbar-bottom, 90px) + 70px);
 }
 
 .aboutAnchor {
   display: block;
   position: relative;
   visibility: hidden;
-  top: -160px;
+  top: calc(-1 * (var(--appbar-bottom, 90px) + 70px));
   height: 0;
-}
-
-@media (min-width: 900px) {
-  .aboutAnchor {
-    top: -190px;
-  }
 }
 
 /* --------------------------------------------------------------------------
@@ -143,20 +130,14 @@
 /* Quick Navigation Bar */
 .aboutQuickNavContainer {
   position: sticky;
-  top: 90px;
+  top: var(--appbar-bottom, 90px);
   z-index: 30;
   background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--about-border);
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
-  transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@media (min-width: 900px) {
-  .aboutQuickNavContainer {
-    top: 116px;
-  }
+  transition: top 0.15s ease;
 }
 
 .aboutQuickNav {

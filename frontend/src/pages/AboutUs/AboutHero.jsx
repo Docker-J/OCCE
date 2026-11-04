@@ -11,17 +11,51 @@ const navItems = [
 
 const AboutHero = ({ onScrollTo }) => {
   const [activeId, setActiveId] = useState("");
+  const [appBarBottom, setAppBarBottom] = useState(89);
   const navContainerRef = useRef(null);
   const pillRefs = useRef({});
 
-  // 1. Detect which section is currently active as user scrolls through the page
+  // 1. Dynamically track the live bottom position of the floating AppBar across all screen sizes
+  useEffect(() => {
+    const updateAppBarBottom = () => {
+      const appBar = document.querySelector(".MuiAppBar-root");
+      if (appBar) {
+        const rect = appBar.getBoundingClientRect();
+        if (rect.height > 0) {
+          const bottom = Math.round(rect.bottom);
+          setAppBarBottom(bottom);
+          document.documentElement.style.setProperty("--appbar-bottom", `${bottom}px`);
+        }
+      }
+    };
+
+    updateAppBarBottom();
+
+    window.addEventListener("resize", updateAppBarBottom, { passive: true });
+    window.addEventListener("scroll", updateAppBarBottom, { passive: true });
+
+    let observer;
+    const appBar = document.querySelector(".MuiAppBar-root");
+    if (appBar && window.ResizeObserver) {
+      observer = new ResizeObserver(updateAppBarBottom);
+      observer.observe(appBar);
+    }
+
+    return () => {
+      window.removeEventListener("resize", updateAppBarBottom);
+      window.removeEventListener("scroll", updateAppBarBottom);
+      if (observer) observer.disconnect();
+    };
+  }, []);
+
+  // 2. Detect which section is currently active as user scrolls through the page
   useEffect(() => {
     let ticking = false;
 
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
-          const scrollOffset = window.innerWidth >= 900 ? 220 : 190;
+          const scrollOffset = appBarBottom + 70;
           const scrollPos = window.scrollY + scrollOffset;
 
           for (let i = navItems.length - 1; i >= 0; i--) {
@@ -42,9 +76,9 @@ const AboutHero = ({ onScrollTo }) => {
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [appBarBottom]);
 
-  // 2. Automatically scroll horizontal quick nav bar to keep active pill centered on narrow screens
+  // 3. Automatically scroll horizontal quick nav bar to keep active pill centered on narrow screens
   useEffect(() => {
     if (!activeId) return;
     const container = navContainerRef.current;
@@ -76,7 +110,11 @@ const AboutHero = ({ onScrollTo }) => {
         </div>
       </header>
 
-      <nav className="aboutQuickNavContainer" aria-label="교회소개 바로가기 메뉴">
+      <nav
+        className="aboutQuickNavContainer"
+        style={{ top: `${appBarBottom}px` }}
+        aria-label="교회소개 바로가기 메뉴"
+      >
         <div className="aboutQuickNav" ref={navContainerRef}>
           {navItems.map((item) => {
             const isActive = activeId === item.id;

@@ -35,13 +35,15 @@ const Submenu = ({ page, scrolled }) => {
           my: 1.75,
           ml: 0.8,
           color: isAnySubpageActive ? (scrolled ? "#FF6B00" : "#FFE082") : "inherit",
-          fontSize: "20.5px",
+          fontSize: { xs: "17px", md: "17px", lg: "20.5px" },
           fontWeight: "600",
           textTransform: "none",
+          whiteSpace: "nowrap",
           transition: "color 0.3s ease",
           "& .nav-button-text": {
             position: "relative",
             py: "4px",
+            whiteSpace: "nowrap",
             "&::after": {
               content: '""',
               position: "absolute",
