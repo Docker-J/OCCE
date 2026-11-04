@@ -1,4 +1,4 @@
-import { Outlet, createBrowserRouter, useNavigation, RouterProvider } from "react-router";
+import { Outlet, createBrowserRouter, useNavigation, RouterProvider, ScrollRestoration } from "react-router";
 import { LinearProgress, CircularProgress, Box } from "@mui/material";
 import { lazy, Suspense } from "react";
 
@@ -40,6 +40,7 @@ const Managers = () => {
 const RootLayout = () => {
   return (
     <NotificationProvider>
+      <ScrollRestoration />
       <GlobalLoader />
       <Managers />
       <Outlet />

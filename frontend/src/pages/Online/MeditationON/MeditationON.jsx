@@ -22,7 +22,7 @@ import AdminComponent from "../../../common/AdminComponent";
 import Footer from "../../../header/Footer";
 import useModals from "../../../util/useModal";
 import { getPosts } from "../../../api/meditationon";
-import { ScrollRestoration, useNavigationType } from "react-router";
+import { useNavigationType } from "react-router";
 
 const PAGE_SIZE = 12;
 const titleBackground = {
