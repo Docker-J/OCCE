@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from "react";
+import React, { createContext, use } from "react";
 import PropTypes from "prop-types";
 import {
   Card as MuiCard,
@@ -17,7 +17,7 @@ const CardContext = createContext({
   density: "standard",
 });
 
-export const useCardContext = () => useContext(CardContext);
+export const useCardContext = () => use(CardContext);
 
 // 2. Subcomponent: CustomCard.Header
 const Header = ({
@@ -426,7 +426,7 @@ export const CustomCard = ({
   );
 
   return (
-    <CardContext.Provider value={contextValue}>
+    <CardContext value={contextValue}>
       <MuiCard
         elevation={elevation}
         onClick={onClick}
@@ -453,7 +453,7 @@ export const CustomCard = ({
           children
         )}
       </MuiCard>
-    </CardContext.Provider>
+    </CardContext>
   );
 };
 

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { createContext, use, useState, useEffect, useCallback, useRef } from "react";
 import { registerToken, unregisterToken, unlinkTokenRole } from "../api/notification";
 import { useShallow } from "zustand/react/shallow";
 import useAuthStore from "../store/useAuthStore";
@@ -15,7 +15,7 @@ const VAPID_KEY =
 
 export const NotificationContext = createContext();
 
-export const useNotification = () => useContext(NotificationContext);
+export const useNotification = () => use(NotificationContext);
 
 export const NotificationProvider = ({ children }) => {
   const navigate = useNavigate();
@@ -285,9 +285,9 @@ export const NotificationProvider = ({ children }) => {
   };
 
   return (
-    <NotificationContext.Provider value={{ enabled, setupPush, disablePush }}>
+    <NotificationContext value={{ enabled, setupPush, disablePush }}>
       {children}
       {isLoading && <FullScreenLoading />}
-    </NotificationContext.Provider>
+    </NotificationContext>
   );
 };

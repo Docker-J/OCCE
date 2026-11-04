@@ -3,7 +3,7 @@
  * @description 정원지기 임명/수정 및 담당 정원 배정 모달 다이얼로그 (상태 국소화 적용)
  */
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import PropTypes from "prop-types";
 import {
   Dialog,
@@ -33,19 +33,23 @@ const GardenRoleModal = ({
   onSave,
   onAddAvailableGarden,
 }) => {
-  const [selectedGardens, setSelectedGardens] = useState([]);
+  const [prevUserId, setPrevUserId] = useState(user?.id);
+  const [selectedGardens, setSelectedGardens] = useState(() => {
+    return user?.garden
+      ? user.garden.split(",").map((g) => g.trim()).filter(Boolean)
+      : [];
+  });
   const [customGardenInput, setCustomGardenInput] = useState("");
 
-  // 모달 대상 유저가 바뀔 때 담당 정원 로컬 상태 동기화
-  useEffect(() => {
-    if (user) {
-      const initial = user.garden
-        ? user.garden.split(",").map((g) => g.trim()).filter(Boolean)
-        : [];
-      setSelectedGardens(initial);
-      setCustomGardenInput("");
-    }
-  }, [user]);
+  // 모달 대상 유저가 바뀔 때 담당 정원 로컬 상태 동기화 (렌더 타임 상태 보정으로 useEffect 폭포수 방지)
+  if (user?.id !== prevUserId) {
+    setPrevUserId(user?.id);
+    const initial = user?.garden
+      ? user.garden.split(",").map((g) => g.trim()).filter(Boolean)
+      : [];
+    setSelectedGardens(initial);
+    setCustomGardenInput("");
+  }
 
   const handleToggleGarden = (gardenName) => {
     setSelectedGardens((prev) =>

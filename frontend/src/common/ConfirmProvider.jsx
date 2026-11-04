@@ -1,6 +1,6 @@
 import React, {
   createContext,
-  useContext,
+  use,
   useState,
   useRef,
   useCallback,
@@ -139,7 +139,7 @@ export const ConfirmProvider = ({ children }) => {
   };
 
   return (
-    <ConfirmContext.Provider value={confirm}>
+    <ConfirmContext value={confirm}>
       {children}
       <Dialog
         open={dialogState.isOpen}
@@ -235,7 +235,7 @@ export const ConfirmProvider = ({ children }) => {
           </Button>
         </DialogActions>
       </Dialog>
-    </ConfirmContext.Provider>
+    </ConfirmContext>
   );
 };
 
@@ -260,7 +260,7 @@ ConfirmProvider.propTypes = {
  * }) => Promise<boolean>}
  */
 export const useConfirm = () => {
-  const context = useContext(ConfirmContext);
+  const context = use(ConfirmContext);
   if (!context) {
     throw new Error("useConfirm must be used within a ConfirmProvider");
   }
