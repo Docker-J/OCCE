@@ -206,24 +206,6 @@
   box-shadow: 0 4px 14px rgba(23, 37, 61, 0.3) !important;
 }
 
-.aboutNavPillHighlight {
-  color: #ff6b00;
-  background-color: rgba(255, 107, 0, 0.07);
-  border-color: rgba(255, 107, 0, 0.2);
-  font-weight: 700;
-}
-
-.aboutNavPillHighlight:hover {
-  background-color: rgba(255, 107, 0, 0.14);
-}
-
-.aboutNavPillHighlight.aboutNavPillActive {
-  background: linear-gradient(135deg, #ff6b00 0%, #ff8533 100%) !important;
-  color: #ffffff !important;
-  border-color: #ff6b00 !important;
-  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.4) !important;
-}
-
 /* --------------------------------------------------------------------------
    Common Section Architecture
    -------------------------------------------------------------------------- */

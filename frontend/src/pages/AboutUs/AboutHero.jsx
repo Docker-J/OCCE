@@ -6,7 +6,7 @@ const navItems = [
   { id: "direction", label: "공동체의 발걸음" },
   { id: "ministers", label: "섬기는 사람들" },
   { id: "worship", label: "예배 안내" },
-  { id: "offering", label: "헌금 안내", isHighlight: true },
+  { id: "offering", label: "헌금 안내" },
 ];
 
 const AboutHero = ({ onScrollTo }) => {
@@ -123,9 +123,7 @@ const AboutHero = ({ onScrollTo }) => {
                 key={item.id}
                 ref={(el) => (pillRefs.current[item.id] = el)}
                 type="button"
-                className={`aboutNavPill ${item.isHighlight ? "aboutNavPillHighlight" : ""} ${
-                  isActive ? "aboutNavPillActive" : ""
-                }`}
+                className={`aboutNavPill ${isActive ? "aboutNavPillActive" : ""}`}
                 onClick={() => onScrollTo(item.id)}
               >
                 {item.label}
