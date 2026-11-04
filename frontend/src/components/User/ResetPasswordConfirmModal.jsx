@@ -17,7 +17,6 @@ const ResetPasswordConfirmModal = ({ phone, isOpen, onClose }) => {
 
   const [confirmCode, setConfirmCode] = useState("");
   const [seconds, setSeconds] = useState(60);
-  const [isTimerActive, setIsTimerActive] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -44,18 +43,25 @@ const ResetPasswordConfirmModal = ({ phone, isOpen, onClose }) => {
       !errors.password
   );
 
+  // Stable countdown timer (only resets when active status changes)
   useEffect(() => {
-    let interval = null;
-    if (isTimerActive && seconds > 0) {
-      interval = setInterval(() => {
-        setSeconds((prev) => prev - 1);
-      }, 1000);
-    } else if (seconds === 0) {
-      setIsTimerActive(false);
-      clearInterval(interval);
-    }
+    if (seconds <= 0) return;
+
+    const interval = setInterval(() => {
+      setSeconds((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
     return () => clearInterval(interval);
-  }, [isTimerActive, seconds]);
+  }, [seconds > 0]);
+
+  const resendSuccess = () => {
+    openSnackbar("success", "새로운 인증번호가 전송되었습니다.");
+    setSeconds(60);
+  };
+
+  const resendFail = () => {
+    openSnackbar("error", "인증번호 재전송에 실패했습니다.");
+  };
 
   const onResendRequest = async () => {
     try {

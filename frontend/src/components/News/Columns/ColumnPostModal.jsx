@@ -1,5 +1,5 @@
 import { Button, CircularProgress, TextField } from "@mui/material";
-import { useEffect, useState, useActionState, startTransition, lazy, Suspense } from "react";
+import { useState, useActionState, startTransition, lazy, Suspense } from "react";
 
 const TextEditor = lazy(() => import("../Announcement/TextEditor"));
 import { postColumn } from "../../../api/columns";
@@ -21,6 +21,18 @@ const ColumnPostModal = ({
   const [title, setTitle] = useState(origTitle);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [body, setBody] = useState(origBody);
+  const [prevProps, setPrevProps] = useState({ id, origTitle, origBody });
+
+  // Adjust state during render when props change (avoids secondary useEffect render cycle)
+  if (
+    prevProps.id !== id ||
+    prevProps.origTitle !== origTitle ||
+    prevProps.origBody !== origBody
+  ) {
+    setPrevProps({ id, origTitle, origBody });
+    setTitle(origTitle);
+    setBody(origBody);
+  }
 
   const [, formAction, isPending] = useActionState(async () => {
     try {
@@ -39,11 +51,6 @@ const ColumnPostModal = ({
       return { error };
     }
   }, null);
-
-  useEffect(() => {
-    setTitle(origTitle);
-    setBody(origBody);
-  }, [origTitle, origBody]);
 
   const handleClose = () => {
     setTitle(origTitle);

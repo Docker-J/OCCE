@@ -13,23 +13,18 @@ const SignUpConfirmModal = ({ phone, isOpen, onClose }) => {
   const { openSnackbar } = useSnackbar();
 
   const [confirmCode, setConfirmCode] = useState("");
-
   const [seconds, setSeconds] = useState(60);
-  const [isTimerActive, setIsTimerActive] = useState(true);
 
-  // 1. The Countdown Logic
+  // 1. Stable countdown timer (only resets when active status changes)
   useEffect(() => {
-    let interval = null;
-    if (isTimerActive && seconds > 0) {
-      interval = setInterval(() => {
-        setSeconds((prev) => prev - 1);
-      }, 1000);
-    } else if (seconds === 0) {
-      setIsTimerActive(false);
-      clearInterval(interval);
-    }
+    if (seconds <= 0) return;
+
+    const interval = setInterval(() => {
+      setSeconds((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
     return () => clearInterval(interval);
-  }, [isTimerActive, seconds]);
+  }, [seconds > 0]);
 
   const onSubmit = async () => {
     try {
@@ -77,8 +72,7 @@ const SignUpConfirmModal = ({ phone, isOpen, onClose }) => {
 
   const resendSuccess = () => {
     openSnackbar("success", "새로운 인증번호가 전송되었습니다.");
-    setSeconds(60); // Reset back to 60
-    setIsTimerActive(true); // Restart the countdown
+    setSeconds(60); // Reset back to 60 to restart the countdown
   };
 
   const resendFail = () => {

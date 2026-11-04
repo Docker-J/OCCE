@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { flushSync } from "react-dom";
 import { TextField } from "@mui/material";
 
 const DebouncedTextField = ({
@@ -9,11 +8,14 @@ const DebouncedTextField = ({
   ...props
 }) => {
   const [localVal, setLocalVal] = useState(value || "");
+  const [prevValue, setPrevValue] = useState(value || "");
   const timerRef = useRef(null);
 
-  useEffect(() => {
+  // Adjust state during render when controlled value prop changes (no post-render effect cycle)
+  if (prevValue !== (value || "")) {
+    setPrevValue(value || "");
     setLocalVal(value || "");
-  }, [value]);
+  }
 
   const handleChange = (e) => {
     const newVal = e.target.value;
@@ -32,9 +34,7 @@ const DebouncedTextField = ({
       timerRef.current = null;
     }
     if (localVal !== (value || "")) {
-      flushSync(() => {
-        onChange?.(localVal);
-      });
+      onChange?.(localVal);
     }
     props.onBlur?.(e);
   };

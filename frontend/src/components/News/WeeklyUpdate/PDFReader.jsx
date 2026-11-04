@@ -3,7 +3,7 @@ import ZoomInIcon from "@mui/icons-material/ZoomIn";
 import ZoomOutIcon from "@mui/icons-material/ZoomOut";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { pdfjs, Page, Document } from "react-pdf";
 
 import "react-pdf/dist/Page/AnnotationLayer.css";
@@ -23,6 +23,14 @@ function PDFReader({ file, loading = false, documentDimension }) {
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [scale, setScale] = useState(MIN_SCALE);
+  const [prevFile, setPrevFile] = useState(file);
+
+  // Reset page and scale during render when file prop changes (eliminates post-commit flash)
+  if (prevFile !== file) {
+    setPrevFile(file);
+    setPageNumber(1);
+    setScale(MIN_SCALE);
+  }
 
   const add = () => {
     setScale((prev) =>
@@ -51,11 +59,6 @@ function PDFReader({ file, loading = false, documentDimension }) {
   function nextPage() {
     changePage(1);
   }
-
-  useEffect(() => {
-    setPageNumber(1);
-    setScale(MIN_SCALE);
-  }, [file]);
 
   if (loading) {
     return (
