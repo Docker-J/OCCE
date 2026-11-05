@@ -14,28 +14,58 @@ import AttendanceChecklist from "./AttendanceChecklist";
 import ReportStatusBanner from "./ReportStatusBanner";
 import ReportSubmitButton from "./ReportSubmitButton";
 import DebouncedTextField from "../../common/DebouncedTextField";
+import { useSmallGroupReportContext } from "./SmallGroupReportContext";
 
 const SundayForm = ({
-  gardens,
-  selectedGarden,
-  handleGardenChange,
-  recentSundays,
-  selectedDate,
-  setSelectedDate,
-  checkingReport,
-  isReported,
-  attendees,
-  absentees,
-  checkedMembers,
-  handleToggleMember,
-  handleCheckAll,
-  handleUncheckAll,
-  absenceReasons,
-  handleAbsenceReasonChange,
-  handleFormSubmit,
-  submitting,
-  membersList,
+  gardens: gardensProp,
+  selectedGarden: selectedGardenProp,
+  handleGardenChange: handleGardenChangeProp,
+  recentSundays: recentSundaysProp,
+  selectedDate: selectedDateProp,
+  setSelectedDate: setSelectedDateProp,
+  checkingReport: checkingReportProp,
+  isReported: isReportedProp,
+  attendees: attendeesProp,
+  absentees: absenteesProp,
+  checkedMembers: checkedMembersProp,
+  handleToggleMember: handleToggleMemberProp,
+  handleCheckAll: handleCheckAllProp,
+  handleUncheckAll: handleUncheckAllProp,
+  absenceReasons: absenceReasonsProp,
+  handleAbsenceReasonChange: handleAbsenceReasonChangeProp,
+  handleFormSubmit: handleFormSubmitProp,
+  submitting: submittingProp,
+  membersList: membersListProp,
 }) => {
+  const ctx = useSmallGroupReportContext();
+
+  const gardens = gardensProp ?? ctx?.state?.gardens ?? {};
+  const selectedGarden = selectedGardenProp ?? ctx?.state?.selectedGarden;
+  const handleGardenChange =
+    handleGardenChangeProp ?? ctx?.actions?.handleGardenChange;
+  const recentSundays = recentSundaysProp ?? ctx?.state?.recentSundays ?? [];
+  const selectedDate = selectedDateProp ?? ctx?.state?.selectedDate;
+  const setSelectedDate = setSelectedDateProp ?? ctx?.actions?.setSelectedDate;
+  const checkingReport = checkingReportProp ?? ctx?.state?.checkingReport;
+  const isReported = isReportedProp ?? ctx?.state?.isReported;
+  const attendees = attendeesProp ?? ctx?.state?.attendees ?? [];
+  const absentees = absenteesProp ?? ctx?.state?.absentees ?? [];
+  const checkedMembers = checkedMembersProp ?? ctx?.state?.checkedMembers;
+  const handleToggleMember =
+    handleToggleMemberProp ?? ctx?.actions?.handleToggleMember;
+  const handleCheckAll = handleCheckAllProp ?? ctx?.actions?.handleCheckAll;
+  const handleUncheckAll =
+    handleUncheckAllProp ?? ctx?.actions?.handleUncheckAll;
+  const absenceReasons =
+    absenceReasonsProp ?? ctx?.state?.absenceReasons ?? {};
+  const handleAbsenceReasonChange =
+    handleAbsenceReasonChangeProp ?? ctx?.actions?.handleAbsenceReasonChange;
+  const handleFormSubmit =
+    handleFormSubmitProp ?? ctx?.actions?.handleSubmitWithConfirm;
+  const submitting = submittingProp ?? ctx?.state?.submitting;
+  const membersList =
+    membersListProp ?? ctx?.state?.membersList ?? gardens[selectedGarden] ?? [];
+
   return (
     <>
       {/* Form Settings Card */}
@@ -105,7 +135,7 @@ const SundayForm = ({
         hoverBgColor="#fee2e2"
         attendeesCount={attendees.length}
         absenteesCount={absentees.length}
-        membersList={gardens[selectedGarden] || []}
+        membersList={gardens[selectedGarden] || membersList}
         checkedMembers={checkedMembers}
         handleToggleMember={handleToggleMember}
         handleCheckAll={handleCheckAll}

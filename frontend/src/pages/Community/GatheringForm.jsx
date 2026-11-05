@@ -24,33 +24,72 @@ import AttendanceChecklist from "./AttendanceChecklist";
 import ReportStatusBanner from "./ReportStatusBanner";
 import ReportSubmitButton from "./ReportSubmitButton";
 import DebouncedTextField from "../../common/DebouncedTextField";
+import { useSmallGroupReportContext } from "./SmallGroupReportContext";
 
 const GatheringForm = ({
-  gardens,
-  selectedGarden,
-  handleGardenChange,
-  gatheringDate,
-  setGatheringDate,
-  gatheringTime,
-  setGatheringTime,
-  gatheringLocation,
-  setGatheringLocation,
-  gatheringNotes,
-  setGatheringNotes,
-  gatheringHistoryDates = [],
-  gatheringDateStr,
-  checkingReport,
-  isReported,
-  attendees,
-  absentees,
-  checkedMembers,
-  handleToggleMember,
-  handleCheckAll,
-  handleUncheckAll,
-  handleFormSubmit,
-  submitting,
-  membersList,
+  gardens: gardensProp,
+  selectedGarden: selectedGardenProp,
+  handleGardenChange: handleGardenChangeProp,
+  gatheringDate: gatheringDateProp,
+  setGatheringDate: setGatheringDateProp,
+  gatheringTime: gatheringTimeProp,
+  setGatheringTime: setGatheringTimeProp,
+  gatheringLocation: gatheringLocationProp,
+  setGatheringLocation: setGatheringLocationProp,
+  gatheringNotes: gatheringNotesProp,
+  setGatheringNotes: setGatheringNotesProp,
+  gatheringHistoryDates: gatheringHistoryDatesProp,
+  gatheringDateStr: gatheringDateStrProp,
+  checkingReport: checkingReportProp,
+  isReported: isReportedProp,
+  attendees: attendeesProp,
+  absentees: absenteesProp,
+  checkedMembers: checkedMembersProp,
+  handleToggleMember: handleToggleMemberProp,
+  handleCheckAll: handleCheckAllProp,
+  handleUncheckAll: handleUncheckAllProp,
+  handleFormSubmit: handleFormSubmitProp,
+  submitting: submittingProp,
+  membersList: membersListProp,
 }) => {
+  const ctx = useSmallGroupReportContext();
+
+  const gardens = gardensProp ?? ctx?.state?.gardens ?? {};
+  const selectedGarden = selectedGardenProp ?? ctx?.state?.selectedGarden;
+  const handleGardenChange =
+    handleGardenChangeProp ?? ctx?.actions?.handleGardenChange;
+  const gatheringDate = gatheringDateProp ?? ctx?.state?.gatheringDate;
+  const setGatheringDate =
+    setGatheringDateProp ?? ctx?.actions?.setGatheringDate;
+  const gatheringTime = gatheringTimeProp ?? ctx?.state?.gatheringTime;
+  const setGatheringTime =
+    setGatheringTimeProp ?? ctx?.actions?.setGatheringTime;
+  const gatheringLocation =
+    gatheringLocationProp ?? ctx?.state?.gatheringLocation;
+  const setGatheringLocation =
+    setGatheringLocationProp ?? ctx?.actions?.setGatheringLocation;
+  const gatheringNotes = gatheringNotesProp ?? ctx?.state?.gatheringNotes;
+  const setGatheringNotes =
+    setGatheringNotesProp ?? ctx?.actions?.setGatheringNotes;
+  const gatheringHistoryDates =
+    gatheringHistoryDatesProp ?? ctx?.state?.gatheringHistoryDates ?? [];
+  const gatheringDateStr = gatheringDateStrProp ?? ctx?.state?.gatheringDateStr;
+  const checkingReport = checkingReportProp ?? ctx?.state?.checkingReport;
+  const isReported = isReportedProp ?? ctx?.state?.isReported;
+  const attendees = attendeesProp ?? ctx?.state?.attendees ?? [];
+  const absentees = absenteesProp ?? ctx?.state?.absentees ?? [];
+  const checkedMembers = checkedMembersProp ?? ctx?.state?.checkedMembers;
+  const handleToggleMember =
+    handleToggleMemberProp ?? ctx?.actions?.handleToggleMember;
+  const handleCheckAll = handleCheckAllProp ?? ctx?.actions?.handleCheckAll;
+  const handleUncheckAll =
+    handleUncheckAllProp ?? ctx?.actions?.handleUncheckAll;
+  const handleFormSubmit =
+    handleFormSubmitProp ?? ctx?.actions?.handleSubmitWithConfirm;
+  const submitting = submittingProp ?? ctx?.state?.submitting;
+  const membersList =
+    membersListProp ?? ctx?.state?.membersList ?? gardens[selectedGarden] ?? [];
+
   return (
     <>
       {/* Gathering Info Card */}
@@ -251,7 +290,7 @@ const GatheringForm = ({
         hoverBgColor="#ffedd5"
         attendeesCount={attendees.length}
         absenteesCount={absentees.length}
-        membersList={gardens[selectedGarden] || []}
+        membersList={gardens[selectedGarden] || membersList}
         checkedMembers={checkedMembers}
         handleToggleMember={handleToggleMember}
         handleCheckAll={handleCheckAll}

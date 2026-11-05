@@ -1,107 +1,58 @@
 /**
  * @file SmallGroupReport.jsx
  * @description 온교회 주일 출석 보고서 및 정원 모임 보고서 페이지
- * 개별 컴포넌트 및 커스텀 훅 분리 구조 적용
+ * React 19 Context Provider (SmallGroupReportProvider) 합성 구조 적용
  */
 
 import { Typography, Box } from "@mui/material";
-import useModals from "../../util/useModal";
 import {
   submitAttendanceReport,
   submitGatheringReport,
 } from "../../api/attendance";
 
-// 커스텀 훅
-import { useSmallGroupReport } from "./hooks/useSmallGroupReport";
+// Context Provider & 훅
+import {
+  SmallGroupReportProvider,
+  useSmallGroupReportContext,
+} from "./SmallGroupReportContext";
 
 // 하위 컴포넌트들
 import ReportStatusView from "./components/ReportStatusView";
 import ReportTypeTabs from "./components/ReportTypeTabs";
 import GatheringForm from "./GatheringForm";
 import SundayForm from "./SundayForm";
-import { useConfirm } from "../../common/ConfirmProvider";
 
 const TITLE_BG_STYLE = {
   backgroundImage: 'url("/img/Community/SmallGroup.webp")',
   backgroundPositionY: "58%",
 };
 
-const SmallGroupReport = () => {
-  const { openModal } = useModals();
-  const confirm = useConfirm();
-
-  const { state, actions } = useSmallGroupReport();
-
+const SmallGroupReportContent = () => {
+  const { state } = useSmallGroupReportContext();
   const {
     authInitialized,
     authenticated,
     isLeader,
     loading,
     error,
-    gardens,
-    selectedGarden,
-    selectedDate,
-    recentSundays,
-    checkedMembers,
-    absenceReasons,
-    isReported,
-    checkingReport,
     submitting,
     reportType,
-    gatheringDate,
-    gatheringDateStr,
-    gatheringTime,
-    gatheringLocation,
-    gatheringNotes,
-    gatheringHistoryDates,
-    membersList,
-    attendees,
-    absentees,
   } = state;
 
-  const {
-    fetchData,
-    handleReportTypeChange,
-    handleGardenChange,
-    setSelectedDate,
-    setGatheringDate,
-    setGatheringTime,
-    setGatheringLocation,
-    setGatheringNotes,
-    handleToggleMember,
-    handleAbsenceReasonChange,
-    handleCheckAll,
-    handleUncheckAll,
-    validateForm,
-    handleFormSubmit,
-    handleConfirmSubmit,
-  } = actions;
-
-  const handleSubmitWithConfirm = async () => {
-    if (validateForm && !validateForm()) return;
-    if (
-      await confirm({
-        title: "보고서 제출",
-        message: "작성하신 보고서를 제출하시겠습니까?",
-        confirmText: "제출",
-        cancelText: "취소",
-      })
-    ) {
-      handleConfirmSubmit();
-    }
-  };
-
-  const handleLoginClick = async () => {
-    const { default: SignInModal } = await import("../../components/User/SignInModal");
-    openModal(SignInModal, {});
-  };
-
-  const isGuarded = !authInitialized || !authenticated || !isLeader || loading || error || submitting;
+  const isGuarded =
+    !authInitialized ||
+    !authenticated ||
+    !isLeader ||
+    loading ||
+    error ||
+    submitting;
 
   return (
     <>
       <title>
-        {reportType === "gathering" ? "정원 모임 보고 - OCCE" : "주일 출석 보고 - OCCE"}
+        {reportType === "gathering"
+          ? "정원 모임 보고 - OCCE"
+          : "주일 출석 보고 - OCCE"}
       </title>
 
       {/* 헤더 배너 */}
@@ -146,77 +97,12 @@ const SmallGroupReport = () => {
         >
           {/* 상태 가드 뷰 (인증, 로딩, 에러, 제출 중) */}
           {isGuarded ? (
-            <ReportStatusView
-              authInitialized={authInitialized}
-              authenticated={authenticated}
-              isLeader={isLeader}
-              loading={loading}
-              error={error}
-              submitting={submitting}
-              reportType={reportType}
-              onLoginClick={handleLoginClick}
-              onRetry={fetchData}
-            />
+            <ReportStatusView />
           ) : (
             /* 실제 폼 뷰 */
             <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-              {/* 탭 전환 버튼 */}
-              <ReportTypeTabs
-                reportType={reportType}
-                onReportTypeChange={handleReportTypeChange}
-              />
-
-              {/* 탭별 폼 렌더링 */}
-              {reportType === "gathering" ? (
-                <GatheringForm
-                  gardens={gardens}
-                  selectedGarden={selectedGarden}
-                  handleGardenChange={handleGardenChange}
-                  gatheringDate={gatheringDate}
-                  setGatheringDate={setGatheringDate}
-                  gatheringTime={gatheringTime}
-                  setGatheringTime={setGatheringTime}
-                  gatheringLocation={gatheringLocation}
-                  setGatheringLocation={setGatheringLocation}
-                  gatheringNotes={gatheringNotes}
-                  setGatheringNotes={setGatheringNotes}
-                  gatheringHistoryDates={gatheringHistoryDates}
-                  gatheringDateStr={gatheringDateStr}
-                  checkingReport={checkingReport}
-                  isReported={isReported}
-                  attendees={attendees}
-                  absentees={absentees}
-                  checkedMembers={checkedMembers}
-                  handleToggleMember={handleToggleMember}
-                  handleCheckAll={handleCheckAll}
-                  handleUncheckAll={handleUncheckAll}
-                  handleFormSubmit={handleSubmitWithConfirm}
-                  submitting={submitting}
-                  membersList={membersList}
-                />
-              ) : (
-                <SundayForm
-                  gardens={gardens}
-                  selectedGarden={selectedGarden}
-                  handleGardenChange={handleGardenChange}
-                  recentSundays={recentSundays}
-                  selectedDate={selectedDate}
-                  setSelectedDate={setSelectedDate}
-                  checkingReport={checkingReport}
-                  isReported={isReported}
-                  attendees={attendees}
-                  absentees={absentees}
-                  checkedMembers={checkedMembers}
-                  handleToggleMember={handleToggleMember}
-                  handleCheckAll={handleCheckAll}
-                  handleUncheckAll={handleUncheckAll}
-                  absenceReasons={absenceReasons}
-                  handleAbsenceReasonChange={handleAbsenceReasonChange}
-                  handleFormSubmit={handleSubmitWithConfirm}
-                  submitting={submitting}
-                  membersList={membersList}
-                />
-              )}
+              <ReportTypeTabs />
+              {reportType === "gathering" ? <GatheringForm /> : <SundayForm />}
             </Box>
           )}
         </div>
@@ -224,6 +110,12 @@ const SmallGroupReport = () => {
     </>
   );
 };
+
+const SmallGroupReport = () => (
+  <SmallGroupReportProvider>
+    <SmallGroupReportContent />
+  </SmallGroupReportProvider>
+);
 
 export default SmallGroupReport;
 

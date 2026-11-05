@@ -14,18 +14,31 @@ import {
   CircularProgress,
 } from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
+import { useSmallGroupReportContext } from "../SmallGroupReportContext";
 
 const ReportStatusView = ({
-  authInitialized,
-  authenticated,
-  isLeader,
-  loading,
-  error,
-  submitting,
-  reportType,
-  onLoginClick,
-  onRetry,
+  authInitialized: authInitializedProp,
+  authenticated: authenticatedProp,
+  isLeader: isLeaderProp,
+  loading: loadingProp,
+  error: errorProp,
+  submitting: submittingProp,
+  reportType: reportTypeProp,
+  onLoginClick: onLoginClickProp,
+  onRetry: onRetryProp,
 }) => {
+  const ctx = useSmallGroupReportContext();
+  const authInitialized =
+    authInitializedProp ?? ctx?.state?.authInitialized;
+  const authenticated = authenticatedProp ?? ctx?.state?.authenticated;
+  const isLeader = isLeaderProp ?? ctx?.state?.isLeader;
+  const loading = loadingProp ?? ctx?.state?.loading;
+  const error = errorProp ?? ctx?.state?.error;
+  const submitting = submittingProp ?? ctx?.state?.submitting;
+  const reportType = reportTypeProp ?? ctx?.state?.reportType;
+  const onLoginClick = onLoginClickProp ?? ctx?.actions?.handleLoginClick;
+  const onRetry = onRetryProp ?? ctx?.actions?.fetchData;
+
   // 1. 인증 초기화 대기
   if (!authInitialized) {
     return (
@@ -210,15 +223,15 @@ const ReportStatusView = ({
 };
 
 ReportStatusView.propTypes = {
-  authInitialized: PropTypes.bool.isRequired,
-  authenticated: PropTypes.bool.isRequired,
-  isLeader: PropTypes.bool.isRequired,
-  loading: PropTypes.bool.isRequired,
+  authInitialized: PropTypes.bool,
+  authenticated: PropTypes.bool,
+  isLeader: PropTypes.bool,
+  loading: PropTypes.bool,
   error: PropTypes.string,
-  submitting: PropTypes.bool.isRequired,
-  reportType: PropTypes.oneOf(["sunday", "gathering"]).isRequired,
-  onLoginClick: PropTypes.func.isRequired,
-  onRetry: PropTypes.func.isRequired,
+  submitting: PropTypes.bool,
+  reportType: PropTypes.oneOf(["sunday", "gathering"]),
+  onLoginClick: PropTypes.func,
+  onRetry: PropTypes.func,
 };
 
 export default ReportStatusView;

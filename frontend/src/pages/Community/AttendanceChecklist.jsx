@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import RemoveDoneIcon from "@mui/icons-material/RemoveDone";
+import { useSmallGroupReportContext } from "./SmallGroupReportContext";
 
 const AttendanceChecklistItem = ({
   member,
@@ -101,15 +102,30 @@ const AttendanceChecklist = ({
   badgeBorderColor = "#fee2e2",
   hoverBorderColor = "#dc2626",
   hoverBgColor = "#fee2e2",
-  attendeesCount = 0,
-  absenteesCount = 0,
-  membersList = [],
-  checkedMembers = {},
-  handleToggleMember,
-  handleCheckAll,
-  handleUncheckAll,
-  checkingReport = false,
+  attendeesCount: attendeesCountProp,
+  absenteesCount: absenteesCountProp,
+  membersList: membersListProp,
+  checkedMembers: checkedMembersProp,
+  handleToggleMember: handleToggleMemberProp,
+  handleCheckAll: handleCheckAllProp,
+  handleUncheckAll: handleUncheckAllProp,
+  checkingReport: checkingReportProp,
 }) => {
+  const ctx = useSmallGroupReportContext();
+  const attendeesCount =
+    attendeesCountProp ?? ctx?.state?.attendees?.length ?? 0;
+  const absenteesCount =
+    absenteesCountProp ?? ctx?.state?.absentees?.length ?? 0;
+  const membersList = membersListProp ?? ctx?.state?.membersList ?? [];
+  const checkedMembers = checkedMembersProp ?? ctx?.state?.checkedMembers ?? {};
+  const handleToggleMember =
+    handleToggleMemberProp ?? ctx?.actions?.handleToggleMember;
+  const handleCheckAll = handleCheckAllProp ?? ctx?.actions?.handleCheckAll;
+  const handleUncheckAll =
+    handleUncheckAllProp ?? ctx?.actions?.handleUncheckAll;
+  const checkingReport =
+    checkingReportProp ?? ctx?.state?.checkingReport ?? false;
+
   const isAllChecked = membersList.length > 0 && absenteesCount === 0;
 
   return (

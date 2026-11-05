@@ -6,14 +6,19 @@ import {
   LinearProgress,
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { useSmallGroupReportContext } from "./SmallGroupReportContext";
 
 const ReportStatusBanner = ({
-  checkingReport,
-  isReported,
+  checkingReport: checkingReportProp,
+  isReported: isReportedProp,
   color = "#dc2626",
   title = "이미 제출된 보고서가 있습니다",
   message = "기존에 제출하신 내역을 불러왔습니다. 변경이 필요한 부분만 수정한 후 다시 제출하시면 업데이트됩니다.",
 }) => {
+  const ctx = useSmallGroupReportContext();
+  const checkingReport = checkingReportProp ?? ctx?.state?.checkingReport;
+  const isReported = isReportedProp ?? ctx?.state?.isReported;
+
   return (
     <>
       {checkingReport && (

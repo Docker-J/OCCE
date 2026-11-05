@@ -5,19 +5,29 @@ import {
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import EditNoteIcon from "@mui/icons-material/EditNote";
+import { useSmallGroupReportContext } from "./SmallGroupReportContext";
 
 const ReportSubmitButton = ({
-  submitting = false,
-  checkingReport = false,
-  disabled = false,
-  isReported = false,
-  onClick,
+  submitting: submittingProp,
+  checkingReport: checkingReportProp,
+  disabled: disabledProp,
+  isReported: isReportedProp,
+  onClick: onClickProp,
   themeColor = "#dc2626",
   hoverColor = "#b91c1c",
   shadowColor = "rgba(220, 38, 38, 0.3)",
   submitText = "보고서 제출하기",
   updateText = "보고서 수정(업데이트)하기",
 }) => {
+  const ctx = useSmallGroupReportContext();
+  const submitting = submittingProp ?? ctx?.state?.submitting ?? false;
+  const checkingReport =
+    checkingReportProp ?? ctx?.state?.checkingReport ?? false;
+  const isReported = isReportedProp ?? ctx?.state?.isReported ?? false;
+  const disabled =
+    disabledProp ?? (ctx?.state?.membersList?.length ?? 0) === 0;
+  const onClick = onClickProp ?? ctx?.actions?.handleSubmitWithConfirm;
+
   return (
     <Box
       sx={{

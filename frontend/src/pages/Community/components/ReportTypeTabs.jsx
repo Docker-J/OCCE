@@ -5,8 +5,17 @@
 
 import PropTypes from "prop-types";
 import { Box, Button } from "@mui/material";
+import { useSmallGroupReportContext } from "../SmallGroupReportContext";
 
-const ReportTypeTabs = ({ reportType, onReportTypeChange }) => {
+const ReportTypeTabs = ({
+  reportType: reportTypeProp,
+  onReportTypeChange: onReportTypeChangeProp,
+}) => {
+  const ctx = useSmallGroupReportContext();
+  const reportType = reportTypeProp ?? ctx?.state?.reportType;
+  const onReportTypeChange =
+    onReportTypeChangeProp ?? ctx?.actions?.handleReportTypeChange;
+
   return (
     <Box
       sx={{
@@ -57,8 +66,8 @@ const ReportTypeTabs = ({ reportType, onReportTypeChange }) => {
 };
 
 ReportTypeTabs.propTypes = {
-  reportType: PropTypes.oneOf(["sunday", "gathering"]).isRequired,
-  onReportTypeChange: PropTypes.func.isRequired,
+  reportType: PropTypes.oneOf(["sunday", "gathering"]),
+  onReportTypeChange: PropTypes.func,
 };
 
 export default ReportTypeTabs;

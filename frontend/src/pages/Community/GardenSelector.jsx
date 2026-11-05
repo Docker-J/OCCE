@@ -6,13 +6,20 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
+import { useSmallGroupReportContext } from "./SmallGroupReportContext";
 
 const GardenSelector = ({
-  gardens = {},
-  selectedGarden,
-  handleGardenChange,
+  gardens: gardensProp,
+  selectedGarden: selectedGardenProp,
+  handleGardenChange: handleGardenChangeProp,
   color = "#dc2626",
 }) => {
+  const ctx = useSmallGroupReportContext();
+  const gardens = gardensProp ?? ctx?.state?.gardens ?? {};
+  const selectedGarden = selectedGardenProp ?? ctx?.state?.selectedGarden;
+  const handleGardenChange =
+    handleGardenChangeProp ?? ctx?.actions?.handleGardenChange;
+
   const gardenNames = Object.keys(gardens);
 
   if (gardenNames.length > 1) {
