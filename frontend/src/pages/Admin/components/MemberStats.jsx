@@ -8,8 +8,14 @@ import { Box, Paper, Typography } from "@mui/material";
 import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import ForestIcon from "@mui/icons-material/Forest";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import { useMemberManagementContext } from "../AdminDashboardContexts";
 
-const MemberStats = ({ metrics }) => {
+const MemberStats = ({ metrics: metricsProp }) => {
+  const ctx = useMemberManagementContext();
+  const metrics = metricsProp ?? ctx?.state?.metrics;
+
+  if (!metrics) return null;
+
   const cards = [
     {
       title: "총 등록 교인",
@@ -102,7 +108,7 @@ MemberStats.propTypes = {
     staffCount: PropTypes.number.isRequired,
     keepers: PropTypes.number.isRequired,
     notificationEnabled: PropTypes.number.isRequired,
-  }).isRequired,
+  }),
 };
 
 export default MemberStats;

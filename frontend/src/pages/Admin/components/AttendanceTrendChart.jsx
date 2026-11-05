@@ -14,8 +14,18 @@ import {
   Chip,
 } from "@mui/material";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import { useAttendanceDashboardContext } from "../AdminDashboardContexts";
 
-const AttendanceTrendChart = ({ trend, selectedDate, onDateChange }) => {
+const AttendanceTrendChart = ({
+  trend: trendProp,
+  selectedDate: selectedDateProp,
+  onDateChange: onDateChangeProp,
+}) => {
+  const ctx = useAttendanceDashboardContext();
+  const trend = trendProp ?? ctx?.state?.trend;
+  const selectedDate = selectedDateProp ?? ctx?.state?.selectedDate;
+  const onDateChange = onDateChangeProp ?? ctx?.actions?.handleDateChange;
+
   const scrollContainerRef = useRef(null);
   const itemRefs = useRef({});
 
@@ -213,9 +223,9 @@ AttendanceTrendChart.propTypes = {
       attended: PropTypes.number.isRequired,
       rate: PropTypes.number.isRequired,
     })
-  ).isRequired,
-  selectedDate: PropTypes.string.isRequired,
-  onDateChange: PropTypes.func.isRequired,
+  ),
+  selectedDate: PropTypes.string,
+  onDateChange: PropTypes.func,
 };
 
 export default AttendanceTrendChart;

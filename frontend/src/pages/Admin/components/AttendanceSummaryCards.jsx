@@ -18,8 +18,12 @@ import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import EventIcon from "@mui/icons-material/Event";
+import { useAttendanceDashboardContext } from "../AdminDashboardContexts";
 
-const AttendanceSummaryCards = ({ summary }) => {
+const AttendanceSummaryCards = ({ summary: summaryProp }) => {
+  const ctx = useAttendanceDashboardContext();
+  const summary = summaryProp ?? ctx?.state?.summary;
+
   if (!summary) return null;
 
   return (

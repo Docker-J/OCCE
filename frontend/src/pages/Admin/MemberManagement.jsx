@@ -1,14 +1,16 @@
 /**
  * @file MemberManagement.jsx
  * @description 온교회 교인 계정 및 정원지기 역할 관리 대시보드
- * 개별 컴포넌트, 커스텀 훅, 유틸리티 분리 구조 적용
+ * React 19 Context Provider (MemberManagementProvider) 합성 구조 적용
  */
 
-import { useState } from "react";
 import { Link } from "react-router";
 
-// 커스텀 훅 & 유틸
-import { useMemberManagement } from "./hooks/useMemberManagement";
+// Context Provider & 유틸
+import {
+  MemberManagementProvider,
+  useMemberManagementContext,
+} from "./AdminDashboardContexts";
 import { TITLE_BG_STYLE } from "./utils/memberUtils";
 import ProtectedRoute from "../../common/ProtectedRoute";
 
@@ -37,12 +39,10 @@ import {
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
-const MemberManagement = () => {
-  // 커스텀 훅에서 상태와 액션 추출
-  const { state, actions } = useMemberManagement();
+const MemberManagementContent = () => {
+  const { state, actions } = useMemberManagementContext();
   const {
     loading,
-    refreshing,
     searchTerm,
     isSearchPending,
     roleFilter,
@@ -55,7 +55,6 @@ const MemberManagement = () => {
     actionLoadingUser,
     filteredUsers,
     paginatedUsers,
-    metrics,
     userForRoleModal,
     updatingRole,
     userToDelete,
@@ -63,26 +62,15 @@ const MemberManagement = () => {
   } = state;
 
   const {
-    setSearchTerm,
-    setRoleFilter,
-    setGardenFilter,
-    setNotificationFilter,
     setPage,
     setRowsPerPage,
-    setSortDirection,
     handleRequestSort,
-    fetchUsers,
     setUserForRoleModal,
     handleSaveRoleAndGardens,
     setUserToDelete,
     handleConfirmDelete,
-    setAvailableGardens,
+    handleAddAvailableGarden,
   } = actions;
-
-  // 커스텀 정원 추가
-  const handleAddAvailableGarden = (newGarden) => {
-    setAvailableGardens((prev) => (prev.includes(newGarden) ? prev : [...prev, newGarden].sort()));
-  };
 
   return (
     <>
@@ -134,172 +122,157 @@ const MemberManagement = () => {
           </Box>
           <ProtectedRoute requiredRole="admin">
             {/* 1) 4대 통계 요약 카드 */}
-            <MemberStats metrics={metrics} />
+            <MemberStats />
 
-                {/* 2) 메인 테이블 카드 */}
-                <Card
+            {/* 2) 메인 테이블 카드 */}
+            <Card
+              sx={{
+                background: "#ffffff",
+                borderRadius: "20px",
+                border: "1px solid rgba(0, 0, 0, 0.08)",
+                boxShadow: "0 8px 32px rgba(0, 0, 0, 0.04)",
+                overflow: "hidden",
+              }}
+            >
+              {/* 검색 및 필터 툴바 */}
+              <MemberFilterToolbar />
+
+              {/* 테이블 본문 */}
+              {loading ? (
+                <Box
                   sx={{
-                    background: "#ffffff",
-                    borderRadius: "20px",
-                    border: "1px solid rgba(0, 0, 0, 0.08)",
-                    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.04)",
-                    overflow: "hidden",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    py: 8,
                   }}
                 >
-                  {/* 검색 및 필터 툴바 */}
-                  <MemberFilterToolbar
-                    searchTerm={searchTerm}
-                    onSearchChange={setSearchTerm}
-                    roleFilter={roleFilter}
-                    onRoleFilterChange={setRoleFilter}
-                    gardenFilter={gardenFilter}
-                    onGardenFilterChange={setGardenFilter}
-                    availableGardens={availableGardens}
-                    notificationFilter={notificationFilter}
-                    onNotificationFilterChange={setNotificationFilter}
-                    sortDirection={sortDirection}
-                    onSortDirectionChange={setSortDirection}
-                    onRefresh={() => fetchUsers(true)}
-                    loading={loading}
-                    refreshing={refreshing}
+                  <CircularProgress sx={{ color: "#FF6B00", mb: 2 }} />
+                  <Typography variant="body2" sx={{ color: "#666" }}>
+                    교인 목록을 불러오고 있습니다...
+                  </Typography>
+                </Box>
+              ) : filteredUsers.length === 0 ? (
+                <Box sx={{ textAlign: "center", py: 8 }}>
+                  <Typography variant="body1" sx={{ color: "#888", fontWeight: 500 }}>
+                    {searchTerm ||
+                    roleFilter !== "all" ||
+                    gardenFilter !== "all" ||
+                    notificationFilter !== "all"
+                      ? "검색 조건에 일치하는 교인이 없습니다."
+                      : "등록된 교인이 없습니다."}
+                  </Typography>
+                </Box>
+              ) : (
+                <>
+                  <TableContainer
+                    component={Box}
+                    sx={{
+                      opacity: isSearchPending ? 0.6 : 1,
+                      transition: "opacity 0.15s ease",
+                    }}
+                  >
+                    <Table sx={{ minWidth: 700 }} aria-label="교인 목록 테이블">
+                      <TableHead sx={{ backgroundColor: "#fbfbfb" }}>
+                        <TableRow>
+                          <TableCell sx={{ fontWeight: 700, color: "#555", py: 1.8 }}>
+                            <TableSortLabel
+                              active={true}
+                              direction={sortDirection}
+                              onClick={handleRequestSort}
+                              sx={{
+                                fontWeight: 700,
+                                "&.Mui-active": { color: "#ea580c" },
+                                "& .MuiTableSortLabel-icon": { color: "#ea580c !important" },
+                              }}
+                            >
+                              성명
+                            </TableSortLabel>
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              fontWeight: 700,
+                              color: "#555",
+                              py: 1.8,
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            연락처
+                          </TableCell>
+                          <TableCell
+                            align="center"
+                            sx={{
+                              fontWeight: 700,
+                              color: "#555",
+                              py: 1.8,
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            역할
+                          </TableCell>
+                          <TableCell
+                            align="center"
+                            sx={{
+                              fontWeight: 700,
+                              color: "#555",
+                              py: 1.8,
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            정원
+                          </TableCell>
+                          <TableCell
+                            align="center"
+                            sx={{
+                              fontWeight: 700,
+                              color: "#555",
+                              py: 1.8,
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            알림
+                          </TableCell>
+                          <TableCell align="center" sx={{ fontWeight: 700, color: "#555", py: 1.8 }}>
+                            관리
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {paginatedUsers.map((user) => (
+                          <MemberTableRow
+                            key={user.username}
+                            user={user}
+                            isProcessing={actionLoadingUser === user.username}
+                            onOpenRoleModal={(u) => setUserForRoleModal(u)}
+                            onOpenDeleteDialog={(u) => setUserToDelete(u)}
+                          />
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+
+                  {/* 페이지네이션 */}
+                  <TablePagination
+                    component="div"
+                    count={filteredUsers.length}
+                    page={page}
+                    onPageChange={(e, newPage) => setPage(newPage)}
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={(e) => {
+                      setRowsPerPage(parseInt(e.target.value, 10));
+                      setPage(0);
+                    }}
+                    rowsPerPageOptions={[10, 25, 50, 100]}
+                    labelRowsPerPage="페이지당 인원:"
+                    labelDisplayedRows={({ from, to, count }) =>
+                      `${count !== -1 ? count : "더 많은"}명 중 ${from}–${to}`
+                    }
+                    sx={{ borderTop: "1px solid rgba(0, 0, 0, 0.08)", px: 2 }}
                   />
-
-                  {/* 테이블 본문 */}
-                  {loading ? (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        py: 8,
-                      }}
-                    >
-                      <CircularProgress sx={{ color: "#FF6B00", mb: 2 }} />
-                      <Typography variant="body2" sx={{ color: "#666" }}>
-                        교인 목록을 불러오고 있습니다...
-                      </Typography>
-                    </Box>
-                  ) : filteredUsers.length === 0 ? (
-                    <Box sx={{ textAlign: "center", py: 8 }}>
-                      <Typography variant="body1" sx={{ color: "#888", fontWeight: 500 }}>
-                        {searchTerm ||
-                        roleFilter !== "all" ||
-                        gardenFilter !== "all" ||
-                        notificationFilter !== "all"
-                          ? "검색 조건에 일치하는 교인이 없습니다."
-                          : "등록된 교인이 없습니다."}
-                      </Typography>
-                    </Box>
-                  ) : (
-                    <>
-                      <TableContainer
-                        component={Box}
-                        sx={{
-                          opacity: isSearchPending ? 0.6 : 1,
-                          transition: "opacity 0.15s ease",
-                        }}
-                      >
-                        <Table sx={{ minWidth: 700 }} aria-label="교인 목록 테이블">
-                          <TableHead sx={{ backgroundColor: "#fbfbfb" }}>
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 700, color: "#555", py: 1.8 }}>
-                                <TableSortLabel
-                                  active={true}
-                                  direction={sortDirection}
-                                  onClick={handleRequestSort}
-                                  sx={{
-                                    fontWeight: 700,
-                                    "&.Mui-active": { color: "#ea580c" },
-                                    "& .MuiTableSortLabel-icon": { color: "#ea580c !important" },
-                                  }}
-                                >
-                                  성명
-                                </TableSortLabel>
-                              </TableCell>
-                              <TableCell
-                                sx={{
-                                  fontWeight: 700,
-                                  color: "#555",
-                                  py: 1.8,
-                                  whiteSpace: "nowrap",
-                                }}
-                              >
-                                연락처
-                              </TableCell>
-                              <TableCell
-                                align="center"
-                                sx={{
-                                  fontWeight: 700,
-                                  color: "#555",
-                                  py: 1.8,
-                                  whiteSpace: "nowrap",
-                                }}
-                              >
-                                역할
-                              </TableCell>
-                              <TableCell
-                                align="center"
-                                sx={{
-                                  fontWeight: 700,
-                                  color: "#555",
-                                  py: 1.8,
-                                  whiteSpace: "nowrap",
-                                }}
-                              >
-                                정원
-                              </TableCell>
-                              <TableCell
-                                align="center"
-                                sx={{
-                                  fontWeight: 700,
-                                  color: "#555",
-                                  py: 1.8,
-                                  whiteSpace: "nowrap",
-                                }}
-                              >
-                                알림
-                              </TableCell>
-                              <TableCell align="center" sx={{ fontWeight: 700, color: "#555", py: 1.8 }}>
-                                관리
-                              </TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {paginatedUsers.map((user) => (
-                              <MemberTableRow
-                                key={user.username}
-                                user={user}
-                                isProcessing={actionLoadingUser === user.username}
-                                onOpenRoleModal={(u) => setUserForRoleModal(u)}
-                                onOpenDeleteDialog={(u) => setUserToDelete(u)}
-                              />
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-
-                      {/* 페이지네이션 */}
-                      <TablePagination
-                        component="div"
-                        count={filteredUsers.length}
-                        page={page}
-                        onPageChange={(e, newPage) => setPage(newPage)}
-                        rowsPerPage={rowsPerPage}
-                        onRowsPerPageChange={(e) => {
-                          setRowsPerPage(parseInt(e.target.value, 10));
-                          setPage(0);
-                        }}
-                        rowsPerPageOptions={[10, 25, 50, 100]}
-                        labelRowsPerPage="페이지당 인원:"
-                        labelDisplayedRows={({ from, to, count }) =>
-                          `${count !== -1 ? count : "더 많은"}명 중 ${from}–${to}`
-                        }
-                        sx={{ borderTop: "1px solid rgba(0, 0, 0, 0.08)", px: 2 }}
-                      />
-                    </>
-                  )}
-                </Card>
+                </>
+              )}
+            </Card>
           </ProtectedRoute>
         </div>
       </div>
@@ -326,5 +299,11 @@ const MemberManagement = () => {
     </>
   );
 };
+
+const MemberManagement = () => (
+  <MemberManagementProvider>
+    <MemberManagementContent />
+  </MemberManagementProvider>
+);
 
 export default MemberManagement;

@@ -22,6 +22,7 @@ import {
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutlined";
+import { useAttendanceDashboardContext } from "../AdminDashboardContexts";
 
 const GardenAttendanceTableRow = ({ stat, onOpenDetail }) => {
   const barColor =
@@ -166,12 +167,22 @@ GardenAttendanceTableRow.propTypes = {
 };
 
 const GardenAttendanceTable = ({
-  stats,
-  sortField,
-  sortDirection,
-  onSort,
-  onOpenDetail,
+  stats: statsProp,
+  sortField: sortFieldProp,
+  sortDirection: sortDirectionProp,
+  onSort: onSortProp,
+  onOpenDetail: onOpenDetailProp,
 }) => {
+  const ctx = useAttendanceDashboardContext();
+
+  const stats = statsProp ?? ctx?.state?.sortedGardenStats ?? [];
+  const sortField = sortFieldProp ?? ctx?.state?.sortField ?? "gardenName";
+  const sortDirection =
+    sortDirectionProp ?? ctx?.state?.sortDirection ?? "asc";
+  const onSort = onSortProp ?? ctx?.actions?.handleSort;
+  const onOpenDetail =
+    onOpenDetailProp ?? ctx?.actions?.handleOpenDetailModal;
+
   return (
     <Card
       sx={{
@@ -272,11 +283,11 @@ const GardenAttendanceTable = ({
 };
 
 GardenAttendanceTable.propTypes = {
-  stats: PropTypes.array.isRequired,
-  sortField: PropTypes.string.isRequired,
-  sortDirection: PropTypes.string.isRequired,
-  onSort: PropTypes.func.isRequired,
-  onOpenDetail: PropTypes.func.isRequired,
+  stats: PropTypes.array,
+  sortField: PropTypes.string,
+  sortDirection: PropTypes.string,
+  onSort: PropTypes.func,
+  onOpenDetail: PropTypes.func,
 };
 
 export default GardenAttendanceTable;

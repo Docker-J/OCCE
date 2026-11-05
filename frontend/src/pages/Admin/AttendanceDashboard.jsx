@@ -1,14 +1,17 @@
 /**
  * @file AttendanceDashboard.jsx
  * @description 구글 드라이브 주간 출석부 실시간 출석 현황 및 통계 대시보드
- * 개별 컴포넌트, 커스텀 훅 분리 구조 적용
+ * React 19 Context Provider (AttendanceDashboardProvider) 합성 구조 적용
  */
 
 import { Box, Typography, CircularProgress, Alert, Button } from "@mui/material";
 import GardenAttendanceDetailModal from "./GardenAttendanceDetailModal";
 
-// 커스텀 훅
-import { useAttendanceDashboard } from "./hooks/useAttendanceDashboard";
+// Context Provider
+import {
+  AttendanceDashboardProvider,
+  useAttendanceDashboardContext,
+} from "./AdminDashboardContexts";
 
 // 분리된 하위 컴포넌트들
 import AttendanceWeekNavigator from "./components/AttendanceWeekNavigator";
@@ -17,36 +20,21 @@ import AttendanceTrendChart from "./components/AttendanceTrendChart";
 import GardenAttendanceTable from "./components/GardenAttendanceTable";
 import OCCEErrorBoundary from "../../common/OCCEErrorBoundary";
 
-const AttendanceDashboard = () => {
-  const { state, actions } = useAttendanceDashboard();
+const AttendanceDashboardContent = () => {
+  const { state, actions } = useAttendanceDashboardContext();
 
   const {
     loading,
-    refreshing,
     data,
     selectedDate,
     errorMsg,
     detailModalOpen,
     selectedGardenForDetail,
-    sortField,
-    sortDirection,
-    availableDates,
-    hasPrevious,
-    hasNext,
     sortedGardenStats,
-    summary,
     trend,
   } = state;
 
-  const {
-    fetchData,
-    handleDateChange,
-    handlePrevDate,
-    handleNextDate,
-    handleSort,
-    handleOpenDetailModal,
-    handleCloseDetailModal,
-  } = actions;
+  const { fetchData, handleCloseDetailModal } = actions;
 
   // 1. 초기 데이터 로딩 중
   if (loading && !data) {
@@ -90,21 +78,10 @@ const AttendanceDashboard = () => {
   return (
     <Box sx={{ pb: 4 }}>
       {/* 1. 주차 선택 및 새로고침 툴바 */}
-      <AttendanceWeekNavigator
-        selectedDate={selectedDate}
-        availableDates={availableDates}
-        hasPrevious={hasPrevious}
-        hasNext={hasNext}
-        loading={loading}
-        refreshing={refreshing}
-        onPrevDate={handlePrevDate}
-        onNextDate={handleNextDate}
-        onDateChange={handleDateChange}
-        onRefresh={() => fetchData(true)}
-      />
+      <AttendanceWeekNavigator />
 
       {/* 2. 상단 4대 요약 카드 */}
-      <AttendanceSummaryCards summary={summary} />
+      <AttendanceSummaryCards />
 
       {/* 3. 최근 주차별 출석 추이 막대 차트 */}
       <OCCEErrorBoundary
@@ -112,11 +89,7 @@ const AttendanceDashboard = () => {
         resetKeys={[trend, selectedDate]}
         onReset={() => fetchData(true)}
       >
-        <AttendanceTrendChart
-          trend={trend}
-          selectedDate={selectedDate}
-          onDateChange={handleDateChange}
-        />
+        <AttendanceTrendChart />
       </OCCEErrorBoundary>
 
       {/* 4. 정원별 출석 현황 테이블 */}
@@ -125,13 +98,7 @@ const AttendanceDashboard = () => {
         resetKeys={[sortedGardenStats, selectedDate]}
         onReset={() => fetchData(true)}
       >
-        <GardenAttendanceTable
-          stats={sortedGardenStats}
-          sortField={sortField}
-          sortDirection={sortDirection}
-          onSort={handleSort}
-          onOpenDetail={handleOpenDetailModal}
-        />
+        <GardenAttendanceTable />
       </OCCEErrorBoundary>
 
       {/* 5. 정원별 상세 출석 팝업 모달 */}
@@ -144,5 +111,11 @@ const AttendanceDashboard = () => {
     </Box>
   );
 };
+
+const AttendanceDashboard = () => (
+  <AttendanceDashboardProvider>
+    <AttendanceDashboardContent />
+  </AttendanceDashboardProvider>
+);
 
 export default AttendanceDashboard;

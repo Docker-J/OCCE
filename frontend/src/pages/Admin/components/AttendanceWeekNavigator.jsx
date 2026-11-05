@@ -19,19 +19,35 @@ import {
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import { useAttendanceDashboardContext } from "../AdminDashboardContexts";
 
 const AttendanceWeekNavigator = ({
-  selectedDate,
-  availableDates,
-  hasPrevious,
-  hasNext,
-  loading,
-  refreshing,
-  onPrevDate,
-  onNextDate,
-  onDateChange,
-  onRefresh,
+  selectedDate: selectedDateProp,
+  availableDates: availableDatesProp,
+  hasPrevious: hasPreviousProp,
+  hasNext: hasNextProp,
+  loading: loadingProp,
+  refreshing: refreshingProp,
+  onPrevDate: onPrevDateProp,
+  onNextDate: onNextDateProp,
+  onDateChange: onDateChangeProp,
+  onRefresh: onRefreshProp,
 }) => {
+  const ctx = useAttendanceDashboardContext();
+
+  const selectedDate = selectedDateProp ?? ctx?.state?.selectedDate ?? "";
+  const availableDates =
+    availableDatesProp ?? ctx?.state?.availableDates ?? [];
+  const hasPrevious = hasPreviousProp ?? ctx?.state?.hasPrevious ?? false;
+  const hasNext = hasNextProp ?? ctx?.state?.hasNext ?? false;
+  const loading = loadingProp ?? ctx?.state?.loading ?? false;
+  const refreshing = refreshingProp ?? ctx?.state?.refreshing ?? false;
+  const onPrevDate = onPrevDateProp ?? ctx?.actions?.handlePrevDate;
+  const onNextDate = onNextDateProp ?? ctx?.actions?.handleNextDate;
+  const onDateChange = onDateChangeProp ?? ctx?.actions?.handleDateChange;
+  const onRefresh =
+    onRefreshProp ?? (() => ctx?.actions?.fetchData?.(true));
+
   return (
     <Card
       sx={{
@@ -137,16 +153,16 @@ const AttendanceWeekNavigator = ({
 };
 
 AttendanceWeekNavigator.propTypes = {
-  selectedDate: PropTypes.string.isRequired,
-  availableDates: PropTypes.arrayOf(PropTypes.string).isRequired,
-  hasPrevious: PropTypes.bool.isRequired,
-  hasNext: PropTypes.bool.isRequired,
-  loading: PropTypes.bool.isRequired,
-  refreshing: PropTypes.bool.isRequired,
-  onPrevDate: PropTypes.func.isRequired,
-  onNextDate: PropTypes.func.isRequired,
-  onDateChange: PropTypes.func.isRequired,
-  onRefresh: PropTypes.func.isRequired,
+  selectedDate: PropTypes.string,
+  availableDates: PropTypes.arrayOf(PropTypes.string),
+  hasPrevious: PropTypes.bool,
+  hasNext: PropTypes.bool,
+  loading: PropTypes.bool,
+  refreshing: PropTypes.bool,
+  onPrevDate: PropTypes.func,
+  onNextDate: PropTypes.func,
+  onDateChange: PropTypes.func,
+  onRefresh: PropTypes.func,
 };
 
 export default AttendanceWeekNavigator;
