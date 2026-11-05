@@ -33,6 +33,8 @@ export const MeditationONComp = ({ posts, cols }) => {
           component={Link}
           to={post.ID}
           sx={{
+            contentVisibility: "auto",
+            containIntrinsicSize: "0 280px",
             textDecoration: "none",
             borderRadius: "8px",
             overflow: "hidden",

@@ -8,6 +8,8 @@ const MeditationONComp = ({ posts }) => {
       component={Link}
       to={post.ID}
       sx={{
+        contentVisibility: "auto",
+        containIntrinsicSize: "0 280px",
         borderRadius: "8px",
         overflow: "hidden",
         transition: "transform 0.2s ease",

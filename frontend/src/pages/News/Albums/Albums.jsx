@@ -21,7 +21,6 @@ import AdminComponent from "../../../common/AdminComponent";
 import Footer from "../../../header/Footer";
 
 import { getAlbums } from "../../../api/albums";
-import AlbumUploadModal from "./AlbumUploadModal";
 
 import { MemoizedMeditationONComp } from "./MeditationONImageListItem";
 import ButtonYearPicker from "../../../common/ButtonYearPicker";
@@ -249,7 +248,12 @@ const Albums = () => {
           variant="primary"
           aria-label="앨범 업로드"
           style={{ position: "fixed", right: "2vw", bottom: "3vh" }}
-          onClick={() => openModal(AlbumUploadModal, { onSuccess: refreshAlbums })}
+          onClick={async () => {
+            const { default: AlbumUploadModal } = await import(
+              "./AlbumUploadModal"
+            );
+            openModal(AlbumUploadModal, { onSuccess: refreshAlbums });
+          }}
         >
           <AddIcon />
         </Fab>
