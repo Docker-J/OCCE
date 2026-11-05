@@ -75,7 +75,10 @@ export const linkPreviewMiddleware = async (c, next, app) => {
     : url.pathname;
 
   const isApi = cleanPath.startsWith("/api/");
-  const isStaticFile = /\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|webmanifest|json)$/i.test(cleanPath);
+  const isStaticFile =
+    /\.(js|mjs|css|png|jpg|jpeg|webp|gif|ico|svg|woff|woff2|ttf|eot|pdf|txt|xml|webmanifest|json|map)$/i.test(
+      cleanPath
+    );
 
   if (isBot && !isApi && !isStaticFile) {
     const cleanPathLower = cleanPath.toLowerCase();
@@ -166,7 +169,12 @@ export const linkPreviewMiddleware = async (c, next, app) => {
           })
           .transform(response);
 
-        return rewrittenResponse;
+        const cachedBotResponse = new Response(rewrittenResponse.body, rewrittenResponse);
+        cachedBotResponse.headers.set(
+          "Cache-Control",
+          "public, max-age=60, s-maxage=300, stale-while-revalidate=600"
+        );
+        return cachedBotResponse;
       } catch (err) {
         console.error("Error running HTMLRewriter in middleware:", err);
       }

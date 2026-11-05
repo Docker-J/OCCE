@@ -76,6 +76,15 @@ export const getRecentWeeklyUpdateDateController = async (c) => {
     }
   }
 
+  if (force) {
+    c.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
+  } else {
+    c.header(
+      "Cache-Control",
+      "public, max-age=60, s-maxage=86400, stale-while-revalidate=86400"
+    );
+  }
+
   return c.text(recentDate || "");
 };
 
@@ -161,7 +170,10 @@ export const uploadWeeklyUpdateController = async (c) => {
     )
   );
 
-  await purgeCache(c.env, ["oncce.ca/api/weekly-update"]);
+  await purgeCache(c.env, [
+    "oncce.ca/api/weekly-update",
+    "oncce.ca/api/weekly-update/recent",
+  ]);
   return c.text(date);
 };
 
@@ -210,6 +222,9 @@ export const deleteWeeklyUpdateController = async (c) => {
     }
   }
   
-  await purgeCache(c.env, ["oncce.ca/api/weekly-update"]);
+  await purgeCache(c.env, [
+    "oncce.ca/api/weekly-update",
+    "oncce.ca/api/weekly-update/recent",
+  ]);
   return c.text(newRecentDate || "");
 };

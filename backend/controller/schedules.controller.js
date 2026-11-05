@@ -1,4 +1,4 @@
-import { calendar } from "googleapis/build/src/apis/calendar/index.js";
+import { calendar_v3 } from "googleapis/build/src/apis/calendar/v3.js";
 import { addMonths } from "date-fns";
 import { getGoogleAuth } from "../api/googleAuth.js";
 import { purgeCache } from "../api/cloudflare.js";
@@ -6,7 +6,7 @@ import { purgeCache } from "../api/cloudflare.js";
 export const getSchedules = async (env) => {
   try {
     const auth = getGoogleAuth(env, ["https://www.googleapis.com/auth/calendar.readonly"]);
-    const calendarClient = calendar({ version: "v3", auth });
+    const calendarClient = new calendar_v3.Calendar({ auth });
 
     const response = await calendarClient.events.list({
       calendarId: env.GOOGLE_CALENDAR_ID,
