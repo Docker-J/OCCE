@@ -27,6 +27,10 @@ export const getSchedules = async (env) => {
         console.error("Failed to cache schedules in KV:", e);
       }
     }
+
+    // Automatically purge Cloudflare CDN edge cache whenever fresh schedules are loaded
+    await purgeCache(env, ["oncce.ca/api/schedules"]);
+
     return schedules;
   } catch (err) {
     console.error("Error fetching schedules from Google Calendar:", err);
