@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, TextField, IconButton, InputAdornment } from "@mui/material";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { Button } from "@mui/material";
 import useModals from "../../util/useModal";
 import useSnackbar from "../../util/useSnackbar";
 import { confirmForgotPassword, forgotPassword } from "../../api/user";
@@ -10,6 +7,7 @@ import VerificationInput from "react-verification-input";
 import CustomModal from "../../common/CustomModal";
 import { useForm } from "react-hook-form";
 import SignInModal from "./SignInModal";
+import { AuthPasswordField } from "./AuthFormFields";
 
 const ResetPasswordConfirmModal = ({ phone, isOpen, onClose }) => {
   const { openModal } = useModals();
@@ -17,8 +15,6 @@ const ResetPasswordConfirmModal = ({ phone, isOpen, onClose }) => {
 
   const [confirmCode, setConfirmCode] = useState("");
   const [seconds, setSeconds] = useState(60);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -109,8 +105,6 @@ const ResetPasswordConfirmModal = ({ phone, isOpen, onClose }) => {
   const handleClose = () => {
     reset();
     setConfirmCode("");
-    setShowPassword(false);
-    setShowConfirmPassword(false);
     onClose();
   };
 
@@ -145,13 +139,13 @@ const ResetPasswordConfirmModal = ({ phone, isOpen, onClose }) => {
         style={{ width: "100%" }}
         onSubmit={handleSubmit(handleConfirmReset)}
       >
-        <TextField
-          sx={{ width: "100%", mt: "1em" }}
+        <AuthPasswordField
           label="새 비밀번호"
-          type={showPassword ? "text" : "password"}
           autoComplete="new-password"
-          required
-          {...register("password", {
+          enterKeyHint="next"
+          error={!!errors.password}
+          helperText={errors.password?.message}
+          registration={register("password", {
             required: true,
             minLength: 8,
             maxLength: 24,
@@ -162,43 +156,12 @@ const ResetPasswordConfirmModal = ({ phone, isOpen, onClose }) => {
             },
             deps: ["confirmPassword"],
           })}
-          error={!!errors.password}
-          helperText={errors.password?.message}
-          slotProps={{
-            input: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label={
-                      showPassword ? "새 비밀번호 숨기기" : "새 비밀번호 보기"
-                    }
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    onMouseDown={(e) => e.preventDefault()}
-                    edge="end"
-                    size="small"
-                  >
-                    {showPassword ? (
-                      <VisibilityOff fontSize="small" />
-                    ) : (
-                      <Visibility fontSize="small" />
-                    )}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            },
-          }}
         />
 
-        <TextField
-          sx={{ width: "100%", mt: "1em" }}
+        <AuthPasswordField
           label="새 비밀번호 확인"
-          type={showConfirmPassword ? "text" : "password"}
           autoComplete="new-password"
-          required
-          {...register("confirmPassword", {
-            required: true,
-            validate: (value) => value === watch("password"),
-          })}
+          enterKeyHint="done"
           error={!!errors.confirmPassword}
           helperText={
             errors.confirmPassword
@@ -207,46 +170,11 @@ const ResetPasswordConfirmModal = ({ phone, isOpen, onClose }) => {
               ? "비밀번호가 일치합니다."
               : ""
           }
-          slotProps={{
-            formHelperText: {
-              sx: {
-                color:
-                  !errors.confirmPassword && isPasswordMatch
-                    ? "#16a34a"
-                    : undefined,
-                fontWeight: isPasswordMatch ? 600 : undefined,
-              },
-            },
-            input: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  {isPasswordMatch && (
-                    <CheckCircleIcon
-                      fontSize="small"
-                      sx={{ color: "#16a34a", mr: 0.5 }}
-                    />
-                  )}
-                  <IconButton
-                    aria-label={
-                      showConfirmPassword
-                        ? "새 비밀번호 확인 숨기기"
-                        : "새 비밀번호 확인 보기"
-                    }
-                    onClick={() => setShowConfirmPassword((prev) => !prev)}
-                    onMouseDown={(e) => e.preventDefault()}
-                    edge="end"
-                    size="small"
-                  >
-                    {showConfirmPassword ? (
-                      <VisibilityOff fontSize="small" />
-                    ) : (
-                      <Visibility fontSize="small" />
-                    )}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            },
-          }}
+          showMatchIndicator={isPasswordMatch}
+          registration={register("confirmPassword", {
+            required: true,
+            validate: (value) => value === watch("password"),
+          })}
         />
 
         <Button

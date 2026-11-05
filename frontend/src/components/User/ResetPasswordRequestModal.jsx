@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Button, TextField, Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import useModals from "../../util/useModal";
 import useSnackbar from "../../util/useSnackbar";
 import { forgotPassword } from "../../api/user";
 import ResetPasswordConfirmModal from "./ResetPasswordConfirmModal";
 import CustomModal from "../../common/CustomModal";
-import { PatternFormat } from "react-number-format";
+import { AuthPhoneField } from "./AuthFormFields";
 
 const ResetPasswordRequestModal = ({ isOpen, onClose }) => {
   const { openModal } = useModals();
@@ -23,7 +23,7 @@ const ResetPasswordRequestModal = ({ isOpen, onClose }) => {
 
   const requestSuccess = () => {
     openSnackbar("success", "인증번호가 전송되었습니다.");
-    openModal(ResetPasswordConfirmModal, { phone: phone });
+    openModal(ResetPasswordConfirmModal, { phone });
     handleClose();
   };
 
@@ -54,28 +54,10 @@ const ResetPasswordRequestModal = ({ isOpen, onClose }) => {
         비밀번호 재설정 인증번호를 전송해 드립니다.
       </Typography>
 
-      <PatternFormat
-        sx={{ width: "100%", mt: "1em" }}
-        label="전화번호"
-        type="tel"
-        autoComplete="tel"
-        inputMode="tel"
-        slotProps={{
-          htmlInput: {
-            autoComplete: "tel",
-            inputMode: "tel",
-            enterKeyHint: "done",
-          },
-        }}
-        format="(###) ###-####"
-        mask="_"
-        allowEmptyFormatting={true}
-        customInput={TextField}
+      <AuthPhoneField
         value={phone}
-        onValueChange={(values) => {
-          setPhone(values.value);
-        }}
-        required
+        onValueChange={setPhone}
+        enterKeyHint="done"
       />
 
       <Button

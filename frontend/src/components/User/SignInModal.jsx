@@ -3,31 +3,26 @@ import {
   Button,
   Checkbox,
   FormControlLabel,
-  TextField,
   Typography,
   CircularProgress,
-  IconButton,
-  InputAdornment,
 } from "@mui/material";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { signIn } from "../../api/user";
 import useAuthStore from "../../store/useAuthStore";
 import useSnackbar from "../../util/useSnackbar";
-import { useForm, Controller } from "react-hook-form"; // Added Controller
-import { PatternFormat } from "react-number-format"; // Added PatternFormat
+import { useForm, Controller } from "react-hook-form";
 import CustomModal from "../../common/CustomModal";
 import useModals from "../../util/useModal";
 import ResetPasswordRequestModal from "./ResetPasswordRequestModal";
 import SignUpConfirmModal from "./SignUpConfirmModal";
+import { AuthPhoneField, AuthPasswordField } from "./AuthFormFields";
 
 const SignInModal = ({ isOpen, onClose }) => {
   const setToken = useAuthStore((state) => state.setToken);
   const { openModal } = useModals();
 
-  // We use control and handleSubmit for the third-party input integration
   const {
     control,
+    register,
     handleSubmit,
     reset,
     getValues,
@@ -43,7 +38,6 @@ const SignInModal = ({ isOpen, onClose }) => {
 
   const { openSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   const signInSuccess = (result) => {
     const data = {
@@ -99,7 +93,6 @@ const SignInModal = ({ isOpen, onClose }) => {
 
   const handleClose = () => {
     reset();
-    setShowPassword(false);
     onClose();
   };
 
@@ -107,97 +100,30 @@ const SignInModal = ({ isOpen, onClose }) => {
     <CustomModal isOpen={isOpen} onClose={handleClose} maxWidth="400px">
       <h1 style={{ marginTop: 0 }}>로그인</h1>
       <form onSubmit={handleSubmit(handleSignIn)}>
-        <Controller
-          name="phoneNumber"
+        <AuthPhoneField
           control={control}
+          name="phoneNumber"
+          autoComplete="username tel"
+          enterKeyHint="next"
+          disabled={isLoading}
+          sx={{ mt: "1.5em" }}
           rules={{
             required: "전화번호를 입력해주세요",
             validate: (value) =>
               value?.length === 10 || "올바른 전화번호 10자리를 입력해주세요",
           }}
-          render={({
-            field: { onChange, name, value },
-            fieldState: { error },
-          }) => (
-            <PatternFormat
-              name={name}
-              value={value}
-              format="(###) ###-####"
-              mask="_"
-              allowEmptyFormatting
-              customInput={TextField}
-              required
-              label="전화번호"
-              type="tel"
-              autoComplete="username tel"
-              inputMode="tel"
-              fullWidth
-              sx={{ mt: "1.5em" }}
-              error={!!error}
-              helperText={error?.message}
-              disabled={isLoading}
-              slotProps={{
-                htmlInput: {
-                  autoComplete: "username tel",
-                  inputMode: "tel",
-                  enterKeyHint: "next",
-                },
-              }}
-              onValueChange={(values) => {
-                // .value provides just digits (1234567890)
-                // .formattedValue provides the string ((123) 456-7890)
-                onChange(values.value);
-              }}
-            />
-          )}
         />
 
-        <Controller
-          name="password"
-          control={control}
-          rules={{
+        <AuthPasswordField
+          label="비밀번호"
+          autoComplete="current-password"
+          enterKeyHint="done"
+          disabled={isLoading}
+          error={!!errors.password}
+          helperText={errors.password?.message}
+          registration={register("password", {
             required: "비밀번호를 입력해주세요.",
-          }}
-          render={({ field, fieldState: { error } }) => (
-            <TextField
-              {...field}
-              sx={{ width: "100%", mt: "1em" }}
-              label="비밀번호"
-              type={showPassword ? "text" : "password"}
-              autoComplete="current-password"
-              required
-              disabled={isLoading}
-              error={!!error}
-              helperText={error?.message}
-              slotProps={{
-                htmlInput: {
-                  enterKeyHint: "done",
-                },
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label={
-                          showPassword ? "비밀번호 숨기기" : "비밀번호 보기"
-                        }
-                        onClick={() => setShowPassword((prev) => !prev)}
-                        onMouseDown={(e) => e.preventDefault()}
-                        edge="end"
-                        size="small"
-                        disabled={isLoading}
-                      >
-                        {showPassword ? (
-                          <VisibilityOff fontSize="small" />
-                        ) : (
-                          <Visibility fontSize="small" />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }}
-            />
-          )}
+          })}
         />
 
         <FormControlLabel
