@@ -38,6 +38,10 @@ export const getColumnsController = async (c) => {
   const count = countResult.result[0]?.results?.[0]?.count ?? 0;
   const announcements = dataResult.result[0]?.results || [];
 
+  c.header(
+    "Cache-Control",
+    "public, max-age=60, s-maxage=86400, stale-while-revalidate=86400"
+  );
   return c.json({
     count,
     announcements,
@@ -53,6 +57,11 @@ export const getColumnController = async (c) => {
   if (!result.result[0]?.results || result.result[0].results.length === 0) {
     throw new HTTPException(404, { message: "칼럼을 찾을 수 없습니다." });
   }
+
+  c.header(
+    "Cache-Control",
+    "public, max-age=60, s-maxage=86400, stale-while-revalidate=86400"
+  );
   return c.json(result.result[0].results[0]);
 };
 

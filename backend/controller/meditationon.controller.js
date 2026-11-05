@@ -31,6 +31,10 @@ export const getMeditationONsController = async (c) => {
     Cover: row.cover,
   }));
 
+  c.header(
+    "Cache-Control",
+    "public, max-age=60, s-maxage=86400, stale-while-revalidate=86400"
+  );
   return c.json(items);
 };
 
@@ -55,6 +59,10 @@ export const getMeditationONController = async (c) => {
     }
   }
 
+  c.header(
+    "Cache-Control",
+    "public, max-age=60, s-maxage=86400, stale-while-revalidate=86400"
+  );
   return c.json({
     ID: row.id,
     Timestamp: row.timestamp,

@@ -43,6 +43,10 @@ export const getAnnouncementsController = async (c) => {
 
   const announcements = pinned.concat(data);
 
+  c.header(
+    "Cache-Control",
+    "public, max-age=60, s-maxage=86400, stale-while-revalidate=86400"
+  );
   return c.json({ count, announcements });
 };
 
@@ -56,6 +60,11 @@ export const getAnnouncementController = async (c) => {
   if (!result.result[0]?.results || result.result[0].results.length === 0) {
     throw new HTTPException(404, { message: "공지사항을 찾을 수 없습니다." });
   }
+
+  c.header(
+    "Cache-Control",
+    "public, max-age=60, s-maxage=86400, stale-while-revalidate=86400"
+  );
   return c.json(result.result[0].results[0]);
 };
 

@@ -44,6 +44,10 @@ export const getAlbumsController = async (c) => {
     Cover: row.cover,
   }));
 
+  c.header(
+    "Cache-Control",
+    "public, max-age=60, s-maxage=86400, stale-while-revalidate=86400"
+  );
   return c.json(items);
 };
 
@@ -68,6 +72,10 @@ export const getAlbumController = async (c) => {
     }
   }
 
+  c.header(
+    "Cache-Control",
+    "public, max-age=60, s-maxage=86400, stale-while-revalidate=86400"
+  );
   return c.json({ title: row.title, images });
 };
 

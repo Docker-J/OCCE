@@ -1,6 +1,7 @@
 import { calendar } from "googleapis/build/src/apis/calendar/index.js";
 import { addMonths } from "date-fns";
 import { getGoogleAuth } from "../api/googleAuth.js";
+import { purgeCache } from "../api/cloudflare.js";
 
 export const getSchedules = async (env) => {
   try {
@@ -42,6 +43,10 @@ export const getSchedulesController = async (c) => {
       const cached = await kv.get("schedules", "json");
       if (cached) {
         console.log("Loaded schedules from KV cache.");
+        c.header(
+          "Cache-Control",
+          "public, max-age=60, s-maxage=3600, stale-while-revalidate=86400"
+        );
         return c.json(cached);
       }
     } catch (e) {
@@ -51,10 +56,19 @@ export const getSchedulesController = async (c) => {
 
   console.log("Schedules cache miss or forced refresh. Fetching from Google Calendar...");
   const schedules = await getSchedules(c.env);
+  if (force) {
+    c.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
+  } else {
+    c.header(
+      "Cache-Control",
+      "public, max-age=60, s-maxage=3600, stale-while-revalidate=86400"
+    );
+  }
   return c.json(schedules);
 };
 
 export const refreshSchedulesController = async (c) => {
   await getSchedules(c.env);
+  await purgeCache(c.env, ["oncce.ca/api/schedules"]);
   return c.body(null, 200);
 };
