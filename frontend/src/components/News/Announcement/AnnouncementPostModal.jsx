@@ -1,12 +1,5 @@
-import { Button, CircularProgress, TextField } from "@mui/material";
-import { useState, useActionState, startTransition, lazy, Suspense } from "react";
-
-const TextEditor = lazy(() => import("./TextEditor"));
-import useSnackbar from "../../../util/useSnackbar";
 import { postAnnouncement } from "../../../api/announcements";
-import CustomModal from "../../../common/CustomModal";
-import OCCEErrorBoundary from "../../../common/OCCEErrorBoundary";
-import { queryClient } from "../../../index";
+import PostComposer from "../common/PostComposer";
 
 const AnnouncementPostModal = ({
   isOpen,
@@ -16,91 +9,26 @@ const AnnouncementPostModal = ({
   origTitle,
   origBody,
 }) => {
-  const { openSnackbar } = useSnackbar();
-
-  const [title, setTitle] = useState(origTitle);
-  const [body, setBody] = useState(origBody);
-  const [prevProps, setPrevProps] = useState({ id, origTitle, origBody });
-
-  // Adjust state during render when props change (avoids secondary useEffect render cycle)
-  if (
-    prevProps.id !== id ||
-    prevProps.origTitle !== origTitle ||
-    prevProps.origBody !== origBody
-  ) {
-    setPrevProps({ id, origTitle, origBody });
-    setTitle(origTitle);
-    setBody(origBody);
-  }
-
-  const [, formAction, isPending] = useActionState(async () => {
-    try {
-      await postAnnouncement(id, title, body);
-      queryClient.invalidateQueries({ queryKey: ["announcements"] });
-      revalidator?.();
-      openSnackbar("success", "The announcement is successfully posted!");
-      handleClose();
-      return { success: true };
-    } catch (error) {
-      console.error(error);
-      openSnackbar(
-        "error",
-        "Error Occured. Please contact to the administrator."
-      );
-      return { error };
-    }
-  }, null);
-
-  const handleClose = () => {
-    setTitle(origTitle);
-    setBody(origBody);
-    onClose();
-  };
-
   return (
-    <CustomModal
+    <PostComposer.Provider
       isOpen={isOpen}
-      onClose={handleClose}
-      maxWidth="1300px"
-      maxHeight="90svh"
+      onClose={onClose}
+      revalidator={revalidator}
+      id={id}
+      origTitle={origTitle}
+      origBody={origBody}
+      queryKey={["announcements"]}
+      successMessage="The announcement is successfully posted!"
+      onSubmitPost={({ id: postId, title, body }) =>
+        postAnnouncement(postId, title, body)
+      }
     >
-      {isPending ? (
-        <CircularProgress />
-      ) : (
-        <>
-          <TextField
-            id="filled-basic"
-            label="Title"
-            variant="outlined"
-            value={title}
-            fullWidth
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-
-          <div style={{ height: "65svh", width: "100%", marginTop: "1em" }}>
-            <OCCEErrorBoundary
-              title="본문 편집기를 불러오는 중 오류가 발생했습니다"
-              resetKeys={[body]}
-            >
-              <Suspense fallback={<CircularProgress />}>
-                <TextEditor body={body} getBody={setBody} />
-              </Suspense>
-            </OCCEErrorBoundary>
-          </div>
-
-          <Button
-            variant="outlined"
-            disabled={isPending || title.trim() === "" || body.trim() === ""}
-            onClick={() => startTransition(() => formAction())}
-            fullWidth
-            sx={{ marginTop: "1.5em" }}
-          >
-            Post
-          </Button>
-        </>
-      )}
-    </CustomModal>
+      <PostComposer.ModalFrame>
+        <PostComposer.TitleInput fullWidth />
+        <PostComposer.Editor />
+        <PostComposer.SubmitButton />
+      </PostComposer.ModalFrame>
+    </PostComposer.Provider>
   );
 };
 

@@ -1,13 +1,5 @@
-import { Button, CircularProgress, TextField } from "@mui/material";
-import { useState, useActionState, startTransition, lazy, Suspense } from "react";
-
-const TextEditor = lazy(() => import("../Announcement/TextEditor"));
 import { postColumn } from "../../../api/columns";
-import useSnackbar from "../../../util/useSnackbar";
-import CustomModal from "../../../common/CustomModal";
-import ButtonDatePicker from "../../../common/ButtonDatePicker";
-import OCCEErrorBoundary from "../../../common/OCCEErrorBoundary";
-import { queryClient } from "../../../index";
+import PostComposer from "../common/PostComposer";
 
 const ColumnPostModal = ({
   isOpen,
@@ -17,100 +9,29 @@ const ColumnPostModal = ({
   origTitle,
   origBody,
 }) => {
-  const { openSnackbar } = useSnackbar();
-
-  const [title, setTitle] = useState(origTitle);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [body, setBody] = useState(origBody);
-  const [prevProps, setPrevProps] = useState({ id, origTitle, origBody });
-
-  // Adjust state during render when props change (avoids secondary useEffect render cycle)
-  if (
-    prevProps.id !== id ||
-    prevProps.origTitle !== origTitle ||
-    prevProps.origBody !== origBody
-  ) {
-    setPrevProps({ id, origTitle, origBody });
-    setTitle(origTitle);
-    setBody(origBody);
-  }
-
-  const [, formAction, isPending] = useActionState(async () => {
-    try {
-      await postColumn(id, title, body, selectedDate);
-      queryClient.invalidateQueries({ queryKey: ["columns"] });
-      revalidator?.();
-      openSnackbar("success", "The column is successfully posted!");
-      handleClose();
-      return { success: true };
-    } catch (error) {
-      console.error(error);
-      openSnackbar(
-        "error",
-        "Error Occured. Please contact to the administrator."
-      );
-      return { error };
-    }
-  }, null);
-
-  const handleClose = () => {
-    setTitle(origTitle);
-    setBody(origBody);
-    onClose();
-  };
-
   return (
-    <CustomModal
+    <PostComposer.Provider
       isOpen={isOpen}
-      onClose={handleClose}
-      maxWidth="1300px"
-      maxHeight="90svh"
+      onClose={onClose}
+      revalidator={revalidator}
+      id={id}
+      origTitle={origTitle}
+      origBody={origBody}
+      queryKey={["columns"]}
+      successMessage="The column is successfully posted!"
+      onSubmitPost={({ id: postId, title, body, selectedDate }) =>
+        postColumn(postId, title, body, selectedDate)
+      }
     >
-      {isPending ? (
-        <CircularProgress />
-      ) : (
-        <>
-          <div style={{ width: "100%" }}>
-            <TextField
-              id="filled-basic"
-              label="Title"
-              variant="outlined"
-              value={title}
-              sx={{ width: "85%" }}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
-
-            <ButtonDatePicker
-              sx={{ width: "10%" }}
-              value={selectedDate}
-              onChange={setSelectedDate}
-            />
-          </div>
-
-          <div style={{ height: "65svh", width: "100%", marginTop: "1em" }}>
-            <OCCEErrorBoundary
-              title="본문 편집기를 불러오는 중 오류가 발생했습니다"
-              resetKeys={[body]}
-            >
-              <Suspense fallback={<CircularProgress />}>
-                <TextEditor body={body} getBody={setBody} />
-              </Suspense>
-            </OCCEErrorBoundary>
-          </div>
-
-          <Button
-            variant="outlined"
-            disabled={isPending || title.trim() === "" || body.trim() === ""}
-            onClick={() => startTransition(() => formAction())}
-            fullWidth
-            sx={{ marginTop: "1.5em" }}
-          >
-            Post
-          </Button>
-        </>
-      )}
-    </CustomModal>
+      <PostComposer.ModalFrame>
+        <div style={{ width: "100%" }}>
+          <PostComposer.TitleInput fullWidth={false} sx={{ width: "85%" }} />
+          <PostComposer.DatePicker sx={{ width: "10%" }} />
+        </div>
+        <PostComposer.Editor />
+        <PostComposer.SubmitButton />
+      </PostComposer.ModalFrame>
+    </PostComposer.Provider>
   );
 };
 
