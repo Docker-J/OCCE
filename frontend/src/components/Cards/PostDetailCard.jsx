@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, ViewTransition } from "react";
 import PropTypes from "prop-types";
 import { Box, Typography } from "@mui/material";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
@@ -13,6 +13,7 @@ import FontSizeController from "../News/common/FontSizeController";
  * Retains full visual styling, chip badges, and action handlers.
  */
 const PostDetailCard = ({
+  id,
   title,
   body,
   timestamp,
@@ -40,7 +41,24 @@ const PostDetailCard = ({
     [body]
   );
 
-  return (
+  const titleElement = title ? (
+    <Typography
+      variant="h4"
+      component="h1"
+      sx={{
+        fontWeight: 800,
+        color: "#2b2b2b",
+        fontSize: { xs: "22px", sm: "28px", md: "32px" },
+        lineHeight: 1.35,
+        mb: 2.5,
+        wordBreak: "break-word",
+      }}
+    >
+      {title}
+    </Typography>
+  ) : null;
+
+  const cardElement = (
     <CustomCard
       variant="elevated"
       themeColor={themeColor}
@@ -86,21 +104,12 @@ const PostDetailCard = ({
         }
       >
         {/* Post Title */}
-        {title && (
-          <Typography
-            variant="h4"
-            component="h1"
-            sx={{
-              fontWeight: 800,
-              color: "#2b2b2b",
-              fontSize: { xs: "22px", sm: "28px", md: "32px" },
-              lineHeight: 1.35,
-              mb: 2.5,
-              wordBreak: "break-word",
-            }}
-          >
-            {title}
-          </Typography>
+        {titleElement && id ? (
+          <ViewTransition name={`post-title-${id}`} share="text-morph" default="none">
+            {titleElement}
+          </ViewTransition>
+        ) : (
+          titleElement
         )}
 
         {/* Metadata Bar */}
@@ -162,9 +171,20 @@ const PostDetailCard = ({
       )}
     </CustomCard>
   );
+
+  if (id) {
+    return (
+      <ViewTransition name={`post-card-${id}`} share="morph" default="none">
+        {cardElement}
+      </ViewTransition>
+    );
+  }
+
+  return cardElement;
 };
 
 PostDetailCard.propTypes = {
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   title: PropTypes.node,
   body: PropTypes.string,
   timestamp: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.instanceOf(Date)]),

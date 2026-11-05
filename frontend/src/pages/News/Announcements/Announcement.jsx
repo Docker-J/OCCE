@@ -137,6 +137,7 @@ const Announcement = () => {
       >
         <Container maxWidth="md" sx={{ py: { xs: 3, md: 6 } }}>
           <PostDetailCard
+            id={id}
             title={title}
             body={body}
             timestamp={timestamp}
@@ -160,9 +161,9 @@ const Announcement = () => {
           themeColor="#FF6B00"
           onClick={() => {
             if (window.history.length > 1) {
-              navigate(-1);
+              navigate(-1, { viewTransition: true });
             } else {
-              navigate("/announcements");
+              navigate("/announcements", { viewTransition: true });
             }
           }}
         />

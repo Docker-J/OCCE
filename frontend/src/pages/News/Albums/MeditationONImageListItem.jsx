@@ -1,3 +1,4 @@
+import { ViewTransition } from "react";
 import {
   ImageListItem,
   ImageListItemBar,
@@ -32,6 +33,7 @@ export const MeditationONComp = ({ posts, cols }) => {
           key={post.ID}
           component={Link}
           to={post.ID}
+          viewTransition
           sx={{
             contentVisibility: "auto",
             containIntrinsicSize: "0 280px",
@@ -44,20 +46,39 @@ export const MeditationONComp = ({ posts, cols }) => {
             },
           }}
         >
-          <img
-            src={`https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${post.Cover}/thumbnail`}
-            alt={post.Title || "thumbnail"}
-            loading="lazy"
-            style={{
-              aspectRatio: "1 / 1",
-              width: "100%",
-              height: "auto",
-              objectFit: "cover",
-              display: "block",
-            }}
-          />
+          <ViewTransition
+            name={`album-cover-${post.ID}`}
+            share="morph"
+            default="none"
+          >
+            <img
+              src={`https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${post.Cover}/thumbnail`}
+              alt={post.Title || "thumbnail"}
+              loading="lazy"
+              style={{
+                aspectRatio: "1 / 1",
+                width: "100%",
+                height: "auto",
+                objectFit: "cover",
+                display: "block",
+              }}
+            />
+          </ViewTransition>
           <ImageListItemBar
-            title={<Typography color="black" sx={{ fontWeight: 600, fontSize: "0.95rem" }}>{post.Title}</Typography>}
+            title={
+              <ViewTransition
+                name={`album-title-${post.ID}`}
+                share="text-morph"
+                default="none"
+              >
+                <Typography
+                  color="black"
+                  sx={{ fontWeight: 600, fontSize: "0.95rem" }}
+                >
+                  {post.Title}
+                </Typography>
+              </ViewTransition>
+            }
             subtitle={
               <Typography
                 color="black"

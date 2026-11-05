@@ -116,8 +116,10 @@ export const useSmallGroupReport = () => {
       });
       if (!confirmLeave) return;
     }
-    setReportType(type);
-    setSearchParams({ type });
+    startTransition(() => {
+      setReportType(type);
+      setSearchParams({ type });
+    });
   };
 
   const handleGardenChange = async (newGarden) => {

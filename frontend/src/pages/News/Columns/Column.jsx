@@ -102,6 +102,7 @@ const Column = () => {
       >
         <Container maxWidth="md" sx={{ py: { xs: 3, md: 6 } }}>
           <PostDetailCard
+            id={id}
             title={title}
             body={body}
             timestamp={timestamp}
@@ -124,9 +125,9 @@ const Column = () => {
           themeColor="#1a365d"
           onClick={() => {
             if (window.history.length > 1) {
-              navigate(-1);
+              navigate(-1, { viewTransition: true });
             } else {
-              navigate("/columns");
+              navigate("/columns", { viewTransition: true });
             }
           }}
         />

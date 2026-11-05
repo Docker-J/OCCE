@@ -135,6 +135,7 @@ const ResponsiveAppBar = () => {
     <>
       <AppBar
         position="fixed"
+        style={{ viewTransitionName: "site-header" }}
         sx={{
           background: scrolled ? "rgba(252, 251, 249, 0.9)" : "transparent",
           backdropFilter: scrolled ? "blur(24px)" : "none",

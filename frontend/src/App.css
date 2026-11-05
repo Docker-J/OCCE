@@ -11,6 +11,9 @@
 
 :root {
   --ck-content-font-family: "NanumSquareNeoVariable", sans-serif !important;
+  --duration-exit: 150ms;
+  --duration-enter: 210ms;
+  --duration-move: 340ms;
 }
 
 /* Smooth scrolling */
@@ -147,4 +150,98 @@ iframe {
 
 .animate-card {
   animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ==========================================
+ * React 19 View Transitions CSS Recipes
+ * ========================================== */
+@keyframes vt-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes vt-slide-y {
+  from {
+    transform: translateY(var(--slide-y-offset, 10px));
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Fade transitions */
+::view-transition-old(.fade-out) {
+  animation: var(--duration-exit) ease-in vt-fade reverse;
+}
+::view-transition-new(.fade-in) {
+  animation: var(--duration-enter) ease-out var(--duration-exit) both vt-fade;
+}
+
+/* Vertical slide transitions */
+::view-transition-old(.slide-down) {
+  animation:
+    var(--duration-exit) ease-out both vt-fade reverse,
+    var(--duration-exit) ease-out both vt-slide-y reverse;
+}
+::view-transition-new(.slide-up) {
+  animation:
+    var(--duration-enter) ease-in var(--duration-exit) both vt-fade,
+    var(--duration-move) ease-in both vt-slide-y;
+}
+
+/* Shared Element Morph */
+::view-transition-group(.morph) {
+  animation-duration: var(--duration-move);
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Text Morph (prevents raster scaling artifacts on headings) */
+::view-transition-group(.text-morph) {
+  animation-duration: var(--duration-move);
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+::view-transition-old(.text-morph) {
+  display: none;
+}
+::view-transition-new(.text-morph) {
+  animation: none;
+  object-fit: none;
+  object-position: left top;
+}
+
+/* Sliding Indicator (tab underline) */
+::view-transition-group(.tab-underline) {
+  animation-duration: 220ms;
+  animation-timing-function: cubic-bezier(0.5, 0, 0.2, 1);
+}
+::view-transition-old(.tab-underline),
+::view-transition-new(.tab-underline) {
+  animation: none;
+  height: 100%;
+}
+
+/* Persistent Element Isolation (Backdrop-Blur Workaround for AppBar) */
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 1200;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+/* Reduced Motion Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
 }

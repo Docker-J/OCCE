@@ -4,6 +4,7 @@
  * DOMParser 병목 제거: extractPlainText 유틸리티 적용으로 렌더링 성능 최적화
  */
 
+import { ViewTransition } from "react";
 import PropTypes from "prop-types";
 import { Box, Card, Stack, Typography, Chip } from "@mui/material";
 import { format } from "date-fns";
@@ -24,140 +25,145 @@ const ForumPostCard = ({ post, themeColor, themeBg, themeHover }) => {
   const plainSnippet = extractPlainText(post?.body);
 
   return (
-    <Card
-      component={Link}
-      to={post.id}
-      elevation={0}
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        textDecoration: "none",
-        bgcolor: isPinned ? themeBg : "#ffffff",
-        mb: 2.5,
-        p: { xs: 2, sm: 2.5 },
-        borderRadius: "20px",
-        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
-        border: "1px solid rgba(0, 0, 0, 0.08)",
-        position: "relative",
-        overflow: "hidden",
-        contentVisibility: "auto",
-        containIntrinsicSize: "auto 140px",
-        transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-        "&:hover": {
-          transform: "translateY(-2px)",
-          boxShadow: "0 6px 24px rgba(0, 0, 0, 0.06)",
-          borderColor: "rgba(0, 0, 0, 0.12)",
-          "& .post-title": {
-            color: themeColor,
+    <ViewTransition name={`post-card-${post.id}`} share="morph" default="none">
+      <Card
+        component={Link}
+        to={post.id}
+        viewTransition
+        elevation={0}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          textDecoration: "none",
+          bgcolor: isPinned ? themeBg : "#ffffff",
+          mb: 2.5,
+          p: { xs: 2, sm: 2.5 },
+          borderRadius: "20px",
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+          border: "1px solid rgba(0, 0, 0, 0.08)",
+          position: "relative",
+          overflow: "hidden",
+          contentVisibility: "auto",
+          containIntrinsicSize: "auto 140px",
+          transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+          "&:hover": {
+            transform: "translateY(-2px)",
+            boxShadow: "0 6px 24px rgba(0, 0, 0, 0.06)",
+            borderColor: "rgba(0, 0, 0, 0.12)",
+            "& .post-title": {
+              color: themeColor,
+            },
           },
-        },
-      }}
-    >
-      {/* 뱃지 & 아이콘 행 */}
-      <Stack direction="row" sx={{ alignItems: "center", mb: 2, width: "100%" }}>
-        <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", flexWrap: "wrap" }}>
-          {isPinned && (
-            <Chip
-              icon={<PushPinIcon sx={{ fontSize: "16px !important", color: "white !important" }} />}
-              label="중요"
-              size="small"
-              sx={{
-                bgcolor: themeColor,
-                color: "white",
-                fontWeight: 800,
-                borderRadius: "8px",
-                height: "26px",
-              }}
-            />
-          )}
-          {formattedDate && (
-            <Chip
-              icon={
-                <CalendarTodayIcon
-                  sx={{ fontSize: "14px !important", color: `${themeColor} !important` }}
-                />
-              }
-              label={formattedDate}
-              size="small"
-              sx={{
-                bgcolor: themeBg,
-                color: themeColor,
-                fontWeight: 700,
-                borderRadius: "8px",
-                height: "26px",
-                border: `1px solid ${themeHover}`,
-              }}
-            />
-          )}
+        }}
+      >
+        {/* 뱃지 & 아이콘 행 */}
+        <Stack direction="row" sx={{ alignItems: "center", mb: 2, width: "100%" }}>
+          <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", flexWrap: "wrap" }}>
+            {isPinned && (
+              <Chip
+                icon={<PushPinIcon sx={{ fontSize: "16px !important", color: "white !important" }} />}
+                label="중요"
+                size="small"
+                sx={{
+                  bgcolor: themeColor,
+                  color: "white",
+                  fontWeight: 800,
+                  borderRadius: "8px",
+                  height: "26px",
+                }}
+              />
+            )}
+            {formattedDate && (
+              <Chip
+                icon={
+                  <CalendarTodayIcon
+                    sx={{ fontSize: "14px !important", color: `${themeColor} !important` }}
+                  />
+                }
+                label={formattedDate}
+                size="small"
+                sx={{
+                  bgcolor: themeBg,
+                  color: themeColor,
+                  fontWeight: 700,
+                  borderRadius: "8px",
+                  height: "26px",
+                  border: `1px solid ${themeHover}`,
+                }}
+              />
+            )}
 
-          {post?.images && (
-            <Box
-              sx={{
-                width: 26,
-                height: 26,
-                borderRadius: "8px",
-                bgcolor: "#f5f5f5",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <PhotoOutlinedIcon sx={{ color: "#777", fontSize: 16 }} />
-            </Box>
-          )}
-          {post?.video && (
-            <Box
-              sx={{
-                width: 26,
-                height: 26,
-                borderRadius: "8px",
-                bgcolor: "#f5f5f5",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <MovieOutlinedIcon sx={{ color: "#777", fontSize: 16 }} />
-            </Box>
-          )}
+            {post?.images && (
+              <Box
+                sx={{
+                  width: 26,
+                  height: 26,
+                  borderRadius: "8px",
+                  bgcolor: "#f5f5f5",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <PhotoOutlinedIcon sx={{ color: "#777", fontSize: 16 }} />
+              </Box>
+            )}
+            {post?.video && (
+              <Box
+                sx={{
+                  width: 26,
+                  height: 26,
+                  borderRadius: "8px",
+                  bgcolor: "#f5f5f5",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <MovieOutlinedIcon sx={{ color: "#777", fontSize: 16 }} />
+              </Box>
+            )}
+          </Stack>
         </Stack>
-      </Stack>
 
-      {/* 제목 */}
-      <Typography
-        className="post-title"
-        sx={{
-          fontSize: { xs: "1.1rem", sm: "1.25rem" },
-          fontWeight: 800,
-          color: "#2b2b2b",
-          mb: 1,
-          lineHeight: 1.3,
-          transition: "color 0.3s ease",
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        }}
-      >
-        {post.title}
-      </Typography>
+        {/* 제목 */}
+        <ViewTransition name={`post-title-${post.id}`} share="text-morph" default="none">
+          <Typography
+            className="post-title"
+            sx={{
+              fontSize: { xs: "1.1rem", sm: "1.25rem" },
+              fontWeight: 800,
+              color: "#2b2b2b",
+              mb: 1,
+              lineHeight: 1.3,
+              transition: "color 0.3s ease",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {post.title}
+          </Typography>
+        </ViewTransition>
 
-      {/* 미리보기 본문 (DOMParser 제거, 초경량 텍스트 추출 적용) */}
-      <Typography
-        sx={{
-          fontSize: "14px",
-          color: "#666666",
-          lineHeight: "1.6",
-          display: "-webkit-box",
-          WebkitBoxOrient: "vertical",
-          WebkitLineClamp: "2",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          wordBreak: "break-all",
-        }}
-      >
-        {plainSnippet}
-      </Typography>
-    </Card>
+        {/* 미리보기 본문 (DOMParser 제거, 초경량 텍스트 추출 적용) */}
+        <Typography
+          sx={{
+            fontSize: "14px",
+            color: "#666666",
+            lineHeight: "1.6",
+            display: "-webkit-box",
+            WebkitBoxOrient: "vertical",
+            WebkitLineClamp: "2",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            wordBreak: "break-all",
+          }}
+        >
+          {plainSnippet}
+        </Typography>
+      </Card>
+    </ViewTransition>
   );
 };
 

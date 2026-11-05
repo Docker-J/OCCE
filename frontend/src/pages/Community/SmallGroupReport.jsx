@@ -4,6 +4,7 @@
  * React 19 Context Provider (SmallGroupReportProvider) 합성 구조 적용
  */
 
+import { ViewTransition } from "react";
 import { Typography, Box } from "@mui/material";
 import {
   submitAttendanceReport,
@@ -102,7 +103,20 @@ const SmallGroupReportContent = () => {
             /* 실제 폼 뷰 */
             <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
               <ReportTypeTabs />
-              {reportType === "gathering" ? <GatheringForm /> : <SundayForm />}
+              <ViewTransition
+                key={reportType}
+                enter="fade-in"
+                exit="fade-out"
+                default="none"
+              >
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                  {reportType === "gathering" ? (
+                    <GatheringForm />
+                  ) : (
+                    <SundayForm />
+                  )}
+                </Box>
+              </ViewTransition>
             </Box>
           )}
         </div>

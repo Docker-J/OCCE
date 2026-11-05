@@ -1,4 +1,5 @@
-import { useLoaderData, useNavigate } from "react-router";
+import { ViewTransition } from "react";
+import { useLoaderData, useNavigate, useParams } from "react-router";
 
 import { Box, Typography } from "@mui/material";
 
@@ -13,6 +14,7 @@ const titleBackground = {
 
 const MeditationONPost = () => {
   const navigate = useNavigate();
+  const { postID } = useParams();
   const { Images, Timestamp } = useLoaderData();
   const timestamp = formatInTimeZone(
     Timestamp,
@@ -67,12 +69,7 @@ const MeditationONPost = () => {
           >
             <CustomCarousel loop={false}>
               {Object.values(Images).map((image, index) => {
-                // if (
-                //   index === selectedItem ||
-                //   index === selectedItem + 1 ||
-                //   index === selectedItem - 1
-                // ) {
-                return (
+                const imgEl = (
                   <img
                     style={{
                       width: "100%",
@@ -80,13 +77,24 @@ const MeditationONPost = () => {
                       display: "block",
                       objectFit: "contain",
                     }}
-                    key={index}
                     src={`https://imagedelivery.net/ICo2WI8PXO_BVRlWfwzOww/${image}/MeditationON`}
                     alt={`묵상 ON ${index + 1}`}
                     loading="lazy"
                   />
                 );
-                // } else return <></>;
+
+                return index === 0 && postID ? (
+                  <ViewTransition
+                    key={index}
+                    name={`meditation-cover-${postID}`}
+                    share="morph"
+                    default="none"
+                  >
+                    {imgEl}
+                  </ViewTransition>
+                ) : (
+                  <div key={index}>{imgEl}</div>
+                );
               })}
             </CustomCarousel>
           </div>
@@ -95,9 +103,9 @@ const MeditationONPost = () => {
           themeColor="#2563eb"
           onClick={() => {
             if (window.history.length > 1) {
-              navigate(-1);
+              navigate(-1, { viewTransition: true });
             } else {
-              navigate("/online/meditationON");
+              navigate("/online/meditationON", { viewTransition: true });
             }
           }}
         />

@@ -1,8 +1,10 @@
 /**
  * @file ReportTypeTabs.jsx
  * @description 주일 출석 보고 / 정원 모임 보고 전환 탭 컴포넌트
+ * React 19 ViewTransition 슬라이딩 인디케이터(.tab-underline) 적용
  */
 
+import { ViewTransition } from "react";
 import PropTypes from "prop-types";
 import { Box, Button } from "@mui/material";
 import { useSmallGroupReportContext } from "../SmallGroupReportContext";
@@ -32,34 +34,74 @@ const ReportTypeTabs = ({
         sx={{
           flex: 1,
           py: 1.8,
+          position: "relative",
           fontWeight: 700,
           fontSize: "1.05em",
           color: reportType === "sunday" ? "#dc2626" : "#666",
-          borderBottom: reportType === "sunday" ? "4px solid #dc2626" : "none",
           borderRadius: 0,
           backgroundColor:
-            reportType === "sunday" ? "rgba(220, 38, 38, 0.05)" : "transparent",
+            reportType === "sunday"
+              ? "rgba(220, 38, 38, 0.05)"
+              : "transparent",
           "&:hover": { backgroundColor: "rgba(220, 38, 38, 0.08)" },
         }}
       >
         주일 출석 보고
+        {reportType === "sunday" && (
+          <ViewTransition
+            name="report-tab-indicator"
+            share="tab-underline"
+            default="none"
+          >
+            <Box
+              sx={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: "4px",
+                backgroundColor: "#dc2626",
+              }}
+            />
+          </ViewTransition>
+        )}
       </Button>
       <Button
         onClick={() => onReportTypeChange("gathering")}
         sx={{
           flex: 1,
           py: 1.8,
+          position: "relative",
           fontWeight: 700,
           fontSize: "1.05em",
           color: reportType === "gathering" ? "#ea580c" : "#666",
-          borderBottom: reportType === "gathering" ? "4px solid #ea580c" : "none",
           borderRadius: 0,
           backgroundColor:
-            reportType === "gathering" ? "rgba(234, 88, 12, 0.05)" : "transparent",
+            reportType === "gathering"
+              ? "rgba(234, 88, 12, 0.05)"
+              : "transparent",
           "&:hover": { backgroundColor: "rgba(234, 88, 12, 0.08)" },
         }}
       >
         정원 모임 보고
+        {reportType === "gathering" && (
+          <ViewTransition
+            name="report-tab-indicator"
+            share="tab-underline"
+            default="none"
+          >
+            <Box
+              sx={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: "4px",
+                backgroundColor: "#ea580c",
+              }}
+            />
+          </ViewTransition>
+        )}
       </Button>
     </Box>
   );
