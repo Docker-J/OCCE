@@ -1,4 +1,3 @@
-import { getUserVerifier } from "../middleware/auth.js";
 import sendNotification from "../api/sendNotification.js";
 import sendBroadcastSms from "../api/sendSms.js";
 
@@ -10,40 +9,26 @@ function getExpirationEpoch() {
 
 export const registerController = async (c) => {
   try {
-    const body = await c.req.json();
-    if (!body?.token) {
-      return c.json({ error: "BadRequest", message: "Token is required." }, 400);
-    }
-
+    const body = c.req.valid("json");
     const db = c.env.DB;
     let roles = [];
     let sub = null;
 
-    // Check if an authenticated user session exists
-    const authHeader = c.req.header("Authorization");
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      try {
-        const token = authHeader.split(" ")[1];
-        const verifier = getUserVerifier(c.env);
-        const payload = await verifier.verify(token);
+    // Optional authenticated user session populated by authUser middleware
+    const payload = c.get("user");
+    if (payload?.sub) {
+      sub = payload.sub;
 
-        if (payload?.sub) {
-          sub = payload.sub;
-        }
-
-        // Only assign roles if explicitly requested for a trusted personal device (isRemembered === true)
-        if (body.isRemembered) {
-          const groups = payload["cognito:groups"] || [];
-          // Filter only valid system roles
-          roles = groups.filter((g) => ["GardenKeeper", "Staff"].includes(g));
-        }
-      } catch (authErr) {
-        console.warn("FCM register auth token verification skipped:", authErr.message);
+      // Only assign roles if explicitly requested for a trusted personal device (isRemembered === true)
+      if (body.isRemembered) {
+        const groups = payload["cognito:groups"] || [];
+        // Filter only valid system roles
+        roles = groups.filter((g) => ["GardenKeeper", "Staff"].includes(g));
       }
     }
 
     const expiresAt = getExpirationEpoch();
-    const rolesJson = JSON.stringify(roles || []);
+    const rolesJson = JSON.stringify(roles);
 
     await db
       .prepare(
@@ -66,10 +51,7 @@ export const registerController = async (c) => {
 
 export const unlinkRoleController = async (c) => {
   try {
-    const body = await c.req.json();
-    if (!body?.token) {
-      return c.json({ error: "BadRequest", message: "Token is required." }, 400);
-    }
+    const body = c.req.valid("json");
     const db = c.env.DB;
 
     await db
@@ -86,10 +68,7 @@ export const unlinkRoleController = async (c) => {
 
 export const unregisterController = async (c) => {
   try {
-    const body = await c.req.json();
-    if (!body?.token) {
-      return c.json({ error: "BadRequest", message: "Token is required." }, 400);
-    }
+    const body = c.req.valid("json");
     const db = c.env.DB;
 
     await db
@@ -106,7 +85,7 @@ export const unregisterController = async (c) => {
 
 export const broadcastController = async (c) => {
   try {
-    const body = await c.req.json();
+    const body = c.req.valid("json");
     const {
       title,
       body: notificationBody,
@@ -116,10 +95,6 @@ export const broadcastController = async (c) => {
       sendSms = false,
       smsTarget = "no_push_only",
     } = body;
-
-    if (!title || !notificationBody) {
-      return c.json({ error: "Title and body are required" }, 400);
-    }
 
     if (!sendPush && !sendSms) {
       return c.json(
