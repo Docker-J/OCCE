@@ -39,7 +39,7 @@ export const getMeditationONsController = async (c) => {
 };
 
 export const getMeditationONController = async (c) => {
-  const id = c.req.param("id");
+  const { id } = c.req.valid("param");
   const db = c.env.DB;
 
   const sql = `SELECT id, timestamp, images FROM ${TABLENAME} WHERE id = ?`;

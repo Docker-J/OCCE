@@ -1,4 +1,5 @@
 import { CognitoJwtVerifier } from "aws-jwt-verify";
+import { createMiddleware } from "hono/factory";
 
 // Cache verifiers per environment configuration
 let staffVerifierInstance;
@@ -72,7 +73,7 @@ export const createAuthMiddleware = ({
   optional = false,
   roleName = "User",
 }) => {
-  return async (c, next) => {
+  return createMiddleware(async (c, next) => {
     const token = extractBearerToken(c);
 
     if (!token) {
@@ -112,7 +113,7 @@ export const createAuthMiddleware = ({
         401
       );
     }
-  };
+  });
 };
 
 /**

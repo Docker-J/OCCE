@@ -6,7 +6,7 @@ import { HTTPException } from "hono/http-exception";
 
 import apiRouter from "./routes/index.js";
 import { handleScheduled } from "./jobs/scheduled.js";
-import { linkPreviewMiddleware } from "./middleware/linkPreview.js";
+import { createLinkPreviewMiddleware } from "./middleware/linkPreview.js";
 import { processSmsQueueMessage } from "./api/sendSms.js";
 
 const app = new Hono();
@@ -49,7 +49,7 @@ app.use(
 );
 
 // Dynamic OpenGraph / Twitter meta-tag rewriter for bot crawlers
-app.use("*", (c, next) => linkPreviewMiddleware(c, next, app));
+app.use("*", createLinkPreviewMiddleware(app));
 
 // ==========================================
 // 2. Error & Not Found Handlers

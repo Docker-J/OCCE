@@ -51,7 +51,7 @@ export const getAnnouncementsController = async (c) => {
 };
 
 export const getAnnouncementController = async (c) => {
-  const id = c.req.param("id");
+  const { id } = c.req.valid("param");
   const db = c.env.DB;
   const sql = `SELECT id, title, body, timestamp, pin FROM ${TABLENAME} WHERE id = ?`;
   const params = [id];
@@ -69,7 +69,7 @@ export const getAnnouncementController = async (c) => {
 };
 
 export const postAnnouncementController = async (c) => {
-  const body = await c.req.json();
+  const body = c.req.valid("json");
   const db = c.env.DB;
   const sql = `INSERT INTO ${TABLENAME} (id, title, body, images, timestamp, video, pin) VALUES (?, ?, ?, ?, ?, ?, 0)`;
   const params = [
@@ -87,8 +87,8 @@ export const postAnnouncementController = async (c) => {
 };
 
 export const editAnnouncementController = async (c) => {
-  const id = c.req.param("id");
-  const body = await c.req.json();
+  const { id } = c.req.valid("param");
+  const body = c.req.valid("json");
   const db = c.env.DB;
 
   const getSql = `SELECT images FROM ${TABLENAME} WHERE id = ?`;
@@ -128,7 +128,7 @@ export const editAnnouncementController = async (c) => {
 };
 
 export const deleteAnnouncementController = async (c) => {
-  const id = c.req.param("id");
+  const { id } = c.req.valid("param");
   const db = c.env.DB;
 
   const getSql = `SELECT images FROM ${TABLENAME} WHERE id = ?`;
@@ -156,7 +156,7 @@ export const deleteAnnouncementController = async (c) => {
 };
 
 export const pinAnnouncementController = async (c) => {
-  const id = c.req.param("id");
+  const { id } = c.req.valid("param");
   const body = await c.req.json();
   const db = c.env.DB;
 

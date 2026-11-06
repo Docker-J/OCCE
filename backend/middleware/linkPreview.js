@@ -1,3 +1,5 @@
+import { createMiddleware } from "hono/factory";
+
 // A comprehensive, categorized list of modern crawler and scraper user-agents
 const BOT_AGENTS = [
   // --- Traditional Search Engines ---
@@ -64,6 +66,9 @@ const ROUTE_TITLES = {
   "/nextgen/youth": "중고등부 - OCCE",
   "/nextgen/youngadult": "청년부 - OCCE",
 };
+
+export const createLinkPreviewMiddleware = (app) =>
+  createMiddleware((c, next) => linkPreviewMiddleware(c, next, app));
 
 export const linkPreviewMiddleware = async (c, next, app) => {
   const userAgent = (c.req.header("user-agent") || "").toLowerCase();

@@ -1,4 +1,5 @@
 import { cache } from "hono/cache";
+import { createMiddleware } from "hono/factory";
 
 /**
  * Centralized HTTP Cache Middleware for Cloudflare Workers & Hono.
@@ -25,13 +26,13 @@ export const apiCache = ({
     return cacheMiddleware;
   }
 
-  return async (c, next) => {
+  return createMiddleware(async (c, next) => {
     // If Authorization header exists, bypass cache to ensure personalized/fresh data
     if (c.req.header("Authorization")) {
       return next();
     }
     return cacheMiddleware(c, next);
-  };
+  });
 };
 
 export default apiCache;

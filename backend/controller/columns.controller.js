@@ -49,7 +49,7 @@ export const getColumnsController = async (c) => {
 };
 
 export const getColumnController = async (c) => {
-  const id = c.req.param("id");
+  const { id } = c.req.valid("param");
   const db = c.env.DB;
   const sql = `SELECT id, title, body, timestamp FROM ${TABLENAME} WHERE id = ?`;
   const params = [id];
@@ -66,7 +66,7 @@ export const getColumnController = async (c) => {
 };
 
 export const postColumnController = async (c) => {
-  const body = await c.req.json();
+  const body = c.req.valid("json");
   const db = c.env.DB;
   const sql = `INSERT INTO ${TABLENAME} (id, title, body, images, timestamp) VALUES (?, ?, ?, ?, ?)`;
   const params = [
@@ -83,8 +83,8 @@ export const postColumnController = async (c) => {
 };
 
 export const editColumnController = async (c) => {
-  const id = c.req.param("id");
-  const body = await c.req.json();
+  const { id } = c.req.valid("param");
+  const body = c.req.valid("json");
   const db = c.env.DB;
 
   const getSql = `SELECT images FROM ${TABLENAME} WHERE id = ?`;
@@ -123,7 +123,7 @@ export const editColumnController = async (c) => {
 };
 
 export const deleteColumnController = async (c) => {
-  const id = c.req.param("id");
+  const { id } = c.req.valid("param");
   const db = c.env.DB;
 
   const getSql = `SELECT images FROM ${TABLENAME} WHERE id = ?`;

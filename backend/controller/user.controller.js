@@ -290,7 +290,7 @@ const checkUserInSheet = async (env, name, phone) => {
 };
 
 export const signUpController = async (c) => {
-  const body = await c.req.json();
+  const body = c.req.valid("json");
   const env = c.env;
   const cleanPhone = normalizePhone(body.phone);
   const cleanName = String(body.name || "").trim();
@@ -344,7 +344,7 @@ export const signUpController = async (c) => {
 };
 
 export const confirmSignUpController = async (c) => {
-  const body = await c.req.json();
+  const body = c.req.valid("json");
   const env = c.env;
   const AWS_COGNITO_CLIENT_ID = env.AWS_COGNITO_CLIENT_ID;
   const cognitoClient = getCognitoClient(env);
@@ -372,7 +372,7 @@ export const confirmSignUpController = async (c) => {
 };
 
 export const requestConfirmController = async (c) => {
-  const body = (await c.req.json().catch(() => ({}))) || {};
+  const body = c.req.valid("json");
   const phone = body.phone || c.req.query("phone");
   const cleanPhone = normalizePhone(phone);
   const username = "+1" + cleanPhone;
@@ -457,7 +457,7 @@ export const signOutController = async (c) => {
 };
 
 export const forgotPasswordController = async (c) => {
-  const body = await c.req.json();
+  const body = c.req.valid("json");
   const cleanPhone = normalizePhone(body.phone);
   const username = "+1" + cleanPhone;
 
@@ -489,7 +489,7 @@ export const forgotPasswordController = async (c) => {
 };
 
 export const confirmForgotPasswordController = async (c) => {
-  const body = await c.req.json();
+  const body = c.req.valid("json");
   const cleanPhone = normalizePhone(body.phone);
   const username = "+1" + cleanPhone;
   const code = body.confirmCode;

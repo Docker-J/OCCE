@@ -89,7 +89,7 @@ export const getRecentWeeklyUpdateDateController = async (c) => {
 };
 
 export const getWeeklyUpdateController = async (c) => {
-  const date = c.req.param("date");
+  const { date } = c.req.valid("param");
   const authenticated = c.get("authenticated") || false;
   const key = `${date}${authenticated ? "_member" : ""}`;
   const bucket = c.env.weeklyupdate;
@@ -129,7 +129,7 @@ export const getWeeklyUpdateController = async (c) => {
 
 export const uploadWeeklyUpdateController = async (c) => {
   const env = c.env;
-  const date = c.req.param("date");
+  const { date } = c.req.valid("param");
   const bucket = env.weeklyupdate;
 
   if (!bucket) {
@@ -178,7 +178,7 @@ export const uploadWeeklyUpdateController = async (c) => {
 };
 
 export const deleteWeeklyUpdateController = async (c) => {
-  const date = c.req.param("date");
+  const { date } = c.req.valid("param");
   const env = c.env;
   const bucket = env.weeklyupdate;
   const kv = env.weeklyupdate_kv;

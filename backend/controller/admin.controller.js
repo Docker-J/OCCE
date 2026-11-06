@@ -181,8 +181,9 @@ export const updateUserRoleController = async (c) => {
   try {
     const env = c.env;
     const userPoolId = env.AWS_COGNITO_USER_POOL_ID;
-    const username = decodeURIComponent(c.req.param("username"));
-    const { action, gardens } = await c.req.json();
+    const { username: rawUsername } = c.req.valid("param");
+    const username = decodeURIComponent(rawUsername);
+    const { action, gardens } = c.req.valid("json");
 
     if (!username || !["assign", "update_gardens", "remove"].includes(action)) {
       return c.json(
@@ -323,8 +324,9 @@ export const updateUserStatusController = async (c) => {
   try {
     const env = c.env;
     const userPoolId = env.AWS_COGNITO_USER_POOL_ID;
-    const username = decodeURIComponent(c.req.param("username"));
-    const { enabled } = await c.req.json();
+    const { username: rawUsername } = c.req.valid("param");
+    const username = decodeURIComponent(rawUsername);
+    const { enabled } = c.req.valid("json");
 
     if (!username || typeof enabled !== "boolean") {
       return c.json(
@@ -383,7 +385,8 @@ export const deleteUserController = async (c) => {
   try {
     const env = c.env;
     const userPoolId = env.AWS_COGNITO_USER_POOL_ID;
-    const username = decodeURIComponent(c.req.param("username"));
+    const { username: rawUsername } = c.req.valid("param");
+    const username = decodeURIComponent(rawUsername);
     const currentUser = c.get("user");
 
     if (!username) {

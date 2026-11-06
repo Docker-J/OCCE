@@ -232,8 +232,9 @@ export const getGardenAttendanceDetailController = async (c) => {
       );
     }
 
-    const gardenName = decodeURIComponent(c.req.param("gardenName") || "").trim();
-    const date = decodeURIComponent(c.req.param("date") || "").trim();
+    const { gardenName: rawGarden, date: rawDate } = c.req.valid("param");
+    const gardenName = decodeURIComponent(rawGarden || "").trim();
+    const date = decodeURIComponent(rawDate || "").trim();
 
     if (!gardenName || !date) {
       return c.json(
