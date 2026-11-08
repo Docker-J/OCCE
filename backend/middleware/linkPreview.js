@@ -162,14 +162,24 @@ export const linkPreviewMiddleware = async (c, next, app) => {
               element.setInnerContent(title);
             },
           })
-          .on("head", {
+          .on('meta[property="og:title"]', {
             element(element) {
-              element.append(`<meta property="og:title" content="${title}" />`, { html: true });
-              element.append(`<meta name="twitter:title" content="${title}" />`, { html: true });
-              element.append(`<meta property="og:image" content="${logoUrl}" />`, { html: true });
-              element.append(`<meta name="twitter:image" content="${logoUrl}" />`, { html: true });
-              element.append(`<meta property="og:type" content="website" />`, { html: true });
-              element.append(`<meta name="twitter:card" content="summary_large_image" />`, { html: true });
+              element.setAttribute("content", title);
+            },
+          })
+          .on('meta[name="twitter:title"]', {
+            element(element) {
+              element.setAttribute("content", title);
+            },
+          })
+          .on('meta[property="og:image"]', {
+            element(element) {
+              element.setAttribute("content", logoUrl);
+            },
+          })
+          .on('meta[name="twitter:image"]', {
+            element(element) {
+              element.setAttribute("content", logoUrl);
             },
           })
           .transform(response);
