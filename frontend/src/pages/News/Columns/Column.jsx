@@ -98,7 +98,7 @@ const Column = () => {
 
       <div
         className="container-wrapper"
-        style={{ backgroundColor: "#fcfbf9", minHeight: "60vh" }}
+        style={{ minHeight: "60vh" }}
       >
         <Container maxWidth="md" sx={{ py: { xs: 3, md: 6 } }}>
           <PostDetailCard
