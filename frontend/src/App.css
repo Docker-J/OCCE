@@ -56,8 +56,7 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 35%;
-  height: max(45svh, 320px);
-  max-height: 360px;
+  height: clamp(180px, 24svh, 220px);
   padding-top: 40px;
   padding-right: 1rem;
   padding-left: 1rem;
@@ -67,6 +66,7 @@ body {
 
 @media only screen and (min-width: 900px) {
   .title-wrapper {
+    height: clamp(210px, 28vh, 260px);
     padding-top: 50px;
   }
 }
@@ -75,10 +75,16 @@ body {
   width: 100%;
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: calc(50% + 14px);
   box-sizing: border-box;
   transform: translate(-50%, -50%);
   padding: inherit;
+}
+
+@media only screen and (min-width: 900px) {
+  .title {
+    top: calc(50% + 18px);
+  }
 }
 
 .container-wrapper {
