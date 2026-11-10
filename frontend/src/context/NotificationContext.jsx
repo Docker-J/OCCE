@@ -98,8 +98,11 @@ export const NotificationProvider = ({ children }) => {
         }
 
         if (permission === "granted") {
-          const { getToken, onMessage, getMessaging } = await import("firebase/messaging");
-          const { firebaseInstance } = await import("../api/firebase");
+          const [{ getToken, onMessage, getMessaging }, { firebaseInstance }] =
+            await Promise.all([
+              import("firebase/messaging"),
+              import("../api/firebase"),
+            ]);
           const messaging = getMessaging(firebaseInstance);
 
           const token = await getToken(messaging, {
@@ -201,10 +204,13 @@ export const NotificationProvider = ({ children }) => {
       if (localStorage.getItem("notifications_opt_out") === "true") return;
 
       try {
-        const { getMessaging, getToken } = await import("firebase/messaging");
-        const { firebaseInstance } = await import("../api/firebase");
+        const [{ getMessaging, getToken }, { firebaseInstance }, registration] =
+          await Promise.all([
+            import("firebase/messaging"),
+            import("../api/firebase"),
+            navigator.serviceWorker.ready,
+          ]);
         const messaging = getMessaging(firebaseInstance);
-        const registration = await navigator.serviceWorker.ready;
         const token = await getToken(messaging, {
           vapidKey: VAPID_KEY,
           serviceWorkerRegistration: registration,
@@ -249,8 +255,11 @@ export const NotificationProvider = ({ children }) => {
   const disablePush = async () => {
     setIsLoading(true);
     try {
-      const { getMessaging, deleteToken, getToken } = await import("firebase/messaging");
-      const { firebaseInstance } = await import("../api/firebase");
+      const [{ getMessaging, deleteToken, getToken }, { firebaseInstance }] =
+        await Promise.all([
+          import("firebase/messaging"),
+          import("../api/firebase"),
+        ]);
       const messaging = getMessaging(firebaseInstance);
 
       try {
