@@ -23,7 +23,7 @@ const MeditationONModal = ({ isOpen, onClose, onSuccess }) => {
   const [filesToUpload, setFilesToUpload] = useState([]);
   const [imagesPreview, setImagesPreview] = useState([]);
 
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(() => new Date());
 
   const handleChangeFile = (files) => {
     setFilesToUpload((prev) => [...prev, ...files]);

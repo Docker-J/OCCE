@@ -77,6 +77,13 @@ const ResponsiveAppBar = () => {
     popupId: "user",
   });
 
+  const preloadAuthModals = () => {
+    if (!authenticated) {
+      import("../components/User/SignInModal");
+      import("../components/User/SignUpModal");
+    }
+  };
+
   const settings_signed = [
     ...(isLeader
       ? [
@@ -244,6 +251,8 @@ const ResponsiveAppBar = () => {
                   size="large"
                   color="inherit"
                   sx={{ pl: 0 }}
+                  onMouseEnter={preloadAuthModals}
+                  onFocus={preloadAuthModals}
                   {...bindTrigger(userPopupState)}
                 >
                   <PersonIcon fontSize="large" />

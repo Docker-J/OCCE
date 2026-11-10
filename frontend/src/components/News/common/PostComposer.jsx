@@ -41,7 +41,7 @@ const Provider = ({
   const { openSnackbar } = useSnackbar();
 
   const [title, setTitle] = useState(origTitle);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [body, setBody] = useState(origBody);
   const [prevProps, setPrevProps] = useState({ id, origTitle, origBody });
 
