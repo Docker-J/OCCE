@@ -137,70 +137,78 @@ export default {
     console.log(`[Queue] Processing batch of ${batch.messages.length} message(s)`);
 
     const tasks = batch.messages.map(async (msg) => {
-      const body = msg.body || {};
+      try {
+        const body = msg.body || {};
 
-      if (body.type === "sms" || body.phoneNumbers) {
-        console.log(`[Queue] Processing SMS chunk of ${body.phoneNumbers?.length || 0} recipient(s)`);
-        await processSmsQueueMessage(env, body);
-        return;
-      }
-
-      // FCM push notification processing
-      const { tokens, payloadTemplate, accessToken, projectId } = body;
-      if (!Array.isArray(tokens) || tokens.length === 0) {
-        return;
-      }
-
-      const sendPromises = tokens.map(async (token) => {
-        const payload = {
-          message: {
-            token: token,
-            ...payloadTemplate,
-          },
-        };
-
-        try {
-          const res = await fetch(
-            `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`,
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(payload),
-            }
-          );
-
-          if (!res.ok) {
-            const errText = await res.text();
-            console.error(`[FCM] Send error for token ${token}:`, errText);
-
-            // Clean up stale / unregistered tokens from D1
-            if (
-              errText.includes("UNREGISTERED") ||
-              errText.includes("NotRegistered")
-            ) {
-              console.log(`[FCM] Token ${token} is unregistered. Removing from D1 fcm_tokens...`);
-              try {
-                await env.DB.prepare("DELETE FROM fcm_tokens WHERE token = ?")
-                  .bind(token)
-                  .run();
-                console.log(`[FCM] Successfully deleted unregistered token: ${token}`);
-              } catch (delErr) {
-                console.error(`[FCM] Failed to delete token ${token} from D1:`, delErr);
-              }
-            }
-          } else {
-            // Cancel response body stream to release worker socket and avoid memory leaks
-            await res.body?.cancel();
-          }
-        } catch (err) {
-          console.error(`[FCM] Network exception for token ${token}:`, err);
+        if (body.type === "sms" || body.phoneNumbers) {
+          console.log(`[Queue] Processing SMS chunk of ${body.phoneNumbers?.length || 0} recipient(s)`);
+          await processSmsQueueMessage(env, body);
+          msg.ack();
+          return;
         }
-      });
 
-      await Promise.all(sendPromises);
+        // FCM push notification processing
+        const { tokens, payloadTemplate, accessToken, projectId } = body;
+        if (!Array.isArray(tokens) || tokens.length === 0) {
+          msg.ack();
+          return;
+        }
+
+        const sendPromises = tokens.map(async (token) => {
+          const payload = {
+            message: {
+              token: token,
+              ...payloadTemplate,
+            },
+          };
+
+          try {
+            const res = await fetch(
+              `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`,
+              {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+              }
+            );
+
+            if (!res.ok) {
+              const errText = await res.text();
+              console.error(`[FCM] Send error for token ${token}:`, errText);
+
+              // Clean up stale / unregistered tokens from D1
+              if (
+                errText.includes("UNREGISTERED") ||
+                errText.includes("NotRegistered")
+              ) {
+                console.log(`[FCM] Token ${token} is unregistered. Removing from D1 fcm_tokens...`);
+                try {
+                  await env.DB.prepare("DELETE FROM fcm_tokens WHERE token = ?")
+                    .bind(token)
+                    .run();
+                  console.log(`[FCM] Successfully deleted unregistered token: ${token}`);
+                } catch (delErr) {
+                  console.error(`[FCM] Failed to delete token ${token} from D1:`, delErr);
+                }
+              }
+            } else {
+              // Cancel response body stream to release worker socket and avoid memory leaks
+              await res.body?.cancel();
+            }
+          } catch (err) {
+            console.error(`[FCM] Network exception for token ${token}:`, err);
+          }
+        });
+
+        await Promise.all(sendPromises);
+        msg.ack();
+      } catch (msgErr) {
+        console.error("[Queue] Message processing failed, requesting retry:", msgErr);
+        msg.retry();
+      }
     });
 
     await Promise.all(tasks);
