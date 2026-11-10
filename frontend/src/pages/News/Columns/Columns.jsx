@@ -1,9 +1,5 @@
-import { useEffect, useLayoutEffect } from "react";
-import {
-  useSearchParams,
-  useNavigationType,
-  useLocation,
-} from "react-router";
+import { useEffect } from "react";
+import { useSearchParams } from "react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Fab, Typography } from "@mui/material";
@@ -13,6 +9,7 @@ import ForumPostBoard from "../../../common/Forum/ForumPostBoard";
 import BoardPagination from "../../../components/News/Announcement/BoardPagination";
 
 import useModals from "../../../util/useModal";
+import useScrollRestoration from "../../../util/useScrollRestoration";
 import AdminComponent from "../../../common/AdminComponent";
 import ForumPostBoardSkeleton from "../../../common/Forum/ForumPostBoardSkeleton";
 import OCCEFallbackCard from "../../../common/OCCEFallbackCard";
@@ -29,8 +26,8 @@ const Columns = () => {
 
   const { openModal } = useModals();
   const queryClient = useQueryClient();
-  const navType = useNavigationType();
-  const location = useLocation();
+
+  useScrollRestoration();
 
   const {
     data,
@@ -55,39 +52,6 @@ const Columns = () => {
       });
     }
   }, [page, data?.count, queryClient]);
-
-  // Track and persist scroll position for POP navigation
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 0) {
-        sessionStorage.setItem(`scroll_pos_${location.pathname}`, String(window.scrollY));
-      }
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [location.pathname]);
-
-  // Restore scroll position when returning from post details (POP navigation)
-  useLayoutEffect(() => {
-    if (navType === "POP") {
-      const savedPos = sessionStorage.getItem(`scroll_pos_${location.pathname}`);
-      if (savedPos) {
-        const targetY = parseInt(savedPos, 10);
-        if (!isNaN(targetY) && targetY > 0) {
-          const rafId = requestAnimationFrame(() => {
-            const prevBehavior = document.documentElement.style.scrollBehavior;
-            document.documentElement.style.scrollBehavior = "auto";
-            window.scrollTo({ top: targetY, behavior: "instant" });
-            document.documentElement.scrollTop = targetY;
-            document.documentElement.style.scrollBehavior = prevBehavior;
-          });
-          return () => cancelAnimationFrame(rafId);
-        }
-      }
-    }
-  }, [navType, location.pathname]);
 
   return (
     <>

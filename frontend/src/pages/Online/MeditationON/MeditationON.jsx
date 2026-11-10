@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import {
   Box,
@@ -21,8 +21,8 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import AdminComponent from "../../../common/AdminComponent";
 import Footer from "../../../header/Footer";
 import useModals from "../../../util/useModal";
+import useScrollRestoration from "../../../util/useScrollRestoration";
 import { getPosts } from "../../../api/meditationon";
-import { useNavigationType, useLocation } from "react-router";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 
 const PAGE_SIZE = 12;
@@ -32,10 +32,10 @@ const titleBackground = {
 
 const MeditationON = () => {
   const matches = useMediaQuery("(min-width:1200px)");
-  const navType = useNavigationType();
-  const location = useLocation();
   const { openModal } = useModals();
   const queryClient = useQueryClient();
+
+  useScrollRestoration();
 
   const {
     data,
@@ -67,39 +67,6 @@ const MeditationON = () => {
     sessionStorage.removeItem("posts");
     queryClient.invalidateQueries({ queryKey: ["meditation-on"] });
   };
-
-  // Track and persist scroll position for POP navigation
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 0) {
-        sessionStorage.setItem(`scroll_pos_${location.pathname}`, String(window.scrollY));
-      }
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [location.pathname]);
-
-  // Restore scroll position when returning from meditation post details (POP navigation)
-  useLayoutEffect(() => {
-    if (navType === "POP") {
-      const savedPos = sessionStorage.getItem(`scroll_pos_${location.pathname}`);
-      if (savedPos) {
-        const targetY = parseInt(savedPos, 10);
-        if (!isNaN(targetY) && targetY > 0) {
-          const rafId = requestAnimationFrame(() => {
-            const prevBehavior = document.documentElement.style.scrollBehavior;
-            document.documentElement.style.scrollBehavior = "auto";
-            window.scrollTo({ top: targetY, behavior: "instant" });
-            document.documentElement.scrollTop = targetY;
-            document.documentElement.style.scrollBehavior = prevBehavior;
-          });
-          return () => cancelAnimationFrame(rafId);
-        }
-      }
-    }
-  }, [navType, location.pathname]);
 
   const scrollRef = useRef();
 

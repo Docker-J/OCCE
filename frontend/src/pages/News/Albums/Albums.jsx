@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import {
   Box,
@@ -17,6 +17,7 @@ import PhotoLibraryOutlinedIcon from "@mui/icons-material/PhotoLibraryOutlined";
 
 import InfiniteScroll from "react-infinite-scroll-component";
 import useModals from "../../../util/useModal";
+import useScrollRestoration from "../../../util/useScrollRestoration";
 import AdminComponent from "../../../common/AdminComponent";
 import Footer from "../../../header/Footer";
 
@@ -24,10 +25,12 @@ import { getAlbums } from "../../../api/albums";
 
 import { MemoizedMeditationONComp } from "./MeditationONImageListItem";
 import ButtonYearPicker from "../../../common/ButtonYearPicker";
-import { useSearchParams, useNavigationType, useLocation } from "react-router";
+import { useSearchParams } from "react-router";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 
 const PAGE_SIZE = 12;
+const MIN_ALBUM_DATE = new Date("2022/04/03");
+const MAX_ALBUM_DATE = new Date();
 
 const titleBackground = {
   backgroundImage: 'url("/img/News/Albums/Albums.webp")',
@@ -37,10 +40,10 @@ const titleBackground = {
 const Albums = () => {
   const matches = useMediaQuery("(min-width:1200px)");
   const [searchParams, setSearchParams] = useSearchParams();
-  const navType = useNavigationType();
-  const location = useLocation();
   const { openModal } = useModals();
   const queryClient = useQueryClient();
+
+  useScrollRestoration();
 
   const yearParam = searchParams.get("year");
   const selectedYear = yearParam ? new Date(Number(yearParam), 0, 1) : null;
@@ -86,39 +89,6 @@ const Albums = () => {
     queryClient.invalidateQueries({ queryKey: ["albums"] });
   };
 
-  // Track and persist scroll position for POP navigation
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 0) {
-        sessionStorage.setItem(`scroll_pos_${location.pathname}`, String(window.scrollY));
-      }
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [location.pathname]);
-
-  // Restore scroll position when returning from album details (POP navigation)
-  useLayoutEffect(() => {
-    if (navType === "POP") {
-      const savedPos = sessionStorage.getItem(`scroll_pos_${location.pathname}`);
-      if (savedPos) {
-        const targetY = parseInt(savedPos, 10);
-        if (!isNaN(targetY) && targetY > 0) {
-          const rafId = requestAnimationFrame(() => {
-            const prevBehavior = document.documentElement.style.scrollBehavior;
-            document.documentElement.style.scrollBehavior = "auto";
-            window.scrollTo({ top: targetY, behavior: "instant" });
-            document.documentElement.scrollTop = targetY;
-            document.documentElement.style.scrollBehavior = prevBehavior;
-          });
-          return () => cancelAnimationFrame(rafId);
-        }
-      }
-    }
-  }, [navType, location.pathname]);
-
   const scrollRef = useRef();
 
   useEffect(() => {
@@ -160,8 +130,8 @@ const Albums = () => {
           <ButtonYearPicker
             sx={{ mt: 2 }}
             value={selectedYear}
-            minDate={new Date("2022/04/03")}
-            maxDate={new Date()}
+            minDate={MIN_ALBUM_DATE}
+            maxDate={MAX_ALBUM_DATE}
             onChange={handleYearChange}
           />
         </div>
