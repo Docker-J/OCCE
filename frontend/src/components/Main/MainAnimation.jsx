@@ -5,6 +5,33 @@ import { useEffect, useCallback } from "react";
 // Assuming MainAnimation.css contains necessary layout styles
 import "./MainAnimation.css";
 
+// Durations in seconds (Framer Motion) - hoisted to module scope
+const DURATIONS = {
+  spin: 4,
+  fadeOut: 4,
+  fadeOut2: 4,
+  fadeInMulti: 6,
+  fadeIn2: 4,
+  moveTextMulti: 6,
+  moveTextMulti2: 5.5,
+  fadeIn3: 4.1,
+  spinHorizontal: 6,
+};
+
+// Delays in seconds (from original timeSteps) - hoisted to module scope
+const DELAYS = {
+  spin: 2, // Special handling for initial 2s delay on first run
+  fadeOut: 6,
+  fadeOut2: 2,
+  fadeInMulti: 4,
+  fadeIn2: 8, // Parent container for text + vertical logo
+  moveLeft: 11,
+  moveRight: 11,
+  fadeIn3: 11.5,
+  spinHorizontal: 14.2,
+  loopRestart: 4, // Delay before the entire sequence loops
+};
+
 const MainAnimation = () => {
   // Animation Controls for each element/group
   const logoControls = useAnimationControls(); // ONLogo.svg
@@ -14,33 +41,6 @@ const MainAnimation = () => {
   const edmontonTextControls = useAnimationControls();
   const churchTextControls = useAnimationControls();
   const verticalLogoControls = useAnimationControls();
-
-  // Durations in seconds (Framer Motion)
-  const durations = {
-    spin: 4,
-    fadeOut: 4,
-    fadeOut2: 4,
-    fadeInMulti: 6,
-    fadeIn2: 4,
-    moveTextMulti: 6,
-    moveTextMulti2: 5.5,
-    fadeIn3: 4.1,
-    spinHorizontal: 6,
-  };
-
-  // Delays in seconds (from original timeSteps)
-  const delays = {
-    spin: 2, // Special handling for initial 2s delay on first run
-    fadeOut: 6,
-    fadeOut2: 2,
-    fadeInMulti: 4,
-    fadeIn2: 8, // Parent container for text + vertical logo
-    moveLeft: 11,
-    moveRight: 11,
-    fadeIn3: 11.5,
-    spinHorizontal: 14.2,
-    loopRestart: 4, // Delay before the entire sequence loops
-  };
 
   const playSequence = useCallback(async () => {
     // 1. Reset all elements to their initial states IMMEDIATELY
@@ -59,18 +59,18 @@ const MainAnimation = () => {
       rotate: 90,
       scale: 0.65,
       transition: {
-        duration: durations.spin,
+        duration: DURATIONS.spin,
         ease: "easeInOut",
-        delay: delays.spin,
+        delay: DELAYS.spin,
       },
     });
     logoControls.start({
       // Properties merge; opacity animates with its own transition
       opacity: 0,
       transition: {
-        duration: durations.fadeOut,
+        duration: DURATIONS.fadeOut,
         ease: "easeInOut",
-        delay: delays.fadeOut,
+        delay: DELAYS.fadeOut,
       },
     });
 
@@ -78,9 +78,9 @@ const MainAnimation = () => {
     nameExplanation1Controls.start({
       opacity: 0,
       transition: {
-        duration: durations.fadeOut2,
+        duration: DURATIONS.fadeOut2,
         ease: "easeInOut",
-        delay: delays.fadeOut2,
+        delay: DELAYS.fadeOut2,
       },
     });
 
@@ -88,9 +88,9 @@ const MainAnimation = () => {
     nameExplanation2Controls.start({
       opacity: [0, 1, 0], // Keyframes: start, middle, end
       transition: {
-        duration: durations.fadeInMulti,
+        duration: DURATIONS.fadeInMulti,
         ease: "easeInOut",
-        delay: delays.fadeInMulti,
+        delay: DELAYS.fadeInMulti,
         times: [0, 0.5, 1], // opacity:1 at 50% of duration
       },
     });
@@ -99,9 +99,9 @@ const MainAnimation = () => {
     nameExplanation3Controls.start({
       opacity: 1,
       transition: {
-        duration: durations.fadeIn2,
+        duration: DURATIONS.fadeIn2,
         ease: "easeInOut",
-        delay: delays.fadeIn2,
+        delay: DELAYS.fadeIn2,
       },
     });
 
@@ -109,9 +109,9 @@ const MainAnimation = () => {
     edmontonTextControls.start({
       x: ["0%", "-30%", "-65%"],
       transition: {
-        duration: durations.moveTextMulti,
+        duration: DURATIONS.moveTextMulti,
         ease: "easeInOut",
-        delay: delays.moveLeft,
+        delay: DELAYS.moveLeft,
         times: [0, 0.4, 1],
       },
     });
@@ -120,9 +120,9 @@ const MainAnimation = () => {
     churchTextControls.start({
       x: ["0%", "50%", "120%"],
       transition: {
-        duration: durations.moveTextMulti2,
+        duration: DURATIONS.moveTextMulti2,
         ease: "easeInOut",
-        delay: delays.moveRight,
+        delay: DELAYS.moveRight,
         times: [0, 0.4, 1],
       },
     });
@@ -132,9 +132,9 @@ const MainAnimation = () => {
       // fadeIn3
       opacity: 1,
       transition: {
-        duration: durations.fadeIn3,
+        duration: DURATIONS.fadeIn3,
         ease: "easeInOut",
-        delay: delays.fadeIn3,
+        delay: DELAYS.fadeIn3,
       },
     });
 
@@ -143,19 +143,55 @@ const MainAnimation = () => {
       rotate: -90,
       scale: 1.4,
       transition: {
-        duration: durations.spinHorizontal,
+        duration: DURATIONS.spinHorizontal,
         ease: "backOut", // Corresponds to easeOutBack
-        delay: delays.spinHorizontal,
+        delay: DELAYS.spinHorizontal,
       },
     });
-
-    console.log("Full sequence completed. Restarting after delay...");
-    setTimeout(playSequence, delays.loopRestart * 1000); // Convert loop delay to ms
-  });
+  }, [
+    logoControls,
+    nameExplanation1Controls,
+    nameExplanation2Controls,
+    nameExplanation3Controls,
+    edmontonTextControls,
+    churchTextControls,
+    verticalLogoControls,
+  ]);
 
   useEffect(() => {
-    playSequence();
-  }, []); // Run once on mount
+    let isCancelled = false;
+    let timerId = null;
+
+    const runLoop = async () => {
+      if (isCancelled) return;
+      await playSequence();
+      if (isCancelled) return;
+      timerId = setTimeout(runLoop, DELAYS.loopRestart * 1000);
+    };
+
+    runLoop();
+
+    return () => {
+      isCancelled = true;
+      if (timerId) clearTimeout(timerId);
+      logoControls.stop();
+      nameExplanation1Controls.stop();
+      nameExplanation2Controls.stop();
+      nameExplanation3Controls.stop();
+      edmontonTextControls.stop();
+      churchTextControls.stop();
+      verticalLogoControls.stop();
+    };
+  }, [
+    playSequence,
+    logoControls,
+    nameExplanation1Controls,
+    nameExplanation2Controls,
+    nameExplanation3Controls,
+    edmontonTextControls,
+    churchTextControls,
+    verticalLogoControls,
+  ]);
 
   return (
     <div className="nameExplanationContainer">

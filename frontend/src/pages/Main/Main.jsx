@@ -1,5 +1,4 @@
 import { Link } from "react-router";
-import { useState } from "react";
 import { Button, Fab } from "@mui/material";
 import CampaignIcon from "@mui/icons-material/Campaign";
 
@@ -11,7 +10,7 @@ import MainAnimation from "../../components/Main/MainAnimation";
 import carouselStyles from "./MainCarousel.module.css";
 import CustomCarousel from "../../common/CustomCarousel";
 import AdminComponent from "../../common/AdminComponent";
-import BroadcastModal from "../../components/Main/BroadcastModal";
+import useModals from "../../util/useModal";
 
 const MainImage = ({
   src,
@@ -53,7 +52,7 @@ const MainImage = ({
 };
 
 const Main = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { openModal } = useModals();
 
   return (
     <>
@@ -135,16 +134,16 @@ const Main = () => {
             bottom: "3vh",
             zIndex: 1000,
           }}
-          onClick={() => setIsModalOpen(true)}
+          onClick={async () => {
+            const { default: BroadcastModal } = await import(
+              "../../components/Main/BroadcastModal"
+            );
+            openModal(BroadcastModal, {});
+          }}
         >
           <CampaignIcon style={{ color: "white" }} />
         </Fab>
       </AdminComponent>
-
-      <BroadcastModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
     </>
   );
 };
