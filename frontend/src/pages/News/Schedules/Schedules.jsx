@@ -75,7 +75,7 @@ const Schedules = () => {
                 <div
                   style={{
                     width: "100%",
-                    maxWidth: "800px",
+                    maxWidth: "760px",
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",

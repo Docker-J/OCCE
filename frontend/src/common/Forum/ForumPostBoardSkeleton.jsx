@@ -7,7 +7,7 @@ const ForumPostBoardSkeleton = ({ count = 5 }) => {
         display: "flex",
         flexDirection: "column",
         width: "100%",
-        maxWidth: "850px",
+        maxWidth: "880px",
       }}
     >
       {Array.from(new Array(count)).map((_, index) => (

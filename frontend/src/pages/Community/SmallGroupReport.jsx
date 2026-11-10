@@ -90,7 +90,7 @@ const SmallGroupReportContent = () => {
         <div
           className="container"
           style={{
-            maxWidth: "800px",
+            maxWidth: "760px",
             width: "100%",
             margin: "0 auto",
             padding: "24px 16px",

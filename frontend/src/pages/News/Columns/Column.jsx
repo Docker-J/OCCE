@@ -100,7 +100,7 @@ const Column = () => {
         className="container-wrapper"
         style={{ minHeight: "60vh" }}
       >
-        <Container maxWidth="md" sx={{ py: { xs: 3, md: 6 } }}>
+        <Container maxWidth={false} sx={{ maxWidth: "880px !important", py: { xs: 3, md: 6 } }}>
           <PostDetailCard
             id={id}
             title={title}

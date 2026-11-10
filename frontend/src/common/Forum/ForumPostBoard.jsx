@@ -197,7 +197,7 @@ const ForumPostBoard = ({
         display: "flex",
         flexDirection: "column",
         width: "100%",
-        maxWidth: "850px",
+        maxWidth: "880px",
       }}
     >
       {posts.map((post) => (
