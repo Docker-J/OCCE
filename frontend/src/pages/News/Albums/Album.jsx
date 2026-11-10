@@ -4,7 +4,6 @@ import { useLoaderData, useNavigate, useParams } from "react-router";
 import { Fab, ImageList, ImageListItem, Typography, useMediaQuery, useTheme } from "@mui/material";
 
 import useModals from "../../../util/useModal";
-import PhotoViewModal from "./PhotoViewModal";
 import AdminComponent from "../../../common/AdminComponent";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { deleteAlbum } from "../../../api/albums";
@@ -92,12 +91,15 @@ const Album = () => {
               return (
                 <ImageListItem
                   key={image}
-                  onClick={() =>
-                    openModal(PhotoViewModal, {
+                  onClick={async () => {
+                    const { default: PhotoViewModalComponent } = await import(
+                      "./PhotoViewModal"
+                    );
+                    openModal(PhotoViewModalComponent, {
                       photos: images,
                       initialIndex: index,
-                    })
-                  }
+                    });
+                  }}
                   sx={{
                     borderRadius: "12px",
                     overflow: "hidden",

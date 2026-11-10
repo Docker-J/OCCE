@@ -197,29 +197,40 @@ export const updateUserRoleController = async (c) => {
       ? gardens.map((g) => g.trim()).filter(Boolean).join(", ")
       : (gardens || "").trim();
 
-    if (action === "assign") {
-      await client.send(
-        new AdminAddUserToGroupCommand({
-          UserPoolId: userPoolId,
-          Username: username,
-          GroupName: "GardenKeeper",
-        }),
-      );
+    // Start sub lookup in parallel if D1 sync will be needed
+    const subPromise =
+      env.DB && (action === "assign" || action === "remove")
+        ? getCognitoUserSub(client, userPoolId, username)
+        : null;
 
-      if (gardensStr) {
-        await client.send(
-          new AdminUpdateUserAttributesCommand({
+    if (action === "assign") {
+      const assignPromises = [
+        client.send(
+          new AdminAddUserToGroupCommand({
             UserPoolId: userPoolId,
             Username: username,
-            UserAttributes: [
-              {
-                Name: "custom:garden",
-                Value: gardensStr,
-              },
-            ],
+            GroupName: "GardenKeeper",
           }),
+        ),
+      ];
+
+      if (gardensStr) {
+        assignPromises.push(
+          client.send(
+            new AdminUpdateUserAttributesCommand({
+              UserPoolId: userPoolId,
+              Username: username,
+              UserAttributes: [
+                {
+                  Name: "custom:garden",
+                  Value: gardensStr,
+                },
+              ],
+            }),
+          ),
         );
       }
+      await Promise.all(assignPromises);
     } else if (action === "update_gardens") {
       await client.send(
         new AdminUpdateUserAttributesCommand({
@@ -234,7 +245,7 @@ export const updateUserRoleController = async (c) => {
         }),
       );
     } else if (action === "remove") {
-      await client.send(
+      const removeGroupPromise = client.send(
         new AdminRemoveUserFromGroupCommand({
           UserPoolId: userPoolId,
           Username: username,
@@ -242,18 +253,17 @@ export const updateUserRoleController = async (c) => {
         }),
       );
 
-      try {
-        await client.send(
+      const deleteAttrPromise = client
+        .send(
           new AdminDeleteUserAttributesCommand({
             UserPoolId: userPoolId,
             Username: username,
             UserAttributeNames: ["custom:garden"],
           }),
-        );
-      } catch (delErr) {
-        // Fallback: update attribute to empty string if delete is not supported
-        try {
-          await client.send(
+        )
+        .catch(() => {
+          // Fallback: update attribute to empty string if delete is not supported
+          return client.send(
             new AdminUpdateUserAttributesCommand({
               UserPoolId: userPoolId,
               Username: username,
@@ -265,13 +275,14 @@ export const updateUserRoleController = async (c) => {
               ],
             }),
           );
-        } catch (_) {}
-      }
+        });
+
+      await Promise.all([removeGroupPromise, deleteAttrPromise]);
     }
 
     // Sync D1 fcm_tokens roles immediately when GardenKeeper role is assigned or removed
-    if (env.DB && (action === "assign" || action === "remove")) {
-      const sub = await getCognitoUserSub(client, userPoolId, username);
+    if (subPromise) {
+      const sub = await subPromise;
       if (sub) {
         try {
           const rowsRes = await env.DB
@@ -345,15 +356,21 @@ export const updateUserStatusController = async (c) => {
         }),
       );
     } else {
-      await client.send(
+      const disablePromise = client.send(
         new AdminDisableUserCommand({
           UserPoolId: userPoolId,
           Username: username,
         }),
       );
 
-      if (env.DB) {
-        const sub = await getCognitoUserSub(client, userPoolId, username);
+      const subPromise = env.DB
+        ? getCognitoUserSub(client, userPoolId, username)
+        : null;
+
+      await disablePromise;
+
+      if (subPromise) {
+        const sub = await subPromise;
         if (sub) {
           try {
             await env.DB

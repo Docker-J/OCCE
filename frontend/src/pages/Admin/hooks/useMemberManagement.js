@@ -121,10 +121,25 @@ export const useMemberManagement = () => {
     }
   }, [authInitialized, authenticated, admin]);
 
-  // 필터 조건 변경 시 첫 페이지로 리셋
-  useEffect(() => {
+  const changeSearchTerm = (val) => {
+    setSearchTerm(val);
     setPage(0);
-  }, [deferredSearchTerm, roleFilter, gardenFilter, notificationFilter, sortDirection]);
+  };
+
+  const changeRoleFilter = (val) => {
+    setRoleFilter(val);
+    setPage(0);
+  };
+
+  const changeGardenFilter = (val) => {
+    setGardenFilter(val);
+    setPage(0);
+  };
+
+  const changeNotificationFilter = (val) => {
+    setNotificationFilter(val);
+    setPage(0);
+  };
 
   // 검색/필터링/정렬 (React Compiler 자동 최적화)
   const search = deferredSearchTerm.trim().toLowerCase();
@@ -156,14 +171,28 @@ export const useMemberManagement = () => {
       return sortDirection === "asc" ? cmp : -cmp;
     });
 
-  const start = page * rowsPerPage;
+  const safePage = Math.min(
+    page,
+    Math.max(0, Math.ceil(filteredUsers.length / rowsPerPage) - 1)
+  );
+  const start = safePage * rowsPerPage;
   const paginatedUsers = filteredUsers.slice(start, start + rowsPerPage);
+
+  let staffCount = 0;
+  let keepers = 0;
+  let notificationEnabled = 0;
+  for (let i = 0; i < optimisticUsers.length; i++) {
+    const u = optimisticUsers[i];
+    if (u.isStaff) staffCount++;
+    if (u.isGardenKeeper) keepers++;
+    if (u.hasNotification) notificationEnabled++;
+  }
 
   const metrics = {
     total: optimisticUsers.length,
-    staffCount: optimisticUsers.filter((u) => u.isStaff).length,
-    keepers: optimisticUsers.filter((u) => u.isGardenKeeper).length,
-    notificationEnabled: optimisticUsers.filter((u) => u.hasNotification).length,
+    staffCount,
+    keepers,
+    notificationEnabled,
   };
 
   const handleRequestSort = () => {
@@ -266,7 +295,7 @@ export const useMemberManagement = () => {
       roleFilter,
       gardenFilter,
       notificationFilter,
-      page,
+      page: safePage,
       rowsPerPage,
       sortDirection,
       availableGardens,
@@ -280,10 +309,10 @@ export const useMemberManagement = () => {
       deleting,
     },
     actions: {
-      setSearchTerm,
-      setRoleFilter,
-      setGardenFilter,
-      setNotificationFilter,
+      setSearchTerm: changeSearchTerm,
+      setRoleFilter: changeRoleFilter,
+      setGardenFilter: changeGardenFilter,
+      setNotificationFilter: changeNotificationFilter,
       setPage,
       setRowsPerPage,
       setSortDirection,

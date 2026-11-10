@@ -218,10 +218,10 @@ export const useSmallGroupReport = () => {
           if (data && data.reported) {
             setIsReported(true);
             const restoredChecked = {};
-            const absenteesList = data.absentees || [];
+            const absenteesSet = new Set(data.absentees || []);
 
             gardens[selectedGarden].forEach((member) => {
-              restoredChecked[member] = !absenteesList.includes(member);
+              restoredChecked[member] = !absenteesSet.has(member);
             });
 
             setCheckedMembers(restoredChecked);
@@ -257,10 +257,10 @@ export const useSmallGroupReport = () => {
           if (data && data.reported) {
             setIsReported(true);
             const restoredChecked = {};
-            const absenteesList = data.absentees || [];
+            const absenteesSet = new Set(data.absentees || []);
 
             gardens[selectedGarden].forEach((member) => {
-              restoredChecked[member] = !absenteesList.includes(member);
+              restoredChecked[member] = !absenteesSet.has(member);
             });
 
             setCheckedMembers(restoredChecked);
@@ -370,8 +370,16 @@ export const useSmallGroupReport = () => {
   };
 
   const membersList = gardens[selectedGarden] || [];
-  const attendees = membersList.filter((m) => checkedMembers[m] !== false);
-  const absentees = membersList.filter((m) => checkedMembers[m] === false);
+  const attendees = [];
+  const absentees = [];
+  for (let i = 0; i < membersList.length; i++) {
+    const m = membersList[i];
+    if (checkedMembers[m] !== false) {
+      attendees.push(m);
+    } else {
+      absentees.push(m);
+    }
+  }
 
   const handleCheckAll = () => {
     const updated = {};

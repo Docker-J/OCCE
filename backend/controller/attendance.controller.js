@@ -448,8 +448,9 @@ export const postReportController = async (c) => {
     const updateRequests = [];
 
     if (members.length > 0) {
+      const attendeesSet = new Set(attendees);
       const rowsData = members.map((name) => {
-        const isPresent = attendees.includes(name);
+        const isPresent = attendeesSet.has(name);
         const reason = absenceReasons?.[name] || "";
         return {
           values: [
