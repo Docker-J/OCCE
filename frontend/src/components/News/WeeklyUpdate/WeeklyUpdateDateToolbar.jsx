@@ -35,6 +35,7 @@ const WeeklyUpdateDateToolbar = ({
     >
       <IconButton
         id="previousBulletin"
+        aria-label="이전 주보 보기"
         onClick={previousSunday}
         disabled={!canGoPrevious}
         sx={{
@@ -58,6 +59,7 @@ const WeeklyUpdateDateToolbar = ({
 
       <IconButton
         id="nextBulletin"
+        aria-label="다음 주보 보기"
         onClick={nextSunday}
         disabled={!canGoNext}
         sx={{

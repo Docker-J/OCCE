@@ -73,6 +73,7 @@ const AttendanceWeekNavigator = ({
           <Tooltip title="이전 주일 출석부">
             <span>
               <IconButton
+                aria-label="이전 주일로 이동"
                 size="small"
                 onClick={onPrevDate}
                 disabled={!hasPrevious || refreshing || loading}
@@ -107,6 +108,7 @@ const AttendanceWeekNavigator = ({
           <Tooltip title="다음 주일 출석부">
             <span>
               <IconButton
+                aria-label="다음 주일로 이동"
                 size="small"
                 onClick={onNextDate}
                 disabled={!hasNext || refreshing || loading}
@@ -130,6 +132,7 @@ const AttendanceWeekNavigator = ({
           <Tooltip title="실시간 새로고침">
             <span>
               <IconButton
+                aria-label="출석 통계 새로고침"
                 onClick={onRefresh}
                 disabled={refreshing || loading}
                 sx={{

@@ -78,7 +78,7 @@ const MemberFilterToolbar = ({
       {/* 검색 입력창 */}
       <TextField
         size="small"
-        placeholder="교인 성명 또는 전화번호 검색..."
+        placeholder="교인 성명 또는 전화번호 검색…"
         value={searchTerm}
         onChange={(e) => onSearchChange(e.target.value)}
         sx={{
@@ -95,7 +95,11 @@ const MemberFilterToolbar = ({
             ),
             endAdornment: searchTerm ? (
               <InputAdornment position="end">
-                <IconButton size="small" onClick={() => onSearchChange("")}>
+                <IconButton
+                  aria-label="검색어 지우기"
+                  size="small"
+                  onClick={() => onSearchChange("")}
+                >
                   <ClearIcon fontSize="small" />
                 </IconButton>
               </InputAdornment>
@@ -174,6 +178,7 @@ const MemberFilterToolbar = ({
         <Tooltip title="새로고침">
           <span>
             <IconButton
+              aria-label="교인 목록 새로고침"
               onClick={onRefresh}
               disabled={refreshing || loading}
               sx={{

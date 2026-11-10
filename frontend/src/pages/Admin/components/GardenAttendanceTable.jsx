@@ -78,17 +78,17 @@ const GardenAttendanceTableRow = ({ stat, onOpenDetail }) => {
       </TableCell>
 
       {/* 총원 */}
-      <TableCell align="center" sx={{ py: 2, fontWeight: 600, color: "#475569" }}>
+      <TableCell align="center" sx={{ py: 2, fontWeight: 600, color: "#475569", fontVariantNumeric: "tabular-nums" }}>
         {stat.total}명
       </TableCell>
 
       {/* 출석 인원 */}
-      <TableCell align="center" sx={{ py: 2, fontWeight: 700, color: "#16a34a" }}>
+      <TableCell align="center" sx={{ py: 2, fontWeight: 700, color: "#16a34a", fontVariantNumeric: "tabular-nums" }}>
         {stat.attended}명
       </TableCell>
 
       {/* 결석 인원 */}
-      <TableCell align="center" sx={{ py: 2, fontWeight: 600, color: "#dc2626" }}>
+      <TableCell align="center" sx={{ py: 2, fontWeight: 600, color: "#dc2626", fontVariantNumeric: "tabular-nums" }}>
         {stat.absent}명
       </TableCell>
 
@@ -116,6 +116,7 @@ const GardenAttendanceTableRow = ({ stat, onOpenDetail }) => {
               color: barColor,
               width: 45,
               textAlign: "right",
+              fontVariantNumeric: "tabular-nums",
             }}
           >
             {stat.rate}%

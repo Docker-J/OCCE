@@ -59,6 +59,7 @@ export const AuthPhoneField = ({
           autoComplete,
           inputMode: "tel",
           enterKeyHint,
+          spellCheck: false,
         },
       }}
       onValueChange={(values) => {
@@ -149,6 +150,7 @@ export const AuthPasswordField = ({
       slotProps={{
         htmlInput: {
           enterKeyHint,
+          spellCheck: false,
         },
         formHelperText: showMatchIndicator
           ? {

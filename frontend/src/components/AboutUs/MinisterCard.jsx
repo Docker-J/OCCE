@@ -20,7 +20,7 @@ const MinisterCard = ({ image, imageOffset, title, position, details }) => {
             {image ? (
               <img loading="lazy" src={image} style={imageOffset} alt="" />
             ) : (
-              <img loading="lazy" src="https://placehold.co/300x300/FFF/FFF" />
+              <img loading="lazy" src="https://placehold.co/300x300/FFF/FFF" alt="" />
             )}
           </div>
 
@@ -45,6 +45,7 @@ const MinisterCard = ({ image, imageOffset, title, position, details }) => {
               </Typography>
               {details && (
                 <IconButton
+                  aria-label={`${title} 사역자 상세 정보 보기`}
                   sx={{ p: 0, pl: 1, justifySelf: "start" }}
                   onClick={() => setShowDetails(true)}
                 >
@@ -120,6 +121,7 @@ const MinisterCard = ({ image, imageOffset, title, position, details }) => {
             </div>
 
             <IconButton
+              aria-label="상세 정보 닫기"
               className="flip-card-back-button"
               onClick={() => setShowDetails(false)}
             >
