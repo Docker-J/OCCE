@@ -82,7 +82,16 @@ export const useMemberManagement = () => {
 
     try {
       const data = await getAdminUsers();
-      setUsers(data?.users ?? []);
+      const fetchedUsers = data?.users ?? [];
+      setUsers(fetchedUsers);
+      const userGardens = fetchedUsers
+        .flatMap((u) => (u?.garden ? u.garden.split(",").map((g) => g.trim()) : []))
+        .filter(Boolean);
+      if (userGardens.length > 0) {
+        setAvailableGardens((prev) =>
+          Array.from(new Set([...prev, ...userGardens])).sort()
+        );
+      }
       if (isManualRefresh) {
         openSnackbar("success", "교인 목록을 새로고침했습니다.");
       }
@@ -102,7 +111,11 @@ export const useMemberManagement = () => {
       fetchUsers();
       getGardenNames()
         .then((names) => {
-          if (names?.length) setAvailableGardens([...names].sort());
+          if (names?.length) {
+            setAvailableGardens((prev) =>
+              Array.from(new Set([...prev, ...names])).sort()
+            );
+          }
         })
         .catch((err) => console.warn("Could not fetch gardens list:", err));
     }

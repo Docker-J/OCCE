@@ -33,7 +33,8 @@ const GardenRoleModal = ({
   onSave,
   onAddAvailableGarden,
 }) => {
-  const [prevUserId, setPrevUserId] = useState(user?.id);
+  const currentModalKey = open && user ? `${user.username}:${user.garden || ""}` : null;
+  const [prevModalKey, setPrevModalKey] = useState(currentModalKey);
   const [selectedGardens, setSelectedGardens] = useState(() => {
     return user?.garden
       ? user.garden.split(",").map((g) => g.trim()).filter(Boolean)
@@ -41,15 +42,17 @@ const GardenRoleModal = ({
   });
   const [customGardenInput, setCustomGardenInput] = useState("");
 
-  // 모달 대상 유저가 바뀔 때 담당 정원 로컬 상태 동기화 (렌더 타임 상태 보정으로 useEffect 폭포수 방지)
-  if (user?.id !== prevUserId) {
-    setPrevUserId(user?.id);
+  // 모달이 열리거나 대상 유저/담당 정원이 바뀔 때 로컬 상태 동기화
+  if (currentModalKey !== prevModalKey) {
+    setPrevModalKey(currentModalKey);
     const initial = user?.garden
       ? user.garden.split(",").map((g) => g.trim()).filter(Boolean)
       : [];
     setSelectedGardens(initial);
     setCustomGardenInput("");
   }
+
+  const displayGardens = Array.from(new Set([...availableGardens, ...selectedGardens]));
 
   const handleToggleGarden = (gardenName) => {
     setSelectedGardens((prev) =>
@@ -103,9 +106,9 @@ const GardenRoleModal = ({
             담당 정원 선택 (1인 다정원 가능):
           </Typography>
 
-          {availableGardens.length > 0 ? (
+          {displayGardens.length > 0 ? (
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 1.5 }}>
-              {availableGardens.map((gardenName) => {
+              {displayGardens.map((gardenName) => {
                 const isSelected = selectedGardens.includes(gardenName);
                 return (
                   <Chip
