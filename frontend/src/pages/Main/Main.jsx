@@ -118,7 +118,7 @@ const Main = () => {
         style={{
           display: "flex",
           justifyContent: "center",
-          backgroundColor: "#f5f5f5",
+          backgroundColor: "#fcfbf9",
         }}
       >
         <ButtonBases />

@@ -38,30 +38,45 @@ const images = [
   {
     url: "img/Main/offering.webp",
     title: "헌금 안내",
-    link: "/aboutus#aboutus/offering",
+    to: "/aboutus#aboutus/offering",
   },
 ];
 
 const ImageButton = styled(ButtonBase)(({ theme }) => ({
   height: 200,
+  borderRadius: 18,
+  overflow: "hidden",
+  position: "relative",
+  boxShadow: "0 4px 18px rgba(0, 0, 0, 0.08)",
+  transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
   [theme.breakpoints.down("md")]: {
-    width: "48% !important", // Overrides inline-style
-    height: 180,
+    width: "calc(50% - 12px) !important",
+    height: 160,
+    borderRadius: 16,
   },
   [theme.breakpoints.down("sm")]: {
-    width: "100% !important", // Overrides inline-style
+    width: "100% !important",
     height: 120,
+    borderRadius: 14,
   },
   "&:hover, &.Mui-focusVisible": {
-    zIndex: 1,
+    zIndex: 2,
+    transform: "translateY(-4px)",
+    boxShadow: "0 12px 30px rgba(0, 0, 0, 0.16), 0 4px 14px rgba(255, 107, 0, 0.18)",
     "& .MuiImageBackdrop-root": {
-      opacity: 0.15,
+      opacity: 0.18,
+    },
+    "& .MuiImageSrc-root": {
+      transform: "scale(1.05)",
     },
     "& .MuiImageMarked-root": {
       opacity: 0,
     },
     "& .MuiTypography-root": {
-      border: "4px solid currentColor",
+      border: "2px solid rgba(255, 255, 255, 0.9)",
+      borderRadius: "10px",
+      backgroundColor: "rgba(0, 0, 0, 0.22)",
+      backdropFilter: "blur(4px)",
     },
   },
 }));
@@ -74,6 +89,7 @@ const ImageSrc = styled("span")({
   bottom: 0,
   backgroundSize: "cover",
   backgroundPosition: "center 40%",
+  transition: "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
 });
 
 const Image = styled("span")(({ theme }) => ({
@@ -95,8 +111,8 @@ const ImageBackdrop = styled("span")(({ theme }) => ({
   top: 0,
   bottom: 0,
   backgroundColor: theme.palette.common.black,
-  opacity: 0.3,
-  transition: theme.transitions.create("opacity"),
+  opacity: 0.32,
+  transition: theme.transitions.create("opacity", { duration: 300 }),
 }));
 
 const ImageMarked = styled("span")(({ theme }) => ({
@@ -123,26 +139,30 @@ export default function ButtonBases() {
   return (
     <Box
       sx={{
-        maxWidth: "1536px",
+        maxWidth: "1400px",
         display: "flex",
         flexWrap: "wrap",
         alignItems: "center",
-        justifyContent: "space-evenly",
+        justifyContent: "center",
         width: "100%",
-        minWidth: "550",
-        my: "0.5em",
+        px: { xs: 2, sm: 3, md: 4 },
+        py: { xs: 2.5, sm: 3, md: 4 },
+        gap: { xs: 1.5, sm: 2, md: 2.5 },
       }}
     >
       {images.map((image) => (
         <ImageButton
-          component={image.to && Link}
-          sx={{ m: 0.5, width: "32%" }}
+          component={image.to ? Link : "a"}
+          sx={{ width: { xs: "100%", sm: "calc(50% - 12px)", md: "calc(33.333% - 18px)" } }}
           key={image.title}
           href={image.link}
           target={image.target}
           to={image.to}
         >
-          <ImageSrc style={{ backgroundImage: `url(${image.url})` }} />
+          <ImageSrc
+            className="MuiImageSrc-root"
+            style={{ backgroundImage: `url(${image.url})` }}
+          />
           <ImageBackdrop className="MuiImageBackdrop-root" />
           <Image>
             <Typography
@@ -151,9 +171,13 @@ export default function ButtonBases() {
               sx={{
                 color: "inherit",
                 position: "relative",
-                p: 4,
-                pt: 2,
+                p: { xs: 2, sm: 3, md: 4 },
+                pt: { xs: 1.5, md: 2 },
                 pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
+                fontSize: { xs: "1.1rem", sm: "1.25rem", md: "1.35rem" },
+                fontWeight: 700,
+                letterSpacing: "0.5px",
+                transition: "all 0.25s ease-in-out",
               }}
             >
               <ImageMarkedUpper className="MuiImageMarked-root" />
