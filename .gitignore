@@ -34,6 +34,7 @@ backend/church-4385c-ceedf27e8d20.json
 /.github/agents
 /.github/hooks
 /.impeccable
+/.hallmark
 db_backup.sql
 schema.sql
 
