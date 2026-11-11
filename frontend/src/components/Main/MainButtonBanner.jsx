@@ -44,7 +44,7 @@ const images = [
 
 const ImageButton = styled(ButtonBase)(({ theme }) => ({
   height: 200,
-  borderRadius: 18,
+  borderRadius: 12,
   overflow: "hidden",
   position: "relative",
   boxShadow: "0 4px 18px rgba(0, 0, 0, 0.08)",
@@ -52,31 +52,27 @@ const ImageButton = styled(ButtonBase)(({ theme }) => ({
   [theme.breakpoints.down("md")]: {
     width: "calc(50% - 12px) !important",
     height: 160,
-    borderRadius: 16,
+    borderRadius: 12,
   },
   [theme.breakpoints.down("sm")]: {
     width: "100% !important",
-    height: 120,
-    borderRadius: 14,
+    height: 110,
+    borderRadius: 10,
   },
   "&:hover, &.Mui-focusVisible": {
     zIndex: 2,
     transform: "translateY(-4px)",
-    boxShadow: "0 12px 30px rgba(0, 0, 0, 0.16), 0 4px 14px rgba(255, 107, 0, 0.18)",
+    boxShadow: "0 12px 28px rgba(0, 0, 0, 0.16), 0 4px 14px rgba(255, 107, 0, 0.18)",
     "& .MuiImageBackdrop-root": {
       opacity: 0.18,
     },
     "& .MuiImageSrc-root": {
       transform: "scale(1.05)",
     },
-    "& .MuiImageMarked-root": {
-      opacity: 0,
-    },
     "& .MuiTypography-root": {
-      border: "2px solid rgba(255, 255, 255, 0.9)",
-      borderRadius: "10px",
-      backgroundColor: "rgba(0, 0, 0, 0.22)",
-      backdropFilter: "blur(4px)",
+      borderColor: "rgba(255, 255, 255, 0.85)",
+      backgroundColor: "rgba(0, 0, 0, 0.25)",
+      backdropFilter: "blur(6px)",
     },
   },
 }));
@@ -115,26 +111,6 @@ const ImageBackdrop = styled("span")(({ theme }) => ({
   transition: theme.transitions.create("opacity", { duration: 300 }),
 }));
 
-const ImageMarked = styled("span")(({ theme }) => ({
-  height: 3,
-  width: 18,
-  backgroundColor: theme.palette.common.white,
-  position: "absolute",
-  bottom: -3,
-  left: "calc(50% - 9px)",
-  transition: theme.transitions.create("opacity"),
-}));
-
-const ImageMarkedUpper = styled("span")(({ theme }) => ({
-  height: 3,
-  width: 18,
-  backgroundColor: theme.palette.common.white,
-  position: "absolute",
-  top: -3,
-  left: "calc(50% - 9px)",
-  transition: theme.transitions.create("opacity"),
-}));
-
 export default function ButtonBases() {
   return (
     <Box
@@ -170,19 +146,22 @@ export default function ButtonBases() {
               variant="h5"
               sx={{
                 color: "inherit",
-                position: "relative",
-                p: { xs: 2, sm: 3, md: 4 },
-                pt: { xs: 1.5, md: 2 },
-                pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+                px: { xs: 2, sm: 2.5, md: 3 },
+                py: { xs: 0.75, sm: 1, md: 1.25 },
                 fontSize: { xs: "1.1rem", sm: "1.25rem", md: "1.35rem" },
                 fontWeight: 700,
                 letterSpacing: "0.5px",
+                lineHeight: 1.2,
+                borderRadius: "8px",
+                border: "1px solid transparent",
                 transition: "all 0.25s ease-in-out",
               }}
             >
-              <ImageMarkedUpper className="MuiImageMarked-root" />
               {image.title}
-              <ImageMarked className="MuiImageMarked-root" />
             </Typography>
           </Image>
         </ImageButton>
