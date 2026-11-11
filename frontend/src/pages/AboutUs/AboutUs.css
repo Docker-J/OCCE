@@ -36,6 +36,11 @@
   --about-font-family: "NanumSquareNeoVariable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
+.about-page-root ::selection {
+  background-color: var(--about-color-primary-subtle);
+  color: var(--about-color-ink);
+}
+
 .about-page-root {
   width: 100%;
   overflow-x: clip;
@@ -370,9 +375,7 @@
 /* 4. Ministers Section (#ministers) */
 .about-ministers-wrap {
   width: 100%;
-  height: 480px;
   position: relative;
-  padding-bottom: 24px;
 }
 
 /* 5. Worship & Offering Section (#aboutus, #offering) */
