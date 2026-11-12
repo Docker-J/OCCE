@@ -1,561 +1,76 @@
-/* Hallmark · genre: editorial · redesign: full · aboutus */
-/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V4 · weakest: V, church identity requires dignified warm editorial structure; led with authentic church story and 4 core values */
-
-:root {
-  --about-color-paper: #fcfbf9;
-  --about-color-paper-warm: #f6f3ed;
-  --about-color-paper-card: #fffdfa;
-  --about-color-primary: #FF6B00;
-  --about-color-primary-hover: #e65100;
-  --about-color-primary-btn: #c74b00;
-  --about-color-primary-btn-hover: #a83d00;
-  --about-color-primary-subtle: rgba(255, 107, 0, 0.1);
-  --about-color-primary-border: rgba(255, 107, 0, 0.25);
-  --about-color-ink: #1f2733;
-  --about-color-ink-muted: #5e6b7d;
-  --about-color-rule: rgba(31, 39, 51, 0.08);
-  --about-color-light: #fffdfa;
-  --about-color-light-dim: rgba(255, 253, 250, 0.92);
-  --about-color-light-muted: rgba(255, 253, 250, 0.82);
-  --about-color-dark-surface: #101926;
-  --about-color-scrim-top: rgba(16, 25, 38, 0.68);
-  --about-color-scrim-bottom: rgba(16, 25, 38, 0.88);
-  --about-color-scrim-card: rgba(16, 25, 38, 0.72);
-  --about-color-pill-bg: rgba(255, 253, 250, 0.16);
-  --about-color-pill-border: rgba(255, 253, 250, 0.28);
-  --about-color-accent-tag-bg: rgba(255, 107, 0, 0.24);
-  --about-color-accent-tag-text: #ffaa6b;
-  --about-color-overlay-card: rgba(255, 253, 250, 0.08);
-  --about-color-overlay-card-border: rgba(255, 253, 250, 0.16);
-  --about-color-overlay-card-hover: rgba(255, 253, 250, 0.14);
-  --about-radius-card: 20px;
-  --about-radius-button: 12px;
-  --about-radius-tag: 8px;
-  --about-shadow-card: 0 4px 20px rgba(0, 0, 0, 0.06);
-  --about-shadow-card-hover: 0 12px 32px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(255, 107, 0, 0.1);
-  --about-font-family: "NanumSquareNeoVariable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
-
-.about-page-root {
-  width: 100%;
-  overflow-x: clip;
-  background-color: var(--about-color-paper);
-  color: var(--about-color-ink);
-  font-family: var(--about-font-family);
-  scroll-behavior: smooth;
-}
-
-.about-section {
-  position: relative;
-  width: 100%;
-  scroll-margin-top: 80px;
-}
-
-.about-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 80px 24px;
-  box-sizing: border-box;
-}
-
-@media (max-width: 900px) {
-  .about-container {
-    padding: 56px 16px;
-  }
-}
-
-/* 1. Hero Section (#beginning) */
-.about-hero {
-  position: relative;
-  min-height: 85svh;
-  display: flex;
-  align-items: center;
+.section {
+  display: flex !important;
   justify-content: center;
-  background-image: url("/img/About/FirstStep.webp");
-  background-size: cover;
-  background-position: center 30%;
+  background-image: var(--bg-image);
+  background-position: var(--bg-pos, center);
   background-repeat: no-repeat;
-  color: var(--about-color-light);
-  padding: 120px 24px 64px;
-  box-sizing: border-box;
-}
-
-.about-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    var(--about-color-scrim-top) 0%,
-    var(--about-color-scrim-bottom) 100%
-  );
-  z-index: 1;
-}
-
-.about-hero-content {
-  position: relative;
-  z-index: 2;
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-}
-
-.about-hero-tag {
-  display: inline-flex;
-  align-items: center;
-  background: var(--about-color-accent-tag-bg);
-  border: 1px solid var(--about-color-primary-border);
-  color: var(--about-color-accent-tag-text);
-  padding: 8px 16px;
-  border-radius: var(--about-radius-tag);
-  font-size: 0.875rem;
-  font-weight: 700;
-}
-
-.about-hero-title {
-  font-size: clamp(2rem, 5vw, 3.25rem);
-  font-weight: 800;
-  line-height: 1.25;
-  margin: 0;
-  letter-spacing: -0.5px;
-  color: var(--about-color-light);
-  overflow-wrap: break-word;
-  min-width: 0;
-}
-
-.about-hero-subtitle {
-  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
-  font-weight: 600;
-  line-height: 1.6;
-  color: var(--about-color-light-dim);
-  margin: 0;
-  max-width: 800px;
-}
-
-.about-hero-callout {
-  margin-top: 8px;
-  padding: 24px 28px;
-  max-width: 800px;
-  background: var(--about-color-overlay-card);
-  border: 1px solid var(--about-color-overlay-card-border);
-  border-radius: var(--about-radius-card);
-  font-size: 0.95rem;
-  line-height: 1.8;
-  color: var(--about-color-light-dim);
-  text-align: left;
-}
-
-/* Quick Jump Nav Pill Bar */
-.about-nav-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
-  margin-top: 16px;
-}
-
-.about-pill-btn {
-  display: inline-flex;
-  align-items: center;
-  padding: 8px 20px;
-  border-radius: 9999px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  text-decoration: none;
-  background: var(--about-color-pill-bg);
-  color: var(--about-color-light);
-  border: 1px solid var(--about-color-pill-border);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-              background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.about-pill-btn:hover {
-  background: var(--about-color-primary);
-  border-color: var(--about-color-primary);
-  transform: translateY(-2px);
-}
-
-.about-pill-btn:focus-visible {
-  outline: 3px solid var(--about-color-primary);
-  outline-offset: 2px;
-}
-
-.about-pill-btn:active {
-  transform: translateY(0);
-}
-
-.about-pill-btn:disabled,
-.about-pill-btn[aria-disabled="true"] {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-/* Section Common Headers */
-.about-header-block {
-  text-align: center;
-  max-width: 720px;
-  margin: 0 auto 48px;
-}
-
-.about-header-badge {
-  display: inline-block;
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: var(--about-color-primary);
-  margin-bottom: 8px;
-}
-
-.about-header-title {
-  font-size: clamp(1.75rem, 3.5vw, 2.4rem);
-  font-weight: 800;
-  line-height: 1.3;
-  margin: 0 0 12px;
-  color: var(--about-color-ink);
-  overflow-wrap: break-word;
-  min-width: 0;
-}
-
-.about-header-desc {
-  font-size: 1.05rem;
-  line-height: 1.6;
-  color: var(--about-color-ink-muted);
-  margin: 0;
-}
-
-/* 2. Name & Mission Section (#name) */
-.about-name-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
-}
-
-@media (max-width: 768px) {
-  .about-name-grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 16px;
-  }
-}
-
-.about-name-card {
-  background: var(--about-color-paper-card);
-  border: 1px solid var(--about-color-rule);
-  border-radius: var(--about-radius-card);
-  padding: 32px;
-  box-shadow: var(--about-shadow-card);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.about-name-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--about-shadow-card-hover);
-}
-
-.about-name-tagline {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.about-name-key {
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: var(--about-color-primary);
-}
-
-.about-name-meaning {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--about-color-ink-muted);
-}
-
-.about-name-body {
-  font-size: 0.975rem;
-  line-height: 1.7;
-  color: var(--about-color-ink);
-}
-
-/* 3. Direction Section (#direction) */
-.about-direction-section {
-  position: relative;
-  background-image: url("/img/About/Direction.webp");
   background-size: cover;
-  background-position: center;
-  color: var(--about-color-light);
-}
-
-.about-direction-section::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--about-color-scrim-card);
+  overflow: hidden;
   z-index: 1;
 }
 
-.about-direction-content {
-  position: relative;
-  z-index: 2;
-}
-
-.about-direction-content .about-header-title {
-  color: var(--about-color-light);
-}
-
-.about-direction-content .about-header-desc {
-  color: var(--about-color-light-muted);
-}
-
-.about-direction-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
-}
-
-@media (max-width: 800px) {
-  .about-direction-grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 16px;
-  }
-}
-
-.about-direction-card {
-  background: var(--about-color-overlay-card);
-  border: 1px solid var(--about-color-overlay-card-border);
-  border-radius: var(--about-radius-card);
-  padding: 36px 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.about-direction-card:hover {
-  transform: translateY(-4px);
-  background: var(--about-color-overlay-card-hover);
-}
-
-.about-direction-num {
-  font-size: 0.875rem;
-  font-weight: 800;
-  color: var(--about-color-accent-tag-text);
-}
-
-.about-direction-title {
-  font-size: 1.5rem;
-  font-weight: 800;
-  margin: 0;
-  color: var(--about-color-light);
-  overflow-wrap: break-word;
-  min-width: 0;
-}
-
-.about-direction-text {
-  font-size: 0.975rem;
-  line-height: 1.8;
-  color: var(--about-color-light-dim);
-  margin: 0;
-}
-
-/* 4. Ministers Section (#ministers) */
-.about-ministers-wrap {
+.section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 480px;
-  position: relative;
-  padding-bottom: 24px;
+  height: 100%;
+  background-color: rgba(0, 0, 0, var(--bg-tint, 0.3));
+  z-index: -1;
 }
 
-/* 5. Worship & Offering Section (#aboutus, #offering) */
-.about-worship-wrap {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
-  align-items: start;
+#section1 {
+  display: flex;
+  --bg-image: url("/img/About/FirstStep.webp");
+  --bg-pos: 83%;
 }
 
-@media (max-width: 900px) {
-  .about-worship-wrap {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 20px;
+#section2 {
+  --bg-image: url("/img/About/Calling.webp");
+  --bg-pos: 35%;
+}
+
+#section3 {
+  --bg-image: url("/img/About/Direction.webp");
+}
+
+@media (max-height: 915px) {
+  .lovegod {
+    height: max(33vh, 14em) !important;
+    overflow-y: auto;
   }
 }
 
-.about-info-card {
-  background: var(--about-color-paper-card);
-  border: 1px solid var(--about-color-rule);
-  border-radius: var(--about-radius-card);
-  padding: 36px 32px;
-  box-shadow: var(--about-shadow-card);
+#section4 {
+  --bg-image: url("/img/About/Servers.webp");
+  --bg-pos: 0;
 }
 
-@media (max-width: 600px) {
-  .about-info-card {
-    padding: 24px 16px;
-  }
+#section5 {
+  --bg-image: url("/img/About/AboutUs.webp");
+  --bg-pos: center 55%;
+  --bg-tint: 0.6;
 }
 
-.about-info-title {
-  font-size: 1.35rem;
-  font-weight: 800;
-  margin: 0 0 20px;
-  color: var(--about-color-ink);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  overflow-wrap: break-word;
-  min-width: 0;
+.sectionBody,
+.section4Body,
+.section5Body {
+  z-index: 2; /* Higher than the :before's z-index */
 }
 
-.about-table-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--about-color-rule);
-  gap: 12px;
+.sectionBody {
+  max-width: 1500px;
+  margin: auto;
+  padding: 0 5vw;
 }
 
-.about-table-item:last-child {
-  border-bottom: none;
+.section4Body {
+  height: 100vh;
+  padding: 0;
 }
 
-.about-table-name {
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--about-color-ink);
-}
-
-.about-table-meta {
-  text-align: right;
-  font-size: 0.875rem;
-  color: var(--about-color-ink-muted);
-}
-
-.about-table-time {
-  font-weight: 600;
-  color: var(--about-color-primary);
-  display: block;
-}
-
-.about-table-place {
-  font-size: 0.85rem;
-  color: var(--about-color-ink-muted);
-}
-
-/* Offering Card Details */
-.about-offering-box {
-  background: var(--about-color-paper-warm);
-  border: 1px solid var(--about-color-primary-border);
-  border-radius: var(--about-radius-button);
-  padding: 20px;
-  margin-bottom: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.about-copy-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--about-color-paper-card);
-  padding: 12px 16px;
-  border-radius: var(--about-radius-tag);
-  border: 1px solid var(--about-color-rule);
-}
-
-.about-copy-btn {
-  background: var(--about-color-primary-btn);
-  color: var(--about-color-light);
-  border: none;
-  border-radius: var(--about-radius-tag);
-  padding: 8px 16px;
-  font-size: 0.875rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.about-copy-btn:hover {
-  background: var(--about-color-primary-btn-hover);
-  transform: translateY(-1px);
-}
-
-.about-copy-btn:focus-visible {
-  outline: 3px solid var(--about-color-primary);
-  outline-offset: 2px;
-}
-
-.about-copy-btn:active {
-  transform: translateY(0);
-}
-
-.about-copy-btn:disabled,
-.about-copy-btn[aria-disabled="true"] {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.about-location-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  margin-top: 16px;
-  padding: 16px;
-  box-sizing: border-box;
-  background: var(--about-color-primary-btn);
-  color: var(--about-color-light);
-  border-radius: var(--about-radius-button);
-  font-size: 0.95rem;
-  font-weight: 700;
-  text-decoration: none;
-  transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.about-location-btn:hover {
-  background: var(--about-color-primary-btn-hover);
-  transform: translateY(-2px);
-}
-
-.about-location-btn:focus-visible {
-  outline: 3px solid var(--about-color-primary);
-  outline-offset: 2px;
-}
-
-.about-location-btn:active {
-  transform: translateY(0);
-}
-
-.about-location-btn:disabled,
-.about-location-btn[aria-disabled="true"] {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-/* Reduced motion fallback */
-@media (prefers-reduced-motion: reduce) {
-  .about-pill-btn,
-  .about-name-card,
-  .about-direction-card,
-  .about-copy-btn,
-  .about-location-btn {
-    transition: none !important;
-    transform: none !important;
-  }
+.section5Body {
+  margin: 0 1em;
+  padding: 2.5em 0;
 }
