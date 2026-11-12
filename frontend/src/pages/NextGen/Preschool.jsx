@@ -137,8 +137,8 @@ const Preschool = () => {
             <Grid size={{ xs: 12, md: 6 }}>
               <DepartmentFeatureCard
                 icon={AutoStoriesIcon}
-                iconBgColor="#fff8e1"
-                iconColor="#fbc02d"
+                iconBgColor="#f1f8e9"
+                iconColor="#558b2f"
                 title="주요 활동"
                 headerMb={4}
                 animationDelay="0.4s"
@@ -146,7 +146,7 @@ const Preschool = () => {
                 <List sx={{ mt: 2, mb: 1 }}>
                   <ListItem sx={{ px: 0, py: 1.5, alignItems: "flex-start" }}>
                     <ListItemIcon sx={{ minWidth: 40, mt: 0.5 }}>
-                      <CheckCircleIcon sx={{ color: "#fbc02d" }} />
+                      <CheckCircleIcon sx={{ color: "#558b2f" }} />
                     </ListItemIcon>
                     <ListItemText
                       primary={<Typography sx={{ fontWeight: 700, color: "#2b2b2b", mb: 0.5 }}>정기 활동</Typography>}
@@ -155,7 +155,7 @@ const Preschool = () => {
                   </ListItem>
                   <ListItem sx={{ px: 0, py: 1.5, alignItems: "flex-start" }}>
                     <ListItemIcon sx={{ minWidth: 40, mt: 0.5 }}>
-                      <CheckCircleIcon sx={{ color: "#fbc02d" }} />
+                      <CheckCircleIcon sx={{ color: "#558b2f" }} />
                     </ListItemIcon>
                     <ListItemText
                       primary={<Typography sx={{ fontWeight: 700, color: "#2b2b2b", mb: 0.5 }}>절기 행사</Typography>}

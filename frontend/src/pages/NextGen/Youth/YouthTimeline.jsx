@@ -5,19 +5,22 @@ import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineDot from "@mui/lab/TimelineDot";
 
-import { Stack, Typography, Box } from "@mui/material";
+import { Stack, Typography, Box, useTheme, useMediaQuery } from "@mui/material";
 
 const YouthTimeline = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
   return (
     <Stack
-      direction="row"
+      direction={{ xs: "column", md: "row" }}
       useFlexGap
-      spacing={0.5}
+      spacing={{ xs: 4, md: 0.5 }}
       sx={{
         flexWrap: "wrap",
         justifyContent: "space-evenly",
-        // maxWidth: "800px",
         margin: "0 auto",
+        width: "100%",
       }}
     >
       <Timeline
@@ -26,8 +29,8 @@ const YouthTimeline = () => {
             flex: 0,
             padding: 0,
           },
-          width: "48%",
-          px: 0,
+          width: { xs: "100%", md: "48%" },
+          px: { xs: 1, md: 0 },
           m: 0,
         }}
       >
@@ -124,14 +127,14 @@ const YouthTimeline = () => {
       </Timeline>
 
       <Timeline
-        position="left"
+        position={isMobile ? "right" : "left"}
         sx={{
           [`& .${timelineItemClasses.root}:before`]: {
             flex: 0,
             padding: 0,
           },
-          width: "48%",
-          px: 0,
+          width: { xs: "100%", md: "48%" },
+          px: { xs: 1, md: 0 },
           m: 0,
         }}
       >
